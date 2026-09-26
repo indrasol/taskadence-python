@@ -7,11 +7,11 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `af1cf48` — "feat(api): 4.6b D - public-spec copy cleanup" (task 4.6b; on `4148026`: public descriptions rewritten for developers — engineering notes kept under `x-internal-notes` in `/openapi.json` only — and every public operation and schema described) |
+| Backend commit | `073e120` — "feat(api): 4.6b D - public-spec prose as lists and tables (no walls of text)" (task 4.6b; on `af1cf48`: the public copy cleanup, then long descriptions restructured as lists and tables) |
 | Served by | `app.main:app` via `TestClient` (`ENV=production`), 2026-09-26 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
 | Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `1bfd48d7dfe98907c07511109bca27c431fb2ca1f7e9f2fa24a2faeb55c70f9d` |
+| SHA-256 | `12fb9ce99683f907c1ca58bdc007e3582524db2f0ca8486b28377520b2f0ed7f` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

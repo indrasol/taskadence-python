@@ -112,9 +112,13 @@ def sync_detailed(
 ) -> Response[Any | MeOut | Problem]:
     """The authenticated principal and its organizations / roles
 
-     The authenticated principal and every organization it is an active member of, with its role there.
-    With an access token, `principal.type` is `service_account` for a service account, only the token's
-    organization is listed, and `auth` carries the token's id, scopes, projects and expiry.
+     Who you are: the authenticated principal and every organization it is an active member of, with its
+    role there.
+
+    With an access token:
+    - `principal.type` is `service_account` for a service account;
+    - only the token's organization is listed;
+    - `auth` carries the token's id, scopes, projects and expiry.
 
     Args:
         if_none_match (str | Unset):
@@ -145,9 +149,13 @@ def sync(
 ) -> Any | MeOut | Problem | None:
     """The authenticated principal and its organizations / roles
 
-     The authenticated principal and every organization it is an active member of, with its role there.
-    With an access token, `principal.type` is `service_account` for a service account, only the token's
-    organization is listed, and `auth` carries the token's id, scopes, projects and expiry.
+     Who you are: the authenticated principal and every organization it is an active member of, with its
+    role there.
+
+    With an access token:
+    - `principal.type` is `service_account` for a service account;
+    - only the token's organization is listed;
+    - `auth` carries the token's id, scopes, projects and expiry.
 
     Args:
         if_none_match (str | Unset):
@@ -173,9 +181,13 @@ async def asyncio_detailed(
 ) -> Response[Any | MeOut | Problem]:
     """The authenticated principal and its organizations / roles
 
-     The authenticated principal and every organization it is an active member of, with its role there.
-    With an access token, `principal.type` is `service_account` for a service account, only the token's
-    organization is listed, and `auth` carries the token's id, scopes, projects and expiry.
+     Who you are: the authenticated principal and every organization it is an active member of, with its
+    role there.
+
+    With an access token:
+    - `principal.type` is `service_account` for a service account;
+    - only the token's organization is listed;
+    - `auth` carries the token's id, scopes, projects and expiry.
 
     Args:
         if_none_match (str | Unset):
@@ -204,9 +216,13 @@ async def asyncio(
 ) -> Any | MeOut | Problem | None:
     """The authenticated principal and its organizations / roles
 
-     The authenticated principal and every organization it is an active member of, with its role there.
-    With an access token, `principal.type` is `service_account` for a service account, only the token's
-    organization is listed, and `auth` carries the token's id, scopes, projects and expiry.
+     Who you are: the authenticated principal and every organization it is an active member of, with its
+    role there.
+
+    With an access token:
+    - `principal.type` is `service_account` for a service account;
+    - only the token's organization is listed;
+    - `auth` carries the token's id, scopes, projects and expiry.
 
     Args:
         if_none_match (str | Unset):

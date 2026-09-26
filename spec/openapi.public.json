@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasksMate API",
-    "description": "The TasksMate public API, under `/v1`. Every error is `application/problem+json` (`type`, `title`, `status`, `detail`, `instance`, `request_id`); every list is `{data, next_cursor}` with `limit` / `cursor` / `sort_by` / `sort_order`; single reads carry an `ETag` (`If-None-Match` \u2192 304, `If-Match` on writes \u2192 412 when stale); creates honour `Idempotency-Key` for 24 h. Search is `GET /v1/tasks?filter[search]=\u2026`. Authenticate with a Supabase session JWT or a TasksMate access token (`TasksMateToken`: scopes, one organization, optional project list; `admin` implies every scope). Problem types: `about:blank` \u2014 A plain HTTP error; the status and `detail` say everything.; `urn:tasksmate:problem:validation` \u2014 The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`).; `urn:tasksmate:problem:invalid-parameter` \u2014 A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values.; `urn:tasksmate:problem:precondition-failed` \u2014 `If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry.; `urn:tasksmate:problem:idempotency-key-reused` \u2014 This `Idempotency-Key` was first used for a different request (method, path or body).; `urn:tasksmate:problem:idempotency-key-in-flight` \u2014 The first request with this `Idempotency-Key` has not finished; retry shortly.; `urn:tasksmate:problem:idempotency-key-invalid` \u2014 `Idempotency-Key` must be 1\u2013255 printable ASCII characters.; `urn:tasksmate:problem:rate-limit` \u2014 Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand).; `urn:tasksmate:problem:internal` \u2014 An unexpected server error. Quote `request_id` to support.; `urn:tasksmate:problem:token-invalid` \u2014 The access token is unknown or malformed (or its principal no longer exists).; `urn:tasksmate:problem:token-expired` \u2014 The access token is past its `expires_at`; mint a new one.; `urn:tasksmate:problem:token-revoked` \u2014 The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation).; `urn:tasksmate:problem:insufficient-scope` \u2014 The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens).; `urn:tasksmate:problem:test-token-read-only` \u2014 A `tm_test_` token can authenticate and read, never write.; `urn:tasksmate:problem:token-policy` \u2014 The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime).; `urn:tasksmate:problem:url-refused` \u2014 The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`).",
+    "description": "The TasksMate public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasksMate access token (`TasksMateToken` \u2014 one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write \u2014 a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:tasksmate:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:tasksmate:problem:invalid-parameter` | A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:tasksmate:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry. |\n| `urn:tasksmate:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:tasksmate:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:tasksmate:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:tasksmate:problem:rate-limit` | Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:tasksmate:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:tasksmate:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:tasksmate:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:tasksmate:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:tasksmate:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:tasksmate:problem:test-token-read-only` | A `tm_test_` token can authenticate and read, never write. |\n| `urn:tasksmate:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:tasksmate:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |",
     "version": "2026-09-25"
   },
   "paths": {
@@ -2734,7 +2734,7 @@
           "tasks"
         ],
         "summary": "List / search tasks (the filter grammar; `filter[search]` is search)",
-        "description": "List the tasks you can see, one page at a time.\n\n**Pagination:** the response is `{\"data\": [TaskCardView\u2026], \"next_cursor\": \"<opaque>\" | null}`. Pass `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page may be `data: []` with a non-null `next_cursor` (every task on it was restricted) \u2014 keep following the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different query is a 400.\n\n**Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks come from the projects you can read plus tasks filed in no project). Private projects you are not a member of never appear. Restricted tasks you may not open are left out, or returned with `has_access: false` when `include_inaccessible=true`.\n\n**Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]` or an unknown status, priority or type is a 400 naming the offending value.\n\n**Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort by rank, not alphabetically: priority critical > high > medium > low > none; status backlog > in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.\n\n**Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.\n\n**Search:** `filter[search]` matches the title, description, task id and tags; add `filter[search_fields]=title` to match the title only.\n\n**Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position` to every task for that scope (`null` when the task is in no section there). `section_scope=own` annotates each task in its own home instead: a task in a project at `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with neither is returned unsectioned. `own` is accepted by this operation only.",
+        "description": "List the tasks you can see, one page at a time.\n\n**Pagination**\n- The response is `{\"data\": [TaskCardView\u2026], \"next_cursor\": \"<opaque>\" | null}`; pass `next_cursor` back as `cursor` for the next page. `null` means the end.\n- A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) \u2014 keep following the cursor until it is null.\n- A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different query is a 400.\n\n**Scope and visibility**\n- `project_id`: you must be able to read the project (it is public, you are a member, or you are an org admin).\n- `org_id`: you must be a member of the organization; tasks come from the projects you can read, plus tasks filed in no project.\n- Private projects you are not a member of never appear.\n- Restricted tasks you may not open are left out \u2014 or returned with `has_access: false` when `include_inaccessible=true`.\n\n**Filters**\n- Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are AND-ed.\n- An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority or type is a 400 naming the value.\n- `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only narrows what you can already see.\n- `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title` for the title only.\n\n**Sort**\n- `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or `desc`.\n- Ties break on `task_id`; empty values sort last.\n- `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog > in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.\n\n**Sections**\n- `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position` for that scope (`null` when the task is in no section there).\n- `section_scope=own` uses each task's own home: its project, or its team when it has no project; a task with neither is unsectioned. `own` works on this operation only.",
         "operationId": "tasks.list",
         "parameters": [
           {
@@ -5126,7 +5126,7 @@
           "tasks"
         ],
         "summary": "Attach a task to a team milestone (or none)",
-        "description": "File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the task may do this, without needing any right over the milestone itself. The milestone must belong to a team the task is reachable from (one of the team's projects, or filed under that team with no project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.",
+        "description": "File the task under a team milestone; `milestone_id: null` takes it out.\n\n- **Who:** anyone who may edit the task \u2014 no right over the milestone itself is needed.\n- **Which milestones:** one of a team the task is reachable from (a project of that team, or filed under the team with no project).\n- **Errors:** 404 for an unknown milestone, 422 when it is unreachable.\n- Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.",
         "operationId": "tasks.set_milestone",
         "parameters": [
           {
@@ -24773,7 +24773,7 @@
           "sections"
         ],
         "summary": "List a scope's sections (or several scopes')",
-        "description": "The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`) starts with the sections Assigned, Doing and Later, created on first read; a team scope starts empty. A team's sections are managed by the team owner or an org admin; everyone who can read the team can read them.\n\n**Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same `scope_type`, answered in one response: `{\"data\": [...], \"scopes\": [...]}`, where every row carries its own `scope_type` / `scope_id`.\n\n- `scope_type=user` is refused (400): personal scopes are private to their owner.\n- Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one you cannot read, and a scope present with no rows has no sections.\n- Nothing is created on this path.",
+        "description": "The ordered sections of one scope, with their task counts.\n\n- **Your personal scope** (`scope_type=user`) starts with Assigned, Doing and Later, created on first read.\n- **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read the team can read it.\n\n**Several scopes at once:** pass `scope_ids` (instead of `scope_id`) \u2014 scopes of one `scope_type`, answered as `{\"data\": [...], \"scopes\": [...]}`, each row carrying its own `scope_type` / `scope_id`.\n\n- `scope_type=user` is refused (400): personal scopes are private to their owner.\n- A scope you cannot read is **omitted**, not an error. Missing from `scopes` means not yours; present with no rows means no sections.\n- Nothing is created on this path.",
         "operationId": "sections.list",
         "parameters": [
           {
@@ -28530,7 +28530,7 @@
           "teams"
         ],
         "summary": "A team's unfiled tasks (the team List's read; task-list envelope)",
-        "description": "The team's tasks that are filed under the team and in no project, through the same pipeline as `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply (`filter[team]` and `filter[project]` are overridden). A guest, who cannot hold such tasks, gets an empty page.",
+        "description": "The team's tasks filed under the team and in no project.\n\n- Works like `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply.\n- `filter[team]` and `filter[project]` are set for you.\n- A guest, who cannot hold such tasks, gets an empty page.",
         "operationId": "teams.list_tasks",
         "parameters": [
           {
@@ -35802,7 +35802,7 @@
           "me"
         ],
         "summary": "The authenticated principal and its organizations / roles",
-        "description": "The authenticated principal and every organization it is an active member of, with its role there. With an access token, `principal.type` is `service_account` for a service account, only the token's organization is listed, and `auth` carries the token's id, scopes, projects and expiry.",
+        "description": "Who you are: the authenticated principal and every organization it is an active member of, with its role there.\n\nWith an access token:\n- `principal.type` is `service_account` for a service account;\n- only the token's organization is listed;\n- `auth` carries the token's id, scopes, projects and expiry.",
         "operationId": "me.read",
         "responses": {
           "200": {
@@ -38270,7 +38270,7 @@
           "views"
         ],
         "summary": "The tasks a saved view shows (task-list envelope)",
-        "description": "The tasks the view shows. Its stored `query` runs through the same pipeline as `GET /v1/tasks`, with YOUR visibility \u2014 a team view saved by an admin and opened by a guest returns the guest's tasks. Same `{data, next_cursor}` envelope. Only `limit`, `cursor` and `include_inaccessible` are accepted here: a `filter[...]`, `sort_by`, `group_by` or `section_scope` in the query string is a 400.",
+        "description": "The tasks a saved view shows, as `{data, next_cursor}`.\n\n- The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened by a guest returns the guest's tasks.\n- Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`, `group_by` or `section_scope` here is a 400.",
         "operationId": "views.rows",
         "parameters": [
           {
@@ -42591,7 +42591,7 @@
         },
         "type": "object",
         "title": "MilestoneUpdate",
-        "description": "A true partial \u2014 an absent field is left alone; `description` / `owner_user_id` sent as\nnull clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,\nre-opening clears them. A caller who may only close (the milestone's owner, without team\n`edit`) may send `status` and nothing else \u2014 403 otherwise."
+        "description": "A partial update: fields you leave out are unchanged.\n\n- `description` / `owner_user_id` sent as null clear them.\n- `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.\n- The milestone's owner without team `edit` rights may send `status` only \u2014 anything else is a 403."
       },
       "OrgCard": {
         "properties": {
@@ -47748,7 +47748,7 @@
           "scopes"
         ],
         "title": "SectionsForScopes",
-        "description": "What `GET /v1/sections?scope_ids=\u2026` returns. `data` holds every requested scope's sections in one list (each row carries its own `scope_type` / `scope_id`); `scopes` names the scopes this response answered for, in the order asked. A scope you cannot read is **omitted from both** \u2014 so a scope missing from `scopes` is one you cannot read, and a scope in `scopes` with no rows has no sections. The single-scope form (`scope_id=`) returns the plain list envelope `{data, next_cursor}`, without `scopes`."
+        "description": "What `GET /v1/sections?scope_ids=\u2026` returns.\n\n- `data`: every requested scope's sections in one list; each row carries its own `scope_type` / `scope_id`.\n- `scopes`: the scopes this response answered for, in the order asked.\n- A scope you cannot read is **omitted from both**: missing from `scopes` means not yours; in `scopes` with no rows means no sections.\n- The single-scope form (`scope_id=`) returns the plain `{data, next_cursor}` list, without `scopes`."
       },
       "ServiceAccountCreate": {
         "properties": {
@@ -48761,7 +48761,7 @@
               }
             ],
             "title": "Type Data",
-            "description": "Extra fields for the task's type. For a bug: `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation` (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only). A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422 naming the key)."
+            "description": "Extra fields for the task's type. For a bug:\n\n- **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`.\n- **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.\n- A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming the key)."
           },
           "metadata": {
             "anyOf": [
@@ -49603,7 +49603,7 @@
               }
             ],
             "title": "Type Data",
-            "description": "Extra fields for the task's type. For a bug: `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation` (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only). A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422 naming the key)."
+            "description": "Extra fields for the task's type. For a bug:\n\n- **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`.\n- **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.\n- A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming the key)."
           },
           "metadata": {
             "anyOf": [
@@ -50062,7 +50062,7 @@
               }
             ],
             "title": "Type Data",
-            "description": "Extra fields for the task's type. For a bug: `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation` (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only). A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422 naming the key)."
+            "description": "Extra fields for the task's type. For a bug:\n\n- **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`.\n- **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.\n- A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming the key)."
           },
           "metadata": {
             "anyOf": [
@@ -50532,7 +50532,7 @@
           "agent"
         ],
         "title": "TaskTypeEnum",
-        "description": "The kind of task: `task`, `bug` or `agent`, in sort order (`sort_by=task_type`). A label, never a permission. A goal is not a task type but a container of a project's tasks (`goal_id`): `task_type=goal` is refused on write (422) and in `filter[task_type]` (400)."
+        "description": "The kind of task: `task`, `bug` or `agent`, in sort order (`sort_by=task_type`).\n\n- A label, never a permission.\n- A goal is not a task type but a container of a project's tasks (`goal_id`): `task_type=goal` is refused on write (422) and in `filter[task_type]` (400)."
       },
       "TaskUpdate": {
         "properties": {
@@ -50732,7 +50732,7 @@
               }
             ],
             "title": "Type Data",
-            "description": "Extra fields for the task's type. For a bug: `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation` (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only). A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422 naming the key)."
+            "description": "Extra fields for the task's type. For a bug:\n\n- **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`.\n- **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.\n- A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming the key)."
           },
           "metadata": {
             "anyOf": [
@@ -53335,7 +53335,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
-        "description": "A TasksMate access token (`Authorization: Bearer tm_live_\u2026`; `tm_test_\u2026` tokens authenticate and read but never write). Mint one with `POST /v1/tokens` \u2014 it is shown once. A token is bound to one organization, may be restricted to some projects, and carries **scopes**; each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`. Internal operations refuse every token (403 `insufficient-scope`, `required: null`). Per token: 600 requests a minute (test: 60) \u2014 `X-RateLimit-*` on every response, 429 with `Retry-After` over it.\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review. |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review. |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       }
     }
   },
@@ -53349,7 +53349,7 @@
     "availability.created": {
       "post": {
         "summary": "availability.created",
-        "description": "A member recorded days they are unavailable.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A member recorded days they are unavailable.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.availability.created",
         "tags": [
           "webhooks"
@@ -53451,7 +53451,7 @@
     "availability.deleted": {
       "post": {
         "summary": "availability.deleted",
-        "description": "A member's unavailable days were removed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A member's unavailable days were removed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.availability.deleted",
         "tags": [
           "webhooks"
@@ -53553,7 +53553,7 @@
     "availability.updated": {
       "post": {
         "summary": "availability.updated",
-        "description": "A member's unavailable days changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A member's unavailable days changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.availability.updated",
         "tags": [
           "webhooks"
@@ -53657,7 +53657,7 @@
     "designation.created": {
       "post": {
         "summary": "designation.created",
-        "description": "A designation was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A designation was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.designation.created",
         "tags": [
           "webhooks"
@@ -53759,7 +53759,7 @@
     "designation.deactivated": {
       "post": {
         "summary": "designation.deactivated",
-        "description": "A designation was deactivated.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A designation was deactivated.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.designation.deactivated",
         "tags": [
           "webhooks"
@@ -53863,7 +53863,7 @@
     "designation.updated": {
       "post": {
         "summary": "designation.updated",
-        "description": "A designation changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A designation changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.designation.updated",
         "tags": [
           "webhooks"
@@ -53967,7 +53967,7 @@
     "designation.visibility_changed": {
       "post": {
         "summary": "designation.visibility_changed",
-        "description": "A designation was shown or hidden.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A designation was shown or hidden.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.designation.visibility_changed",
         "tags": [
           "webhooks"
@@ -54071,7 +54071,7 @@
     "goal.closed": {
       "post": {
         "summary": "goal.closed",
-        "description": "A project goal was closed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project goal was closed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.closed",
         "tags": [
           "webhooks"
@@ -54175,7 +54175,7 @@
     "goal.created": {
       "post": {
         "summary": "goal.created",
-        "description": "A project goal was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project goal was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.created",
         "tags": [
           "webhooks"
@@ -54277,7 +54277,7 @@
     "goal.deleted": {
       "post": {
         "summary": "goal.deleted",
-        "description": "A project goal was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project goal was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.deleted",
         "tags": [
           "webhooks"
@@ -54379,7 +54379,7 @@
     "goal.moved": {
       "post": {
         "summary": "goal.moved",
-        "description": "A goal moved to another project.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A goal moved to another project.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.moved",
         "tags": [
           "webhooks"
@@ -54483,7 +54483,7 @@
     "goal.reopened": {
       "post": {
         "summary": "goal.reopened",
-        "description": "A project goal was reopened.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project goal was reopened.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.reopened",
         "tags": [
           "webhooks"
@@ -54587,7 +54587,7 @@
     "goal.reordered": {
       "post": {
         "summary": "goal.reordered",
-        "description": "A project's goal order changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project's goal order changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.reordered",
         "tags": [
           "webhooks"
@@ -54691,7 +54691,7 @@
     "goal.updated": {
       "post": {
         "summary": "goal.updated",
-        "description": "A project goal changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project goal changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.goal.updated",
         "tags": [
           "webhooks"
@@ -54795,7 +54795,7 @@
     "invite.accepted": {
       "post": {
         "summary": "invite.accepted",
-        "description": "An invitation was accepted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation was accepted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.accepted",
         "tags": [
           "webhooks"
@@ -54899,7 +54899,7 @@
     "invite.created": {
       "post": {
         "summary": "invite.created",
-        "description": "An invitation to the organization was sent.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation to the organization was sent.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.created",
         "tags": [
           "webhooks"
@@ -55001,7 +55001,7 @@
     "invite.external_override": {
       "post": {
         "summary": "invite.external_override",
-        "description": "An invitation outside the verified domains was allowed by an admin.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation outside the verified domains was allowed by an admin.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.external_override",
         "tags": [
           "webhooks"
@@ -55105,7 +55105,7 @@
     "invite.rejected": {
       "post": {
         "summary": "invite.rejected",
-        "description": "An invitation was declined.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation was declined.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.rejected",
         "tags": [
           "webhooks"
@@ -55209,7 +55209,7 @@
     "invite.revoked": {
       "post": {
         "summary": "invite.revoked",
-        "description": "An invitation was withdrawn.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation was withdrawn.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.revoked",
         "tags": [
           "webhooks"
@@ -55313,7 +55313,7 @@
     "invite.updated": {
       "post": {
         "summary": "invite.updated",
-        "description": "An invitation was changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An invitation was changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.invite.updated",
         "tags": [
           "webhooks"
@@ -55417,7 +55417,7 @@
     "member.added": {
       "post": {
         "summary": "member.added",
-        "description": "Someone joined the organization.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone joined the organization.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.member.added",
         "tags": [
           "webhooks"
@@ -55519,7 +55519,7 @@
     "member.auto_joined": {
       "post": {
         "summary": "member.auto_joined",
-        "description": "Someone joined the organization through a verified domain.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone joined the organization through a verified domain.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.member.auto_joined",
         "tags": [
           "webhooks"
@@ -55623,7 +55623,7 @@
     "member.designation_changed": {
       "post": {
         "summary": "member.designation_changed",
-        "description": "A member's designation changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A member's designation changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.member.designation_changed",
         "tags": [
           "webhooks"
@@ -55727,7 +55727,7 @@
     "member.removed": {
       "post": {
         "summary": "member.removed",
-        "description": "Someone left or was removed from the organization.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone left or was removed from the organization.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.member.removed",
         "tags": [
           "webhooks"
@@ -55829,7 +55829,7 @@
     "member.role_changed": {
       "post": {
         "summary": "member.role_changed",
-        "description": "A member's organization role changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A member's organization role changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.member.role_changed",
         "tags": [
           "webhooks"
@@ -55933,7 +55933,7 @@
     "milestone.closed": {
       "post": {
         "summary": "milestone.closed",
-        "description": "A team milestone was closed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team milestone was closed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.closed",
         "tags": [
           "webhooks"
@@ -56037,7 +56037,7 @@
     "milestone.created": {
       "post": {
         "summary": "milestone.created",
-        "description": "A team milestone was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team milestone was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.created",
         "tags": [
           "webhooks"
@@ -56139,7 +56139,7 @@
     "milestone.deleted": {
       "post": {
         "summary": "milestone.deleted",
-        "description": "A team milestone was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team milestone was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.deleted",
         "tags": [
           "webhooks"
@@ -56241,7 +56241,7 @@
     "milestone.reopened": {
       "post": {
         "summary": "milestone.reopened",
-        "description": "A team milestone was reopened.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team milestone was reopened.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.reopened",
         "tags": [
           "webhooks"
@@ -56345,7 +56345,7 @@
     "milestone.updated": {
       "post": {
         "summary": "milestone.updated",
-        "description": "A team milestone changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team milestone changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.updated",
         "tags": [
           "webhooks"
@@ -56449,7 +56449,7 @@
     "org.deleted": {
       "post": {
         "summary": "org.deleted",
-        "description": "The organization was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "The organization was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.deleted",
         "tags": [
           "webhooks"
@@ -56551,7 +56551,7 @@
     "org.domain_added": {
       "post": {
         "summary": "org.domain_added",
-        "description": "A domain was added to the organization.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A domain was added to the organization.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.domain_added",
         "tags": [
           "webhooks"
@@ -56653,7 +56653,7 @@
     "org.domain_removed": {
       "post": {
         "summary": "org.domain_removed",
-        "description": "A domain was removed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A domain was removed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.domain_removed",
         "tags": [
           "webhooks"
@@ -56755,7 +56755,7 @@
     "org.domain_verified": {
       "post": {
         "summary": "org.domain_verified",
-        "description": "A domain was verified.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A domain was verified.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.domain_verified",
         "tags": [
           "webhooks"
@@ -56859,7 +56859,7 @@
     "org.join_request_decided": {
       "post": {
         "summary": "org.join_request_decided",
-        "description": "A request to join the organization was approved or declined.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A request to join the organization was approved or declined.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.join_request_decided",
         "tags": [
           "webhooks"
@@ -56963,7 +56963,7 @@
     "org.settings_changed": {
       "post": {
         "summary": "org.settings_changed",
-        "description": "The organization's settings changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "The organization's settings changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.settings_changed",
         "tags": [
           "webhooks"
@@ -57067,7 +57067,7 @@
     "org.updated": {
       "post": {
         "summary": "org.updated",
-        "description": "The organization's name or description changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "The organization's name or description changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.org.updated",
         "tags": [
           "webhooks"
@@ -57171,7 +57171,7 @@
     "project.created": {
       "post": {
         "summary": "project.created",
-        "description": "A project was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.created",
         "tags": [
           "webhooks"
@@ -57273,7 +57273,7 @@
     "project.delegation_changed": {
       "post": {
         "summary": "project.delegation_changed",
-        "description": "Whether a project's editors may add members changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Whether a project's editors may add members changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.delegation_changed",
         "tags": [
           "webhooks"
@@ -57377,7 +57377,7 @@
     "project.deleted": {
       "post": {
         "summary": "project.deleted",
-        "description": "A project was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.deleted",
         "tags": [
           "webhooks"
@@ -57479,7 +57479,7 @@
     "project.leads_changed": {
       "post": {
         "summary": "project.leads_changed",
-        "description": "A project's leads changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project's leads changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.leads_changed",
         "tags": [
           "webhooks"
@@ -57583,7 +57583,7 @@
     "project.member_added": {
       "post": {
         "summary": "project.member_added",
-        "description": "Someone was added to a project.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone was added to a project.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.member_added",
         "tags": [
           "webhooks"
@@ -57685,7 +57685,7 @@
     "project.member_removed": {
       "post": {
         "summary": "project.member_removed",
-        "description": "Someone was removed from a project.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone was removed from a project.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.member_removed",
         "tags": [
           "webhooks"
@@ -57787,7 +57787,7 @@
     "project.member_role_changed": {
       "post": {
         "summary": "project.member_role_changed",
-        "description": "A project member's role changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project member's role changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.member_role_changed",
         "tags": [
           "webhooks"
@@ -57891,7 +57891,7 @@
     "project.member_updated": {
       "post": {
         "summary": "project.member_updated",
-        "description": "A project member's details changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project member's details changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.member_updated",
         "tags": [
           "webhooks"
@@ -57995,7 +57995,7 @@
     "project.owner_transferred": {
       "post": {
         "summary": "project.owner_transferred",
-        "description": "A project's ownership moved to another member.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project's ownership moved to another member.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.owner_transferred",
         "tags": [
           "webhooks"
@@ -58099,7 +58099,7 @@
     "project.reordered": {
       "post": {
         "summary": "project.reordered",
-        "description": "The organization's project order changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "The organization's project order changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.reordered",
         "tags": [
           "webhooks"
@@ -58203,7 +58203,7 @@
     "project.updated": {
       "post": {
         "summary": "project.updated",
-        "description": "A project's fields changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project's fields changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.updated",
         "tags": [
           "webhooks"
@@ -58307,7 +58307,7 @@
     "project.visibility_changed": {
       "post": {
         "summary": "project.visibility_changed",
-        "description": "A project became public or private.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A project became public or private.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.visibility_changed",
         "tags": [
           "webhooks"
@@ -58411,7 +58411,7 @@
     "roadmap_journey.created": {
       "post": {
         "summary": "roadmap_journey.created",
-        "description": "A roadmap journey was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap journey was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_journey.created",
         "tags": [
           "webhooks"
@@ -58513,7 +58513,7 @@
     "roadmap_journey.deleted": {
       "post": {
         "summary": "roadmap_journey.deleted",
-        "description": "A roadmap journey was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap journey was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_journey.deleted",
         "tags": [
           "webhooks"
@@ -58615,7 +58615,7 @@
     "roadmap_journey.updated": {
       "post": {
         "summary": "roadmap_journey.updated",
-        "description": "A roadmap journey changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap journey changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_journey.updated",
         "tags": [
           "webhooks"
@@ -58719,7 +58719,7 @@
     "roadmap_stop.created": {
       "post": {
         "summary": "roadmap_stop.created",
-        "description": "A roadmap stop was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap stop was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.created",
         "tags": [
           "webhooks"
@@ -58821,7 +58821,7 @@
     "roadmap_stop.deleted": {
       "post": {
         "summary": "roadmap_stop.deleted",
-        "description": "A roadmap stop was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap stop was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.deleted",
         "tags": [
           "webhooks"
@@ -58923,7 +58923,7 @@
     "roadmap_stop.milestone_pinned": {
       "post": {
         "summary": "roadmap_stop.milestone_pinned",
-        "description": "A milestone was pinned to a roadmap stop.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A milestone was pinned to a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.milestone_pinned",
         "tags": [
           "webhooks"
@@ -59025,7 +59025,7 @@
     "roadmap_stop.milestone_unpinned": {
       "post": {
         "summary": "roadmap_stop.milestone_unpinned",
-        "description": "A milestone was unpinned from a roadmap stop.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A milestone was unpinned from a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.milestone_unpinned",
         "tags": [
           "webhooks"
@@ -59127,7 +59127,7 @@
     "roadmap_stop.task_attached": {
       "post": {
         "summary": "roadmap_stop.task_attached",
-        "description": "A task was attached to a roadmap stop.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task was attached to a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.task_attached",
         "tags": [
           "webhooks"
@@ -59229,7 +59229,7 @@
     "roadmap_stop.task_detached": {
       "post": {
         "summary": "roadmap_stop.task_detached",
-        "description": "A task was detached from a roadmap stop.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task was detached from a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.task_detached",
         "tags": [
           "webhooks"
@@ -59331,7 +59331,7 @@
     "roadmap_stop.updated": {
       "post": {
         "summary": "roadmap_stop.updated",
-        "description": "A roadmap stop changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A roadmap stop changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.roadmap_stop.updated",
         "tags": [
           "webhooks"
@@ -59435,7 +59435,7 @@
     "service_account.created": {
       "post": {
         "summary": "service_account.created",
-        "description": "A service account was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A service account was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.service_account.created",
         "tags": [
           "webhooks"
@@ -59537,7 +59537,7 @@
     "service_account.deactivated": {
       "post": {
         "summary": "service_account.deactivated",
-        "description": "A service account was deactivated and its tokens revoked.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A service account was deactivated and its tokens revoked.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.service_account.deactivated",
         "tags": [
           "webhooks"
@@ -59641,7 +59641,7 @@
     "service_account.renamed": {
       "post": {
         "summary": "service_account.renamed",
-        "description": "A service account was renamed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A service account was renamed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.service_account.renamed",
         "tags": [
           "webhooks"
@@ -59745,7 +59745,7 @@
     "sprint.created": {
       "post": {
         "summary": "sprint.created",
-        "description": "A team sprint was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team sprint was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.sprint.created",
         "tags": [
           "webhooks"
@@ -59847,7 +59847,7 @@
     "sprint.deleted": {
       "post": {
         "summary": "sprint.deleted",
-        "description": "A team sprint was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team sprint was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.sprint.deleted",
         "tags": [
           "webhooks"
@@ -59949,7 +59949,7 @@
     "sprint.updated": {
       "post": {
         "summary": "sprint.updated",
-        "description": "A team sprint changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team sprint changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.sprint.updated",
         "tags": [
           "webhooks"
@@ -60053,7 +60053,7 @@
     "task.attachment_added": {
       "post": {
         "summary": "task.attachment_added",
-        "description": "A file was attached to a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A file was attached to a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.attachment_added",
         "tags": [
           "webhooks"
@@ -60155,7 +60155,7 @@
     "task.attachment_removed": {
       "post": {
         "summary": "task.attachment_removed",
-        "description": "An attachment was removed from a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An attachment was removed from a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.attachment_removed",
         "tags": [
           "webhooks"
@@ -60257,7 +60257,7 @@
     "task.comment_added": {
       "post": {
         "summary": "task.comment_added",
-        "description": "A comment was posted on a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A comment was posted on a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.comment_added",
         "tags": [
           "webhooks"
@@ -60359,7 +60359,7 @@
     "task.comment_removed": {
       "post": {
         "summary": "task.comment_removed",
-        "description": "A comment on a task was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A comment on a task was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.comment_removed",
         "tags": [
           "webhooks"
@@ -60461,7 +60461,7 @@
     "task.comment_updated": {
       "post": {
         "summary": "task.comment_updated",
-        "description": "A comment on a task was edited.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A comment on a task was edited.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.comment_updated",
         "tags": [
           "webhooks"
@@ -60565,7 +60565,7 @@
     "task.created": {
       "post": {
         "summary": "task.created",
-        "description": "A task was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.created",
         "tags": [
           "webhooks"
@@ -60667,7 +60667,7 @@
     "task.deleted": {
       "post": {
         "summary": "task.deleted",
-        "description": "A task was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.deleted",
         "tags": [
           "webhooks"
@@ -60769,7 +60769,7 @@
     "task.dependency_added": {
       "post": {
         "summary": "task.dependency_added",
-        "description": "A dependency was added to a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A dependency was added to a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.dependency_added",
         "tags": [
           "webhooks"
@@ -60871,7 +60871,7 @@
     "task.dependency_removed": {
       "post": {
         "summary": "task.dependency_removed",
-        "description": "A dependency was removed from a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A dependency was removed from a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.dependency_removed",
         "tags": [
           "webhooks"
@@ -60973,7 +60973,7 @@
     "task.moved": {
       "post": {
         "summary": "task.moved",
-        "description": "A task moved to another project (or out of one).\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task moved to another project (or out of one).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.moved",
         "tags": [
           "webhooks"
@@ -61077,7 +61077,7 @@
     "task.restricted": {
       "post": {
         "summary": "task.restricted",
-        "description": "Who may see a task changed (`restricted_to`).\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Who may see a task changed (`restricted_to`).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.restricted",
         "tags": [
           "webhooks"
@@ -61181,7 +61181,7 @@
     "task.subtask_added": {
       "post": {
         "summary": "task.subtask_added",
-        "description": "A subtask was linked under a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A subtask was linked under a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.subtask_added",
         "tags": [
           "webhooks"
@@ -61283,7 +61283,7 @@
     "task.subtask_removed": {
       "post": {
         "summary": "task.subtask_removed",
-        "description": "A subtask was unlinked from a task.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A subtask was unlinked from a task.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.subtask_removed",
         "tags": [
           "webhooks"
@@ -61385,7 +61385,7 @@
     "task.updated": {
       "post": {
         "summary": "task.updated",
-        "description": "A task's fields changed (status, title, assignee, dates, \u2026); `data.before` / `data.after` name the fields.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A task's fields changed (status, title, assignee, dates, \u2026); `data.before` / `data.after` name the fields.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.task.updated",
         "tags": [
           "webhooks"
@@ -61489,7 +61489,7 @@
     "team.created": {
       "post": {
         "summary": "team.created",
-        "description": "A team was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.created",
         "tags": [
           "webhooks"
@@ -61591,7 +61591,7 @@
     "team.deleted": {
       "post": {
         "summary": "team.deleted",
-        "description": "A team was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.deleted",
         "tags": [
           "webhooks"
@@ -61693,7 +61693,7 @@
     "team.member_added": {
       "post": {
         "summary": "team.member_added",
-        "description": "Someone joined a team.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone joined a team.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.member_added",
         "tags": [
           "webhooks"
@@ -61795,7 +61795,7 @@
     "team.member_removed": {
       "post": {
         "summary": "team.member_removed",
-        "description": "Someone left a team.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "Someone left a team.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.member_removed",
         "tags": [
           "webhooks"
@@ -61897,7 +61897,7 @@
     "team.member_role_changed": {
       "post": {
         "summary": "team.member_role_changed",
-        "description": "A team member's role changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team member's role changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.member_role_changed",
         "tags": [
           "webhooks"
@@ -62001,7 +62001,7 @@
     "team.updated": {
       "post": {
         "summary": "team.updated",
-        "description": "A team's fields changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A team's fields changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.team.updated",
         "tags": [
           "webhooks"
@@ -62105,7 +62105,7 @@
     "token.auth_failed": {
       "post": {
         "summary": "token.auth_failed",
-        "description": "A request presented an expired or revoked access token.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A request presented an expired or revoked access token.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.token.auth_failed",
         "tags": [
           "webhooks"
@@ -62209,7 +62209,7 @@
     "token.created": {
       "post": {
         "summary": "token.created",
-        "description": "An access token was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An access token was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.token.created",
         "tags": [
           "webhooks"
@@ -62311,7 +62311,7 @@
     "token.renamed": {
       "post": {
         "summary": "token.renamed",
-        "description": "An access token was renamed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An access token was renamed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.token.renamed",
         "tags": [
           "webhooks"
@@ -62415,7 +62415,7 @@
     "token.revoked": {
       "post": {
         "summary": "token.revoked",
-        "description": "An access token was revoked.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An access token was revoked.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.token.revoked",
         "tags": [
           "webhooks"
@@ -62519,7 +62519,7 @@
     "token.rotated": {
       "post": {
         "summary": "token.rotated",
-        "description": "An access token was rotated (the old one works 60 seconds more).\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "An access token was rotated (the old one works 60 seconds more).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.token.rotated",
         "tags": [
           "webhooks"
@@ -62623,7 +62623,7 @@
     "webhook.created": {
       "post": {
         "summary": "webhook.created",
-        "description": "A webhook was created.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.created",
         "tags": [
           "webhooks"
@@ -62725,7 +62725,7 @@
     "webhook.deleted": {
       "post": {
         "summary": "webhook.deleted",
-        "description": "A webhook was deleted.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.deleted",
         "tags": [
           "webhooks"
@@ -62827,7 +62827,7 @@
     "webhook.delivery_replayed": {
       "post": {
         "summary": "webhook.delivery_replayed",
-        "description": "A webhook delivery was sent again.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook delivery was sent again.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.delivery_replayed",
         "tags": [
           "webhooks"
@@ -62931,7 +62931,7 @@
     "webhook.disabled": {
       "post": {
         "summary": "webhook.disabled",
-        "description": "A webhook was disabled after repeated failed deliveries, or because its endpoint answered 410 Gone.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook was disabled after repeated failed deliveries, or because its endpoint answered 410 Gone.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.disabled",
         "tags": [
           "webhooks"
@@ -63035,7 +63035,7 @@
     "webhook.paused": {
       "post": {
         "summary": "webhook.paused",
-        "description": "A webhook was paused.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook was paused.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.paused",
         "tags": [
           "webhooks"
@@ -63139,7 +63139,7 @@
     "webhook.resumed": {
       "post": {
         "summary": "webhook.resumed",
-        "description": "A webhook was resumed (or re-enabled after being disabled).\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook was resumed (or re-enabled after being disabled).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.resumed",
         "tags": [
           "webhooks"
@@ -63243,7 +63243,7 @@
     "webhook.rotated": {
       "post": {
         "summary": "webhook.rotated",
-        "description": "A webhook's signing secret was rotated (the old one signs too for 24 hours).\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook's signing secret was rotated (the old one signs too for 24 hours).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.rotated",
         "tags": [
           "webhooks"
@@ -63347,7 +63347,7 @@
     "webhook.test": {
       "post": {
         "summary": "webhook.test",
-        "description": "A test delivery (`POST /v1/webhooks/{subscription_id}/test`); `data` names the webhook itself. Never retried.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A test delivery (`POST /v1/webhooks/{subscription_id}/test`); `data` names the webhook itself. Never retried.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.test",
         "tags": [
           "webhooks"
@@ -63451,7 +63451,7 @@
     "webhook.updated": {
       "post": {
         "summary": "webhook.updated",
-        "description": "A webhook's name, URL, events or projects changed.\n\nSigned with Standard Webhooks (the headers below). Verify the signature over the RAW body before parsing it; answer any 2xx within 20 s. Anything else \u2014 or no answer \u2014 is retried (8 attempts over ~21 h); 410 Gone disables the webhook. The recipes are in the developer docs' Webhooks guide.",
+        "description": "A webhook's name, URL, events or projects changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.webhook.updated",
         "tags": [
           "webhooks"

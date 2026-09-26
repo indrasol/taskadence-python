@@ -140,10 +140,12 @@ def sync_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """The tasks a saved view shows (task-list envelope)
 
-     The tasks the view shows. Its stored `query` runs through the same pipeline as `GET /v1/tasks`, with
-    YOUR visibility — a team view saved by an admin and opened by a guest returns the guest's tasks.
-    Same `{data, next_cursor}` envelope. Only `limit`, `cursor` and `include_inaccessible` are accepted
-    here: a `filter[...]`, `sort_by`, `group_by` or `section_scope` in the query string is a 400.
+     The tasks a saved view shows, as `{data, next_cursor}`.
+
+    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
+    by a guest returns the guest's tasks.
+    - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
+    `group_by` or `section_scope` here is a 400.
 
     Args:
         view_id (str):
@@ -187,10 +189,12 @@ def sync(
 ) -> Any | Problem | TaskListPage | None:
     """The tasks a saved view shows (task-list envelope)
 
-     The tasks the view shows. Its stored `query` runs through the same pipeline as `GET /v1/tasks`, with
-    YOUR visibility — a team view saved by an admin and opened by a guest returns the guest's tasks.
-    Same `{data, next_cursor}` envelope. Only `limit`, `cursor` and `include_inaccessible` are accepted
-    here: a `filter[...]`, `sort_by`, `group_by` or `section_scope` in the query string is a 400.
+     The tasks a saved view shows, as `{data, next_cursor}`.
+
+    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
+    by a guest returns the guest's tasks.
+    - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
+    `group_by` or `section_scope` here is a 400.
 
     Args:
         view_id (str):
@@ -229,10 +233,12 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """The tasks a saved view shows (task-list envelope)
 
-     The tasks the view shows. Its stored `query` runs through the same pipeline as `GET /v1/tasks`, with
-    YOUR visibility — a team view saved by an admin and opened by a guest returns the guest's tasks.
-    Same `{data, next_cursor}` envelope. Only `limit`, `cursor` and `include_inaccessible` are accepted
-    here: a `filter[...]`, `sort_by`, `group_by` or `section_scope` in the query string is a 400.
+     The tasks a saved view shows, as `{data, next_cursor}`.
+
+    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
+    by a guest returns the guest's tasks.
+    - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
+    `group_by` or `section_scope` here is a 400.
 
     Args:
         view_id (str):
@@ -274,10 +280,12 @@ async def asyncio(
 ) -> Any | Problem | TaskListPage | None:
     """The tasks a saved view shows (task-list envelope)
 
-     The tasks the view shows. Its stored `query` runs through the same pipeline as `GET /v1/tasks`, with
-    YOUR visibility — a team view saved by an admin and opened by a guest returns the guest's tasks.
-    Same `{data, next_cursor}` envelope. Only `limit`, `cursor` and `include_inaccessible` are accepted
-    here: a `filter[...]`, `sort_by`, `group_by` or `section_scope` in the query string is a 400.
+     The tasks a saved view shows, as `{data, next_cursor}`.
+
+    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
+    by a guest returns the guest's tasks.
+    - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
+    `group_by` or `section_scope` here is a 400.
 
     Args:
         view_id (str):

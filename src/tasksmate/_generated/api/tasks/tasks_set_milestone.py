@@ -112,11 +112,13 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
-     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
-    task may do this, without needing any right over the milestone itself. The milestone must belong to
-    a team the task is reachable from (one of the team's projects, or filed under that team with no
-    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
-    `milestone_id` and deletes nothing. Independent of the task's sprint.
+     File the task under a team milestone; `milestone_id: null` takes it out.
+
+    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
+    under the team with no project).
+    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
@@ -151,11 +153,13 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
-     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
-    task may do this, without needing any right over the milestone itself. The milestone must belong to
-    a team the task is reachable from (one of the team's projects, or filed under that team with no
-    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
-    `milestone_id` and deletes nothing. Independent of the task's sprint.
+     File the task under a team milestone; `milestone_id: null` takes it out.
+
+    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
+    under the team with no project).
+    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
@@ -185,11 +189,13 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
-     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
-    task may do this, without needing any right over the milestone itself. The milestone must belong to
-    a team the task is reachable from (one of the team's projects, or filed under that team with no
-    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
-    `milestone_id` and deletes nothing. Independent of the task's sprint.
+     File the task under a team milestone; `milestone_id: null` takes it out.
+
+    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
+    under the team with no project).
+    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
@@ -222,11 +228,13 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
-     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
-    task may do this, without needing any right over the milestone itself. The milestone must belong to
-    a team the task is reachable from (one of the team's projects, or filed under that team with no
-    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
-    `milestone_id` and deletes nothing. Independent of the task's sprint.
+     File the task under a team milestone; `milestone_id: null` takes it out.
+
+    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
+    under the team with no project).
+    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):

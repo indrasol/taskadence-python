@@ -20,10 +20,11 @@ T = TypeVar("T", bound="MilestoneUpdate")
 
 @_attrs_define
 class MilestoneUpdate:
-    """A true partial — an absent field is left alone; `description` / `owner_user_id` sent as
-    null clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,
-    re-opening clears them. A caller who may only close (the milestone's owner, without team
-    `edit`) may send `status` and nothing else — 403 otherwise.
+    """A partial update: fields you leave out are unchanged.
+
+    - `description` / `owner_user_id` sent as null clear them.
+    - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.
+    - The milestone's owner without team `edit` rights may send `status` only — anything else is a 403.
 
         Attributes:
             title (None | str | Unset):

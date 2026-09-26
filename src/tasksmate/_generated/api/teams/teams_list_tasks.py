@@ -157,10 +157,12 @@ def sync_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """A team's unfiled tasks (the team List's read; task-list envelope)
 
-     The team's tasks that are filed under the team and in no project, through the same pipeline as `GET
-    /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply
-    (`filter[team]` and `filter[project]` are overridden). A guest, who cannot hold such tasks, gets an
-    empty page.
+     The team's tasks filed under the team and in no project.
+
+    - Works like `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and
+    `section_scope` all apply.
+    - `filter[team]` and `filter[project]` are set for you.
+    - A guest, who cannot hold such tasks, gets an empty page.
 
     Args:
         team_id (str):
@@ -215,10 +217,12 @@ def sync(
 ) -> Any | Problem | TaskListPage | None:
     """A team's unfiled tasks (the team List's read; task-list envelope)
 
-     The team's tasks that are filed under the team and in no project, through the same pipeline as `GET
-    /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply
-    (`filter[team]` and `filter[project]` are overridden). A guest, who cannot hold such tasks, gets an
-    empty page.
+     The team's tasks filed under the team and in no project.
+
+    - Works like `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and
+    `section_scope` all apply.
+    - `filter[team]` and `filter[project]` are set for you.
+    - A guest, who cannot hold such tasks, gets an empty page.
 
     Args:
         team_id (str):
@@ -268,10 +272,12 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """A team's unfiled tasks (the team List's read; task-list envelope)
 
-     The team's tasks that are filed under the team and in no project, through the same pipeline as `GET
-    /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply
-    (`filter[team]` and `filter[project]` are overridden). A guest, who cannot hold such tasks, gets an
-    empty page.
+     The team's tasks filed under the team and in no project.
+
+    - Works like `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and
+    `section_scope` all apply.
+    - `filter[team]` and `filter[project]` are set for you.
+    - A guest, who cannot hold such tasks, gets an empty page.
 
     Args:
         team_id (str):
@@ -324,10 +330,12 @@ async def asyncio(
 ) -> Any | Problem | TaskListPage | None:
     """A team's unfiled tasks (the team List's read; task-list envelope)
 
-     The team's tasks that are filed under the team and in no project, through the same pipeline as `GET
-    /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and `section_scope` all apply
-    (`filter[team]` and `filter[project]` are overridden). A guest, who cannot hold such tasks, gets an
-    empty page.
+     The team's tasks filed under the team and in no project.
+
+    - Works like `GET /v1/tasks`: its other `filter[...]` parameters, sort, cursor paging and
+    `section_scope` all apply.
+    - `filter[team]` and `filter[project]` are set for you.
+    - A guest, who cannot hold such tasks, gets an empty page.
 
     Args:
         team_id (str):

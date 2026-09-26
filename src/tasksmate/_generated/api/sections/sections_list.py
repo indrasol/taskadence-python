@@ -194,19 +194,19 @@ def sync_detailed(
 ) -> Response[Any | PageSectionOut | SectionsForScopes | Problem]:
     """List a scope's sections (or several scopes')
 
-     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
-    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
-    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
-    team can read them.
+     The ordered sections of one scope, with their task counts.
 
-    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
-    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
-    its own `scope_type` / `scope_id`.
+    - **Your personal scope** (`scope_type=user`) starts with Assigned, Doing and Later, created on
+    first read.
+    - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
+    the team can read it.
+
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
-    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
-    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
-    you cannot read, and a scope present with no rows has no sections.
+    - A scope you cannot read is **omitted**, not an error. Missing from `scopes` means not yours;
+    present with no rows means no sections.
     - Nothing is created on this path.
 
     Args:
@@ -267,19 +267,19 @@ def sync(
 ) -> Any | PageSectionOut | SectionsForScopes | Problem | None:
     """List a scope's sections (or several scopes')
 
-     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
-    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
-    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
-    team can read them.
+     The ordered sections of one scope, with their task counts.
 
-    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
-    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
-    its own `scope_type` / `scope_id`.
+    - **Your personal scope** (`scope_type=user`) starts with Assigned, Doing and Later, created on
+    first read.
+    - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
+    the team can read it.
+
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
-    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
-    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
-    you cannot read, and a scope present with no rows has no sections.
+    - A scope you cannot read is **omitted**, not an error. Missing from `scopes` means not yours;
+    present with no rows means no sections.
     - Nothing is created on this path.
 
     Args:
@@ -335,19 +335,19 @@ async def asyncio_detailed(
 ) -> Response[Any | PageSectionOut | SectionsForScopes | Problem]:
     """List a scope's sections (or several scopes')
 
-     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
-    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
-    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
-    team can read them.
+     The ordered sections of one scope, with their task counts.
 
-    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
-    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
-    its own `scope_type` / `scope_id`.
+    - **Your personal scope** (`scope_type=user`) starts with Assigned, Doing and Later, created on
+    first read.
+    - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
+    the team can read it.
+
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
-    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
-    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
-    you cannot read, and a scope present with no rows has no sections.
+    - A scope you cannot read is **omitted**, not an error. Missing from `scopes` means not yours;
+    present with no rows means no sections.
     - Nothing is created on this path.
 
     Args:
@@ -406,19 +406,19 @@ async def asyncio(
 ) -> Any | PageSectionOut | SectionsForScopes | Problem | None:
     """List a scope's sections (or several scopes')
 
-     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
-    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
-    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
-    team can read them.
+     The ordered sections of one scope, with their task counts.
 
-    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
-    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
-    its own `scope_type` / `scope_id`.
+    - **Your personal scope** (`scope_type=user`) starts with Assigned, Doing and Later, created on
+    first read.
+    - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
+    the team can read it.
+
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
-    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
-    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
-    you cannot read, and a scope present with no rows has no sections.
+    - A scope you cannot read is **omitted**, not an error. Missing from `scopes` means not yours;
+    present with no rows means no sections.
     - Nothing is created on this path.
 
     Args:

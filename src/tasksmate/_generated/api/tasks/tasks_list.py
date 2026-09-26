@@ -351,39 +351,46 @@ def sync_detailed(
 
      List the tasks you can see, one page at a time.
 
-    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
-    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
-    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
-    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
-    reusing it with a different query is a 400.
+    **Pagination**
+    - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
+    back as `cursor` for the next page. `null` means the end.
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    following the cursor until it is null.
+    - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
+    query is a 400.
 
-    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
-    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
-    come from the projects you can read plus tasks filed in no project). Private projects you are not a
-    member of never appear. Restricted tasks you may not open are left out, or returned with
-    `has_access: false` when `include_inaccessible=true`.
+    **Scope and visibility**
+    - `project_id`: you must be able to read the project (it is public, you are a member, or you are an
+    org admin).
+    - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
+    plus tasks filed in no project.
+    - Private projects you are not a member of never appear.
+    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    `include_inaccessible=true`.
 
-    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
-    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
-    or an unknown status, priority or type is a 400 naming the offending value.
+    **Filters**
+    - Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are
+    AND-ed.
+    - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
+    or type is a 400 naming the value.
+    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
+    narrows what you can already see.
+    - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
+    for the title only.
 
-    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
-    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
-    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
-    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
-    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
+    **Sort**
+    - `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`,
+    `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or
+    `desc`.
+    - Ties break on `task_id`; empty values sort last.
+    - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
+    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
 
-    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
-    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
-
-    **Search:** `filter[search]` matches the title, description, task id and tags; add
-    `filter[search_fields]=title` to match the title only.
-
-    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
-    `section_position` to every task for that scope (`null` when the task is in no section there).
-    `section_scope=own` annotates each task in its own home instead: a task in a project at
-    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
-    neither is returned unsectioned. `own` is accepted by this operation only.
+    **Sections**
+    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
+    for that scope (`null` when the task is in no section there).
+    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
+    task with neither is unsectioned. `own` works on this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -511,39 +518,46 @@ def sync(
 
      List the tasks you can see, one page at a time.
 
-    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
-    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
-    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
-    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
-    reusing it with a different query is a 400.
+    **Pagination**
+    - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
+    back as `cursor` for the next page. `null` means the end.
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    following the cursor until it is null.
+    - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
+    query is a 400.
 
-    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
-    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
-    come from the projects you can read plus tasks filed in no project). Private projects you are not a
-    member of never appear. Restricted tasks you may not open are left out, or returned with
-    `has_access: false` when `include_inaccessible=true`.
+    **Scope and visibility**
+    - `project_id`: you must be able to read the project (it is public, you are a member, or you are an
+    org admin).
+    - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
+    plus tasks filed in no project.
+    - Private projects you are not a member of never appear.
+    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    `include_inaccessible=true`.
 
-    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
-    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
-    or an unknown status, priority or type is a 400 naming the offending value.
+    **Filters**
+    - Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are
+    AND-ed.
+    - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
+    or type is a 400 naming the value.
+    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
+    narrows what you can already see.
+    - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
+    for the title only.
 
-    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
-    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
-    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
-    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
-    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
+    **Sort**
+    - `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`,
+    `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or
+    `desc`.
+    - Ties break on `task_id`; empty values sort last.
+    - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
+    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
 
-    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
-    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
-
-    **Search:** `filter[search]` matches the title, description, task id and tags; add
-    `filter[search_fields]=title` to match the title only.
-
-    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
-    `section_position` to every task for that scope (`null` when the task is in no section there).
-    `section_scope=own` annotates each task in its own home instead: a task in a project at
-    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
-    neither is returned unsectioned. `own` is accepted by this operation only.
+    **Sections**
+    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
+    for that scope (`null` when the task is in no section there).
+    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
+    task with neither is unsectioned. `own` works on this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -666,39 +680,46 @@ async def asyncio_detailed(
 
      List the tasks you can see, one page at a time.
 
-    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
-    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
-    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
-    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
-    reusing it with a different query is a 400.
+    **Pagination**
+    - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
+    back as `cursor` for the next page. `null` means the end.
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    following the cursor until it is null.
+    - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
+    query is a 400.
 
-    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
-    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
-    come from the projects you can read plus tasks filed in no project). Private projects you are not a
-    member of never appear. Restricted tasks you may not open are left out, or returned with
-    `has_access: false` when `include_inaccessible=true`.
+    **Scope and visibility**
+    - `project_id`: you must be able to read the project (it is public, you are a member, or you are an
+    org admin).
+    - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
+    plus tasks filed in no project.
+    - Private projects you are not a member of never appear.
+    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    `include_inaccessible=true`.
 
-    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
-    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
-    or an unknown status, priority or type is a 400 naming the offending value.
+    **Filters**
+    - Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are
+    AND-ed.
+    - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
+    or type is a 400 naming the value.
+    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
+    narrows what you can already see.
+    - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
+    for the title only.
 
-    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
-    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
-    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
-    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
-    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
+    **Sort**
+    - `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`,
+    `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or
+    `desc`.
+    - Ties break on `task_id`; empty values sort last.
+    - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
+    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
 
-    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
-    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
-
-    **Search:** `filter[search]` matches the title, description, task id and tags; add
-    `filter[search_fields]=title` to match the title only.
-
-    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
-    `section_position` to every task for that scope (`null` when the task is in no section there).
-    `section_scope=own` annotates each task in its own home instead: a task in a project at
-    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
-    neither is returned unsectioned. `own` is accepted by this operation only.
+    **Sections**
+    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
+    for that scope (`null` when the task is in no section there).
+    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
+    task with neither is unsectioned. `own` works on this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -824,39 +845,46 @@ async def asyncio(
 
      List the tasks you can see, one page at a time.
 
-    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
-    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
-    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
-    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
-    reusing it with a different query is a 400.
+    **Pagination**
+    - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
+    back as `cursor` for the next page. `null` means the end.
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    following the cursor until it is null.
+    - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
+    query is a 400.
 
-    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
-    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
-    come from the projects you can read plus tasks filed in no project). Private projects you are not a
-    member of never appear. Restricted tasks you may not open are left out, or returned with
-    `has_access: false` when `include_inaccessible=true`.
+    **Scope and visibility**
+    - `project_id`: you must be able to read the project (it is public, you are a member, or you are an
+    org admin).
+    - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
+    plus tasks filed in no project.
+    - Private projects you are not a member of never appear.
+    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    `include_inaccessible=true`.
 
-    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
-    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
-    or an unknown status, priority or type is a 400 naming the offending value.
+    **Filters**
+    - Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are
+    AND-ed.
+    - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
+    or type is a 400 naming the value.
+    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
+    narrows what you can already see.
+    - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
+    for the title only.
 
-    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
-    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
-    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
-    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
-    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
+    **Sort**
+    - `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`,
+    `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or
+    `desc`.
+    - Ties break on `task_id`; empty values sort last.
+    - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
+    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
 
-    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
-    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
-
-    **Search:** `filter[search]` matches the title, description, task id and tags; add
-    `filter[search_fields]=title` to match the title only.
-
-    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
-    `section_position` to every task for that scope (`null` when the task is in no section there).
-    `section_scope=own` annotates each task in its own home instead: a task in a project at
-    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
-    neither is returned unsectioned. `own` is accepted by this operation only.
+    **Sections**
+    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
+    for that scope (`null` when the task is in no section there).
+    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
+    task with neither is unsectioned. `own` works on this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.

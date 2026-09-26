@@ -123,11 +123,13 @@ def sync_detailed(
     Args:
         team_id (str):
         milestone_id (str):
-        body (MilestoneUpdate): A true partial — an absent field is left alone; `description` /
-            `owner_user_id` sent as
-            null clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,
-            re-opening clears them. A caller who may only close (the milestone's owner, without team
-            `edit`) may send `status` and nothing else — 403 otherwise.
+        body (MilestoneUpdate): A partial update: fields you leave out are unchanged.
+
+            - `description` / `owner_user_id` sent as null clear them.
+            - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
+            re-opening clears them.
+            - The milestone's owner without team `edit` rights may send `status` only — anything else
+            is a 403.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -165,11 +167,13 @@ def sync(
     Args:
         team_id (str):
         milestone_id (str):
-        body (MilestoneUpdate): A true partial — an absent field is left alone; `description` /
-            `owner_user_id` sent as
-            null clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,
-            re-opening clears them. A caller who may only close (the milestone's owner, without team
-            `edit`) may send `status` and nothing else — 403 otherwise.
+        body (MilestoneUpdate): A partial update: fields you leave out are unchanged.
+
+            - `description` / `owner_user_id` sent as null clear them.
+            - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
+            re-opening clears them.
+            - The milestone's owner without team `edit` rights may send `status` only — anything else
+            is a 403.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -202,11 +206,13 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         milestone_id (str):
-        body (MilestoneUpdate): A true partial — an absent field is left alone; `description` /
-            `owner_user_id` sent as
-            null clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,
-            re-opening clears them. A caller who may only close (the milestone's owner, without team
-            `edit`) may send `status` and nothing else — 403 otherwise.
+        body (MilestoneUpdate): A partial update: fields you leave out are unchanged.
+
+            - `description` / `owner_user_id` sent as null clear them.
+            - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
+            re-opening clears them.
+            - The milestone's owner without team `edit` rights may send `status` only — anything else
+            is a 403.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -242,11 +248,13 @@ async def asyncio(
     Args:
         team_id (str):
         milestone_id (str):
-        body (MilestoneUpdate): A true partial — an absent field is left alone; `description` /
-            `owner_user_id` sent as
-            null clear. `status` closes or re-opens: closing writes `closed_at` / `closed_by`,
-            re-opening clears them. A caller who may only close (the milestone's owner, without team
-            `edit`) may send `status` and nothing else — 403 otherwise.
+        body (MilestoneUpdate): A partial update: fields you leave out are unchanged.
+
+            - `description` / `owner_user_id` sent as null clear them.
+            - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
+            re-opening clears them.
+            - The milestone's owner without team `edit` rights may send `status` only — anything else
+            is a 403.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

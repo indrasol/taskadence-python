@@ -50,11 +50,13 @@ class TaskInDB:
         task_type (None | TaskTypeEnum | Unset): The kind of task: `task` (default), `bug` or `agent`. A label, not a
             permission. Default: 'task'. Example: task.
         tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
-        type_data (None | TaskInDBTypeDataType0 | Unset): Extra fields for the task's type. For a bug: `bug_status`,
-            `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`
-            (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only).
-            A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422
-            naming the key).
+        type_data (None | TaskInDBTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
+
+            - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
+            `actual_result`, `recommendation`.
+            - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+            - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
+            the key).
         metadata (list[TaskInDBMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
             'new': 'in_progress', 'old': 'not_started'}].
         created_by (None | str | Unset): Who created the task
