@@ -2,8 +2,9 @@
 """Regenerate everything derived from `spec/openapi.public.json` — one command, idempotent (CI runs it and then
 `git diff --exit-code`):
 
-1. `src/tasksmate/_generated/`  openapi-python-client 0.29.1 (config `openapi-python-client.yaml`, the one-line model
-                                template override in `templates/`), a do-not-edit header on every file, `ruff format`;
+1. `src/tasksmate/_generated/`  openapi-python-client 0.29.1 (config `openapi-python-client.yaml`; two one-line
+                                template overrides in `templates/`: a model `etag` field, `Self` from typing_extensions
+                                for Python 3.10), a do-not-edit header on every file, `ruff format`;
 2. `src/tasksmate/_operations.py`  the facade's operation table: method, path, parameters, filters, body, list /
                                 create / If-Match / If-None-Match, scopes — and each operation's generated parser;
 3. `src/tasksmate/resources.py`  `tm.<resource>.<verb>(…)` for every public operationId (sync and async), typed with
@@ -582,7 +583,7 @@ class Facade:
             ]
             for op in ops:
                 params, _ = self.signature(op)
-                shown = ", ".join(p for p in params if p != "*")
+                shown = ", ".join(p for p in params if p != "*").replace("models.", "").replace(" | _Auto", "")
                 lines += [
                     f"## `tm.{attr}.{op.verb}({shown})`",
                     "",
