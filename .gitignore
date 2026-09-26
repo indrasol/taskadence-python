@@ -17,7 +17,6 @@ sbom*.json
 .env
 .env.*
 *.token
-config.toml
 .streamlit/secrets.toml
 
 # OS / editors

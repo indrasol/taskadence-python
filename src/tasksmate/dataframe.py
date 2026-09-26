@@ -6,8 +6,8 @@
   (keys differ per task type, so a column is empty where a task has no such key);
 - a list of scalars becomes one comma-separated string: `tags` → `"api, backend"`, `restricted_to` → `"ada, lin"`;
   a list of objects stays a Python list in its cell;
-- columns ending in `_at` are parsed as timezone-aware datetimes, and `_date` columns as dates (both left alone when
-  a value does not parse).
+- columns ending in `_at` are parsed as timezone-aware datetimes (missing → `NaT`), and `_date` columns as
+  `datetime.date` objects (missing → `None`); a column is left as text when any value does not parse.
 
 `Page.to_dataframe()` / `AsyncPage.to_dataframe()` call this over every page.
 """
@@ -64,5 +64,5 @@ def to_dataframe(items: Iterable[Any]) -> pd.DataFrame:
         elif name.endswith("_date"):
             parsed = pandas.to_datetime(frame[column], errors="coerce", format="ISO8601")
             if parsed.notna().sum() == frame[column].notna().sum():
-                frame[column] = parsed.dt.date
+                frame[column] = [value.date() if pandas.notna(value) else None for value in parsed]
     return frame

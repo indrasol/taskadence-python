@@ -1,0 +1,9 @@
+# The example's look: TasksMate's teal, no developer toolbar. Put secrets in the environment, never in this folder.
+[client]
+toolbarMode = "viewer"
+
+[theme]
+primaryColor = "#0f766e"
+
+[browser]
+gatherUsageStats = false

@@ -122,7 +122,7 @@ def test_to_dataframe_flattens_and_types(tm: Any, api: respx.MockRouter) -> None
     frame = tm.views.rows("V1").to_dataframe()
     assert list(frame["task_id"]) == ["T1", "T2"]  # every page
     assert frame.loc[0, "tags"] == "api, backend" and frame.loc[0, "type_data.severity"] == "high"
-    assert frame.loc[0, "due_date"] == dt.date(2026, 10, 1)
+    assert frame.loc[0, "due_date"] == dt.date(2026, 10, 1) and frame.loc[1, "due_date"] is None  # a missing date: None
     assert str(frame["created_at"].dtype).startswith("datetime64") and frame["created_at"].dt.tz is not None
 
 
