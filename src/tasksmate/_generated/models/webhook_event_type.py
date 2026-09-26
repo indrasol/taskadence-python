@@ -18,7 +18,8 @@ T = TypeVar("T", bound="WebhookEventType")
 
 @_attrs_define
 class WebhookEventType:
-    """
+    """Part of `Page_WebhookEventType_`.
+
     Attributes:
         type_ (str): The dotted name, or `<resource>.*`
         resource (str):

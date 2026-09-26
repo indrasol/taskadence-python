@@ -123,17 +123,14 @@ def sync_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create a project resource row.
-
-    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
-    `project_id` form
-    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
-    value is used
-    for both the check and the write (4.1b — they used to be read from different places).
+     Upload a file and add it to the project as a resource. The project is the `project_id` query
+    parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
+    ignored — the query value is used.
 
     Args:
         project_id (str):
-        body (BodyUploadResourceV1ProjectResourcesUploadPost):
+        body (BodyUploadResourceV1ProjectResourcesUploadPost): The request body of `project-
+            resources.upload`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -163,17 +160,14 @@ def sync(
 ) -> Problem | ProjectResourceInDB | None:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create a project resource row.
-
-    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
-    `project_id` form
-    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
-    value is used
-    for both the check and the write (4.1b — they used to be read from different places).
+     Upload a file and add it to the project as a resource. The project is the `project_id` query
+    parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
+    ignored — the query value is used.
 
     Args:
         project_id (str):
-        body (BodyUploadResourceV1ProjectResourcesUploadPost):
+        body (BodyUploadResourceV1ProjectResourcesUploadPost): The request body of `project-
+            resources.upload`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -198,17 +192,14 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create a project resource row.
-
-    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
-    `project_id` form
-    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
-    value is used
-    for both the check and the write (4.1b — they used to be read from different places).
+     Upload a file and add it to the project as a resource. The project is the `project_id` query
+    parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
+    ignored — the query value is used.
 
     Args:
         project_id (str):
-        body (BodyUploadResourceV1ProjectResourcesUploadPost):
+        body (BodyUploadResourceV1ProjectResourcesUploadPost): The request body of `project-
+            resources.upload`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -236,17 +227,14 @@ async def asyncio(
 ) -> Problem | ProjectResourceInDB | None:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create a project resource row.
-
-    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
-    `project_id` form
-    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
-    value is used
-    for both the check and the write (4.1b — they used to be read from different places).
+     Upload a file and add it to the project as a resource. The project is the `project_id` query
+    parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
+    ignored — the query value is used.
 
     Args:
         project_id (str):
-        body (BodyUploadResourceV1ProjectResourcesUploadPost):
+        body (BodyUploadResourceV1ProjectResourcesUploadPost): The request body of `project-
+            resources.upload`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

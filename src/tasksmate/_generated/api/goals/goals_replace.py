@@ -115,9 +115,8 @@ def sync_detailed(
 ) -> Response[GoalOut | Problem]:
     """Update a goal (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         project_id (str):
@@ -157,9 +156,8 @@ def sync(
 ) -> GoalOut | Problem | None:
     """Update a goal (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         project_id (str):
@@ -194,9 +192,8 @@ async def asyncio_detailed(
 ) -> Response[GoalOut | Problem]:
     """Update a goal (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         project_id (str):
@@ -234,9 +231,8 @@ async def asyncio(
 ) -> GoalOut | Problem | None:
     """Update a goal (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         project_id (str):

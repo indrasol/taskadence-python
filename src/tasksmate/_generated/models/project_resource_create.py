@@ -19,7 +19,8 @@ T = TypeVar("T", bound="ProjectResourceCreate")
 
 @_attrs_define
 class ProjectResourceCreate:
-    """
+    """The request body of `project-resources.create`.
+
     Attributes:
         project_id (str): Project ID (text) Example: project-1234.
         project_name (str): Project name Example: Project 1.

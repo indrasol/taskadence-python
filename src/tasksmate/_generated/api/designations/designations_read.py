@@ -132,6 +132,8 @@ def sync_detailed(
 ) -> Response[Any | Designation | Problem]:
     """Read a designation
 
+     Read a designation.
+
     Args:
         designation_id (str):
         org_id (None | str | Unset):
@@ -167,6 +169,8 @@ def sync(
 ) -> Any | Designation | Problem | None:
     """Read a designation
 
+     Read a designation.
+
     Args:
         designation_id (str):
         org_id (None | str | Unset):
@@ -196,6 +200,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Designation | Problem]:
     """Read a designation
+
+     Read a designation.
 
     Args:
         designation_id (str):
@@ -229,6 +235,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Designation | Problem | None:
     """Read a designation
+
+     Read a designation.
 
     Args:
         designation_id (str):

@@ -145,8 +145,8 @@ def sync_detailed(
 ) -> Response[Any | PageOrgCard | Problem]:
     """Organizations you belong to or are invited to
 
-     List all organizations the user is a member of or invited to.
-    Returns simplified OrgCard objects with essential information, in the 4.1 list envelope.
+     The organizations you are a member of or have a pending invitation to, as organization cards
+    (`is_invite` marks an invitation), paginated as `{data, next_cursor}`.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -190,8 +190,8 @@ def sync(
 ) -> Any | PageOrgCard | Problem | None:
     """Organizations you belong to or are invited to
 
-     List all organizations the user is a member of or invited to.
-    Returns simplified OrgCard objects with essential information, in the 4.1 list envelope.
+     The organizations you are a member of or have a pending invitation to, as organization cards
+    (`is_invite` marks an invitation), paginated as `{data, next_cursor}`.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -230,8 +230,8 @@ async def asyncio_detailed(
 ) -> Response[Any | PageOrgCard | Problem]:
     """Organizations you belong to or are invited to
 
-     List all organizations the user is a member of or invited to.
-    Returns simplified OrgCard objects with essential information, in the 4.1 list envelope.
+     The organizations you are a member of or have a pending invitation to, as organization cards
+    (`is_invite` marks an invitation), paginated as `{data, next_cursor}`.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -273,8 +273,8 @@ async def asyncio(
 ) -> Any | PageOrgCard | Problem | None:
     """Organizations you belong to or are invited to
 
-     List all organizations the user is a member of or invited to.
-    Returns simplified OrgCard objects with essential information, in the 4.1 list envelope.
+     The organizations you are a member of or have a pending invitation to, as organization cards
+    (`is_invite` marks an invitation), paginated as `{data, next_cursor}`.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.

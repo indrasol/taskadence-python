@@ -117,25 +117,16 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Update a task (JSON merge-patch)
 
-     Requires `edit` on the task (task 2.2 — the whole route, not only a move):
-    editor+ / org admin, the assignee, or on a restricted task its creator /
-    assignee / org admin. Setting `restricted_to` additionally requires `restrict`.
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
+    permission to restrict the task.
 
     Args:
         task_id (str):
         if_match (str | Unset):
-        body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
-            `pass`, so it inherited
-            `title: str = Field(...)` and any body without a title was a 422 before the route ran (the
-            goal
-            card's `{"type_data": {...}}` write among them). Every field is optional here, `title`
-            included;
-            the route sends `dict(exclude_unset=True)` on, so an absent field is absent from the write
-            and the
-            base model's defaults never ride along. An EXPLICIT empty / whitespace-only title is still
-            refused —
-            "absent" and "blank" are different things. `TaskCreate` is unchanged: a task needs a title
-            to exist.
+        body (TaskUpdate): The body of a task update. Every field is optional, `title` included,
+            and omitted fields are left unchanged. An explicitly empty or whitespace-only `title` is
+            refused (422).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -167,25 +158,16 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Update a task (JSON merge-patch)
 
-     Requires `edit` on the task (task 2.2 — the whole route, not only a move):
-    editor+ / org admin, the assignee, or on a restricted task its creator /
-    assignee / org admin. Setting `restricted_to` additionally requires `restrict`.
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
+    permission to restrict the task.
 
     Args:
         task_id (str):
         if_match (str | Unset):
-        body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
-            `pass`, so it inherited
-            `title: str = Field(...)` and any body without a title was a 422 before the route ran (the
-            goal
-            card's `{"type_data": {...}}` write among them). Every field is optional here, `title`
-            included;
-            the route sends `dict(exclude_unset=True)` on, so an absent field is absent from the write
-            and the
-            base model's defaults never ride along. An EXPLICIT empty / whitespace-only title is still
-            refused —
-            "absent" and "blank" are different things. `TaskCreate` is unchanged: a task needs a title
-            to exist.
+        body (TaskUpdate): The body of a task update. Every field is optional, `title` included,
+            and omitted fields are left unchanged. An explicitly empty or whitespace-only `title` is
+            refused (422).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -212,25 +194,16 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Update a task (JSON merge-patch)
 
-     Requires `edit` on the task (task 2.2 — the whole route, not only a move):
-    editor+ / org admin, the assignee, or on a restricted task its creator /
-    assignee / org admin. Setting `restricted_to` additionally requires `restrict`.
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
+    permission to restrict the task.
 
     Args:
         task_id (str):
         if_match (str | Unset):
-        body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
-            `pass`, so it inherited
-            `title: str = Field(...)` and any body without a title was a 422 before the route ran (the
-            goal
-            card's `{"type_data": {...}}` write among them). Every field is optional here, `title`
-            included;
-            the route sends `dict(exclude_unset=True)` on, so an absent field is absent from the write
-            and the
-            base model's defaults never ride along. An EXPLICIT empty / whitespace-only title is still
-            refused —
-            "absent" and "blank" are different things. `TaskCreate` is unchanged: a task needs a title
-            to exist.
+        body (TaskUpdate): The body of a task update. Every field is optional, `title` included,
+            and omitted fields are left unchanged. An explicitly empty or whitespace-only `title` is
+            refused (422).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -260,25 +233,16 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Update a task (JSON merge-patch)
 
-     Requires `edit` on the task (task 2.2 — the whole route, not only a move):
-    editor+ / org admin, the assignee, or on a restricted task its creator /
-    assignee / org admin. Setting `restricted_to` additionally requires `restrict`.
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
+    permission to restrict the task.
 
     Args:
         task_id (str):
         if_match (str | Unset):
-        body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
-            `pass`, so it inherited
-            `title: str = Field(...)` and any body without a title was a 422 before the route ran (the
-            goal
-            card's `{"type_data": {...}}` write among them). Every field is optional here, `title`
-            included;
-            the route sends `dict(exclude_unset=True)` on, so an absent field is absent from the write
-            and the
-            base model's defaults never ride along. An EXPLICIT empty / whitespace-only title is still
-            refused —
-            "absent" and "blank" are different things. `TaskCreate` is unchanged: a task needs a title
-            to exist.
+        body (TaskUpdate): The body of a task update. Every field is optional, `title` included,
+            and omitted fields are left unchanged. An explicitly empty or whitespace-only `title` is
+            refused (422).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

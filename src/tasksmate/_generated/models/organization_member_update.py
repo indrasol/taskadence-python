@@ -20,14 +20,15 @@ T = TypeVar("T", bound="OrganizationMemberUpdate")
 
 @_attrs_define
 class OrganizationMemberUpdate:
-    """
+    """The request body of `organization-members.replace` and `organization-members.update`.
+
     Attributes:
         designation (None | str | Unset): Designation ID (UUID) Example: d1e2f3g4-5678-1234-9abc-def012345678.
-        designation_id (None | str | Unset): Task 2.8: a designations row id (DG… seed / DO… org row). Either this or
-            `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
+        designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
+            this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
         role (None | str | Unset): Role ID (UUID) Example: r1e2f3g4-5678-1234-9abc-def012345678.
         invited_by (None | str | Unset): Inviter's User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
-        is_active (bool | None | Unset): Is the member active? (4.1b: no default — omitted = unchanged) Example: True.
+        is_active (bool | None | Unset): Whether the member is active. Omit to leave it unchanged. Example: True.
         invited_at (datetime.datetime | None | Unset): When the invite was sent
         accepted_at (datetime.datetime | None | Unset): When the invite was accepted
         updated_by (None | str | Unset): Who updates the member

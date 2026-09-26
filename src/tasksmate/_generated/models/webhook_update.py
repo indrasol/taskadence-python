@@ -21,7 +21,8 @@ T = TypeVar("T", bound="WebhookUpdate")
 
 @_attrs_define
 class WebhookUpdate:
-    """
+    """The request body of `webhooks.update`.
+
     Attributes:
         name (None | str | Unset):
         url (None | str | Unset):

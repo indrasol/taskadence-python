@@ -20,7 +20,8 @@ T = TypeVar("T", bound="GoalCreate")
 
 @_attrs_define
 class GoalCreate:
-    """
+    """The request body of `goals.create`.
+
     Attributes:
         name (str): The goal's name (1..200).
         target_date (datetime.date | None | Unset): Optional. Passing it changes nothing in the data; the view shows it.

@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PinListPage")
 
 @_attrs_define
 class PinListPage:
-    """
+    """Returned by `view-pins.list` and `view-pins.reorder`.
+
     Attributes:
         data (list[PinOut]):
         next_cursor (None | str | Unset):

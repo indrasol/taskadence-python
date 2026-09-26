@@ -122,6 +122,8 @@ def sync_detailed(
 ) -> Response[Any | Problem]:
     """Delete an attachment
 
+     Delete an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
@@ -157,6 +159,8 @@ def sync(
 ) -> Any | Problem | None:
     """Delete an attachment
 
+     Delete an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
@@ -186,6 +190,8 @@ async def asyncio_detailed(
     if_match: str | Unset = UNSET,
 ) -> Response[Any | Problem]:
     """Delete an attachment
+
+     Delete an attachment.
 
     Args:
         attachment_id (str):
@@ -219,6 +225,8 @@ async def asyncio(
     if_match: str | Unset = UNSET,
 ) -> Any | Problem | None:
     """Delete an attachment
+
+     Delete an attachment.
 
     Args:
         attachment_id (str):

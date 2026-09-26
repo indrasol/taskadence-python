@@ -20,9 +20,10 @@ T = TypeVar("T", bound="SectionReorder")
 
 @_attrs_define
 class SectionReorder:
-    """
+    """The request body of `sections.reorder`.
+
     Attributes:
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.
         scope_id (str):
         section_ids (list[str]): Every section of the scope, in the new order
     """

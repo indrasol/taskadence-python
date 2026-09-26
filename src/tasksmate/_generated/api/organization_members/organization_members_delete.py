@@ -117,6 +117,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Remove a member
 
+     Remove a member.
+
     Args:
         user_id (str):
         org_id (str):
@@ -152,6 +154,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Remove a member
 
+     Remove a member.
+
     Args:
         user_id (str):
         org_id (str):
@@ -181,6 +185,8 @@ async def asyncio_detailed(
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Remove a member
+
+     Remove a member.
 
     Args:
         user_id (str):
@@ -214,6 +220,8 @@ async def asyncio(
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Remove a member
+
+     Remove a member.
 
     Args:
         user_id (str):

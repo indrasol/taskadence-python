@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageWebhookEventType")
 
 @_attrs_define
 class PageWebhookEventType:
-    """
+    """Returned by `webhooks.events`.
+
     Attributes:
         data (list[WebhookEventType]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

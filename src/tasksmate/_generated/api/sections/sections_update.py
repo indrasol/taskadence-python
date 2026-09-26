@@ -118,7 +118,7 @@ def sync_detailed(
 
     Args:
         section_id (str):
-        body (SectionUpdate):
+        body (SectionUpdate): The request body of `sections.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,7 +152,7 @@ def sync(
 
     Args:
         section_id (str):
-        body (SectionUpdate):
+        body (SectionUpdate): The request body of `sections.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -181,7 +181,7 @@ async def asyncio_detailed(
 
     Args:
         section_id (str):
-        body (SectionUpdate):
+        body (SectionUpdate): The request body of `sections.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -213,7 +213,7 @@ async def asyncio(
 
     Args:
         section_id (str):
-        body (SectionUpdate):
+        body (SectionUpdate): The request body of `sections.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

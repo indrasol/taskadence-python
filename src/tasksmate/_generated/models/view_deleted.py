@@ -16,7 +16,8 @@ T = TypeVar("T", bound="ViewDeleted")
 
 @_attrs_define
 class ViewDeleted:
-    """
+    """Returned by `views.delete`.
+
     Attributes:
         ok (bool):
         view_id (str):

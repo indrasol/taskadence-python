@@ -19,7 +19,8 @@ T = TypeVar("T", bound="TeamUpdate")
 
 @_attrs_define
 class TeamUpdate:
-    """
+    """The request body of `teams.replace` and `teams.update`.
+
     Attributes:
         name (None | str | Unset):
         description (None | str | Unset):

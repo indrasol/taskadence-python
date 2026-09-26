@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageTaskAttachmentInDB")
 
 @_attrs_define
 class PageTaskAttachmentInDB:
-    """
+    """Returned by `task-attachments.list`.
+
     Attributes:
         data (list[TaskAttachmentInDB]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

@@ -16,7 +16,8 @@ T = TypeVar("T", bound="AvailabilityDeleted")
 
 @_attrs_define
 class AvailabilityDeleted:
-    """
+    """Returned by `availability.delete`.
+
     Attributes:
         ok (bool):
         entry_id (str):

@@ -119,15 +119,15 @@ def sync_detailed(
 ) -> Response[Problem | TeamDetail]:
     """Update a team (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Rename / re-describe. `edit`: the team owner or an org owner / admin.
 
     Args:
         team_id (str):
         if_match (str | Unset):
-        body (TeamUpdate):
+        body (TeamUpdate): The request body of `teams.replace` and `teams.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -159,15 +159,15 @@ def sync(
 ) -> Problem | TeamDetail | None:
     """Update a team (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Rename / re-describe. `edit`: the team owner or an org owner / admin.
 
     Args:
         team_id (str):
         if_match (str | Unset):
-        body (TeamUpdate):
+        body (TeamUpdate): The request body of `teams.replace` and `teams.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,15 +194,15 @@ async def asyncio_detailed(
 ) -> Response[Problem | TeamDetail]:
     """Update a team (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Rename / re-describe. `edit`: the team owner or an org owner / admin.
 
     Args:
         team_id (str):
         if_match (str | Unset):
-        body (TeamUpdate):
+        body (TeamUpdate): The request body of `teams.replace` and `teams.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -232,15 +232,15 @@ async def asyncio(
 ) -> Problem | TeamDetail | None:
     """Update a team (PUT; partial)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Rename / re-describe. `edit`: the team owner or an org owner / admin.
 
     Args:
         team_id (str):
         if_match (str | Unset):
-        body (TeamUpdate):
+        body (TeamUpdate): The request body of `teams.replace` and `teams.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

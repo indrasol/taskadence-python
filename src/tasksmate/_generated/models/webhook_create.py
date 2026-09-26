@@ -19,7 +19,8 @@ T = TypeVar("T", bound="WebhookCreate")
 
 @_attrs_define
 class WebhookCreate:
-    """
+    """The request body of `webhooks.create`.
+
     Attributes:
         org_id (str): The organization
         name (str):

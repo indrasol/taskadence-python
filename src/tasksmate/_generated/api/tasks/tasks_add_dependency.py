@@ -116,8 +116,7 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
-            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
+        body (DependencyLink): The body of `POST /v1/tasks/{task_id}/dependencies`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -151,8 +150,7 @@ def sync(
 
     Args:
         task_id (str):
-        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
-            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
+        body (DependencyLink): The body of `POST /v1/tasks/{task_id}/dependencies`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -181,8 +179,7 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
-            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
+        body (DependencyLink): The body of `POST /v1/tasks/{task_id}/dependencies`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -214,8 +211,7 @@ async def asyncio(
 
     Args:
         task_id (str):
-        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
-            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
+        body (DependencyLink): The body of `POST /v1/tasks/{task_id}/dependencies`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

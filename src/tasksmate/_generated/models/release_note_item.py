@@ -22,11 +22,13 @@ T = TypeVar("T", bound="ReleaseNoteItem")
 
 @_attrs_define
 class ReleaseNoteItem:
-    """
+    """Part of `Release`.
+
     Attributes:
         id (str):
         commit_sha (str):
-        commit_type (CommitType):
+        commit_type (CommitType): One of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`,
+            `build`, `revert`. Used by `ReleaseNoteItem`.
         subject (str):
         commit_date (datetime.datetime):
         scope (None | str | Unset):

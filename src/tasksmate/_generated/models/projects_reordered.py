@@ -18,7 +18,8 @@ T = TypeVar("T", bound="ProjectsReordered")
 
 @_attrs_define
 class ProjectsReordered:
-    """
+    """Returned by `projects.reorder`.
+
     Attributes:
         ok (bool):
         org_id (str):

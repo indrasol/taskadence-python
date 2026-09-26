@@ -123,9 +123,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | RoadmapOut]:
     """The organization's roadmap
 
-     The Roadmap page (6.9b): every readable project of the org with journeys, and the readable ones
-    without (the Add-project dropdown). The team route's read over the org — same function, same
-    queries.
+     The organization's roadmap: every project you can read that has journeys, plus the readable projects
+    that have none.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the
@@ -160,9 +159,8 @@ def sync(
 ) -> Any | Problem | RoadmapOut | None:
     """The organization's roadmap
 
-     The Roadmap page (6.9b): every readable project of the org with journeys, and the readable ones
-    without (the Add-project dropdown). The team route's read over the org — same function, same
-    queries.
+     The organization's roadmap: every project you can read that has journeys, plus the readable projects
+    that have none.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the
@@ -192,9 +190,8 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | RoadmapOut]:
     """The organization's roadmap
 
-     The Roadmap page (6.9b): every readable project of the org with journeys, and the readable ones
-    without (the Add-project dropdown). The team route's read over the org — same function, same
-    queries.
+     The organization's roadmap: every project you can read that has journeys, plus the readable projects
+    that have none.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the
@@ -227,9 +224,8 @@ async def asyncio(
 ) -> Any | Problem | RoadmapOut | None:
     """The organization's roadmap
 
-     The Roadmap page (6.9b): every readable project of the org with journeys, and the readable ones
-    without (the Add-project dropdown). The team route's read over the org — same function, same
-    queries.
+     The organization's roadmap: every project you can read that has journeys, plus the readable projects
+    that have none.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the

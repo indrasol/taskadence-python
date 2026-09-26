@@ -20,7 +20,8 @@ T = TypeVar("T", bound="MilestoneCreate")
 
 @_attrs_define
 class MilestoneCreate:
-    """
+    """The request body of `milestones.create`.
+
     Attributes:
         title (str): Unique among the team's live milestones, open or closed (case-insensitive) — 409 otherwise
         target_date (datetime.date): The date the team commits to. Passing it changes nothing; the view shows it as

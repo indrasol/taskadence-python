@@ -36,7 +36,8 @@ class Designation:
         Attributes:
             designation_id (str):
             label (None | str | Unset): The human name
-            name (None | str | Unset): The pre-2.8 name (the list mirrors `label`; a row holds the legacy enum)
+            name (None | str | Unset): Older alias of `label`. In a list it equals `label`; a single read returns the stored
+                value, which may be the older fixed name.
             category (None | str | Unset):
             org_id (None | str | Unset): null = a global (system) designation
             is_system (bool | None | Unset):
@@ -45,7 +46,8 @@ class Designation:
             aliases (list[str] | None | Unset):
             pinned (bool | None | Unset): List only: listed first in its category for this org
             hidden (bool | None | Unset): List only: not offered in this org's picker
-            legacy_value (None | str | Unset): List only: the pre-2.8 enum value this row replaces, if any
+            legacy_value (None | str | Unset): List only: the older fixed designation value this designation replaces, if
+                any.
             usage (DesignationUsage | None | Unset): List only, `with_usage=true`
             slug (None | str | Unset):
             metadata (DesignationMetadataType0 | None | Unset):

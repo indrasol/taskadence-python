@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageOrganizationInviteInDB")
 
 @_attrs_define
 class PageOrganizationInviteInDB:
-    """
+    """Returned by `organization-invites.list` and `organization-invites.mine`.
+
     Attributes:
         data (list[OrganizationInviteInDB]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

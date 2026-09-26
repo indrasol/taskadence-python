@@ -23,7 +23,8 @@ T = TypeVar("T", bound="ViewUpdate")
 
 @_attrs_define
 class ViewUpdate:
-    """
+    """The request body of `views.update`.
+
     Attributes:
         name (None | str | Unset):
         query (None | Unset | ViewUpdateQueryType0):

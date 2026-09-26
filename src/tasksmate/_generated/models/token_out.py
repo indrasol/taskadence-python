@@ -26,7 +26,8 @@ T = TypeVar("T", bound="TokenOut")
 
 @_attrs_define
 class TokenOut:
-    """
+    """Returned by `tokens.delete`, `tokens.read` and `tokens.update`.
+
     Example:
         {'created_at': '2026-09-25T12:00:00Z', 'created_by': '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'expires_at':
             '2026-12-31T00:00:00Z', 'grant_type': 'personal', 'kind': 'live', 'name': 'CI deploys', 'org_id': 'O0020',
@@ -45,9 +46,9 @@ class TokenOut:
         grant_type (TokenOutGrantType):
         scopes (list[str]):
         status (TokenOutStatus):
-        principal_display (None | str | Unset): The principal's name (4.5): a service account's display name, else the
-            username (the email when there is none); null when the principal is no longer in the organization
-        client_id (None | str | Unset): Reserved for third-party apps (4.8); null
+        principal_display (None | str | Unset): The principal's name: a service account's display name, otherwise the
+            username (or the email when there is none); null when the principal is no longer in the organization.
+        client_id (None | str | Unset): Reserved for third-party apps; null.
         project_ids (list[str] | None | Unset):
         expires_at (datetime.datetime | None | Unset):
         last_used_at (datetime.datetime | None | Unset): Updated at most once a minute

@@ -112,6 +112,8 @@ def sync_detailed(
 ) -> Response[Any | Health | Problem]:
     """Liveness probe
 
+     Liveness probe.
+
     Args:
         if_none_match (str | Unset):
 
@@ -141,6 +143,8 @@ def sync(
 ) -> Any | Health | Problem | None:
     """Liveness probe
 
+     Liveness probe.
+
     Args:
         if_none_match (str | Unset):
 
@@ -164,6 +168,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Health | Problem]:
     """Liveness probe
+
+     Liveness probe.
 
     Args:
         if_none_match (str | Unset):
@@ -191,6 +197,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Health | Problem | None:
     """Liveness probe
+
+     Liveness probe.
 
     Args:
         if_none_match (str | Unset):

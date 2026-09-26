@@ -25,7 +25,8 @@ T = TypeVar("T", bound="TeamDetail")
 
 @_attrs_define
 class TeamDetail:
-    """
+    """Returned by `teams.create`, `teams.read`, `teams.replace` and `teams.update`.
+
     Attributes:
         team_id (str):
         org_id (str):

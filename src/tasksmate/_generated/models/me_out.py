@@ -24,16 +24,17 @@ T = TypeVar("T", bound="MeOut")
 
 @_attrs_define
 class MeOut:
-    """
+    """Returned by `me.read`.
+
     Example:
         {'organizations': [{'designation': 'Engineering Manager', 'name': 'Indrasol', 'org_id': 'O0020', 'role':
             'owner'}], 'principal': {'email': 'ada@example.com', 'email_verified': True, 'id': '3f1c…', 'type': 'user',
             'username': 'ada'}}
 
     Attributes:
-        principal (MePrincipal):
+        principal (MePrincipal): Part of `MeOut`.
         organizations (list[MeOrganization] | Unset): Active memberships, by name (a token: only its own organization)
-        auth (MeAuth | None | Unset): 4.2: the access token behind this request (absent for a Supabase session)
+        auth (MeAuth | None | Unset): The access token behind this request; absent for a session token.
     """
 
     principal: MePrincipal

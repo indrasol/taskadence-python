@@ -194,35 +194,30 @@ def sync_detailed(
 ) -> Response[Any | PageSectionOut | SectionsForScopes | Problem]:
     """List a scope's sections (or several scopes')
 
-     Ordered sections of one scope with their task counts. A user's own personal
-    scope is seeded with Assigned · Doing · Later on first read (idempotent); a team
-    scope is NOT seeded (6.1 — it was Default · Agent tasks from 2.6a; sections
-    seeded before 6.1 stay). Team sections are managed by the team owner / an org
-    admin only; every reader of the team reads them.
+     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
+    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
+    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
+    team can read them.
 
-    **Several scopes at once (6.1b).** `scope_ids` replaces `scope_id` with a list of
-    scopes of the same `scope_type` and answers in **one** query (plus one for the
-    counts), returning `{"data": [...], "scopes": [...]}` instead of a bare list —
-    every row carries its own `scope_type` / `scope_id`, so the caller buckets them.
+    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
+    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
+    its own `scope_type` / `scope_id`.
 
-    - **`scope_type=user` is refused (400).** A personal scope is private to its
-      owner, so "several personal scopes" is a question nobody should be able to ask.
-    - **Access is checked per scope, and an unreadable scope is OMITTED** — not a 403
-      for the whole call. An API caller may name any ids, and one private project must
-      not deny the other eleven. `scopes` names what the response answered for, so
-      "absent from `scopes`" is *not yours* and "present with no rows" is *no sections*.
-      A scope the caller cannot read never contributes a row.
-    - **Nothing is seeded**: seeding is the personal scope's behaviour and this path
-      cannot reach one.
+    - `scope_type=user` is refused (400): personal scopes are private to their owner.
+    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
+    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
+    you cannot read, and a scope present with no rows has no sections.
+    - Nothing is created on this path.
 
     Args:
         org_id (str): Organization the scope belongs to.
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5
+            more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): 6.1b: several scopes of `scope_type` in ONE read —
-            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for scope_type in
-            project, team; `user` → 400.
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
+            `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: position, name, created_at. Default: the list's
@@ -272,35 +267,30 @@ def sync(
 ) -> Any | PageSectionOut | SectionsForScopes | Problem | None:
     """List a scope's sections (or several scopes')
 
-     Ordered sections of one scope with their task counts. A user's own personal
-    scope is seeded with Assigned · Doing · Later on first read (idempotent); a team
-    scope is NOT seeded (6.1 — it was Default · Agent tasks from 2.6a; sections
-    seeded before 6.1 stay). Team sections are managed by the team owner / an org
-    admin only; every reader of the team reads them.
+     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
+    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
+    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
+    team can read them.
 
-    **Several scopes at once (6.1b).** `scope_ids` replaces `scope_id` with a list of
-    scopes of the same `scope_type` and answers in **one** query (plus one for the
-    counts), returning `{"data": [...], "scopes": [...]}` instead of a bare list —
-    every row carries its own `scope_type` / `scope_id`, so the caller buckets them.
+    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
+    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
+    its own `scope_type` / `scope_id`.
 
-    - **`scope_type=user` is refused (400).** A personal scope is private to its
-      owner, so "several personal scopes" is a question nobody should be able to ask.
-    - **Access is checked per scope, and an unreadable scope is OMITTED** — not a 403
-      for the whole call. An API caller may name any ids, and one private project must
-      not deny the other eleven. `scopes` names what the response answered for, so
-      "absent from `scopes`" is *not yours* and "present with no rows" is *no sections*.
-      A scope the caller cannot read never contributes a row.
-    - **Nothing is seeded**: seeding is the personal scope's behaviour and this path
-      cannot reach one.
+    - `scope_type=user` is refused (400): personal scopes are private to their owner.
+    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
+    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
+    you cannot read, and a scope present with no rows has no sections.
+    - Nothing is created on this path.
 
     Args:
         org_id (str): Organization the scope belongs to.
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5
+            more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): 6.1b: several scopes of `scope_type` in ONE read —
-            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for scope_type in
-            project, team; `user` → 400.
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
+            `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: position, name, created_at. Default: the list's
@@ -345,35 +335,30 @@ async def asyncio_detailed(
 ) -> Response[Any | PageSectionOut | SectionsForScopes | Problem]:
     """List a scope's sections (or several scopes')
 
-     Ordered sections of one scope with their task counts. A user's own personal
-    scope is seeded with Assigned · Doing · Later on first read (idempotent); a team
-    scope is NOT seeded (6.1 — it was Default · Agent tasks from 2.6a; sections
-    seeded before 6.1 stay). Team sections are managed by the team owner / an org
-    admin only; every reader of the team reads them.
+     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
+    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
+    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
+    team can read them.
 
-    **Several scopes at once (6.1b).** `scope_ids` replaces `scope_id` with a list of
-    scopes of the same `scope_type` and answers in **one** query (plus one for the
-    counts), returning `{"data": [...], "scopes": [...]}` instead of a bare list —
-    every row carries its own `scope_type` / `scope_id`, so the caller buckets them.
+    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
+    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
+    its own `scope_type` / `scope_id`.
 
-    - **`scope_type=user` is refused (400).** A personal scope is private to its
-      owner, so "several personal scopes" is a question nobody should be able to ask.
-    - **Access is checked per scope, and an unreadable scope is OMITTED** — not a 403
-      for the whole call. An API caller may name any ids, and one private project must
-      not deny the other eleven. `scopes` names what the response answered for, so
-      "absent from `scopes`" is *not yours* and "present with no rows" is *no sections*.
-      A scope the caller cannot read never contributes a row.
-    - **Nothing is seeded**: seeding is the personal scope's behaviour and this path
-      cannot reach one.
+    - `scope_type=user` is refused (400): personal scopes are private to their owner.
+    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
+    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
+    you cannot read, and a scope present with no rows has no sections.
+    - Nothing is created on this path.
 
     Args:
         org_id (str): Organization the scope belongs to.
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5
+            more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): 6.1b: several scopes of `scope_type` in ONE read —
-            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for scope_type in
-            project, team; `user` → 400.
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
+            `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: position, name, created_at. Default: the list's
@@ -421,35 +406,30 @@ async def asyncio(
 ) -> Any | PageSectionOut | SectionsForScopes | Problem | None:
     """List a scope's sections (or several scopes')
 
-     Ordered sections of one scope with their task counts. A user's own personal
-    scope is seeded with Assigned · Doing · Later on first read (idempotent); a team
-    scope is NOT seeded (6.1 — it was Default · Agent tasks from 2.6a; sections
-    seeded before 6.1 stay). Team sections are managed by the team owner / an org
-    admin only; every reader of the team reads them.
+     The ordered sections of one scope, with their task counts. Your personal scope (`scope_type=user`)
+    starts with the sections Assigned, Doing and Later, created on first read; a team scope starts
+    empty. A team's sections are managed by the team owner or an org admin; everyone who can read the
+    team can read them.
 
-    **Several scopes at once (6.1b).** `scope_ids` replaces `scope_id` with a list of
-    scopes of the same `scope_type` and answers in **one** query (plus one for the
-    counts), returning `{"data": [...], "scopes": [...]}` instead of a bare list —
-    every row carries its own `scope_type` / `scope_id`, so the caller buckets them.
+    **Several scopes at once.** `scope_ids` replaces `scope_id` with a list of scopes of the same
+    `scope_type`, answered in one response: `{"data": [...], "scopes": [...]}`, where every row carries
+    its own `scope_type` / `scope_id`.
 
-    - **`scope_type=user` is refused (400).** A personal scope is private to its
-      owner, so "several personal scopes" is a question nobody should be able to ask.
-    - **Access is checked per scope, and an unreadable scope is OMITTED** — not a 403
-      for the whole call. An API caller may name any ids, and one private project must
-      not deny the other eleven. `scopes` names what the response answered for, so
-      "absent from `scopes`" is *not yours* and "present with no rows" is *no sections*.
-      A scope the caller cannot read never contributes a row.
-    - **Nothing is seeded**: seeding is the personal scope's behaviour and this path
-      cannot reach one.
+    - `scope_type=user` is refused (400): personal scopes are private to their owner.
+    - Access is checked per scope, and a scope you cannot read is **omitted** rather than failing the
+    whole call. `scopes` names what the response answered for, so a scope missing from `scopes` is one
+    you cannot read, and a scope present with no rows has no sections.
+    - Nothing is created on this path.
 
     Args:
         org_id (str): Organization the scope belongs to.
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5
+            more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): 6.1b: several scopes of `scope_type` in ONE read —
-            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for scope_type in
-            project, team; `user` → 400.
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+            repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
+            `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: position, name, created_at. Default: the list's

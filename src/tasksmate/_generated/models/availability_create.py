@@ -20,7 +20,8 @@ T = TypeVar("T", bound="AvailabilityCreate")
 
 @_attrs_define
 class AvailabilityCreate:
-    """
+    """The request body of `availability.create`.
+
     Attributes:
         user_id (str): The person who is away — must be an active member of THIS team (422 otherwise)
         start_date (datetime.date): First unavailable day

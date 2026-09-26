@@ -30,7 +30,8 @@ T = TypeVar("T", bound="ProjectUpdate")
 
 @_attrs_define
 class ProjectUpdate:
-    """
+    """The request body of `projects.replace` and `projects.update`.
+
     Attributes:
         org_id (None | str | Unset):
         name (None | str | Unset):

@@ -30,7 +30,8 @@ T = TypeVar("T", bound="ProjectCreate")
 
 @_attrs_define
 class ProjectCreate:
-    """
+    """The request body of `projects.create`.
+
     Attributes:
         org_id (str): Organization ID (UUID) Example: a1b2c3d4-5678-1234-9abc-def012345678.
         name (str): Project name Example: Website Redesign.
@@ -46,10 +47,10 @@ class ProjectCreate:
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
         team_members (list[str] | None | Unset): List of user names to add as members
-        visibility (None | ProjectVisibilityEnum | Unset): public: every org member sees the project; private: members
-            only (enforced from task 2.2) Default: 'public'. Example: public.
-        team_id (None | str | Unset): Team the project is filed under (2.6a); an active team of the same org (422
-            otherwise). null = none.
+        visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
+            project; `private`: only its members and org admins. Default: 'public'. Example: public.
+        team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
+            organization (422 otherwise). null = none.
         owner_designation (None | str | Unset): Designation of the project owner Example: manager.
         team_member_designations (list[TeamMemberDesignation] | None | Unset): Designations for team members
     """

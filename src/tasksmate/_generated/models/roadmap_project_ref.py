@@ -18,7 +18,8 @@ T = TypeVar("T", bound="RoadmapProjectRef")
 
 @_attrs_define
 class RoadmapProjectRef:
-    """
+    """Part of `RoadmapOut`.
+
     Attributes:
         project_id (str):
         name (str):

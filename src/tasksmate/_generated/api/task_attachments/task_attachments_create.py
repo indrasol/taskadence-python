@@ -116,7 +116,8 @@ def sync_detailed(
     Enforces per-task limit.
 
     Args:
-        body (BodyUploadAttachmentV1TaskAttachmentsPost):
+        body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
+            attachments.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -148,7 +149,8 @@ def sync(
     Enforces per-task limit.
 
     Args:
-        body (BodyUploadAttachmentV1TaskAttachmentsPost):
+        body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
+            attachments.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -175,7 +177,8 @@ async def asyncio_detailed(
     Enforces per-task limit.
 
     Args:
-        body (BodyUploadAttachmentV1TaskAttachmentsPost):
+        body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
+            attachments.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -205,7 +208,8 @@ async def asyncio(
     Enforces per-task limit.
 
     Args:
-        body (BodyUploadAttachmentV1TaskAttachmentsPost):
+        body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
+            attachments.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

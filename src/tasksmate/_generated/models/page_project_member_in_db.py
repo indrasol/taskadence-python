@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageProjectMemberInDB")
 
 @_attrs_define
 class PageProjectMemberInDB:
-    """
+    """Returned by `project-members.list`.
+
     Attributes:
         data (list[ProjectMemberInDB]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

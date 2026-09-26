@@ -112,29 +112,19 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """File a task in a team sprint (or none)
 
-     File the task into a TEAM sprint (`sprint_id: null` takes it out). The permission is
-    the task's own `edit` and nothing more — 2.6a's rule for `team_id` (*"setting a task's
-    `team_id` needs only the task's `edit`"*), copied rather than re-invented, so a plain
-    team member may put work they may edit into the sprint without being able to rename it.
+     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
+    do this, without needing any right over the sprint itself.
 
-    The one data rule is reachability: the sprint must belong to a team the task can be
-    reached from — a project of that team, or, for an unfiled task, that team itself. A
-    sprint that does not exist is a 404; an unreachable one is a **422** with a message
-    that says which, never a silent drop.
+    The sprint must belong to a team the task is reachable from: the task is in one of the team's
+    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
+    one is a 422 whose message says why.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
-    Not to be confused with `PUT /tasks/{id}/test-run` (3.13), which files a BUG under a
-    `test_trackers` row through `type_data.tracker_id`. Different table, different rule.
-
     Args:
         task_id (str):
-        body (TaskSprintSet): `PUT /tasks/{task_id}/sprint` (6.3): file the task into a TEAM
-            sprint, `null` to take it out.
-            Only the task's own `edit` (2.6a's rule for `team_id`), plus the reachability rule; one
-            history entry.
-            Distinct from `TaskTestRunSet` below, which is 3.13's bug → `test_trackers` writer over
-            `type_data`.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
+            file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -164,29 +154,19 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """File a task in a team sprint (or none)
 
-     File the task into a TEAM sprint (`sprint_id: null` takes it out). The permission is
-    the task's own `edit` and nothing more — 2.6a's rule for `team_id` (*"setting a task's
-    `team_id` needs only the task's `edit`"*), copied rather than re-invented, so a plain
-    team member may put work they may edit into the sprint without being able to rename it.
+     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
+    do this, without needing any right over the sprint itself.
 
-    The one data rule is reachability: the sprint must belong to a team the task can be
-    reached from — a project of that team, or, for an unfiled task, that team itself. A
-    sprint that does not exist is a 404; an unreachable one is a **422** with a message
-    that says which, never a silent drop.
+    The sprint must belong to a team the task is reachable from: the task is in one of the team's
+    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
+    one is a 422 whose message says why.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
-    Not to be confused with `PUT /tasks/{id}/test-run` (3.13), which files a BUG under a
-    `test_trackers` row through `type_data.tracker_id`. Different table, different rule.
-
     Args:
         task_id (str):
-        body (TaskSprintSet): `PUT /tasks/{task_id}/sprint` (6.3): file the task into a TEAM
-            sprint, `null` to take it out.
-            Only the task's own `edit` (2.6a's rule for `team_id`), plus the reachability rule; one
-            history entry.
-            Distinct from `TaskTestRunSet` below, which is 3.13's bug → `test_trackers` writer over
-            `type_data`.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
+            file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -211,29 +191,19 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """File a task in a team sprint (or none)
 
-     File the task into a TEAM sprint (`sprint_id: null` takes it out). The permission is
-    the task's own `edit` and nothing more — 2.6a's rule for `team_id` (*"setting a task's
-    `team_id` needs only the task's `edit`"*), copied rather than re-invented, so a plain
-    team member may put work they may edit into the sprint without being able to rename it.
+     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
+    do this, without needing any right over the sprint itself.
 
-    The one data rule is reachability: the sprint must belong to a team the task can be
-    reached from — a project of that team, or, for an unfiled task, that team itself. A
-    sprint that does not exist is a 404; an unreachable one is a **422** with a message
-    that says which, never a silent drop.
+    The sprint must belong to a team the task is reachable from: the task is in one of the team's
+    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
+    one is a 422 whose message says why.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
-    Not to be confused with `PUT /tasks/{id}/test-run` (3.13), which files a BUG under a
-    `test_trackers` row through `type_data.tracker_id`. Different table, different rule.
-
     Args:
         task_id (str):
-        body (TaskSprintSet): `PUT /tasks/{task_id}/sprint` (6.3): file the task into a TEAM
-            sprint, `null` to take it out.
-            Only the task's own `edit` (2.6a's rule for `team_id`), plus the reachability rule; one
-            history entry.
-            Distinct from `TaskTestRunSet` below, which is 3.13's bug → `test_trackers` writer over
-            `type_data`.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
+            file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -261,29 +231,19 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """File a task in a team sprint (or none)
 
-     File the task into a TEAM sprint (`sprint_id: null` takes it out). The permission is
-    the task's own `edit` and nothing more — 2.6a's rule for `team_id` (*"setting a task's
-    `team_id` needs only the task's `edit`"*), copied rather than re-invented, so a plain
-    team member may put work they may edit into the sprint without being able to rename it.
+     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
+    do this, without needing any right over the sprint itself.
 
-    The one data rule is reachability: the sprint must belong to a team the task can be
-    reached from — a project of that team, or, for an unfiled task, that team itself. A
-    sprint that does not exist is a 404; an unreachable one is a **422** with a message
-    that says which, never a silent drop.
+    The sprint must belong to a team the task is reachable from: the task is in one of the team's
+    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
+    one is a 422 whose message says why.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
-    Not to be confused with `PUT /tasks/{id}/test-run` (3.13), which files a BUG under a
-    `test_trackers` row through `type_data.tracker_id`. Different table, different rule.
-
     Args:
         task_id (str):
-        body (TaskSprintSet): `PUT /tasks/{task_id}/sprint` (6.3): file the task into a TEAM
-            sprint, `null` to take it out.
-            Only the task's own `edit` (2.6a's rule for `team_id`), plus the reachability rule; one
-            history entry.
-            Distinct from `TaskTestRunSet` below, which is 3.13's bug → `test_trackers` writer over
-            `type_data`.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
+            file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

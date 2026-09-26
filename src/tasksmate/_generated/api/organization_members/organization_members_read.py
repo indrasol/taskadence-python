@@ -121,6 +121,8 @@ def sync_detailed(
 ) -> Response[Any | OrganizationMemberInDB | Problem]:
     """Read one member
 
+     Read one member.
+
     Args:
         user_id (str):
         org_id (str):
@@ -156,6 +158,8 @@ def sync(
 ) -> Any | OrganizationMemberInDB | Problem | None:
     """Read one member
 
+     Read one member.
+
     Args:
         user_id (str):
         org_id (str):
@@ -185,6 +189,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | OrganizationMemberInDB | Problem]:
     """Read one member
+
+     Read one member.
 
     Args:
         user_id (str):
@@ -218,6 +224,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | OrganizationMemberInDB | Problem | None:
     """Read one member
+
+     Read one member.
 
     Args:
         user_id (str):

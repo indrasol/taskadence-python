@@ -18,7 +18,8 @@ T = TypeVar("T", bound="Health")
 
 @_attrs_define
 class Health:
-    """
+    """Returned by `health.read`.
+
     Example:
         {'status': 'ok'}
 

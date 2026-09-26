@@ -16,7 +16,8 @@ T = TypeVar("T", bound="ReplyCreate")
 
 @_attrs_define
 class ReplyCreate:
-    """
+    """The request body of `task-comments.reply`.
+
     Attributes:
         content (str):
         parent_comment_id (str):

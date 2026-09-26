@@ -24,18 +24,19 @@ T = TypeVar("T", bound="OrganizationSettingsOut")
 
 @_attrs_define
 class OrganizationSettingsOut:
-    """
+    """Returned by `organizations.settings` and `organizations.update_settings`.
+
     Attributes:
         org_id (str):
-        default_visibility (ProjectVisibilityEnum | Unset): `project_visibility_enum` — `projects.visibility` and
-            `organization_settings.default_visibility` (task 2.1). Enforcement is 2.2's `can()`.
-        domain_join_mode (OrgJoinModeEnum | Unset): `org_join_mode_enum` (task 2.4): what a sign-in from a verified
-            domain gets —
-            `instant` inserts the member row, `approval` files a join request for an admin.
+        default_visibility (ProjectVisibilityEnum | Unset): Who can see a project: `public` — every member of the
+            organization; `private` — the project's members and org admins. Also the organization's default for new
+            projects.
+        domain_join_mode (OrgJoinModeEnum | Unset): What a sign-in from one of the organization's verified domains gets:
+            `instant` makes the person a member immediately; `approval` files a join request for an admin to decide.
         audit_retention_days (int | None | Unset): Audit log retention in days; null = keep forever
-        allow_personal_tokens (bool | Unset): 4.2: members may mint personal access tokens Default: True.
-        max_token_ttl_days (int | None | Unset): 4.2: longest lifetime of a new token, in days; null = no cap
-        require_token_expiry (bool | Unset): 4.2: every new token must carry an `expires_at` Default: False.
+        allow_personal_tokens (bool | Unset): Members may mint personal access tokens. Default: True.
+        max_token_ttl_days (int | None | Unset): The longest lifetime of a new token, in days; null = no cap.
+        require_token_expiry (bool | Unset): Every new token must carry an `expires_at`. Default: False.
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         updated_by (None | str | Unset):

@@ -20,8 +20,8 @@ T = TypeVar("T", bound="TaskAttachmentUpdate")
 
 @_attrs_define
 class TaskAttachmentUpdate:
-    """`PUT /task-attachments/{attachment_id}` body — a true partial (3.15 audit: `task_id` was required
-    through inheritance; the attachment is the path). The route sends `exclude_unset=True` on.
+    """The body of an attachment update. Every field is optional and omitted fields are left unchanged; the attachment is
+    the one in the path.
 
         Attributes:
             task_id (None | str | Unset): Task ID (text) — optional in the body Example: task-1234.
@@ -32,7 +32,7 @@ class TaskAttachmentUpdate:
             uploaded_at (datetime.datetime | None | Unset): When the attachment was uploaded
             deleted_at (datetime.datetime | None | Unset): When the attachment was deleted
             deleted_by (None | str | Unset): Who deleted the attachment
-            is_inline (bool | None | Unset): Is the attachment inline? (4.1b: no default — omitted = unchanged) Example:
+            is_inline (bool | None | Unset): Whether the attachment is shown inline. Omit to leave it unchanged. Example:
                 False.
     """
 

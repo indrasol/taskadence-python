@@ -21,7 +21,8 @@ T = TypeVar("T", bound="PinOrder")
 
 @_attrs_define
 class PinOrder:
-    """
+    """The request body of `view-pins.reorder`.
+
     Attributes:
         org_id (str):
         pins (list[PinRef]): Every pin of the caller in the org, in the wanted order (missing ones keep their place

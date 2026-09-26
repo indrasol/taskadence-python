@@ -19,7 +19,8 @@ T = TypeVar("T", bound="ReviewToken")
 
 @_attrs_define
 class ReviewToken:
-    """
+    """Part of `ReviewMember`.
+
     Attributes:
         token_id (str):
         name (str):

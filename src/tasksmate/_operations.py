@@ -350,7 +350,7 @@ OPERATIONS: dict[str, Operation] = {
         if_match=True,
         parse=_tasks_replace._parse_response,
         scopes=("tasks:write",),
-        summary="Update a task (PUT; partial since 3.15)",
+        summary="Update a task (PUT; partial)",
     ),
     "tasks.update": Operation(
         op_id="tasks.update",
@@ -1182,7 +1182,7 @@ OPERATIONS: dict[str, Operation] = {
         query=("environment", "since_days", "repository"),
         if_none_match=True,
         parse=_releases_whats_new._parse_response,
-        summary="What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1 decision)",
+        summary="What's new — recent release notes",
     ),
     "sections.list": Operation(
         op_id="sections.list",

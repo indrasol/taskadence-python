@@ -16,7 +16,7 @@ T = TypeVar("T", bound="SubtaskLink")
 
 @_attrs_define
 class SubtaskLink:
-    """`POST /tasks/{task_id}/subtasks` (4.1b: named — it was FastAPI's `Body_add_subtask_to_task_…`; same wire shape).
+    """The body of `POST /v1/tasks/{task_id}/subtasks`.
 
     Attributes:
         subtask_id (str): The task to link under this one (you need `read` on it) Example: T123456.

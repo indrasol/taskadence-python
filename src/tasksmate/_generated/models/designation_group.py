@@ -21,7 +21,8 @@ T = TypeVar("T", bound="DesignationGroup")
 
 @_attrs_define
 class DesignationGroup:
-    """
+    """Part of `DesignationCatalog`.
+
     Attributes:
         category (str):
         items (list[Designation]):

@@ -37,16 +37,16 @@ class GoalMoved:
         status (str | Unset):  Default: 'open'.
         closed_at (datetime.datetime | None | Unset):
         closed_by (None | str | Unset):
-        converted_from_task_id (None | str | Unset): 6.12's migration: the retired goal TASK this goal replaced (null
-            for goals created here).
+        converted_from_task_id (None | str | Unset): The id of the older goal-type task this goal was converted from;
+            null for goals created as goals.
         created_by (None | str | Unset):
         updated_by (None | str | Unset):
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         tasks_total (int | Unset): Tasks under this goal the caller can read (subtasks excluded). Default: 0.
         tasks_completed (int | Unset): How many of them are `completed`. Default: 0.
-        tasks (list[GoalMovedTasksType0Item] | None | Unset): `?include_tasks=true` only: the goal's task rows
-            (task_card_view shape).
+        tasks (list[GoalMovedTasksType0Item] | None | Unset): Only with `include_tasks=true`: the goal's tasks, as the
+            task list returns them.
     """
 
     goal_id: str

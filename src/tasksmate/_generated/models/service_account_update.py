@@ -16,7 +16,8 @@ T = TypeVar("T", bound="ServiceAccountUpdate")
 
 @_attrs_define
 class ServiceAccountUpdate:
-    """
+    """The request body of `service-accounts.update`.
+
     Attributes:
         name (str): The new name (the username never changes)
     """

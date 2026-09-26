@@ -20,22 +20,24 @@ T = TypeVar("T", bound="ProjectResourceInDB")
 
 @_attrs_define
 class ProjectResourceInDB:
-    """
-    Attributes:
-        project_id (str): Project ID (text) Example: project-1234.
-        project_name (str): Project name Example: Project 1.
-        resource_name (str): Resource name Example: API Docs.
-        resource_id (str): Resource ID Example: RE0001.
-        created_at (datetime.datetime | None):
-        updated_at (datetime.datetime | None):
-        deleted_at (datetime.datetime | None):
-        resource_url (None | str | Unset): Resource URL Example: https://example.com/api-docs.pdf.
-        resource_type (None | str | Unset): Type of resource Example: pdf.
-        storage_path (None | str | Unset): Original File Storage Path
-        is_active (bool | None | Unset): Is the resource active? Default: True. Example: True.
-        created_by (None | str | Unset): Who created the resource
-        updated_by (None | str | Unset): Who last updated the resource
-        delete_reason (None | str | Unset): Reason for deletion
+    """Returned by `project-resources.create`, `project-resources.read`, `project-resources.update` and `project-
+    resources.upload`.
+
+        Attributes:
+            project_id (str): Project ID (text) Example: project-1234.
+            project_name (str): Project name Example: Project 1.
+            resource_name (str): Resource name Example: API Docs.
+            resource_id (str): Resource ID Example: RE0001.
+            created_at (datetime.datetime | None):
+            updated_at (datetime.datetime | None):
+            deleted_at (datetime.datetime | None):
+            resource_url (None | str | Unset): Resource URL Example: https://example.com/api-docs.pdf.
+            resource_type (None | str | Unset): Type of resource Example: pdf.
+            storage_path (None | str | Unset): Original File Storage Path
+            is_active (bool | None | Unset): Is the resource active? Default: True. Example: True.
+            created_by (None | str | Unset): Who created the resource
+            updated_by (None | str | Unset): Who last updated the resource
+            delete_reason (None | str | Unset): Reason for deletion
     """
 
     project_id: str

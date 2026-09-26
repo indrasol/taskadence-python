@@ -128,6 +128,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete a comment
 
+     Delete a comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
@@ -163,6 +165,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Delete a comment
 
+     Delete a comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
@@ -192,6 +196,8 @@ async def asyncio_detailed(
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete a comment
+
+     Delete a comment.
 
     Args:
         comment_id (str):
@@ -225,6 +231,8 @@ async def asyncio(
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete a comment
+
+     Delete a comment.
 
     Args:
         comment_id (str):

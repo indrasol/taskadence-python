@@ -26,11 +26,12 @@ T = TypeVar("T", bound="ViewOut")
 
 @_attrs_define
 class ViewOut:
-    """
+    """Returned by `views.create`, `views.duplicate`, `views.read` and `views.update`.
+
     Attributes:
         view_id (str):
         org_id (str):
-        scope_type (ViewScopeEnum):
+        scope_type (ViewScopeEnum): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
         scope_id (str):
         name (str):
         query (ViewOutQuery | Unset):
@@ -40,8 +41,7 @@ class ViewOut:
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         is_active (bool | Unset):  Default: True.
-        can_edit (bool | Unset): `view_actions` grants edit / delete to the caller (the scope's write rule) Default:
-            False.
+        can_edit (bool | Unset): You may edit and delete this view (the scope's write rule). Default: False.
         pinned (bool | Unset): The caller has this view pinned (pins are personal) Default: False.
     """
 

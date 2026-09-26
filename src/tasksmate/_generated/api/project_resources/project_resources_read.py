@@ -127,6 +127,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | ProjectResourceInDB]:
     """Read a project resource
 
+     Read a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
@@ -162,6 +164,8 @@ def sync(
 ) -> Any | Problem | ProjectResourceInDB | None:
     """Read a project resource
 
+     Read a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
@@ -191,6 +195,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ProjectResourceInDB]:
     """Read a project resource
+
+     Read a project resource.
 
     Args:
         resource_id (str):
@@ -224,6 +230,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ProjectResourceInDB | None:
     """Read a project resource
+
+     Read a project resource.
 
     Args:
         resource_id (str):

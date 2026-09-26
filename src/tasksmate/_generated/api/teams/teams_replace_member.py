@@ -119,15 +119,16 @@ def sync_detailed(
 ) -> Response[Problem | TeamMemberOut]:
     """Change a team member's role (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Change a member's role. The last owner cannot be demoted (422).
 
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -159,15 +160,16 @@ def sync(
 ) -> Problem | TeamMemberOut | None:
     """Change a team member's role (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Change a member's role. The last owner cannot be demoted (422).
 
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,15 +196,16 @@ async def asyncio_detailed(
 ) -> Response[Problem | TeamMemberOut]:
     """Change a team member's role (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Change a member's role. The last owner cannot be demoted (422).
 
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -232,15 +235,16 @@ async def asyncio(
 ) -> Problem | TeamMemberOut | None:
     """Change a team member's role (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Change a member's role. The last owner cannot be demoted (422).
 
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

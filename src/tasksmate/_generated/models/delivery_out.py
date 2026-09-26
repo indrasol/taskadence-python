@@ -22,7 +22,8 @@ T = TypeVar("T", bound="DeliveryOut")
 
 @_attrs_define
 class DeliveryOut:
-    """
+    """Returned by `webhooks.replay`.
+
     Attributes:
         delivery_id (str):
         subscription_id (str):

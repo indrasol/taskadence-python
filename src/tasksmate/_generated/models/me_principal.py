@@ -21,7 +21,8 @@ T = TypeVar("T", bound="MePrincipal")
 
 @_attrs_define
 class MePrincipal:
-    """
+    """Part of `MeOut`.
+
     Attributes:
         id (str): The user id (Supabase `auth.users.id`)
         type_ (MePrincipalType | Unset): What authenticated this request Default: 'user'.

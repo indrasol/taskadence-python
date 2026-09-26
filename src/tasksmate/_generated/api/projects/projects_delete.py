@@ -114,6 +114,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete (archive) a project
 
+     Delete (archive) a project.
+
     Args:
         project_id (str):
         if_match (str | Unset):
@@ -146,6 +148,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Delete (archive) a project
 
+     Delete (archive) a project.
+
     Args:
         project_id (str):
         if_match (str | Unset):
@@ -172,6 +176,8 @@ async def asyncio_detailed(
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete (archive) a project
+
+     Delete (archive) a project.
 
     Args:
         project_id (str):
@@ -202,6 +208,8 @@ async def asyncio(
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete (archive) a project
+
+     Delete (archive) a project.
 
     Args:
         project_id (str):

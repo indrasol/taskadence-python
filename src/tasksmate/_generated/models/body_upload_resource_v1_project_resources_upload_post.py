@@ -23,7 +23,8 @@ T = TypeVar("T", bound="BodyUploadResourceV1ProjectResourcesUploadPost")
 
 @_attrs_define
 class BodyUploadResourceV1ProjectResourcesUploadPost:
-    """
+    """The request body of `project-resources.upload`.
+
     Attributes:
         file (File):
         project_name (None | str | Unset):

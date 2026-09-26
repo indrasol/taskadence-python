@@ -22,7 +22,7 @@ T = TypeVar("T", bound="DesignationCatalog")
 
 @_attrs_define
 class DesignationCatalog:
-    """`GET /v1/designations?grouped=true` — the picker's catalog document (not a list: no pager).
+    """`GET /v1/designations?grouped=true`: the designation catalog grouped by category, in one response (not paginated).
 
     Attributes:
         groups (list[DesignationGroup]):

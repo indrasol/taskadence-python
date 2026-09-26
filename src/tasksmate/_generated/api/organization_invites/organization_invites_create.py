@@ -112,8 +112,10 @@ def sync_detailed(
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Invite someone to an organization
 
+     Invite someone to an organization.
+
     Args:
-        body (OrganizationInviteCreate):
+        body (OrganizationInviteCreate): The request body of `organization-invites.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -141,8 +143,10 @@ def sync(
 ) -> OrganizationInviteInDB | Problem | None:
     """Invite someone to an organization
 
+     Invite someone to an organization.
+
     Args:
-        body (OrganizationInviteCreate):
+        body (OrganizationInviteCreate): The request body of `organization-invites.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -165,8 +169,10 @@ async def asyncio_detailed(
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Invite someone to an organization
 
+     Invite someone to an organization.
+
     Args:
-        body (OrganizationInviteCreate):
+        body (OrganizationInviteCreate): The request body of `organization-invites.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -192,8 +198,10 @@ async def asyncio(
 ) -> OrganizationInviteInDB | Problem | None:
     """Invite someone to an organization
 
+     Invite someone to an organization.
+
     Args:
-        body (OrganizationInviteCreate):
+        body (OrganizationInviteCreate): The request body of `organization-invites.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

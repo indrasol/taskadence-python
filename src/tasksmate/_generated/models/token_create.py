@@ -23,7 +23,8 @@ T = TypeVar("T", bound="TokenCreate")
 
 @_attrs_define
 class TokenCreate:
-    """
+    """The request body of `tokens.create`.
+
     Attributes:
         org_id (str): The organization the token belongs to (a token is org-bound)
         name (str): What the token is for

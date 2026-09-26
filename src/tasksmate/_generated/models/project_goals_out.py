@@ -22,13 +22,13 @@ T = TypeVar("T", bound="ProjectGoalsOut")
 
 @_attrs_define
 class ProjectGoalsOut:
-    """`GET /v1/projects/{project_id}/goals` — the project's live goals by position, and decision 4's sums:
-    the project's progress ON /goals counts only the tasks under its goals.
+    """`GET /v1/projects/{project_id}/goals`: the project's live goals by position, plus project-level sums that count only
+    the tasks filed under its goals.
 
         Attributes:
             project_id (str):
             data (list[GoalOut]):
-            next_cursor (None | str | Unset): 4.1 list envelope: the next page's cursor, null on the last page
+            next_cursor (None | str | Unset): The next page's cursor; null on the last page.
             goals_tasks_total (int | Unset):  Default: 0.
             goals_tasks_completed (int | Unset):  Default: 0.
     """

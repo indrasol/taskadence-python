@@ -37,7 +37,7 @@ Read a task.
 
 ## `tm.tasks.replace(task_id: str, body: TaskUpdate | Mapping[str, Any], if_match: str | None = None)`
 
-Update a task (PUT; partial since 3.15).
+Update a task (PUT; partial).
 
 - **HTTP:** `PUT /v1/tasks/{task_id}`
 - **operationId:** `tasks.replace`

@@ -21,10 +21,11 @@ T = TypeVar("T", bound="SectionCreate")
 
 @_attrs_define
 class SectionCreate:
-    """
+    """The request body of `sections.create`.
+
     Attributes:
         org_id (str): Organization ID (text)
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.
         scope_id (str): project_id for `project`; the caller's username for `user`; team_id for `team`
         name (str):
         position (float | None | Unset): Omit to append at the end

@@ -22,7 +22,7 @@ T = TypeVar("T", bound="MeAuth")
 
 @_attrs_define
 class MeAuth:
-    """4.2: present only when the request authenticated with an access token — what the client holds.
+    """Present only when the request authenticated with an access token: the token's id, scopes, projects and expiry.
 
     Attributes:
         token_id (str):

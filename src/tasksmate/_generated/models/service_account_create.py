@@ -19,7 +19,8 @@ T = TypeVar("T", bound="ServiceAccountCreate")
 
 @_attrs_define
 class ServiceAccountCreate:
-    """
+    """The request body of `service-accounts.create`.
+
     Attributes:
         name (str): What the account is for, e.g. `CI bot`
         designation (None | str | Unset): Optional designation (id, name or label), as for any member

@@ -30,12 +30,8 @@ T = TypeVar("T", bound="TaskUpdate")
 
 @_attrs_define
 class TaskUpdate:
-    """`PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was `pass`, so it inherited
-    `title: str = Field(...)` and any body without a title was a 422 before the route ran (the goal
-    card's `{"type_data": {...}}` write among them). Every field is optional here, `title` included;
-    the route sends `dict(exclude_unset=True)` on, so an absent field is absent from the write and the
-    base model's defaults never ride along. An EXPLICIT empty / whitespace-only title is still refused —
-    "absent" and "blank" are different things. `TaskCreate` is unchanged: a task needs a title to exist.
+    """The body of a task update. Every field is optional, `title` included, and omitted fields are left unchanged. An
+    explicitly empty or whitespace-only `title` is refused (422).
 
         Attributes:
             project_id (None | str | Unset): Project ID (text) Example: project-1234.
@@ -50,35 +46,34 @@ class TaskUpdate:
             start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
             due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
             priority (None | PriorityEnum | Unset): Task priority Example: high.
-            task_type (None | TaskTypeEnum | Unset): Kind of row (3.3): task · bug · agent. A label, not a permission. 6.12:
-                `goal` is retired. Example: task.
+            task_type (None | TaskTypeEnum | Unset): The kind of task: `task`, `bug` or `agent`. A label, not a permission.
+                Example: task.
             tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
-            type_data (None | TaskUpdateTypeDataType0 | Unset): Per-type extras (3.4). Bug keys: bug_status, bug_kind,
-                environment, steps_to_reproduce, expected_result, actual_result, recommendation (writable); legacy_bug_id,
-                tracker_id, reporter, estimated_time, actual_time, closed_at (response only). A write merges; null removes a
-                key. 6.12: the goal keys (goal_*, legacy_goal_*) are retired — refused on write (422 naming the key), omitted
-                from responses.
+            type_data (None | TaskUpdateTypeDataType0 | Unset): Extra fields for the task's type. For a bug: `bug_status`,
+                `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`, `actual_result`, `recommendation`
+                (writable); `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at` (read-only).
+                A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused on write (422
+                naming the key).
             metadata (list[TaskUpdateMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
                 'new': 'in_progress', 'old': 'not_started'}].
             created_by (None | str | Unset): Who created the task
             updated_by (None | str | Unset): Who last updated the task
             is_subtask (bool | None | Unset): Is Sub Task
             bug_id (None | str | Unset): Bug ID (text) Example: B1234.
-            tracker_id (None | str | Unset): On create (3.13): the sprint to file a bug under (`test_trackers.tracker_id`);
-                refused (422) for a non-bug or a sprint of another project. Re-file through PUT /tasks/{id}/test-run. Example:
-                TR1234.
+            tracker_id (None | str | Unset): On create, for a bug only: the test tracker to file it under. Refused (422) for
+                a task that is not a bug or a tracker of another project. Example: TR1234.
             restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
                 Setting it needs `restrict` on the task.
-            team_id (None | str | Unset): Team the task is filed under (2.6a). Unfiled + team = that team's Intake. null =
-                none.
-            sprint_id (None | str | Unset): Team sprint this task is filed into (6.3, `team_sprints.sprint_id`). One per
-                task; refused (422) unless the task is reachable from the sprint's team. null = none. Example: SP12345.
-            milestone_id (None | str | Unset): Team milestone this task is filed under (6.5,
-                `team_milestones.milestone_id`). One per task, independent of `sprint_id`; refused (422) unless the task is
-                reachable from the milestone's team. null = none. Example: MS12345.
-            goal_id (None | str | Unset): Project goal this task is filed under (6.12, `project_goals.goal_id`). One per
-                task; refused (422) unless it is a live goal of the task's own project. A move to another project clears it.
-                null = none. Example: G12345.
+            team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
+                team's intake. null = none.
+            sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
+                task is reachable from the sprint's team. null = none. Example: SP12345.
+            milestone_id (None | str | Unset): The team milestone this task is filed under. One per task, independent of
+                `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none. Example:
+                MS12345.
+            goal_id (None | str | Unset): The project goal this task is filed under. One per task; refused (422) unless it
+                is a live goal of the task's own project. Moving the task to another project clears it. null = none. Example:
+                G12345.
     """
 
     project_id: None | str | Unset = UNSET

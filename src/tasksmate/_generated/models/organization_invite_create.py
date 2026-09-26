@@ -22,13 +22,14 @@ T = TypeVar("T", bound="OrganizationInviteCreate")
 
 @_attrs_define
 class OrganizationInviteCreate:
-    """
+    """The request body of `organization-invites.create`.
+
     Attributes:
         org_id (str): Organization ID (UUID) Example: a1b2c3d4-5678-1234-9abc-def012345678.
         email (str): Invitee's email Example: invitee@example.com.
         designation (None | str | Unset): Designation ID (UUID) Example: d1e2f3g4-5678-1234-9abc-def012345678.
-        designation_id (None | str | Unset): Task 2.8: a designations row id (DG… seed / DO… org row). Either this or
-            `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
+        designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
+            this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
         role (None | str | Unset): Role ID (UUID) Example: r1e2f3g4-5678-1234-9abc-def012345678.
         invited_by (None | str | Unset): Inviter's User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
         invite_status (InviteStatusEnum | None | Unset): Status of the invite Default: 'pending'. Example: pending.

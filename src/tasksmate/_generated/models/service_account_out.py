@@ -20,14 +20,15 @@ T = TypeVar("T", bound="ServiceAccountOut")
 
 @_attrs_define
 class ServiceAccountOut:
-    """
+    """Returned by `service-accounts.create`, `service-accounts.delete` and `service-accounts.update`.
+
     Example:
         {'active_tokens': 1, 'created_at': '2026-09-25T12:00:00Z', 'email': 'ci-bot@service.o0020.tasksmate.invalid',
             'is_active': True, 'kind': 'service_account', 'name': 'CI bot', 'org_id': 'O0020', 'role': 'member', 'user_id':
             '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'username': 'sa-ci-bot'}
 
     Attributes:
-        user_id (str): The service account's principal id (`users.id`)
+        user_id (str): The service account's principal id (its user id).
         org_id (str):
         username (str): `sa-<slug>`: fixed at creation (tasks reference it)
         email (str): `<slug>@service.<org_id>.tasksmate.invalid` — syntactically valid, never deliverable

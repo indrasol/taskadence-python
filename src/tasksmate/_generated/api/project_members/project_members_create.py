@@ -112,8 +112,10 @@ def sync_detailed(
 ) -> Response[Problem | ProjectMemberInDB]:
     """Add a member to a project
 
+     Add a member to a project.
+
     Args:
-        body (ProjectMemberCreate):
+        body (ProjectMemberCreate): The request body of `project-members.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -141,8 +143,10 @@ def sync(
 ) -> Problem | ProjectMemberInDB | None:
     """Add a member to a project
 
+     Add a member to a project.
+
     Args:
-        body (ProjectMemberCreate):
+        body (ProjectMemberCreate): The request body of `project-members.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -165,8 +169,10 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectMemberInDB]:
     """Add a member to a project
 
+     Add a member to a project.
+
     Args:
-        body (ProjectMemberCreate):
+        body (ProjectMemberCreate): The request body of `project-members.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -192,8 +198,10 @@ async def asyncio(
 ) -> Problem | ProjectMemberInDB | None:
     """Add a member to a project
 
+     Add a member to a project.
+
     Args:
-        body (ProjectMemberCreate):
+        body (ProjectMemberCreate): The request body of `project-members.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

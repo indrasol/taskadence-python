@@ -22,7 +22,8 @@ T = TypeVar("T", bound="SprintListPage")
 
 @_attrs_define
 class SprintListPage:
-    """
+    """Returned by `sprints.list`.
+
     Attributes:
         data (list[SprintOut]):
         total (int):

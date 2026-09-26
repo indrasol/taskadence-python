@@ -121,9 +121,11 @@ def sync_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Add a link resource to a project
 
+     Add a link resource to a project.
+
     Args:
         project_id (str):
-        body (ProjectResourceCreate):
+        body (ProjectResourceCreate): The request body of `project-resources.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -153,9 +155,11 @@ def sync(
 ) -> Problem | ProjectResourceInDB | None:
     """Add a link resource to a project
 
+     Add a link resource to a project.
+
     Args:
         project_id (str):
-        body (ProjectResourceCreate):
+        body (ProjectResourceCreate): The request body of `project-resources.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -180,9 +184,11 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Add a link resource to a project
 
+     Add a link resource to a project.
+
     Args:
         project_id (str):
-        body (ProjectResourceCreate):
+        body (ProjectResourceCreate): The request body of `project-resources.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -210,9 +216,11 @@ async def asyncio(
 ) -> Problem | ProjectResourceInDB | None:
     """Add a link resource to a project
 
+     Add a link resource to a project.
+
     Args:
         project_id (str):
-        body (ProjectResourceCreate):
+        body (ProjectResourceCreate): The request body of `project-resources.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

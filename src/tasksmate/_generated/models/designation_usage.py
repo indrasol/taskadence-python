@@ -18,7 +18,8 @@ T = TypeVar("T", bound="DesignationUsage")
 
 @_attrs_define
 class DesignationUsage:
-    """
+    """Part of `Designation`.
+
     Attributes:
         members (int | Unset):  Default: 0.
         invites (int | Unset):  Default: 0.

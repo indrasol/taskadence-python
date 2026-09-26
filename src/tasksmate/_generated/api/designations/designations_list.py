@@ -187,21 +187,22 @@ def sync_detailed(
 ) -> Response[Any | DesignationCatalog | PageDesignation | Problem]:
     """List designations (flat list, or the grouped catalog)
 
-     The flat list is the 4.1 envelope (`{data, next_cursor}`). `grouped=true` is the catalog DOCUMENT
-    (`{org_id, groups, total}`) the Settings and pickers read — one grouped read, not a list, so no
-    pager.
+     Without `grouped`, one flat list of designations, paginated as `{data, next_cursor}`. With
+    `grouped=true`, the catalog grouped by category (`{org_id, groups, total}`) in a single response,
+    not paginated.
 
     Args:
         org_id (None | str | Unset): Globals + this org's rows, with the org's hide / pin applied;
             omitted → globals only
-        grouped (bool | Unset): true → {groups: [{category, items}]} in appendix order; false →
-            one flat list (the pre-2.8 shape, `name` included) Default: False.
+        grouped (bool | Unset): `true` returns the catalog grouped by category (`{groups:
+            [{category, items}]}`); `false` returns one flat list, each row including `name`. Default:
+            False.
         with_usage (bool | Unset): Per row: members + pending invites + project members of the org
             pointing at it (org_id required) Default: False.
-        include_hidden (bool | Unset): Settings pages: hidden rows too (flagged `hidden`) Default:
-            False.
-        include_inactive (bool | Unset): Settings → Designations (owner / admin only): the org's
-            deactivated rows too (flagged `is_active: false`), so a mistaken deactivate can be undone
+        include_hidden (bool | Unset): Also return the designations hidden in this organization
+            (flagged `hidden`). Default: False.
+        include_inactive (bool | Unset): Also return the organization's deactivated designations
+            (flagged `is_active: false`), so a deactivation can be undone. Org owners and admins only.
             Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -254,21 +255,22 @@ def sync(
 ) -> Any | DesignationCatalog | PageDesignation | Problem | None:
     """List designations (flat list, or the grouped catalog)
 
-     The flat list is the 4.1 envelope (`{data, next_cursor}`). `grouped=true` is the catalog DOCUMENT
-    (`{org_id, groups, total}`) the Settings and pickers read — one grouped read, not a list, so no
-    pager.
+     Without `grouped`, one flat list of designations, paginated as `{data, next_cursor}`. With
+    `grouped=true`, the catalog grouped by category (`{org_id, groups, total}`) in a single response,
+    not paginated.
 
     Args:
         org_id (None | str | Unset): Globals + this org's rows, with the org's hide / pin applied;
             omitted → globals only
-        grouped (bool | Unset): true → {groups: [{category, items}]} in appendix order; false →
-            one flat list (the pre-2.8 shape, `name` included) Default: False.
+        grouped (bool | Unset): `true` returns the catalog grouped by category (`{groups:
+            [{category, items}]}`); `false` returns one flat list, each row including `name`. Default:
+            False.
         with_usage (bool | Unset): Per row: members + pending invites + project members of the org
             pointing at it (org_id required) Default: False.
-        include_hidden (bool | Unset): Settings pages: hidden rows too (flagged `hidden`) Default:
-            False.
-        include_inactive (bool | Unset): Settings → Designations (owner / admin only): the org's
-            deactivated rows too (flagged `is_active: false`), so a mistaken deactivate can be undone
+        include_hidden (bool | Unset): Also return the designations hidden in this organization
+            (flagged `hidden`). Default: False.
+        include_inactive (bool | Unset): Also return the organization's deactivated designations
+            (flagged `is_active: false`), so a deactivation can be undone. Org owners and admins only.
             Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -316,21 +318,22 @@ async def asyncio_detailed(
 ) -> Response[Any | DesignationCatalog | PageDesignation | Problem]:
     """List designations (flat list, or the grouped catalog)
 
-     The flat list is the 4.1 envelope (`{data, next_cursor}`). `grouped=true` is the catalog DOCUMENT
-    (`{org_id, groups, total}`) the Settings and pickers read — one grouped read, not a list, so no
-    pager.
+     Without `grouped`, one flat list of designations, paginated as `{data, next_cursor}`. With
+    `grouped=true`, the catalog grouped by category (`{org_id, groups, total}`) in a single response,
+    not paginated.
 
     Args:
         org_id (None | str | Unset): Globals + this org's rows, with the org's hide / pin applied;
             omitted → globals only
-        grouped (bool | Unset): true → {groups: [{category, items}]} in appendix order; false →
-            one flat list (the pre-2.8 shape, `name` included) Default: False.
+        grouped (bool | Unset): `true` returns the catalog grouped by category (`{groups:
+            [{category, items}]}`); `false` returns one flat list, each row including `name`. Default:
+            False.
         with_usage (bool | Unset): Per row: members + pending invites + project members of the org
             pointing at it (org_id required) Default: False.
-        include_hidden (bool | Unset): Settings pages: hidden rows too (flagged `hidden`) Default:
-            False.
-        include_inactive (bool | Unset): Settings → Designations (owner / admin only): the org's
-            deactivated rows too (flagged `is_active: false`), so a mistaken deactivate can be undone
+        include_hidden (bool | Unset): Also return the designations hidden in this organization
+            (flagged `hidden`). Default: False.
+        include_inactive (bool | Unset): Also return the organization's deactivated designations
+            (flagged `is_active: false`), so a deactivation can be undone. Org owners and admins only.
             Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -381,21 +384,22 @@ async def asyncio(
 ) -> Any | DesignationCatalog | PageDesignation | Problem | None:
     """List designations (flat list, or the grouped catalog)
 
-     The flat list is the 4.1 envelope (`{data, next_cursor}`). `grouped=true` is the catalog DOCUMENT
-    (`{org_id, groups, total}`) the Settings and pickers read — one grouped read, not a list, so no
-    pager.
+     Without `grouped`, one flat list of designations, paginated as `{data, next_cursor}`. With
+    `grouped=true`, the catalog grouped by category (`{org_id, groups, total}`) in a single response,
+    not paginated.
 
     Args:
         org_id (None | str | Unset): Globals + this org's rows, with the org's hide / pin applied;
             omitted → globals only
-        grouped (bool | Unset): true → {groups: [{category, items}]} in appendix order; false →
-            one flat list (the pre-2.8 shape, `name` included) Default: False.
+        grouped (bool | Unset): `true` returns the catalog grouped by category (`{groups:
+            [{category, items}]}`); `false` returns one flat list, each row including `name`. Default:
+            False.
         with_usage (bool | Unset): Per row: members + pending invites + project members of the org
             pointing at it (org_id required) Default: False.
-        include_hidden (bool | Unset): Settings pages: hidden rows too (flagged `hidden`) Default:
-            False.
-        include_inactive (bool | Unset): Settings → Designations (owner / admin only): the org's
-            deactivated rows too (flagged `is_active: false`), so a mistaken deactivate can be undone
+        include_hidden (bool | Unset): Also return the designations hidden in this organization
+            (flagged `hidden`). Default: False.
+        include_inactive (bool | Unset): Also return the organization's deactivated designations
+            (flagged `is_active: false`), so a deactivation can be undone. Org owners and admins only.
             Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim

@@ -158,9 +158,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | TeamListPage]:
     """List an organization's teams
 
-     The teams the caller may read, each with `member_count`, `project_count`
-    and the caller's own `team_role` (null when not on it). 4.1 envelope: `{data, next_cursor, total}`;
-    the service pages (it annotates only the page), so the order is the one it pages in — by name.
+     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
+    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
@@ -210,9 +209,8 @@ def sync(
 ) -> Any | Problem | TeamListPage | None:
     """List an organization's teams
 
-     The teams the caller may read, each with `member_count`, `project_count`
-    and the caller's own `team_role` (null when not on it). 4.1 envelope: `{data, next_cursor, total}`;
-    the service pages (it annotates only the page), so the order is the one it pages in — by name.
+     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
+    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
@@ -257,9 +255,8 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | TeamListPage]:
     """List an organization's teams
 
-     The teams the caller may read, each with `member_count`, `project_count`
-    and the caller's own `team_role` (null when not on it). 4.1 envelope: `{data, next_cursor, total}`;
-    the service pages (it annotates only the page), so the order is the one it pages in — by name.
+     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
+    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
@@ -307,9 +304,8 @@ async def asyncio(
 ) -> Any | Problem | TeamListPage | None:
     """List an organization's teams
 
-     The teams the caller may read, each with `member_count`, `project_count`
-    and the caller's own `team_role` (null when not on it). 4.1 envelope: `{data, next_cursor, total}`;
-    the service pages (it annotates only the page), so the order is the one it pages in — by name.
+     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
+    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only the teams

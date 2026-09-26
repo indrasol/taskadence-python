@@ -19,10 +19,11 @@ T = TypeVar("T", bound="TaskProjectSet")
 
 @_attrs_define
 class TaskProjectSet:
-    """`POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles the task.
+    """The body of `POST /v1/tasks/{task_id}/project`: the project to move the task to, or `project_id: null` to take it
+    out of its project.
 
-    Attributes:
-        project_id (None | str | Unset): Target project, or null to remove the task from its project
+        Attributes:
+            project_id (None | str | Unset): Target project, or null to remove the task from its project
     """
 
     project_id: None | str | Unset = UNSET

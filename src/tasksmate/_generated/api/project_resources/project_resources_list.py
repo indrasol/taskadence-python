@@ -167,7 +167,7 @@ def sync_detailed(
 ) -> Response[Any | PageProjectResourceInDB | Problem]:
     """List a project's resources
 
-     A project's resources in the 4.1 envelope (the database sorts; the page is cut from the whole set).
+     A project's resources, paginated as `{data, next_cursor}`.
 
     Args:
         project_id (str):
@@ -220,7 +220,7 @@ def sync(
 ) -> Any | PageProjectResourceInDB | Problem | None:
     """List a project's resources
 
-     A project's resources in the 4.1 envelope (the database sorts; the page is cut from the whole set).
+     A project's resources, paginated as `{data, next_cursor}`.
 
     Args:
         project_id (str):
@@ -268,7 +268,7 @@ async def asyncio_detailed(
 ) -> Response[Any | PageProjectResourceInDB | Problem]:
     """List a project's resources
 
-     A project's resources in the 4.1 envelope (the database sorts; the page is cut from the whole set).
+     A project's resources, paginated as `{data, next_cursor}`.
 
     Args:
         project_id (str):
@@ -319,7 +319,7 @@ async def asyncio(
 ) -> Any | PageProjectResourceInDB | Problem | None:
     """List a project's resources
 
-     A project's resources in the 4.1 envelope (the database sorts; the page is cut from the whole set).
+     A project's resources, paginated as `{data, next_cursor}`.
 
     Args:
         project_id (str):

@@ -16,7 +16,8 @@ T = TypeVar("T", bound="DesignationDeleted")
 
 @_attrs_define
 class DesignationDeleted:
-    """
+    """Returned by `designations.delete`.
+
     Attributes:
         ok (bool):
         designation_id (str):

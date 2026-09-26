@@ -19,7 +19,8 @@ T = TypeVar("T", bound="TeamCreate")
 
 @_attrs_define
 class TeamCreate:
-    """
+    """The request body of `teams.create`.
+
     Attributes:
         org_id (str): Organization the team belongs to; the caller must be a non-guest member of it
         name (str): Unique among the org's active teams (case-insensitive) — 409 otherwise

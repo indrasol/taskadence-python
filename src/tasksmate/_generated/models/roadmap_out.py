@@ -22,7 +22,7 @@ T = TypeVar("T", bound="RoadmapOut")
 
 @_attrs_define
 class RoadmapOut:
-    """One shape for the team tab and the project tab: the project tab is the same read over one project.
+    """A roadmap. A team's roadmap and a project's roadmap share this shape.
 
     Attributes:
         projects (list[RoadmapProjectOut]):

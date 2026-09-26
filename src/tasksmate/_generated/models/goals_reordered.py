@@ -18,7 +18,8 @@ T = TypeVar("T", bound="GoalsReordered")
 
 @_attrs_define
 class GoalsReordered:
-    """
+    """Returned by `goals.reorder`.
+
     Attributes:
         ok (bool):
         goal_ids (list[str]): The project's goals in their new order

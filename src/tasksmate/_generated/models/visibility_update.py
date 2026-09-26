@@ -19,7 +19,8 @@ T = TypeVar("T", bound="VisibilityUpdate")
 
 @_attrs_define
 class VisibilityUpdate:
-    """
+    """The request body of `designations.set_visibility`.
+
     Attributes:
         hidden (bool | None | Unset): Not offered in this org's picker (existing assignments keep it)
         pinned (bool | None | Unset): Listed first in its category for this org

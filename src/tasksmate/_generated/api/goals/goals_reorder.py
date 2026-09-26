@@ -116,6 +116,8 @@ def sync_detailed(
 ) -> Response[GoalsReordered | Problem]:
     """Reorder a project's goals
 
+     Reorder a project's goals.
+
     Args:
         project_id (str):
         body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
@@ -149,6 +151,8 @@ def sync(
 ) -> GoalsReordered | Problem | None:
     """Reorder a project's goals
 
+     Reorder a project's goals.
+
     Args:
         project_id (str):
         body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
@@ -176,6 +180,8 @@ async def asyncio_detailed(
     body: GoalOrder,
 ) -> Response[GoalsReordered | Problem]:
     """Reorder a project's goals
+
+     Reorder a project's goals.
 
     Args:
         project_id (str):
@@ -207,6 +213,8 @@ async def asyncio(
     body: GoalOrder,
 ) -> GoalsReordered | Problem | None:
     """Reorder a project's goals
+
+     Reorder a project's goals.
 
     Args:
         project_id (str):

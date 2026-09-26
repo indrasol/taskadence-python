@@ -121,6 +121,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | ProjectMemberInDB]:
     """Read one project member
 
+     Read one project member.
+
     Args:
         user_id (str):
         project_id (str):
@@ -156,6 +158,8 @@ def sync(
 ) -> Any | Problem | ProjectMemberInDB | None:
     """Read one project member
 
+     Read one project member.
+
     Args:
         user_id (str):
         project_id (str):
@@ -185,6 +189,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ProjectMemberInDB]:
     """Read one project member
+
+     Read one project member.
 
     Args:
         user_id (str):
@@ -218,6 +224,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ProjectMemberInDB | None:
     """Read one project member
+
+     Read one project member.
 
     Args:
         user_id (str):

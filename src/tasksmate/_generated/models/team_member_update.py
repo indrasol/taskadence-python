@@ -20,9 +20,10 @@ T = TypeVar("T", bound="TeamMemberUpdate")
 
 @_attrs_define
 class TeamMemberUpdate:
-    """
+    """The request body of `teams.replace_member` and `teams.update_member`.
+
     Attributes:
-        team_role (TeamRoleEnum):
+        team_role (TeamRoleEnum): One of `owner`, `member`. Used by `TeamDetail` and 4 more.
     """
 
     team_role: TeamRoleEnum

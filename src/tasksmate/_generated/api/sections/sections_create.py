@@ -114,7 +114,7 @@ def sync_detailed(
     given.
 
     Args:
-        body (SectionCreate):
+        body (SectionCreate): The request body of `sections.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -146,7 +146,7 @@ def sync(
     given.
 
     Args:
-        body (SectionCreate):
+        body (SectionCreate): The request body of `sections.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -173,7 +173,7 @@ async def asyncio_detailed(
     given.
 
     Args:
-        body (SectionCreate):
+        body (SectionCreate): The request body of `sections.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -203,7 +203,7 @@ async def asyncio(
     given.
 
     Args:
-        body (SectionCreate):
+        body (SectionCreate): The request body of `sections.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

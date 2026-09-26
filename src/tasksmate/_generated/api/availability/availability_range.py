@@ -141,9 +141,9 @@ def sync_detailed(
 ) -> Response[Any | AvailabilityRange | Problem]:
     """A team's availability over a date range
 
-     The Capacity tab's ONE read: the team's active members and every entry of theirs that
-    intersects `[from, to]`. A guest on the team receives only their own entries (the SELECT
-    policy). 400 on a missing / malformed / inverted window or a span over 93 days.
+     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
+    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
+    inverted window, or one longer than 93 days.
 
     Args:
         team_id (str):
@@ -184,9 +184,9 @@ def sync(
 ) -> Any | AvailabilityRange | Problem | None:
     """A team's availability over a date range
 
-     The Capacity tab's ONE read: the team's active members and every entry of theirs that
-    intersects `[from, to]`. A guest on the team receives only their own entries (the SELECT
-    policy). 400 on a missing / malformed / inverted window or a span over 93 days.
+     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
+    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
+    inverted window, or one longer than 93 days.
 
     Args:
         team_id (str):
@@ -222,9 +222,9 @@ async def asyncio_detailed(
 ) -> Response[Any | AvailabilityRange | Problem]:
     """A team's availability over a date range
 
-     The Capacity tab's ONE read: the team's active members and every entry of theirs that
-    intersects `[from, to]`. A guest on the team receives only their own entries (the SELECT
-    policy). 400 on a missing / malformed / inverted window or a span over 93 days.
+     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
+    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
+    inverted window, or one longer than 93 days.
 
     Args:
         team_id (str):
@@ -263,9 +263,9 @@ async def asyncio(
 ) -> Any | AvailabilityRange | Problem | None:
     """A team's availability over a date range
 
-     The Capacity tab's ONE read: the team's active members and every entry of theirs that
-    intersects `[from, to]`. A guest on the team receives only their own entries (the SELECT
-    policy). 400 on a missing / malformed / inverted window or a span over 93 days.
+     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
+    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
+    inverted window, or one longer than 93 days.
 
     Args:
         team_id (str):

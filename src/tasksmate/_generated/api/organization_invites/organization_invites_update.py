@@ -116,9 +116,11 @@ def sync_detailed(
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Change a pending invite's role
 
+     Change a pending invite's role.
+
     Args:
         invite_id (str):
-        body (OrganizationInviteUpdate):
+        body (OrganizationInviteUpdate): The request body of `organization-invites.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -148,9 +150,11 @@ def sync(
 ) -> OrganizationInviteInDB | Problem | None:
     """Change a pending invite's role
 
+     Change a pending invite's role.
+
     Args:
         invite_id (str):
-        body (OrganizationInviteUpdate):
+        body (OrganizationInviteUpdate): The request body of `organization-invites.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -175,9 +179,11 @@ async def asyncio_detailed(
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Change a pending invite's role
 
+     Change a pending invite's role.
+
     Args:
         invite_id (str):
-        body (OrganizationInviteUpdate):
+        body (OrganizationInviteUpdate): The request body of `organization-invites.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -205,9 +211,11 @@ async def asyncio(
 ) -> OrganizationInviteInDB | Problem | None:
     """Change a pending invite's role
 
+     Change a pending invite's role.
+
     Args:
         invite_id (str):
-        body (OrganizationInviteUpdate):
+        body (OrganizationInviteUpdate): The request body of `organization-invites.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -158,10 +158,8 @@ def sync_detailed(
 ) -> Response[Any | PageTaskCommentInDB | Problem]:
     """List a task's comments (threaded)
 
-     Get all comments for a task, including nested replies, in the 4.1 envelope.
-
-    Returns a tree structure where each comment may have a 'replies' array
-    containing its direct replies; a page is a page of TOP-LEVEL comments.
+     A task's comments with their replies, paginated as `{data, next_cursor}`. Each comment may carry a
+    `replies` array of its direct replies; a page is a page of top-level comments.
 
     Args:
         task_id (str):
@@ -211,10 +209,8 @@ def sync(
 ) -> Any | PageTaskCommentInDB | Problem | None:
     """List a task's comments (threaded)
 
-     Get all comments for a task, including nested replies, in the 4.1 envelope.
-
-    Returns a tree structure where each comment may have a 'replies' array
-    containing its direct replies; a page is a page of TOP-LEVEL comments.
+     A task's comments with their replies, paginated as `{data, next_cursor}`. Each comment may carry a
+    `replies` array of its direct replies; a page is a page of top-level comments.
 
     Args:
         task_id (str):
@@ -259,10 +255,8 @@ async def asyncio_detailed(
 ) -> Response[Any | PageTaskCommentInDB | Problem]:
     """List a task's comments (threaded)
 
-     Get all comments for a task, including nested replies, in the 4.1 envelope.
-
-    Returns a tree structure where each comment may have a 'replies' array
-    containing its direct replies; a page is a page of TOP-LEVEL comments.
+     A task's comments with their replies, paginated as `{data, next_cursor}`. Each comment may carry a
+    `replies` array of its direct replies; a page is a page of top-level comments.
 
     Args:
         task_id (str):
@@ -310,10 +304,8 @@ async def asyncio(
 ) -> Any | PageTaskCommentInDB | Problem | None:
     """List a task's comments (threaded)
 
-     Get all comments for a task, including nested replies, in the 4.1 envelope.
-
-    Returns a tree structure where each comment may have a 'replies' array
-    containing its direct replies; a page is a page of TOP-LEVEL comments.
+     A task's comments with their replies, paginated as `{data, next_cursor}`. Each comment may carry a
+    `replies` array of its direct replies; a page is a page of top-level comments.
 
     Args:
         task_id (str):

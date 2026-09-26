@@ -130,11 +130,13 @@ def sync_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Update a project resource
 
+     Update a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectResourceUpdate):
+        body (ProjectResourceUpdate): The request body of `project-resources.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -168,11 +170,13 @@ def sync(
 ) -> Problem | ProjectResourceInDB | None:
     """Update a project resource
 
+     Update a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectResourceUpdate):
+        body (ProjectResourceUpdate): The request body of `project-resources.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -201,11 +205,13 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectResourceInDB]:
     """Update a project resource
 
+     Update a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectResourceUpdate):
+        body (ProjectResourceUpdate): The request body of `project-resources.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -237,11 +243,13 @@ async def asyncio(
 ) -> Problem | ProjectResourceInDB | None:
     """Update a project resource
 
+     Update a project resource.
+
     Args:
         resource_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectResourceUpdate):
+        body (ProjectResourceUpdate): The request body of `project-resources.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

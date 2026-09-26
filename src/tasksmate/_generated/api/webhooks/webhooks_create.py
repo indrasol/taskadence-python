@@ -118,7 +118,7 @@ def sync_detailed(
     `webhook-signature`). Events of private projects are included.
 
     Args:
-        body (WebhookCreate):
+        body (WebhookCreate): The request body of `webhooks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,7 +152,7 @@ def sync(
     `webhook-signature`). Events of private projects are included.
 
     Args:
-        body (WebhookCreate):
+        body (WebhookCreate): The request body of `webhooks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -181,7 +181,7 @@ async def asyncio_detailed(
     `webhook-signature`). Events of private projects are included.
 
     Args:
-        body (WebhookCreate):
+        body (WebhookCreate): The request body of `webhooks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -213,7 +213,7 @@ async def asyncio(
     `webhook-signature`). Events of private projects are included.
 
     Args:
-        body (WebhookCreate):
+        body (WebhookCreate): The request body of `webhooks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

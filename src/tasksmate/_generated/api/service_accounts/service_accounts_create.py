@@ -116,13 +116,13 @@ def sync_detailed(
 ) -> Response[Problem | ServiceAccountOut]:
     """Create a service account (owner / admin)
 
-     Create a service account: a `users` row of kind `service_account` (it cannot sign in) and a `member`
-    membership.
-    Its tokens are minted with `POST /v1/tokens` and `principal_user_id` = its id.
+     Create a service account: a non-human member of the organization (role `member`) that cannot sign
+    in. Mint its tokens with `POST /v1/tokens`, setting `principal_user_id` to its id. Org owners and
+    admins only.
 
     Args:
         org_id (str):
-        body (ServiceAccountCreate):
+        body (ServiceAccountCreate): The request body of `service-accounts.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,13 +152,13 @@ def sync(
 ) -> Problem | ServiceAccountOut | None:
     """Create a service account (owner / admin)
 
-     Create a service account: a `users` row of kind `service_account` (it cannot sign in) and a `member`
-    membership.
-    Its tokens are minted with `POST /v1/tokens` and `principal_user_id` = its id.
+     Create a service account: a non-human member of the organization (role `member`) that cannot sign
+    in. Mint its tokens with `POST /v1/tokens`, setting `principal_user_id` to its id. Org owners and
+    admins only.
 
     Args:
         org_id (str):
-        body (ServiceAccountCreate):
+        body (ServiceAccountCreate): The request body of `service-accounts.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -183,13 +183,13 @@ async def asyncio_detailed(
 ) -> Response[Problem | ServiceAccountOut]:
     """Create a service account (owner / admin)
 
-     Create a service account: a `users` row of kind `service_account` (it cannot sign in) and a `member`
-    membership.
-    Its tokens are minted with `POST /v1/tokens` and `principal_user_id` = its id.
+     Create a service account: a non-human member of the organization (role `member`) that cannot sign
+    in. Mint its tokens with `POST /v1/tokens`, setting `principal_user_id` to its id. Org owners and
+    admins only.
 
     Args:
         org_id (str):
-        body (ServiceAccountCreate):
+        body (ServiceAccountCreate): The request body of `service-accounts.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -217,13 +217,13 @@ async def asyncio(
 ) -> Problem | ServiceAccountOut | None:
     """Create a service account (owner / admin)
 
-     Create a service account: a `users` row of kind `service_account` (it cannot sign in) and a `member`
-    membership.
-    Its tokens are minted with `POST /v1/tokens` and `principal_user_id` = its id.
+     Create a service account: a non-human member of the organization (role `member`) that cannot sign
+    in. Mint its tokens with `POST /v1/tokens`, setting `principal_user_id` to its id. Org owners and
+    admins only.
 
     Args:
         org_id (str):
-        body (ServiceAccountCreate):
+        body (ServiceAccountCreate): The request body of `service-accounts.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

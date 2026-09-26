@@ -149,8 +149,8 @@ def sync_detailed(
 ) -> Response[Any | PinListPage | Problem]:
     """Your pins (views and projects), in order
 
-     The caller's pins in the org (views and projects), in `position` order, labels resolved. 4.1 list
-    envelope.
+     Your pins in the organization (views and projects), in `position` order with their labels, paginated
+    as `{data, next_cursor}`.
 
     Args:
         org_id (str):
@@ -196,8 +196,8 @@ def sync(
 ) -> Any | PinListPage | Problem | None:
     """Your pins (views and projects), in order
 
-     The caller's pins in the org (views and projects), in `position` order, labels resolved. 4.1 list
-    envelope.
+     Your pins in the organization (views and projects), in `position` order with their labels, paginated
+    as `{data, next_cursor}`.
 
     Args:
         org_id (str):
@@ -238,8 +238,8 @@ async def asyncio_detailed(
 ) -> Response[Any | PinListPage | Problem]:
     """Your pins (views and projects), in order
 
-     The caller's pins in the org (views and projects), in `position` order, labels resolved. 4.1 list
-    envelope.
+     Your pins in the organization (views and projects), in `position` order with their labels, paginated
+    as `{data, next_cursor}`.
 
     Args:
         org_id (str):
@@ -283,8 +283,8 @@ async def asyncio(
 ) -> Any | PinListPage | Problem | None:
     """Your pins (views and projects), in order
 
-     The caller's pins in the org (views and projects), in `position` order, labels resolved. 4.1 list
-    envelope.
+     Your pins in the organization (views and projects), in `position` order with their labels, paginated
+    as `{data, next_cursor}`.
 
     Args:
         org_id (str):

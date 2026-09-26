@@ -118,6 +118,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | TokenOut]:
     """Read an access token (never the token itself)
 
+     Read an access token (never the token itself).
+
     Args:
         token_id (str):
         if_none_match (str | Unset):
@@ -150,6 +152,8 @@ def sync(
 ) -> Any | Problem | TokenOut | None:
     """Read an access token (never the token itself)
 
+     Read an access token (never the token itself).
+
     Args:
         token_id (str):
         if_none_match (str | Unset):
@@ -176,6 +180,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TokenOut]:
     """Read an access token (never the token itself)
+
+     Read an access token (never the token itself).
 
     Args:
         token_id (str):
@@ -206,6 +212,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TokenOut | None:
     """Read an access token (never the token itself)
+
+     Read an access token (never the token itself).
 
     Args:
         token_id (str):

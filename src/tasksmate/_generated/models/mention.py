@@ -19,7 +19,8 @@ T = TypeVar("T", bound="Mention")
 
 @_attrs_define
 class Mention:
-    """
+    """Part of `TaskCommentCreate` and `TaskCommentInDB`.
+
     Attributes:
         user_id (None | str | Unset):
         username (None | str | Unset):

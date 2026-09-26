@@ -158,7 +158,8 @@ def sync_detailed(
 ) -> Response[Any | PageTaskHistoryInDB | Problem]:
     """A task's change history
 
-     A task's history in the 4.1 envelope, in the service's order unless `sort_by=created_at`.
+     A task's change history, paginated as `{data, next_cursor}`. Send `sort_by=created_at` to order it
+    by time.
 
     Args:
         task_id (str):
@@ -208,7 +209,8 @@ def sync(
 ) -> Any | PageTaskHistoryInDB | Problem | None:
     """A task's change history
 
-     A task's history in the 4.1 envelope, in the service's order unless `sort_by=created_at`.
+     A task's change history, paginated as `{data, next_cursor}`. Send `sort_by=created_at` to order it
+    by time.
 
     Args:
         task_id (str):
@@ -253,7 +255,8 @@ async def asyncio_detailed(
 ) -> Response[Any | PageTaskHistoryInDB | Problem]:
     """A task's change history
 
-     A task's history in the 4.1 envelope, in the service's order unless `sort_by=created_at`.
+     A task's change history, paginated as `{data, next_cursor}`. Send `sort_by=created_at` to order it
+    by time.
 
     Args:
         task_id (str):
@@ -301,7 +304,8 @@ async def asyncio(
 ) -> Any | PageTaskHistoryInDB | Problem | None:
     """A task's change history
 
-     A task's history in the 4.1 envelope, in the service's order unless `sort_by=created_at`.
+     A task's change history, paginated as `{data, next_cursor}`. Send `sort_by=created_at` to order it
+    by time.
 
     Args:
         task_id (str):

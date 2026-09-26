@@ -21,7 +21,7 @@ class WebhookActor:
     """Who caused the event.
 
     Attributes:
-        kind (str): `user`, `service_account` (a 4.2 access token's service account) or `system`
+        kind (str): `user`, `service_account` (acting through an access token) or `system`.
         id (None | str): The user's id (null for `system`)
         username (None | str): Their username at the time
     """

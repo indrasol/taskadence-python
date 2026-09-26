@@ -124,7 +124,8 @@ def sync_detailed(
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -161,7 +162,8 @@ def sync(
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -193,7 +195,8 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -228,7 +231,8 @@ async def asyncio(
     Args:
         team_id (str):
         user_id (str):
-        body (TeamMemberUpdate):
+        body (TeamMemberUpdate): The request body of `teams.replace_member` and
+            `teams.update_member`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

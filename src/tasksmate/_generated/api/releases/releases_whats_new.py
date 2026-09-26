@@ -140,13 +140,13 @@ def sync_detailed(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | WhatsNewResponse]:
-    """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1
-    decision)
+    """What's new — recent release notes
 
      Get 'What's New' information for the specified time period.
 
     Args:
-        environment (Environment | Unset):
+        environment (Environment | Unset): One of `development`, `uat`, `production`. Used by
+            `Release`.
         since_days (int | Unset): Number of days to look back Default: 30.
         repository (None | str | Unset): Filter by repository
         if_none_match (str | Unset):
@@ -181,13 +181,13 @@ def sync(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | WhatsNewResponse | None:
-    """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1
-    decision)
+    """What's new — recent release notes
 
      Get 'What's New' information for the specified time period.
 
     Args:
-        environment (Environment | Unset):
+        environment (Environment | Unset): One of `development`, `uat`, `production`. Used by
+            `Release`.
         since_days (int | Unset): Number of days to look back Default: 30.
         repository (None | str | Unset): Filter by repository
         if_none_match (str | Unset):
@@ -217,13 +217,13 @@ async def asyncio_detailed(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | WhatsNewResponse]:
-    """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1
-    decision)
+    """What's new — recent release notes
 
      Get 'What's New' information for the specified time period.
 
     Args:
-        environment (Environment | Unset):
+        environment (Environment | Unset): One of `development`, `uat`, `production`. Used by
+            `Release`.
         since_days (int | Unset): Number of days to look back Default: 30.
         repository (None | str | Unset): Filter by repository
         if_none_match (str | Unset):
@@ -256,13 +256,13 @@ async def asyncio(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | WhatsNewResponse | None:
-    """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1
-    decision)
+    """What's new — recent release notes
 
      Get 'What's New' information for the specified time period.
 
     Args:
-        environment (Environment | Unset):
+        environment (Environment | Unset): One of `development`, `uat`, `production`. Used by
+            `Release`.
         since_days (int | Unset): Number of days to look back Default: 30.
         repository (None | str | Unset): Filter by repository
         if_none_match (str | Unset):

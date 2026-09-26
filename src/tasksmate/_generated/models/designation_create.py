@@ -22,12 +22,13 @@ T = TypeVar("T", bound="DesignationCreate")
 
 @_attrs_define
 class DesignationCreate:
-    """
+    """The request body of `designations.create`.
+
     Attributes:
         org_id (str): The organization the row belongs to (org rows only; seeds are read-only)
         label (None | str | Unset): The human name (unique per org, case-insensitive, among active rows) Example:
             Delivery Lead.
-        name (None | str | Unset): Alias of `label` for the pre-2.8 clients
+        name (None | str | Unset): Alias of `label`, accepted from older clients.
         category (None | str | Unset): Group in the picker; defaults to 'Custom'
         aliases (list[str] | None | Unset): Other spellings the resolver accepts
         sort_order (int | None | Unset):

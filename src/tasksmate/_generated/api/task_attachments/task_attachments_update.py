@@ -135,13 +135,14 @@ def sync_detailed(
 ) -> Response[Problem | TaskAttachmentInDB]:
     """Rename an attachment
 
+     Rename an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskAttachmentUpdate): `PUT /task-attachments/{attachment_id}` body — a true partial
-            (3.15 audit: `task_id` was required
-            through inheritance; the attachment is the path). The route sends `exclude_unset=True` on.
+        body (TaskAttachmentUpdate): The body of an attachment update. Every field is optional and
+            omitted fields are left unchanged; the attachment is the one in the path.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -175,13 +176,14 @@ def sync(
 ) -> Problem | TaskAttachmentInDB | None:
     """Rename an attachment
 
+     Rename an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskAttachmentUpdate): `PUT /task-attachments/{attachment_id}` body — a true partial
-            (3.15 audit: `task_id` was required
-            through inheritance; the attachment is the path). The route sends `exclude_unset=True` on.
+        body (TaskAttachmentUpdate): The body of an attachment update. Every field is optional and
+            omitted fields are left unchanged; the attachment is the one in the path.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -210,13 +212,14 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskAttachmentInDB]:
     """Rename an attachment
 
+     Rename an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskAttachmentUpdate): `PUT /task-attachments/{attachment_id}` body — a true partial
-            (3.15 audit: `task_id` was required
-            through inheritance; the attachment is the path). The route sends `exclude_unset=True` on.
+        body (TaskAttachmentUpdate): The body of an attachment update. Every field is optional and
+            omitted fields are left unchanged; the attachment is the one in the path.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -248,13 +251,14 @@ async def asyncio(
 ) -> Problem | TaskAttachmentInDB | None:
     """Rename an attachment
 
+     Rename an attachment.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskAttachmentUpdate): `PUT /task-attachments/{attachment_id}` body — a true partial
-            (3.15 audit: `task_id` was required
-            through inheritance; the attachment is the path). The route sends `exclude_unset=True` on.
+        body (TaskAttachmentUpdate): The body of an attachment update. Every field is optional and
+            omitted fields are left unchanged; the attachment is the one in the path.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

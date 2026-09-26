@@ -28,20 +28,21 @@ T = TypeVar("T", bound="Release")
 
 @_attrs_define
 class Release:
-    """
+    """Part of `WhatsNewResponse`.
+
     Attributes:
         id (str):
         version (str):
         tag_name (str):
-        release_type (ReleaseType):
-        environment (Environment):
+        release_type (ReleaseType): One of `major`, `minor`, `patch`, `prerelease`. Used by `Release`.
+        environment (Environment): One of `development`, `uat`, `production`. Used by `Release`.
         repository (str):
         commit_sha (str):
         branch (str):
         release_date (datetime.datetime):
         created_at (datetime.datetime):
         updated_at (datetime.datetime):
-        summary (ReleaseSummary):
+        summary (ReleaseSummary): Part of `Release`.
         is_prerelease (bool | Unset):  Default: False.
         is_draft (bool | Unset):  Default: False.
         release_notes (list[ReleaseNoteItem] | Unset):

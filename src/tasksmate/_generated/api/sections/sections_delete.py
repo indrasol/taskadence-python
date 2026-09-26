@@ -106,8 +106,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete a section
 
-     Delete a section. **Tasks are never deleted**: only their `task_sections`
-    rows for this section go, and those tasks read as unsectioned in this scope.
+     Delete a section. **Tasks are never deleted**: the tasks that were in it become unsectioned in this
+    scope.
 
     Args:
         section_id (str):
@@ -138,8 +138,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Delete a section
 
-     Delete a section. **Tasks are never deleted**: only their `task_sections`
-    rows for this section go, and those tasks read as unsectioned in this scope.
+     Delete a section. **Tasks are never deleted**: the tasks that were in it become unsectioned in this
+    scope.
 
     Args:
         section_id (str):
@@ -165,8 +165,8 @@ async def asyncio_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete a section
 
-     Delete a section. **Tasks are never deleted**: only their `task_sections`
-    rows for this section go, and those tasks read as unsectioned in this scope.
+     Delete a section. **Tasks are never deleted**: the tasks that were in it become unsectioned in this
+    scope.
 
     Args:
         section_id (str):
@@ -195,8 +195,8 @@ async def asyncio(
 ) -> Acknowledgement | Problem | None:
     """Delete a section
 
-     Delete a section. **Tasks are never deleted**: only their `task_sections`
-    rows for this section go, and those tasks read as unsectioned in this scope.
+     Delete a section. **Tasks are never deleted**: the tasks that were in it become unsectioned in this
+    scope.
 
     Args:
         section_id (str):

@@ -1,6 +1,6 @@
 # `tm.service_accounts`
 
-Non-human organization members that hold access tokens (4.2). They cannot sign in.
+Non-human organization members that hold access tokens. They cannot sign in.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

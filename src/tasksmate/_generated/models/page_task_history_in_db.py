@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageTaskHistoryInDB")
 
 @_attrs_define
 class PageTaskHistoryInDB:
-    """
+    """Returned by `task-history.list`.
+
     Attributes:
         data (list[TaskHistoryInDB]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

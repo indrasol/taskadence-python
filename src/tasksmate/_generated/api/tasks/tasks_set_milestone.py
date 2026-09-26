@@ -112,19 +112,16 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
-     File the task under a TEAM milestone (`milestone_id: null` takes it out) — 6.3's
-    `/sprint` route copied. The permission is the task's own `edit` and nothing more (2.6a's
-    rule for `team_id`), so a plain team member may put work they may edit under a milestone
-    they cannot rename. The one data rule is reachability (the milestone's team's projects'
-    tasks, or that team's unfiled tasks): 404 for an unknown milestone, 422 when unreachable.
-    Taking a task out clears `milestone_id` and deletes nothing. Independent of the sprint.
+     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
+    task may do this, without needing any right over the milestone itself. The milestone must belong to
+    a team the task is reachable from (one of the team's projects, or filed under that team with no
+    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
+    `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
-            TEAM milestone, `null` to take it out.
-            6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
-            history entry.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
+            milestone to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -154,19 +151,16 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
-     File the task under a TEAM milestone (`milestone_id: null` takes it out) — 6.3's
-    `/sprint` route copied. The permission is the task's own `edit` and nothing more (2.6a's
-    rule for `team_id`), so a plain team member may put work they may edit under a milestone
-    they cannot rename. The one data rule is reachability (the milestone's team's projects'
-    tasks, or that team's unfiled tasks): 404 for an unknown milestone, 422 when unreachable.
-    Taking a task out clears `milestone_id` and deletes nothing. Independent of the sprint.
+     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
+    task may do this, without needing any right over the milestone itself. The milestone must belong to
+    a team the task is reachable from (one of the team's projects, or filed under that team with no
+    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
+    `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
-            TEAM milestone, `null` to take it out.
-            6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
-            history entry.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
+            milestone to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -191,19 +185,16 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
-     File the task under a TEAM milestone (`milestone_id: null` takes it out) — 6.3's
-    `/sprint` route copied. The permission is the task's own `edit` and nothing more (2.6a's
-    rule for `team_id`), so a plain team member may put work they may edit under a milestone
-    they cannot rename. The one data rule is reachability (the milestone's team's projects'
-    tasks, or that team's unfiled tasks): 404 for an unknown milestone, 422 when unreachable.
-    Taking a task out clears `milestone_id` and deletes nothing. Independent of the sprint.
+     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
+    task may do this, without needing any right over the milestone itself. The milestone must belong to
+    a team the task is reachable from (one of the team's projects, or filed under that team with no
+    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
+    `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
-            TEAM milestone, `null` to take it out.
-            6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
-            history entry.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
+            milestone to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -231,19 +222,16 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
-     File the task under a TEAM milestone (`milestone_id: null` takes it out) — 6.3's
-    `/sprint` route copied. The permission is the task's own `edit` and nothing more (2.6a's
-    rule for `team_id`), so a plain team member may put work they may edit under a milestone
-    they cannot rename. The one data rule is reachability (the milestone's team's projects'
-    tasks, or that team's unfiled tasks): 404 for an unknown milestone, 422 when unreachable.
-    Taking a task out clears `milestone_id` and deletes nothing. Independent of the sprint.
+     File the task under a team milestone (`milestone_id: null` takes it out). Anyone who may edit the
+    task may do this, without needing any right over the milestone itself. The milestone must belong to
+    a team the task is reachable from (one of the team's projects, or filed under that team with no
+    project): 404 for an unknown milestone, 422 when it is unreachable. Taking a task out clears
+    `milestone_id` and deletes nothing. Independent of the task's sprint.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
-            TEAM milestone, `null` to take it out.
-            6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
-            history entry.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
+            milestone to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

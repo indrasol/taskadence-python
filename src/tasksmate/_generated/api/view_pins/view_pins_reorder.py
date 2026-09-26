@@ -110,11 +110,11 @@ def sync_detailed(
 ) -> Response[PinListPage | Problem]:
     """Reorder your pins
 
-     Rewrite the caller's pin order (1.0, 2.0, …). Pins not named keep their relative order after the
-    named ones.
+     Set the order of your pins (their positions become 1, 2, 3, …). Pins you do not name keep their
+    relative order after the named ones.
 
     Args:
-        body (PinOrder):
+        body (PinOrder): The request body of `view-pins.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -142,11 +142,11 @@ def sync(
 ) -> PinListPage | Problem | None:
     """Reorder your pins
 
-     Rewrite the caller's pin order (1.0, 2.0, …). Pins not named keep their relative order after the
-    named ones.
+     Set the order of your pins (their positions become 1, 2, 3, …). Pins you do not name keep their
+    relative order after the named ones.
 
     Args:
-        body (PinOrder):
+        body (PinOrder): The request body of `view-pins.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -169,11 +169,11 @@ async def asyncio_detailed(
 ) -> Response[PinListPage | Problem]:
     """Reorder your pins
 
-     Rewrite the caller's pin order (1.0, 2.0, …). Pins not named keep their relative order after the
-    named ones.
+     Set the order of your pins (their positions become 1, 2, 3, …). Pins you do not name keep their
+    relative order after the named ones.
 
     Args:
-        body (PinOrder):
+        body (PinOrder): The request body of `view-pins.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -199,11 +199,11 @@ async def asyncio(
 ) -> PinListPage | Problem | None:
     """Reorder your pins
 
-     Rewrite the caller's pin order (1.0, 2.0, …). Pins not named keep their relative order after the
-    named ones.
+     Set the order of your pins (their positions become 1, 2, 3, …). Pins you do not name keep their
+    relative order after the named ones.
 
     Args:
-        body (PinOrder):
+        body (PinOrder): The request body of `view-pins.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

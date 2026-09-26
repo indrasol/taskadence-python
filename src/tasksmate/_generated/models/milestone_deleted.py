@@ -16,7 +16,8 @@ T = TypeVar("T", bound="MilestoneDeleted")
 
 @_attrs_define
 class MilestoneDeleted:
-    """
+    """Returned by `milestones.delete`.
+
     Attributes:
         ok (bool):
         milestone_id (str):

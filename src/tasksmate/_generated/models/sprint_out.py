@@ -20,7 +20,8 @@ T = TypeVar("T", bound="SprintOut")
 
 @_attrs_define
 class SprintOut:
-    """
+    """Returned by `sprints.create` and `sprints.update`.
+
     Attributes:
         sprint_id (str):
         org_id (str):

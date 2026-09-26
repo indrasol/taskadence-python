@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageTaskRoadmapStop")
 
 @_attrs_define
 class PageTaskRoadmapStop:
-    """
+    """Returned by `roadmap.task_stops`.
+
     Attributes:
         data (list[TaskRoadmapStop]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

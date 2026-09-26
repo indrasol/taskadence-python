@@ -118,7 +118,7 @@ def sync_detailed(
 ) -> Response[Any | Problem | RoadmapOut]:
     """A project's roadmap
 
-     The project's roadmap — the team tab's data filtered to this project, through the same function.
+     The project's roadmap: the same shape as a team's roadmap, narrowed to this project.
 
     Args:
         project_id (str):
@@ -152,7 +152,7 @@ def sync(
 ) -> Any | Problem | RoadmapOut | None:
     """A project's roadmap
 
-     The project's roadmap — the team tab's data filtered to this project, through the same function.
+     The project's roadmap: the same shape as a team's roadmap, narrowed to this project.
 
     Args:
         project_id (str):
@@ -181,7 +181,7 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | RoadmapOut]:
     """A project's roadmap
 
-     The project's roadmap — the team tab's data filtered to this project, through the same function.
+     The project's roadmap: the same shape as a team's roadmap, narrowed to this project.
 
     Args:
         project_id (str):
@@ -213,7 +213,7 @@ async def asyncio(
 ) -> Any | Problem | RoadmapOut | None:
     """A project's roadmap
 
-     The project's roadmap — the team tab's data filtered to this project, through the same function.
+     The project's roadmap: the same shape as a team's roadmap, narrowed to this project.
 
     Args:
         project_id (str):

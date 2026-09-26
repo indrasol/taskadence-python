@@ -20,10 +20,11 @@ T = TypeVar("T", bound="TaskSectionOut")
 
 @_attrs_define
 class TaskSectionOut:
-    """
+    """Returned by `tasks.set_section`.
+
     Attributes:
         task_id (str):
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.
         scope_id (str):
         section_id (None | str):
         position (float | None):

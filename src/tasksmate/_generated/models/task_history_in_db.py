@@ -23,7 +23,8 @@ T = TypeVar("T", bound="TaskHistoryInDB")
 
 @_attrs_define
 class TaskHistoryInDB:
-    """
+    """Returned by `task-history.read`.
+
     Attributes:
         task_id (str): Task ID (text) Example: task-1234.
         history_id (str):

@@ -132,6 +132,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | TaskAttachmentInDB]:
     """Read an attachment's metadata
 
+     Read an attachment's metadata.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
@@ -167,6 +169,8 @@ def sync(
 ) -> Any | Problem | TaskAttachmentInDB | None:
     """Read an attachment's metadata
 
+     Read an attachment's metadata.
+
     Args:
         attachment_id (str):
         project_id (None | str | Unset):
@@ -196,6 +200,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskAttachmentInDB]:
     """Read an attachment's metadata
+
+     Read an attachment's metadata.
 
     Args:
         attachment_id (str):
@@ -229,6 +235,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskAttachmentInDB | None:
     """Read an attachment's metadata
+
+     Read an attachment's metadata.
 
     Args:
         attachment_id (str):

@@ -149,7 +149,7 @@ def sync_detailed(
 ) -> Response[Any | PageTaskAttachmentInDB | Problem]:
     """List a task's attachments
 
-     A task's attachments in the 4.1 envelope.
+     A task's attachments, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -196,7 +196,7 @@ def sync(
 ) -> Any | PageTaskAttachmentInDB | Problem | None:
     """List a task's attachments
 
-     A task's attachments in the 4.1 envelope.
+     A task's attachments, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -238,7 +238,7 @@ async def asyncio_detailed(
 ) -> Response[Any | PageTaskAttachmentInDB | Problem]:
     """List a task's attachments
 
-     A task's attachments in the 4.1 envelope.
+     A task's attachments, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -283,7 +283,7 @@ async def asyncio(
 ) -> Any | PageTaskAttachmentInDB | Problem | None:
     """List a task's attachments
 
-     A task's attachments in the 4.1 envelope.
+     A task's attachments, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):

@@ -23,7 +23,8 @@ T = TypeVar("T", bound="OrganizationInDB")
 
 @_attrs_define
 class OrganizationInDB:
-    """
+    """Returned by `organizations.read`.
+
     Attributes:
         name (str): Organization name Example: Acme Corp.
         org_id (str):

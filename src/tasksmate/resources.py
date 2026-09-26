@@ -300,7 +300,7 @@ class TasksResource:
     def replace(
         self, task_id: str, body: models.TaskUpdate | Mapping[str, Any], *, if_match: str | None = None
     ) -> models.TaskInDB:
-        """Update a task (PUT; partial since 3.15).
+        """Update a task (PUT; partial).
 
         `PUT /v1/tasks/{task_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
         """
@@ -1274,7 +1274,7 @@ class ProjectStatsResource:
 
 
 class ServiceAccountsResource:
-    """Non-human organization members that hold access tokens (4.2). They cannot sign in."""
+    """Non-human organization members that hold access tokens. They cannot sign in."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -1333,7 +1333,7 @@ class ServiceAccountsResource:
 
 
 class TokensResource:
-    """TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate (4.2)."""
+    """TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -1412,7 +1412,7 @@ class TokensResource:
 
 
 class WebhooksResource:
-    """Signed HTTP callbacks for audit events (4.4): subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries."""
+    """Signed HTTP callbacks for audit events: subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -1611,7 +1611,7 @@ class ReleasesResource:
         repository: str | None = None,
         if_none_match: str | None = None,
     ) -> models.WhatsNewResponse | NotModifiedType:
-        """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1 decision).
+        """What's new — recent release notes.
 
         `GET /v1/releases/whats-new` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -2832,7 +2832,7 @@ class AsyncTasksResource:
     async def replace(
         self, task_id: str, body: models.TaskUpdate | Mapping[str, Any], *, if_match: str | None = None
     ) -> models.TaskInDB:
-        """Update a task (PUT; partial since 3.15).
+        """Update a task (PUT; partial).
 
         `PUT /v1/tasks/{task_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
         """
@@ -3835,7 +3835,7 @@ class AsyncProjectStatsResource:
 
 
 class AsyncServiceAccountsResource:
-    """Non-human organization members that hold access tokens (4.2). They cannot sign in."""
+    """Non-human organization members that hold access tokens. They cannot sign in."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -3898,7 +3898,7 @@ class AsyncServiceAccountsResource:
 
 
 class AsyncTokensResource:
-    """TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate (4.2)."""
+    """TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -3977,7 +3977,7 @@ class AsyncTokensResource:
 
 
 class AsyncWebhooksResource:
-    """Signed HTTP callbacks for audit events (4.4): subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries."""
+    """Signed HTTP callbacks for audit events: subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -4179,7 +4179,7 @@ class AsyncReleasesResource:
         repository: str | None = None,
         if_none_match: str | None = None,
     ) -> models.WhatsNewResponse | NotModifiedType:
-        """What's new — recent release notes (no app caller since 6.13's static carousel; public by the 4.1 decision).
+        """What's new — recent release notes.
 
         `GET /v1/releases/whats-new` · `if_none_match=<etag>` → `NotModified` when unchanged
         """

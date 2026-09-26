@@ -22,8 +22,8 @@ T = TypeVar("T", bound="OrgGoalsOut")
 
 @_attrs_define
 class OrgGoalsOut:
-    """`GET /v1/goals?org_id=` — every live goal in the projects the caller can read, grouped by project, each group
-    with decision 4's sums. A readable project with no goal is absent (the page has the projects read).
+    """`GET /v1/goals?org_id=`: every live goal in the projects you can read, grouped by project, each group with its
+    goals' task totals. A readable project with no goals is absent.
 
         Attributes:
             org_id (str):

@@ -27,7 +27,8 @@ T = TypeVar("T", bound="DeliveryDetail")
 
 @_attrs_define
 class DeliveryDetail:
-    """
+    """Returned by `webhooks.delivery` and `webhooks.test`.
+
     Attributes:
         delivery_id (str):
         subscription_id (str):

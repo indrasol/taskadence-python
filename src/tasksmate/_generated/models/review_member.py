@@ -22,7 +22,8 @@ T = TypeVar("T", bound="ReviewMember")
 
 @_attrs_define
 class ReviewMember:
-    """
+    """Part of `AccessReview`.
+
     Attributes:
         user_id (str):
         kind (str): `user` or `service_account`

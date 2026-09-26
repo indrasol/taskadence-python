@@ -24,7 +24,7 @@ class TaskSectionSet:
     """`PUT /tasks/{task_id}/section`: `section_id: null` removes the task from its section in that scope.
 
     Attributes:
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.
         scope_id (str):
         section_id (None | str | Unset):
         position (float | None | Unset): Omit to append at the end of the section

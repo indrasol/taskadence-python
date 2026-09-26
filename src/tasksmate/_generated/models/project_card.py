@@ -38,8 +38,7 @@ class ProjectCard:
         project_id (str): Project ID Example: P00001.
         tasks_total (int): Total number of tasks in the project Example: 25.
         tasks_completed (int): Number of completed tasks Example: 15.
-        progress_percent (float): Project completion percentage, 0–100 (a JSON number since 4.1b; was a decimal string)
-            Example: 60.0.
+        progress_percent (float): Project completion percentage, 0–100. Example: 60.0.
         description (None | str | Unset): Project description Example: Redesign the company website..
         metadata (None | ProjectCardMetadataType0 | Unset): Additional metadata Example: {'budget': 10000}.
         status (None | ProjectStatusEnum | Unset): Project status Default: 'not_started'. Example: not_started.
@@ -52,16 +51,15 @@ class ProjectCard:
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
         team_members (list[str] | None | Unset): List of user names to add as members
-        visibility (None | ProjectVisibilityEnum | Unset): public: every org member sees the project; private: members
-            only (enforced from task 2.2) Default: 'public'. Example: public.
-        team_id (None | str | Unset): Team the project is filed under (2.6a); an active team of the same org (422
-            otherwise). null = none.
+        visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
+            project; `private`: only its members and org admins. Default: 'public'. Example: public.
+        team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
+            organization (422 otherwise). null = none.
         created_at (datetime.datetime | None | Unset): Timestamp when the project was created
-        updated_at (datetime.datetime | None | Unset): Timestamp of the last change to the project row (task 2.1, from
-            project_card_view)
-        leads (list[ProjectLeadOut] | Unset): The project's leads (6.1c); optional — [] is the common case
-        position (int | Unset): The project's place in the org's drag order (6.12). Lists sort by position, then name.
-            Default: 0.
+        updated_at (datetime.datetime | None | Unset): When the project was last changed.
+        leads (list[ProjectLeadOut] | Unset): The project's leads; optional, usually empty.
+        position (int | Unset): The project's place in the organization's manual order. Lists sort by position, then
+            name. Default: 0.
     """
 
     org_id: str

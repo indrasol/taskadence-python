@@ -20,7 +20,8 @@ T = TypeVar("T", bound="SprintCreate")
 
 @_attrs_define
 class SprintCreate:
-    """
+    """The request body of `sprints.create`.
+
     Attributes:
         name (str): Unique among the team's active sprints (case-insensitive) — 409 otherwise
         start_date (datetime.date): First day of the time box

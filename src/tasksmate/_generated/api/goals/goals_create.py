@@ -117,10 +117,12 @@ def sync_detailed(
 ) -> Response[GoalOut | Problem]:
     """Create a goal in a project
 
+     Create a goal in a project.
+
     Args:
         project_id (str):
         idempotency_key (str | Unset):
-        body (GoalCreate):
+        body (GoalCreate): The request body of `goals.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,10 +154,12 @@ def sync(
 ) -> GoalOut | Problem | None:
     """Create a goal in a project
 
+     Create a goal in a project.
+
     Args:
         project_id (str):
         idempotency_key (str | Unset):
-        body (GoalCreate):
+        body (GoalCreate): The request body of `goals.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -182,10 +186,12 @@ async def asyncio_detailed(
 ) -> Response[GoalOut | Problem]:
     """Create a goal in a project
 
+     Create a goal in a project.
+
     Args:
         project_id (str):
         idempotency_key (str | Unset):
-        body (GoalCreate):
+        body (GoalCreate): The request body of `goals.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -215,10 +221,12 @@ async def asyncio(
 ) -> GoalOut | Problem | None:
     """Create a goal in a project
 
+     Create a goal in a project.
+
     Args:
         project_id (str):
         idempotency_key (str | Unset):
-        body (GoalCreate):
+        body (GoalCreate): The request body of `goals.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -23,7 +23,8 @@ T = TypeVar("T", bound="TaskCommentInDB")
 
 @_attrs_define
 class TaskCommentInDB:
-    """
+    """Returned by `task-comments.create`, `task-comments.read`, `task-comments.reply` and `task-comments.update`.
+
     Attributes:
         task_id (str): Task ID (text) Example: task-1234.
         comment_id (str):

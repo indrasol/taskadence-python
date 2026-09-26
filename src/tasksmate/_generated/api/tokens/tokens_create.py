@@ -117,7 +117,7 @@ def sync_detailed(
     allowed? expiry required? maximum lifetime?).
 
     Args:
-        body (TokenCreate):
+        body (TokenCreate): The request body of `tokens.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,7 +152,7 @@ def sync(
     allowed? expiry required? maximum lifetime?).
 
     Args:
-        body (TokenCreate):
+        body (TokenCreate): The request body of `tokens.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -182,7 +182,7 @@ async def asyncio_detailed(
     allowed? expiry required? maximum lifetime?).
 
     Args:
-        body (TokenCreate):
+        body (TokenCreate): The request body of `tokens.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -215,7 +215,7 @@ async def asyncio(
     allowed? expiry required? maximum lifetime?).
 
     Args:
-        body (TokenCreate):
+        body (TokenCreate): The request body of `tokens.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

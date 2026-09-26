@@ -22,11 +22,12 @@ T = TypeVar("T", bound="TeamListPage")
 
 @_attrs_define
 class TeamListPage:
-    """
+    """Returned by `teams.list`.
+
     Attributes:
         data (list[TeamOut]):
         total (int): Teams matching the query the caller may read, before `limit` / `offset`
-        next_cursor (None | str | Unset): 4.1 list envelope: the next page's cursor, null on the last page
+        next_cursor (None | str | Unset): The next page's cursor; null on the last page.
     """
 
     data: list[TeamOut]

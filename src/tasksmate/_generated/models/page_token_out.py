@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageTokenOut")
 
 @_attrs_define
 class PageTokenOut:
-    """
+    """Returned by `tokens.list`.
+
     Attributes:
         data (list[TokenOut]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

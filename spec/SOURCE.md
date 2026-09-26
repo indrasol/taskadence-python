@@ -7,15 +7,16 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `4148026` — "feat(api): 4.6 - x-problem-types, x-scope-descriptions, x-limits in the public spec" (task 4.6; on `f277980`, S.9 — the served document is `6b75d01`'s (4.1b) byte for byte plus the three top-level `x-` extensions) |
-| Served by | `app.main:app` via `TestClient` (`ENV=dev`, the same settings as a local uvicorn), 2026-09-26 |
+| Backend commit | `af1cf48` — "feat(api): 4.6b D - public-spec copy cleanup" (task 4.6b; on `4148026`: public descriptions rewritten for developers — engineering notes kept under `x-internal-notes` in `/openapi.json` only — and every public operation and schema described) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`), 2026-09-26 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
 | Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `da53d76fb8c6650e22485a675a771822a17a145c56ecd58740ff2ebc9ac03ed2` |
+| SHA-256 | `1bfd48d7dfe98907c07511109bca27c431fb2ca1f7e9f2fa24a2faeb55c70f9d` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
-served it (here: the deployed dev API first, then `http://localhost:8000`). The first one is the SDK's default base URL
-(`tasksmate.DEFAULT_BASE_URL`), so **the snapshot for a release (S.23) must be taken from production settings**.
+served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).
+The first one is the SDK's default base URL (`tasksmate.DEFAULT_BASE_URL`) — the same URL as before, now labelled
+correctly — and the rule for a release (S.23) holds: take the snapshot from production settings.
 
 ## Refreshing it
 

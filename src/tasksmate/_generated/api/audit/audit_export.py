@@ -196,8 +196,8 @@ def sync_detailed(
         resource_type (None | str | Unset): task | project | organization | member | invite | team
             | designation | section | settings
         resource_id (None | str | Unset): One resource's trail (with resource_type)
-        project_id (None | str | Unset): The project Activity tab: every event denormalised to
-            this project
+        project_id (None | str | Unset): One project's events: every event recorded against this
+            project.
         action (None | str | Unset): Prefix match: `project.` for the family,
             `member.role_changed` for one action
         actor (None | str | Unset): Username or user id
@@ -257,8 +257,8 @@ def sync(
         resource_type (None | str | Unset): task | project | organization | member | invite | team
             | designation | section | settings
         resource_id (None | str | Unset): One resource's trail (with resource_type)
-        project_id (None | str | Unset): The project Activity tab: every event denormalised to
-            this project
+        project_id (None | str | Unset): One project's events: every event recorded against this
+            project.
         action (None | str | Unset): Prefix match: `project.` for the family,
             `member.role_changed` for one action
         actor (None | str | Unset): Username or user id
@@ -313,8 +313,8 @@ async def asyncio_detailed(
         resource_type (None | str | Unset): task | project | organization | member | invite | team
             | designation | section | settings
         resource_id (None | str | Unset): One resource's trail (with resource_type)
-        project_id (None | str | Unset): The project Activity tab: every event denormalised to
-            this project
+        project_id (None | str | Unset): One project's events: every event recorded against this
+            project.
         action (None | str | Unset): Prefix match: `project.` for the family,
             `member.role_changed` for one action
         actor (None | str | Unset): Username or user id
@@ -372,8 +372,8 @@ async def asyncio(
         resource_type (None | str | Unset): task | project | organization | member | invite | team
             | designation | section | settings
         resource_id (None | str | Unset): One resource's trail (with resource_type)
-        project_id (None | str | Unset): The project Activity tab: every event denormalised to
-            this project
+        project_id (None | str | Unset): One project's events: every event recorded against this
+            project.
         action (None | str | Unset): Prefix match: `project.` for the family,
             `member.role_changed` for one action
         actor (None | str | Unset): Username or user id

@@ -123,6 +123,8 @@ def sync_detailed(
 ) -> Response[DesignationDeleted | Problem]:
     """Deactivate a custom designation
 
+     Deactivate a custom designation.
+
     Args:
         designation_id (str):
         org_id (str):
@@ -158,6 +160,8 @@ def sync(
 ) -> DesignationDeleted | Problem | None:
     """Deactivate a custom designation
 
+     Deactivate a custom designation.
+
     Args:
         designation_id (str):
         org_id (str):
@@ -187,6 +191,8 @@ async def asyncio_detailed(
     if_match: str | Unset = UNSET,
 ) -> Response[DesignationDeleted | Problem]:
     """Deactivate a custom designation
+
+     Deactivate a custom designation.
 
     Args:
         designation_id (str):
@@ -220,6 +226,8 @@ async def asyncio(
     if_match: str | Unset = UNSET,
 ) -> DesignationDeleted | Problem | None:
     """Deactivate a custom designation
+
+     Deactivate a custom designation.
 
     Args:
         designation_id (str):

@@ -22,7 +22,8 @@ T = TypeVar("T", bound="TeamOut")
 
 @_attrs_define
 class TeamOut:
-    """
+    """Part of `TeamListPage`.
+
     Attributes:
         team_id (str):
         org_id (str):

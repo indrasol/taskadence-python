@@ -19,13 +19,10 @@ T = TypeVar("T", bound="TaskSprintSet")
 
 @_attrs_define
 class TaskSprintSet:
-    """`PUT /tasks/{task_id}/sprint` (6.3): file the task into a TEAM sprint, `null` to take it out.
-    Only the task's own `edit` (2.6a's rule for `team_id`), plus the reachability rule; one history entry.
-    Distinct from `TaskTestRunSet` below, which is 3.13's bug → `test_trackers` writer over `type_data`.
+    """The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to file the task into, or `null` to take it out.
 
-        Attributes:
-            sprint_id (None | str | Unset): The team sprint (`team_sprints.sprint_id`, SP-nnnnn) to file this task into, or
-                null for none Example: SP12345.
+    Attributes:
+        sprint_id (None | str | Unset): The team sprint to file this task into, or null for none. Example: SP12345.
     """
 
     sprint_id: None | str | Unset = UNSET

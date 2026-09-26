@@ -24,9 +24,10 @@ T = TypeVar("T", bound="PinOut")
 
 @_attrs_define
 class PinOut:
-    """
+    """Returned by `view-pins.pin_project` and `view-pins.pin_view`.
+
     Attributes:
-        pin_type (PinTypeEnum):
+        pin_type (PinTypeEnum): One of `view`, `project`. Used by `PinOut` and 1 more.
         pin_id (str):
         org_id (str):
         position (float):

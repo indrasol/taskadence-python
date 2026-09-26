@@ -114,7 +114,7 @@ def sync_detailed(
     a duplicate name within the scope.
 
     Args:
-        body (ViewCreate):
+        body (ViewCreate): The request body of `views.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -148,7 +148,7 @@ def sync(
     a duplicate name within the scope.
 
     Args:
-        body (ViewCreate):
+        body (ViewCreate): The request body of `views.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -177,7 +177,7 @@ async def asyncio_detailed(
     a duplicate name within the scope.
 
     Args:
-        body (ViewCreate):
+        body (ViewCreate): The request body of `views.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -209,7 +209,7 @@ async def asyncio(
     a duplicate name within the scope.
 
     Args:
-        body (ViewCreate):
+        body (ViewCreate): The request body of `views.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

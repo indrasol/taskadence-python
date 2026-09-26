@@ -20,7 +20,8 @@ T = TypeVar("T", bound="MilestoneOut")
 
 @_attrs_define
 class MilestoneOut:
-    """
+    """Returned by `milestones.create` and `milestones.update`.
+
     Attributes:
         milestone_id (str):
         org_id (str):
@@ -37,8 +38,8 @@ class MilestoneOut:
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         is_active (bool | Unset):  Default: True.
-        stop_id (None | str | Unset): 6.9: the roadmap stop this milestone is pinned to (its tasks count toward that
-            stop's ring). Set through PUT /teams/{id}/milestones/{id}/stop.
+        stop_id (None | str | Unset): The roadmap stop this milestone is pinned to (its tasks count toward that stop's
+            progress); null when not pinned.
         task_count (int | Unset): Tasks filed under this milestone (every status, subtasks excluded). Default: 0.
         completed_count (int | Unset): How many of them are `completed` — the roll-up's done against total. Default: 0.
     """

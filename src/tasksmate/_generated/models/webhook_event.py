@@ -23,8 +23,8 @@ T = TypeVar("T", bound="WebhookEvent")
 
 @_attrs_define
 class WebhookEvent:
-    """One webhook delivery's JSON body. Verify the signature over the RAW bytes first (Standard Webhooks; see
-    `docs/api/WEBHOOKS_WORKFLOW.md`); delivery is at-least-once, so dedupe on `id`.
+    """One webhook delivery's JSON body. Verify the signature over the raw bytes first (Standard Webhooks; the developer
+    docs' Webhooks guide has the recipe); delivery is at-least-once, so deduplicate on `id`.
 
         Attributes:
             id (str): The delivery id — the same as the `webhook-id` header (a replay keeps the original's)

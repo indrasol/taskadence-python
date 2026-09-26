@@ -20,7 +20,8 @@ T = TypeVar("T", bound="TaskCommentUpdate")
 
 @_attrs_define
 class TaskCommentUpdate:
-    """
+    """The request body of `task-comments.update`.
+
     Attributes:
         task_id (None | str | Unset): Task ID (text)
         task_title (None | str | Unset): Task title snapshot at time of comment

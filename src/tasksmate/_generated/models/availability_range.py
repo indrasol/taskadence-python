@@ -23,15 +23,14 @@ T = TypeVar("T", bound="AvailabilityRange")
 
 @_attrs_define
 class AvailabilityRange:
-    """The Capacity tab's one read: the team's active members AND every entry of theirs that
-    intersects `[from, to]`, in one response.
+    """The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in one response.
 
-        Attributes:
-            team_id (str):
-            from_ (datetime.date):
-            to (datetime.date):
-            members (list[AvailabilityMember]):
-            entries (list[AvailabilityEntry]):
+    Attributes:
+        team_id (str):
+        from_ (datetime.date):
+        to (datetime.date):
+        members (list[AvailabilityMember]):
+        entries (list[AvailabilityEntry]):
     """
 
     team_id: str

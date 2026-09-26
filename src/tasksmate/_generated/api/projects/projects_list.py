@@ -153,15 +153,13 @@ def sync_detailed(
 ) -> Response[Any | PageProjectCard | Problem]:
     """List an organization's projects you can read
 
-     List projects for the organization, in the 4.1 envelope.
+     The organization's projects, paginated as `{data, next_cursor}`.
 
-    Parameters:
-    - show_all: If true, returns every project the caller may read (task 2.2:
-                public ones, those they are a member of, all for org admins —
-                private projects they are not in do not appear).
-                If false, returns only projects where the current user is a member.
-    - filter[status] / filter[priority] / filter[team] (team ids): the Projects page's and /goals' own
-      client-side filters, now also server-side.
+    - `show_all=true` returns every project you can read: public projects, the projects you are a member
+    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    appear.
+    - `show_all=false` returns only the projects you are a member of.
+    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
 
     Args:
         org_id (str):
@@ -212,15 +210,13 @@ def sync(
 ) -> Any | PageProjectCard | Problem | None:
     """List an organization's projects you can read
 
-     List projects for the organization, in the 4.1 envelope.
+     The organization's projects, paginated as `{data, next_cursor}`.
 
-    Parameters:
-    - show_all: If true, returns every project the caller may read (task 2.2:
-                public ones, those they are a member of, all for org admins —
-                private projects they are not in do not appear).
-                If false, returns only projects where the current user is a member.
-    - filter[status] / filter[priority] / filter[team] (team ids): the Projects page's and /goals' own
-      client-side filters, now also server-side.
+    - `show_all=true` returns every project you can read: public projects, the projects you are a member
+    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    appear.
+    - `show_all=false` returns only the projects you are a member of.
+    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
 
     Args:
         org_id (str):
@@ -266,15 +262,13 @@ async def asyncio_detailed(
 ) -> Response[Any | PageProjectCard | Problem]:
     """List an organization's projects you can read
 
-     List projects for the organization, in the 4.1 envelope.
+     The organization's projects, paginated as `{data, next_cursor}`.
 
-    Parameters:
-    - show_all: If true, returns every project the caller may read (task 2.2:
-                public ones, those they are a member of, all for org admins —
-                private projects they are not in do not appear).
-                If false, returns only projects where the current user is a member.
-    - filter[status] / filter[priority] / filter[team] (team ids): the Projects page's and /goals' own
-      client-side filters, now also server-side.
+    - `show_all=true` returns every project you can read: public projects, the projects you are a member
+    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    appear.
+    - `show_all=false` returns only the projects you are a member of.
+    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
 
     Args:
         org_id (str):
@@ -323,15 +317,13 @@ async def asyncio(
 ) -> Any | PageProjectCard | Problem | None:
     """List an organization's projects you can read
 
-     List projects for the organization, in the 4.1 envelope.
+     The organization's projects, paginated as `{data, next_cursor}`.
 
-    Parameters:
-    - show_all: If true, returns every project the caller may read (task 2.2:
-                public ones, those they are a member of, all for org admins —
-                private projects they are not in do not appear).
-                If false, returns only projects where the current user is a member.
-    - filter[status] / filter[priority] / filter[team] (team ids): the Projects page's and /goals' own
-      client-side filters, now also server-side.
+    - `show_all=true` returns every project you can read: public projects, the projects you are a member
+    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    appear.
+    - `show_all=false` returns only the projects you are a member of.
+    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
 
     Args:
         org_id (str):

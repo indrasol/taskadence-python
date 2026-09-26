@@ -349,61 +349,41 @@ def sync_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """List / search tasks (the filter grammar; `filter[search]` is search)
 
-     List the tasks the caller may see, one page at a time (task 1.5).
+     List the tasks you can see, one page at a time.
 
-    **Envelope:** `{"data": [TaskCardView...], "next_cursor": "<opaque>" | null}`.
-    Pass `next_cursor` back as `cursor` to get the next page; `null` means the
-    database returned fewer than `limit` rows, i.e. the end. The cursor is
-    minted from the last row the **database** returned, before restricted rows
-    are dropped, so a page may be `data: []` with a non-null `next_cursor` —
-    keep walking until the cursor is null. A cursor is bound to the filters,
-    sort and scope it was minted for; reusing it with a different query → 400.
+    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
+    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
+    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
+    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
+    reusing it with a different query is a 400.
 
-    **Scope / visibility (task 2.2):** `project_id` → the caller must be able to
-    read the project (public, or member, or org admin); otherwise `org_id` is
-    required → org membership required, and rows come only from projects the
-    caller may read plus unfiled tasks (private projects the caller is not in
-    never appear). Restricted tasks are dropped (or flagged with
-    `include_inaccessible=true`) after the query.
+    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
+    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
+    come from the projects you can read plus tasks filed in no project). Private projects you are not a
+    member of never appear. Restricted tasks you may not open are left out, or returned with
+    `has_access: false` when `include_inaccessible=true`.
 
-    **Filters:** repeated `filter[...]` params; comma-separated values are OR
-    within a key, keys are AND-ed. Unknown key, bad date, non-boolean `overdue`,
-    unknown status/priority → 400 naming the offender.
+    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
+    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
+    or an unknown status, priority or type is a 400 naming the offending value.
 
-    **Sort:** `sort_by` whitelist (`task_id, title, status, priority, due_date,
-    start_date, created_at, assignee, project_id, priority_rank, status_rank,
-    task_type`),
-    `sort_order` asc|desc, tie broken by `task_id`; nullable columns sort nulls
-    last. `status` / `priority` are aliases of `status_rank` / `priority_rank`
-    (1.9b): the client's ranking (critical>high>medium>low>none,
-    in_progress>not_started>blocked>completed), never the enum declaration
-    order. Frontend field names map as `id→task_id`, `name→title`,
-    `targetDate→due_date`, `owner→assignee`, `createdDate→created_at`.
-    `task_type` (3.3) sorts in enum order (task · bug · goal · agent).
+    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
+    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
+    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
+    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
+    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
 
-    **Type (3.3):** `filter[task_type]` = one or more of `task, bug, agent` (6.12: `goal` → 400)
-    (OR within the key). A type is a label, never a permission: the filter runs
-    over the rows the caller could already see. Every row carries `task_type`
-    (`task` for rows that predate the column).
+    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
+    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
 
-    **Search (1.9b):** `filter[search]` matches title, description, task id and
-    tags (the catalog's searchable text); `filter[search_fields]=title` keeps the
-    title-only match.
+    **Search:** `filter[search]` matches the title, description, task id and tags; add
+    `filter[search_fields]=title` to match the title only.
 
-    **Sections (1.7):** `section_scope=user:me` | `project:<id>` | `team:<id>` adds
-    `section_id` and `section_position` to every row for that one scope (`null` when
-    the task has no section there). Annotated in Python after the query; the envelope
-    is otherwise unchanged.
-
-    **`section_scope=own` (6.1b):** there is no one scope — each row is annotated at
-    **its own holder's**: a row with a `project_id` at `project:<that id>`, a row
-    without one at `team:<its team_id>` (a task filed under a team and no project).
-    A row with **neither** has no holder and is annotated as unsectioned rather than
-    guessed at. It is still one `task_sections` query for the page, and it widens
-    nothing: the rows are the ones 2.2's visibility filter and the restriction pass
-    already returned, each labelled with the section it sits in where it lives. This
-    is what a team tree reads with `filter[team]=<id>`. `own` is accepted **here
-    only** — group-counts and saved views still reject it (a count needs one scope).
+    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
+    `section_position` to every task for that scope (`null` when the task is in no section there).
+    `section_scope=own` annotates each task in its own home instead: a task in a project at
+    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
+    neither is returned unsectioned. `own` is accepted by this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -432,18 +412,17 @@ def sync_detailed(
         filterdue_before (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_after (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_before (None | str | Unset): YYYY-MM-DD, inclusive.
-        filteroverdue (None | str | Unset): `true` → due before today and not completed (the
-            frontend's isTaskOverdue rule).
-        filtersearch (None | str | Unset): Case-insensitive substring of title, description, task
-            id or any tag (1.9b); `%`, `_`, `*`, `,`, `(` are matched literally.
-        filtersearch_fields (None | str | Unset): `all` (default) or `title` to keep the pre-1.9b
-            title-only match.
+        filteroverdue (None | str | Unset): `true` → due before today and not completed.
+        filtersearch (None | str | Unset): Case-insensitive substring of the title, description,
+            task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
+        filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
+            only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (2.6a; mixable).
-        filtertask_type (list[str] | None | Unset): One or more of `task, bug, agent` (3.3),
-            comma-separated or repeated; unknown value → 400 (6.12: `goal` is retired).
-        section_scope (None | str | Unset): `user:me`, `project:<id>` (task 1.7), `team:<id>`
-            (2.6a) or `own` (6.1b: each row at its OWN holder's scope). Unknown scope → 400.
+            (the two can be mixed).
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
+            separated or repeated; any other value (including `goal`) is a 400.
+        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
+            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -530,61 +509,41 @@ def sync(
 ) -> Any | Problem | TaskListPage | None:
     """List / search tasks (the filter grammar; `filter[search]` is search)
 
-     List the tasks the caller may see, one page at a time (task 1.5).
+     List the tasks you can see, one page at a time.
 
-    **Envelope:** `{"data": [TaskCardView...], "next_cursor": "<opaque>" | null}`.
-    Pass `next_cursor` back as `cursor` to get the next page; `null` means the
-    database returned fewer than `limit` rows, i.e. the end. The cursor is
-    minted from the last row the **database** returned, before restricted rows
-    are dropped, so a page may be `data: []` with a non-null `next_cursor` —
-    keep walking until the cursor is null. A cursor is bound to the filters,
-    sort and scope it was minted for; reusing it with a different query → 400.
+    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
+    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
+    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
+    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
+    reusing it with a different query is a 400.
 
-    **Scope / visibility (task 2.2):** `project_id` → the caller must be able to
-    read the project (public, or member, or org admin); otherwise `org_id` is
-    required → org membership required, and rows come only from projects the
-    caller may read plus unfiled tasks (private projects the caller is not in
-    never appear). Restricted tasks are dropped (or flagged with
-    `include_inaccessible=true`) after the query.
+    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
+    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
+    come from the projects you can read plus tasks filed in no project). Private projects you are not a
+    member of never appear. Restricted tasks you may not open are left out, or returned with
+    `has_access: false` when `include_inaccessible=true`.
 
-    **Filters:** repeated `filter[...]` params; comma-separated values are OR
-    within a key, keys are AND-ed. Unknown key, bad date, non-boolean `overdue`,
-    unknown status/priority → 400 naming the offender.
+    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
+    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
+    or an unknown status, priority or type is a 400 naming the offending value.
 
-    **Sort:** `sort_by` whitelist (`task_id, title, status, priority, due_date,
-    start_date, created_at, assignee, project_id, priority_rank, status_rank,
-    task_type`),
-    `sort_order` asc|desc, tie broken by `task_id`; nullable columns sort nulls
-    last. `status` / `priority` are aliases of `status_rank` / `priority_rank`
-    (1.9b): the client's ranking (critical>high>medium>low>none,
-    in_progress>not_started>blocked>completed), never the enum declaration
-    order. Frontend field names map as `id→task_id`, `name→title`,
-    `targetDate→due_date`, `owner→assignee`, `createdDate→created_at`.
-    `task_type` (3.3) sorts in enum order (task · bug · goal · agent).
+    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
+    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
+    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
+    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
+    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
 
-    **Type (3.3):** `filter[task_type]` = one or more of `task, bug, agent` (6.12: `goal` → 400)
-    (OR within the key). A type is a label, never a permission: the filter runs
-    over the rows the caller could already see. Every row carries `task_type`
-    (`task` for rows that predate the column).
+    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
+    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
 
-    **Search (1.9b):** `filter[search]` matches title, description, task id and
-    tags (the catalog's searchable text); `filter[search_fields]=title` keeps the
-    title-only match.
+    **Search:** `filter[search]` matches the title, description, task id and tags; add
+    `filter[search_fields]=title` to match the title only.
 
-    **Sections (1.7):** `section_scope=user:me` | `project:<id>` | `team:<id>` adds
-    `section_id` and `section_position` to every row for that one scope (`null` when
-    the task has no section there). Annotated in Python after the query; the envelope
-    is otherwise unchanged.
-
-    **`section_scope=own` (6.1b):** there is no one scope — each row is annotated at
-    **its own holder's**: a row with a `project_id` at `project:<that id>`, a row
-    without one at `team:<its team_id>` (a task filed under a team and no project).
-    A row with **neither** has no holder and is annotated as unsectioned rather than
-    guessed at. It is still one `task_sections` query for the page, and it widens
-    nothing: the rows are the ones 2.2's visibility filter and the restriction pass
-    already returned, each labelled with the section it sits in where it lives. This
-    is what a team tree reads with `filter[team]=<id>`. `own` is accepted **here
-    only** — group-counts and saved views still reject it (a count needs one scope).
+    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
+    `section_position` to every task for that scope (`null` when the task is in no section there).
+    `section_scope=own` annotates each task in its own home instead: a task in a project at
+    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
+    neither is returned unsectioned. `own` is accepted by this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -613,18 +572,17 @@ def sync(
         filterdue_before (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_after (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_before (None | str | Unset): YYYY-MM-DD, inclusive.
-        filteroverdue (None | str | Unset): `true` → due before today and not completed (the
-            frontend's isTaskOverdue rule).
-        filtersearch (None | str | Unset): Case-insensitive substring of title, description, task
-            id or any tag (1.9b); `%`, `_`, `*`, `,`, `(` are matched literally.
-        filtersearch_fields (None | str | Unset): `all` (default) or `title` to keep the pre-1.9b
-            title-only match.
+        filteroverdue (None | str | Unset): `true` → due before today and not completed.
+        filtersearch (None | str | Unset): Case-insensitive substring of the title, description,
+            task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
+        filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
+            only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (2.6a; mixable).
-        filtertask_type (list[str] | None | Unset): One or more of `task, bug, agent` (3.3),
-            comma-separated or repeated; unknown value → 400 (6.12: `goal` is retired).
-        section_scope (None | str | Unset): `user:me`, `project:<id>` (task 1.7), `team:<id>`
-            (2.6a) or `own` (6.1b: each row at its OWN holder's scope). Unknown scope → 400.
+            (the two can be mixed).
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
+            separated or repeated; any other value (including `goal`) is a 400.
+        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
+            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -706,61 +664,41 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | TaskListPage]:
     """List / search tasks (the filter grammar; `filter[search]` is search)
 
-     List the tasks the caller may see, one page at a time (task 1.5).
+     List the tasks you can see, one page at a time.
 
-    **Envelope:** `{"data": [TaskCardView...], "next_cursor": "<opaque>" | null}`.
-    Pass `next_cursor` back as `cursor` to get the next page; `null` means the
-    database returned fewer than `limit` rows, i.e. the end. The cursor is
-    minted from the last row the **database** returned, before restricted rows
-    are dropped, so a page may be `data: []` with a non-null `next_cursor` —
-    keep walking until the cursor is null. A cursor is bound to the filters,
-    sort and scope it was minted for; reusing it with a different query → 400.
+    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
+    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
+    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
+    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
+    reusing it with a different query is a 400.
 
-    **Scope / visibility (task 2.2):** `project_id` → the caller must be able to
-    read the project (public, or member, or org admin); otherwise `org_id` is
-    required → org membership required, and rows come only from projects the
-    caller may read plus unfiled tasks (private projects the caller is not in
-    never appear). Restricted tasks are dropped (or flagged with
-    `include_inaccessible=true`) after the query.
+    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
+    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
+    come from the projects you can read plus tasks filed in no project). Private projects you are not a
+    member of never appear. Restricted tasks you may not open are left out, or returned with
+    `has_access: false` when `include_inaccessible=true`.
 
-    **Filters:** repeated `filter[...]` params; comma-separated values are OR
-    within a key, keys are AND-ed. Unknown key, bad date, non-boolean `overdue`,
-    unknown status/priority → 400 naming the offender.
+    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
+    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
+    or an unknown status, priority or type is a 400 naming the offending value.
 
-    **Sort:** `sort_by` whitelist (`task_id, title, status, priority, due_date,
-    start_date, created_at, assignee, project_id, priority_rank, status_rank,
-    task_type`),
-    `sort_order` asc|desc, tie broken by `task_id`; nullable columns sort nulls
-    last. `status` / `priority` are aliases of `status_rank` / `priority_rank`
-    (1.9b): the client's ranking (critical>high>medium>low>none,
-    in_progress>not_started>blocked>completed), never the enum declaration
-    order. Frontend field names map as `id→task_id`, `name→title`,
-    `targetDate→due_date`, `owner→assignee`, `createdDate→created_at`.
-    `task_type` (3.3) sorts in enum order (task · bug · goal · agent).
+    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
+    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
+    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
+    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
+    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
 
-    **Type (3.3):** `filter[task_type]` = one or more of `task, bug, agent` (6.12: `goal` → 400)
-    (OR within the key). A type is a label, never a permission: the filter runs
-    over the rows the caller could already see. Every row carries `task_type`
-    (`task` for rows that predate the column).
+    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
+    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
 
-    **Search (1.9b):** `filter[search]` matches title, description, task id and
-    tags (the catalog's searchable text); `filter[search_fields]=title` keeps the
-    title-only match.
+    **Search:** `filter[search]` matches the title, description, task id and tags; add
+    `filter[search_fields]=title` to match the title only.
 
-    **Sections (1.7):** `section_scope=user:me` | `project:<id>` | `team:<id>` adds
-    `section_id` and `section_position` to every row for that one scope (`null` when
-    the task has no section there). Annotated in Python after the query; the envelope
-    is otherwise unchanged.
-
-    **`section_scope=own` (6.1b):** there is no one scope — each row is annotated at
-    **its own holder's**: a row with a `project_id` at `project:<that id>`, a row
-    without one at `team:<its team_id>` (a task filed under a team and no project).
-    A row with **neither** has no holder and is annotated as unsectioned rather than
-    guessed at. It is still one `task_sections` query for the page, and it widens
-    nothing: the rows are the ones 2.2's visibility filter and the restriction pass
-    already returned, each labelled with the section it sits in where it lives. This
-    is what a team tree reads with `filter[team]=<id>`. `own` is accepted **here
-    only** — group-counts and saved views still reject it (a count needs one scope).
+    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
+    `section_position` to every task for that scope (`null` when the task is in no section there).
+    `section_scope=own` annotates each task in its own home instead: a task in a project at
+    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
+    neither is returned unsectioned. `own` is accepted by this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -789,18 +727,17 @@ async def asyncio_detailed(
         filterdue_before (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_after (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_before (None | str | Unset): YYYY-MM-DD, inclusive.
-        filteroverdue (None | str | Unset): `true` → due before today and not completed (the
-            frontend's isTaskOverdue rule).
-        filtersearch (None | str | Unset): Case-insensitive substring of title, description, task
-            id or any tag (1.9b); `%`, `_`, `*`, `,`, `(` are matched literally.
-        filtersearch_fields (None | str | Unset): `all` (default) or `title` to keep the pre-1.9b
-            title-only match.
+        filteroverdue (None | str | Unset): `true` → due before today and not completed.
+        filtersearch (None | str | Unset): Case-insensitive substring of the title, description,
+            task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
+        filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
+            only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (2.6a; mixable).
-        filtertask_type (list[str] | None | Unset): One or more of `task, bug, agent` (3.3),
-            comma-separated or repeated; unknown value → 400 (6.12: `goal` is retired).
-        section_scope (None | str | Unset): `user:me`, `project:<id>` (task 1.7), `team:<id>`
-            (2.6a) or `own` (6.1b: each row at its OWN holder's scope). Unknown scope → 400.
+            (the two can be mixed).
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
+            separated or repeated; any other value (including `goal`) is a 400.
+        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
+            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -885,61 +822,41 @@ async def asyncio(
 ) -> Any | Problem | TaskListPage | None:
     """List / search tasks (the filter grammar; `filter[search]` is search)
 
-     List the tasks the caller may see, one page at a time (task 1.5).
+     List the tasks you can see, one page at a time.
 
-    **Envelope:** `{"data": [TaskCardView...], "next_cursor": "<opaque>" | null}`.
-    Pass `next_cursor` back as `cursor` to get the next page; `null` means the
-    database returned fewer than `limit` rows, i.e. the end. The cursor is
-    minted from the last row the **database** returned, before restricted rows
-    are dropped, so a page may be `data: []` with a non-null `next_cursor` —
-    keep walking until the cursor is null. A cursor is bound to the filters,
-    sort and scope it was minted for; reusing it with a different query → 400.
+    **Pagination:** the response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`. Pass
+    `next_cursor` back as `cursor` to get the next page; `null` means you have reached the end. A page
+    may be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep following
+    the cursor until it is null. A cursor is bound to the filters, sort and scope it was issued for;
+    reusing it with a different query is a 400.
 
-    **Scope / visibility (task 2.2):** `project_id` → the caller must be able to
-    read the project (public, or member, or org admin); otherwise `org_id` is
-    required → org membership required, and rows come only from projects the
-    caller may read plus unfiled tasks (private projects the caller is not in
-    never appear). Restricted tasks are dropped (or flagged with
-    `include_inaccessible=true`) after the query.
+    **Scope and visibility:** pass `project_id` (you must be able to read the project: it is public, you
+    are a member, or you are an org admin) or `org_id` (you must be a member of the organization; tasks
+    come from the projects you can read plus tasks filed in no project). Private projects you are not a
+    member of never appear. Restricted tasks you may not open are left out, or returned with
+    `has_access: false` when `include_inaccessible=true`.
 
-    **Filters:** repeated `filter[...]` params; comma-separated values are OR
-    within a key, keys are AND-ed. Unknown key, bad date, non-boolean `overdue`,
-    unknown status/priority → 400 naming the offender.
+    **Filters:** repeat `filter[...]` parameters as needed; comma-separated values are OR-ed within a
+    key and different keys are AND-ed. An unknown key, a malformed date, a non-boolean `filter[overdue]`
+    or an unknown status, priority or type is a 400 naming the offending value.
 
-    **Sort:** `sort_by` whitelist (`task_id, title, status, priority, due_date,
-    start_date, created_at, assignee, project_id, priority_rank, status_rank,
-    task_type`),
-    `sort_order` asc|desc, tie broken by `task_id`; nullable columns sort nulls
-    last. `status` / `priority` are aliases of `status_rank` / `priority_rank`
-    (1.9b): the client's ranking (critical>high>medium>low>none,
-    in_progress>not_started>blocked>completed), never the enum declaration
-    order. Frontend field names map as `id→task_id`, `name→title`,
-    `targetDate→due_date`, `owner→assignee`, `createdDate→created_at`.
-    `task_type` (3.3) sorts in enum order (task · bug · goal · agent).
+    **Sort:** `sort_by` is one of `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`,
+    `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order` is
+    `asc` or `desc`. Ties are broken by `task_id`; empty values sort last. `status` and `priority` sort
+    by rank, not alphabetically: priority critical > high > medium > low > none; status backlog >
+    in_progress > not_started > blocked > completed. `task_type` sorts task, bug, agent.
 
-    **Type (3.3):** `filter[task_type]` = one or more of `task, bug, agent` (6.12: `goal` → 400)
-    (OR within the key). A type is a label, never a permission: the filter runs
-    over the rows the caller could already see. Every row carries `task_type`
-    (`task` for rows that predate the column).
+    **Types:** `filter[task_type]` takes one or more of `task`, `bug`, `agent`. A type is a label, not a
+    permission: the filter only narrows the tasks you can already see. Every task carries `task_type`.
 
-    **Search (1.9b):** `filter[search]` matches title, description, task id and
-    tags (the catalog's searchable text); `filter[search_fields]=title` keeps the
-    title-only match.
+    **Search:** `filter[search]` matches the title, description, task id and tags; add
+    `filter[search_fields]=title` to match the title only.
 
-    **Sections (1.7):** `section_scope=user:me` | `project:<id>` | `team:<id>` adds
-    `section_id` and `section_position` to every row for that one scope (`null` when
-    the task has no section there). Annotated in Python after the query; the envelope
-    is otherwise unchanged.
-
-    **`section_scope=own` (6.1b):** there is no one scope — each row is annotated at
-    **its own holder's**: a row with a `project_id` at `project:<that id>`, a row
-    without one at `team:<its team_id>` (a task filed under a team and no project).
-    A row with **neither** has no holder and is annotated as unsectioned rather than
-    guessed at. It is still one `task_sections` query for the page, and it widens
-    nothing: the rows are the ones 2.2's visibility filter and the restriction pass
-    already returned, each labelled with the section it sits in where it lives. This
-    is what a team tree reads with `filter[team]=<id>`. `own` is accepted **here
-    only** — group-counts and saved views still reject it (a count needs one scope).
+    **Sections:** `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and
+    `section_position` to every task for that scope (`null` when the task is in no section there).
+    `section_scope=own` annotates each task in its own home instead: a task in a project at
+    `project:<its project>`, a task filed under a team and no project at `team:<its team>`; a task with
+    neither is returned unsectioned. `own` is accepted by this operation only.
 
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
@@ -968,18 +885,17 @@ async def asyncio(
         filterdue_before (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_after (None | str | Unset): YYYY-MM-DD, inclusive.
         filtercreated_before (None | str | Unset): YYYY-MM-DD, inclusive.
-        filteroverdue (None | str | Unset): `true` → due before today and not completed (the
-            frontend's isTaskOverdue rule).
-        filtersearch (None | str | Unset): Case-insensitive substring of title, description, task
-            id or any tag (1.9b); `%`, `_`, `*`, `,`, `(` are matched literally.
-        filtersearch_fields (None | str | Unset): `all` (default) or `title` to keep the pre-1.9b
-            title-only match.
+        filteroverdue (None | str | Unset): `true` → due before today and not completed.
+        filtersearch (None | str | Unset): Case-insensitive substring of the title, description,
+            task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
+        filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
+            only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (2.6a; mixable).
-        filtertask_type (list[str] | None | Unset): One or more of `task, bug, agent` (3.3),
-            comma-separated or repeated; unknown value → 400 (6.12: `goal` is retired).
-        section_scope (None | str | Unset): `user:me`, `project:<id>` (task 1.7), `team:<id>`
-            (2.6a) or `own` (6.1b: each row at its OWN holder's scope). Unknown scope → 400.
+            (the two can be mixed).
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
+            separated or repeated; any other value (including `goal`) is a 400.
+        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
+            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored

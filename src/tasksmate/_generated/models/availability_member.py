@@ -19,7 +19,7 @@ T = TypeVar("T", bound="AvailabilityMember")
 
 @_attrs_define
 class AvailabilityMember:
-    """What `TeamMemberAvatars` / `useTeamMemberNames` already read off a team member row.
+    """A team member in an availability response — who the entries belong to.
 
     Attributes:
         user_id (str):

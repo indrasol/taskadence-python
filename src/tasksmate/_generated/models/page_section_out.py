@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageSectionOut")
 
 @_attrs_define
 class PageSectionOut:
-    """
+    """Returned by `sections.list`.
+
     Attributes:
         data (list[SectionOut]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

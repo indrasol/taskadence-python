@@ -21,13 +21,13 @@ T = TypeVar("T", bound="TaskRoadmapStop")
 
 @_attrs_define
 class TaskRoadmapStop:
-    """A stop a task is on, for the task panel's read-only Roadmap line.
+    """A roadmap stop a task is on.
 
     Attributes:
         stop_id (str):
         project_id (str):
         title (str):
-        via (str): `direct` (roadmap_stop_tasks) or `milestone` (through the task's pinned milestone).
+        via (str): `direct` (the task is attached to the stop) or `milestone` (through the task's pinned milestone).
         journeys (list[TaskRoadmapStopJourneysItem]):
     """
 

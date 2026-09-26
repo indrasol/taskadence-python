@@ -22,7 +22,8 @@ T = TypeVar("T", bound="ViewListPage")
 
 @_attrs_define
 class ViewListPage:
-    """
+    """Returned by `views.list`.
+
     Attributes:
         data (list[ViewOut]):
         next_cursor (None | str | Unset):

@@ -20,8 +20,8 @@ T = TypeVar("T", bound="ProjectLeadOut")
 
 @_attrs_define
 class ProjectLeadOut:
-    """One lead of a project (6.1c, `project_leads`): who, set by whom, when. Additional to and
-    distinct from the owner — the owner administers the project, a lead is accountable for delivering it.
+    """One lead of a project: who, who set them, and when. A lead is distinct from the owner — the owner administers the
+    project, a lead is accountable for delivering it.
 
         Attributes:
             user_id (str):

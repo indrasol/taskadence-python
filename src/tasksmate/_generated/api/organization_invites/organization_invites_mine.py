@@ -145,6 +145,8 @@ def sync_detailed(
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
 
+     Invites addressed to you.
+
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -187,6 +189,8 @@ def sync(
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
 
+     Invites addressed to you.
+
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -223,6 +227,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
+
+     Invites addressed to you.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -263,6 +269,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
+
+     Invites addressed to you.
 
     Args:
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.

@@ -22,11 +22,12 @@ T = TypeVar("T", bound="TeamMemberOut")
 
 @_attrs_define
 class TeamMemberOut:
-    """
+    """Returned by `teams.add_member`, `teams.replace_member` and `teams.update_member`.
+
     Attributes:
         team_id (str):
         user_id (str):
-        team_role (TeamRoleEnum):
+        team_role (TeamRoleEnum): One of `owner`, `member`. Used by `TeamDetail` and 4 more.
         username (None | str | Unset):
         added_by (None | str | Unset):
         created_at (datetime.datetime | None | Unset):

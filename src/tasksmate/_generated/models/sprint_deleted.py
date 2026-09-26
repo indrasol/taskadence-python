@@ -16,7 +16,8 @@ T = TypeVar("T", bound="SprintDeleted")
 
 @_attrs_define
 class SprintDeleted:
-    """
+    """Returned by `sprints.delete`.
+
     Attributes:
         ok (bool):
         sprint_id (str):

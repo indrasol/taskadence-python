@@ -112,14 +112,13 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Move a task to another project (or unfile it)
 
-     Move the task into `project_id` (or unfile it with `project_id: null`).
-    Same permission path and same result as `PUT /tasks/{id}` with `project_id`
-    (`move_task_to_project`); returns the annotated task.
+     Move the task into `project_id`, or take it out of its project with `project_id: null`. Same
+    permissions and result as updating the task's `project_id`; returns the updated task.
 
     Args:
         task_id (str):
-        body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
-            the task.
+        body (TaskProjectSet): The body of `POST /v1/tasks/{task_id}/project`: the project to move
+            the task to, or `project_id: null` to take it out of its project.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,14 +148,13 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Move a task to another project (or unfile it)
 
-     Move the task into `project_id` (or unfile it with `project_id: null`).
-    Same permission path and same result as `PUT /tasks/{id}` with `project_id`
-    (`move_task_to_project`); returns the annotated task.
+     Move the task into `project_id`, or take it out of its project with `project_id: null`. Same
+    permissions and result as updating the task's `project_id`; returns the updated task.
 
     Args:
         task_id (str):
-        body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
-            the task.
+        body (TaskProjectSet): The body of `POST /v1/tasks/{task_id}/project`: the project to move
+            the task to, or `project_id: null` to take it out of its project.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -181,14 +179,13 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Move a task to another project (or unfile it)
 
-     Move the task into `project_id` (or unfile it with `project_id: null`).
-    Same permission path and same result as `PUT /tasks/{id}` with `project_id`
-    (`move_task_to_project`); returns the annotated task.
+     Move the task into `project_id`, or take it out of its project with `project_id: null`. Same
+    permissions and result as updating the task's `project_id`; returns the updated task.
 
     Args:
         task_id (str):
-        body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
-            the task.
+        body (TaskProjectSet): The body of `POST /v1/tasks/{task_id}/project`: the project to move
+            the task to, or `project_id: null` to take it out of its project.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -216,14 +213,13 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Move a task to another project (or unfile it)
 
-     Move the task into `project_id` (or unfile it with `project_id: null`).
-    Same permission path and same result as `PUT /tasks/{id}` with `project_id`
-    (`move_task_to_project`); returns the annotated task.
+     Move the task into `project_id`, or take it out of its project with `project_id: null`. Same
+    permissions and result as updating the task's `project_id`; returns the updated task.
 
     Args:
         task_id (str):
-        body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
-            the task.
+        body (TaskProjectSet): The body of `POST /v1/tasks/{task_id}/project`: the project to move
+            the task to, or `project_id: null` to take it out of its project.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -123,10 +123,8 @@ def sync_detailed(
 ) -> Response[Any | OrgGoalsOut | Problem]:
     """Every goal you can read in an organization, grouped by project
 
-     Every live goal in the projects the caller can read, grouped by project, each goal with its roll-up
-    and
-    each group with `goals_tasks_total` / `goals_tasks_completed` (decision 4). Three queries, whatever
-    the size.
+     Every live goal in the projects you can read, grouped by project. Each goal carries its task roll-
+    up, and each group `goals_tasks_total` / `goals_tasks_completed`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
@@ -161,10 +159,8 @@ def sync(
 ) -> Any | OrgGoalsOut | Problem | None:
     """Every goal you can read in an organization, grouped by project
 
-     Every live goal in the projects the caller can read, grouped by project, each goal with its roll-up
-    and
-    each group with `goals_tasks_total` / `goals_tasks_completed` (decision 4). Three queries, whatever
-    the size.
+     Every live goal in the projects you can read, grouped by project. Each goal carries its task roll-
+    up, and each group `goals_tasks_total` / `goals_tasks_completed`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
@@ -194,10 +190,8 @@ async def asyncio_detailed(
 ) -> Response[Any | OrgGoalsOut | Problem]:
     """Every goal you can read in an organization, grouped by project
 
-     Every live goal in the projects the caller can read, grouped by project, each goal with its roll-up
-    and
-    each group with `goals_tasks_total` / `goals_tasks_completed` (decision 4). Three queries, whatever
-    the size.
+     Every live goal in the projects you can read, grouped by project. Each goal carries its task roll-
+    up, and each group `goals_tasks_total` / `goals_tasks_completed`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
@@ -230,10 +224,8 @@ async def asyncio(
 ) -> Any | OrgGoalsOut | Problem | None:
     """Every goal you can read in an organization, grouped by project
 
-     Every live goal in the projects the caller can read, grouped by project, each goal with its roll-up
-    and
-    each group with `goals_tasks_total` / `goals_tasks_completed` (decision 4). Three queries, whatever
-    the size.
+     Every live goal in the projects you can read, grouped by project. Each goal carries its task roll-
+    up, and each group `goals_tasks_total` / `goals_tasks_completed`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its

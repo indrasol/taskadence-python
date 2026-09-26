@@ -32,11 +32,11 @@ class OrganizationSettingsUpdate:
             approval: it files a join request (default)
         audit_retention_days (int | None | Unset): Audit log retention in days; send null to keep events forever (the
             default)
-        allow_personal_tokens (bool | None | Unset): 4.2: may members mint personal access tokens? (default true;
-            service-account tokens are unaffected)
-        max_token_ttl_days (int | None | Unset): 4.2: the longest lifetime a new token may have, in days; send null for
-            no cap (the default)
-        require_token_expiry (bool | None | Unset): 4.2: must every new token carry an `expires_at`? (default false)
+        allow_personal_tokens (bool | None | Unset): Whether members may mint personal access tokens (default true;
+            service-account tokens are unaffected).
+        max_token_ttl_days (int | None | Unset): The longest lifetime a new token may have, in days; send null for no
+            cap (the default).
+        require_token_expiry (bool | None | Unset): Whether every new token must carry an `expires_at` (default false).
     """
 
     default_visibility: None | ProjectVisibilityEnum | Unset = UNSET

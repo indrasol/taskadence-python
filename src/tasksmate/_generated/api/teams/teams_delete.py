@@ -135,9 +135,9 @@ def sync_detailed(
 
     Args:
         team_id (str):
-        detach (bool | Unset): Null `projects.team_id` / `tasks.team_id` of everything filed under
-            the team first; without it the delete is refused (409) while anything still points at the
-            team. Default: False.
+        detach (bool | Unset): First unfile everything filed under the team (its projects and
+            tasks lose their `team_id`); without it the delete is refused (409) while anything is
+            still filed under the team. Default: False.
         reason (None | str | Unset):
         if_match (str | Unset):
 
@@ -178,9 +178,9 @@ def sync(
 
     Args:
         team_id (str):
-        detach (bool | Unset): Null `projects.team_id` / `tasks.team_id` of everything filed under
-            the team first; without it the delete is refused (409) while anything still points at the
-            team. Default: False.
+        detach (bool | Unset): First unfile everything filed under the team (its projects and
+            tasks lose their `team_id`); without it the delete is refused (409) while anything is
+            still filed under the team. Default: False.
         reason (None | str | Unset):
         if_match (str | Unset):
 
@@ -216,9 +216,9 @@ async def asyncio_detailed(
 
     Args:
         team_id (str):
-        detach (bool | Unset): Null `projects.team_id` / `tasks.team_id` of everything filed under
-            the team first; without it the delete is refused (409) while anything still points at the
-            team. Default: False.
+        detach (bool | Unset): First unfile everything filed under the team (its projects and
+            tasks lose their `team_id`); without it the delete is refused (409) while anything is
+            still filed under the team. Default: False.
         reason (None | str | Unset):
         if_match (str | Unset):
 
@@ -257,9 +257,9 @@ async def asyncio(
 
     Args:
         team_id (str):
-        detach (bool | Unset): Null `projects.team_id` / `tasks.team_id` of everything filed under
-            the team first; without it the delete is refused (409) while anything still points at the
-            team. Default: False.
+        detach (bool | Unset): First unfile everything filed under the team (its projects and
+            tasks lose their `team_id`); without it the delete is refused (409) while anything is
+            still filed under the team. Default: False.
         reason (None | str | Unset):
         if_match (str | Unset):
 

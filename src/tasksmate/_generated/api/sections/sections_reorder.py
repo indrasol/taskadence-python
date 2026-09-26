@@ -117,11 +117,11 @@ def sync_detailed(
 ) -> Response[Problem | list[SectionOut]]:
     """Reorder a scope's sections
 
-     Rewrite one scope's section positions to 1.0, 2.0, … in the order given.
+     Set the order of one scope's sections to the order given (their positions become 1, 2, 3, …).
     `section_ids` must list every section of the scope exactly once.
 
     Args:
-        body (SectionReorder):
+        body (SectionReorder): The request body of `sections.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,11 +149,11 @@ def sync(
 ) -> Problem | list[SectionOut] | None:
     """Reorder a scope's sections
 
-     Rewrite one scope's section positions to 1.0, 2.0, … in the order given.
+     Set the order of one scope's sections to the order given (their positions become 1, 2, 3, …).
     `section_ids` must list every section of the scope exactly once.
 
     Args:
-        body (SectionReorder):
+        body (SectionReorder): The request body of `sections.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -176,11 +176,11 @@ async def asyncio_detailed(
 ) -> Response[Problem | list[SectionOut]]:
     """Reorder a scope's sections
 
-     Rewrite one scope's section positions to 1.0, 2.0, … in the order given.
+     Set the order of one scope's sections to the order given (their positions become 1, 2, 3, …).
     `section_ids` must list every section of the scope exactly once.
 
     Args:
-        body (SectionReorder):
+        body (SectionReorder): The request body of `sections.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -206,11 +206,11 @@ async def asyncio(
 ) -> Problem | list[SectionOut] | None:
     """Reorder a scope's sections
 
-     Rewrite one scope's section positions to 1.0, 2.0, … in the order given.
+     Set the order of one scope's sections to the order given (their positions become 1, 2, 3, …).
     `section_ids` must list every section of the scope exactly once.
 
     Args:
-        body (SectionReorder):
+        body (SectionReorder): The request body of `sections.reorder`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -114,7 +114,7 @@ def sync_detailed(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        body (TeamCreate):
+        body (TeamCreate): The request body of `teams.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -146,7 +146,7 @@ def sync(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        body (TeamCreate):
+        body (TeamCreate): The request body of `teams.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -173,7 +173,7 @@ async def asyncio_detailed(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        body (TeamCreate):
+        body (TeamCreate): The request body of `teams.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -203,7 +203,7 @@ async def asyncio(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        body (TeamCreate):
+        body (TeamCreate): The request body of `teams.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -22,25 +22,27 @@ T = TypeVar("T", bound="ProjectMemberInDB")
 
 @_attrs_define
 class ProjectMemberInDB:
-    """
-    Attributes:
-        project_id (str): Project ID (text) Example: project-1234.
-        user_id (str): User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
-        username (None | str | Unset): Username of the member Example: john_doe.
-        designation (None | str | Unset): Designation name Example: developer.
-        designation_id (None | str | Unset): Task 2.8: a designations row id (DG… seed / DO… org row). Either this or
-            `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
-        role (None | str | Unset): Legacy role (owner / admin / member) — kept until S.20; derived from project_role
-            when omitted Example: owner.
-        project_role (None | ProjectRoleEnum | Unset): V2 project role (task 2.1); derived from role when omitted
-            Example: editor.
-        created_by (None | str | Unset): Who created the membership (username)
-        updated_by (None | str | Unset): Who last updated the membership (username)
-        is_active (bool | None | Unset): Is the member active? Default: True. Example: True.
-        created_at (datetime.datetime | None | Unset): Creation timestamp
-        updated_at (datetime.datetime | None | Unset): Last update timestamp
-        deleted_at (datetime.datetime | None | Unset): When the member was deleted
-        delete_reason (None | str | Unset): Reason for deletion
+    """Returned by `project-members.create`, `project-members.read`, `project-members.replace` and `project-
+    members.update`.
+
+        Attributes:
+            project_id (str): Project ID (text) Example: project-1234.
+            user_id (str): User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
+            username (None | str | Unset): Username of the member Example: john_doe.
+            designation (None | str | Unset): Designation name Example: developer.
+            designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
+                this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
+            role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
+                omitted. Prefer `project_role`. Example: owner.
+            project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
+                omitted. Example: editor.
+            created_by (None | str | Unset): Who created the membership (username)
+            updated_by (None | str | Unset): Who last updated the membership (username)
+            is_active (bool | None | Unset): Is the member active? Default: True. Example: True.
+            created_at (datetime.datetime | None | Unset): Creation timestamp
+            updated_at (datetime.datetime | None | Unset): Last update timestamp
+            deleted_at (datetime.datetime | None | Unset): When the member was deleted
+            delete_reason (None | str | Unset): Reason for deletion
     """
 
     project_id: str

@@ -22,7 +22,7 @@ T = TypeVar("T", bound="AuditPage")
 
 @_attrs_define
 class AuditPage:
-    """4.1: the audit page is the public list envelope (keyset cursor on `event_id`).
+    """A page of the audit log, newest first: `{data, next_cursor}`.
 
     Attributes:
         data (list[AuditPageDataItem]):

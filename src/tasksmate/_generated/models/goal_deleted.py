@@ -16,7 +16,8 @@ T = TypeVar("T", bound="GoalDeleted")
 
 @_attrs_define
 class GoalDeleted:
-    """
+    """Returned by `goals.delete`.
+
     Attributes:
         ok (bool):
         goal_id (str):

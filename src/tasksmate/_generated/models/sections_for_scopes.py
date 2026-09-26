@@ -23,13 +23,11 @@ T = TypeVar("T", bound="SectionsForScopes")
 
 @_attrs_define
 class SectionsForScopes:
-    """6.1b: what `GET /v1/sections?scope_ids=...` returns. `data` is every scope's
-    sections in one list (each row carries its own `scope_type` / `scope_id`, so the
-    caller buckets them); `scopes` names the scopes this response actually answered
-    for, in the order asked. A scope the caller may not read is **omitted from both**
-    — so "not in `scopes`" is "not yours" and "in `scopes` with no rows" is "no
-    sections". 4.1: the single-scope form (`scope_id=`) returns the list envelope
-    (`{data, next_cursor}`, no `scopes`); both carry `next_cursor`.
+    """What `GET /v1/sections?scope_ids=…` returns. `data` holds every requested scope's sections in one list (each row
+    carries its own `scope_type` / `scope_id`); `scopes` names the scopes this response answered for, in the order
+    asked. A scope you cannot read is **omitted from both** — so a scope missing from `scopes` is one you cannot read,
+    and a scope in `scopes` with no rows has no sections. The single-scope form (`scope_id=`) returns the plain list
+    envelope `{data, next_cursor}`, without `scopes`.
 
         Attributes:
             data (list[SectionOut]):

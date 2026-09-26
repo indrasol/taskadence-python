@@ -24,18 +24,19 @@ T = TypeVar("T", bound="Problem")
 
 @_attrs_define
 class Problem:
-    """RFC 9457 problem details. `detail` is what the pre-4.1 body carried under the same name.
+    """An RFC 9457 problem details object — the body of every error response. `detail` is the human-readable explanation;
+    `request_id` identifies the request for support.
 
-    Attributes:
-        type_ (ProblemType): `about:blank` or a `urn:tasksmate:problem:*` identifier
-        title (str):  Example: Forbidden.
-        status (int):  Example: 403.
-        detail (Any): Human-readable explanation (a string; for a 422, the list of validation errors) Example: This task
-            is restricted to other users.
-        instance (str):  Example: /v1/tasks/T123.
-        request_id (str):  Example: 9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11.
-        errors (list[ProblemErrorsItem] | Unset): Structured failures: validation errors, or `{loc, msg, allowed}` for a
-            bad parameter
+        Attributes:
+            type_ (ProblemType): `about:blank` or a `urn:tasksmate:problem:*` identifier
+            title (str):  Example: Forbidden.
+            status (int):  Example: 403.
+            detail (Any): Human-readable explanation (a string; for a 422, the list of validation errors) Example: This task
+                is restricted to other users.
+            instance (str):  Example: /v1/tasks/T123.
+            request_id (str):  Example: 9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11.
+            errors (list[ProblemErrorsItem] | Unset): Structured failures: validation errors, or `{loc, msg, allowed}` for a
+                bad parameter
     """
 
     type_: ProblemType

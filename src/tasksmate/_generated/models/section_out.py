@@ -22,11 +22,12 @@ T = TypeVar("T", bound="SectionOut")
 
 @_attrs_define
 class SectionOut:
-    """
+    """Returned by `sections.create`, `sections.reorder` and `sections.update`.
+
     Attributes:
         section_id (str):
         org_id (str):
-        scope_type (SectionScopeEnum):
+        scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.
         scope_id (str):
         name (str):
         position (float):

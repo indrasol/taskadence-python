@@ -119,10 +119,12 @@ def sync_detailed(
 ) -> Response[Problem | ProjectInDB]:
     """Update a project (JSON merge-patch)
 
+     Update a project (JSON merge-patch).
+
     Args:
         project_id (str):
         if_match (str | Unset):
-        body (ProjectUpdate):
+        body (ProjectUpdate): The request body of `projects.replace` and `projects.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -154,10 +156,12 @@ def sync(
 ) -> Problem | ProjectInDB | None:
     """Update a project (JSON merge-patch)
 
+     Update a project (JSON merge-patch).
+
     Args:
         project_id (str):
         if_match (str | Unset):
-        body (ProjectUpdate):
+        body (ProjectUpdate): The request body of `projects.replace` and `projects.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -184,10 +188,12 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectInDB]:
     """Update a project (JSON merge-patch)
 
+     Update a project (JSON merge-patch).
+
     Args:
         project_id (str):
         if_match (str | Unset):
-        body (ProjectUpdate):
+        body (ProjectUpdate): The request body of `projects.replace` and `projects.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -217,10 +223,12 @@ async def asyncio(
 ) -> Problem | ProjectInDB | None:
     """Update a project (JSON merge-patch)
 
+     Update a project (JSON merge-patch).
+
     Args:
         project_id (str):
         if_match (str | Unset):
-        body (ProjectUpdate):
+        body (ProjectUpdate): The request body of `projects.replace` and `projects.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

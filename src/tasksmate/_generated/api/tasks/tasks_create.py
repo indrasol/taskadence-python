@@ -113,9 +113,11 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Create a task
 
+     Create a task.
+
     Args:
         idempotency_key (str | Unset):
-        body (TaskCreate):
+        body (TaskCreate): The request body of `tasks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -145,9 +147,11 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Create a task
 
+     Create a task.
+
     Args:
         idempotency_key (str | Unset):
-        body (TaskCreate):
+        body (TaskCreate): The request body of `tasks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -172,9 +176,11 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Create a task
 
+     Create a task.
+
     Args:
         idempotency_key (str | Unset):
-        body (TaskCreate):
+        body (TaskCreate): The request body of `tasks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -202,9 +208,11 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Create a task
 
+     Create a task.
+
     Args:
         idempotency_key (str | Unset):
-        body (TaskCreate):
+        body (TaskCreate): The request body of `tasks.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

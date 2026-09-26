@@ -19,7 +19,8 @@ T = TypeVar("T", bound="ProjectResourceUpdate")
 
 @_attrs_define
 class ProjectResourceUpdate:
-    """
+    """The request body of `project-resources.update`.
+
     Attributes:
         project_id (None | str | Unset):
         project_name (None | str | Unset):

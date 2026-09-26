@@ -18,7 +18,8 @@ T = TypeVar("T", bound="ReleaseSummary")
 
 @_attrs_define
 class ReleaseSummary:
-    """
+    """Part of `Release`.
+
     Attributes:
         features_count (int | Unset):  Default: 0.
         fixes_count (int | Unset):  Default: 0.

@@ -124,15 +124,15 @@ def sync_detailed(
 ) -> Response[Problem | ProjectMemberInDB]:
     """Change a project member's role
 
+     Change a project member's role.
+
     Args:
         user_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectMemberUpdate): `PUT /project-members/{user_id}/{project_id}` body — a true
-            partial (3.15 audit). The two keys
-            are the URL path; they were required here through inheritance, so a body of only
-            `{"project_role": ...}` was a 422 and every client repeated them. The route sends
-            `exclude_unset=True` on.
+        body (ProjectMemberUpdate): The body of a project-member update. Every field is optional
+            and omitted fields are left unchanged; `user_id` and `project_id` come from the path and
+            need not be repeated.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -166,15 +166,15 @@ def sync(
 ) -> Problem | ProjectMemberInDB | None:
     """Change a project member's role
 
+     Change a project member's role.
+
     Args:
         user_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectMemberUpdate): `PUT /project-members/{user_id}/{project_id}` body — a true
-            partial (3.15 audit). The two keys
-            are the URL path; they were required here through inheritance, so a body of only
-            `{"project_role": ...}` was a 422 and every client repeated them. The route sends
-            `exclude_unset=True` on.
+        body (ProjectMemberUpdate): The body of a project-member update. Every field is optional
+            and omitted fields are left unchanged; `user_id` and `project_id` come from the path and
+            need not be repeated.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -203,15 +203,15 @@ async def asyncio_detailed(
 ) -> Response[Problem | ProjectMemberInDB]:
     """Change a project member's role
 
+     Change a project member's role.
+
     Args:
         user_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectMemberUpdate): `PUT /project-members/{user_id}/{project_id}` body — a true
-            partial (3.15 audit). The two keys
-            are the URL path; they were required here through inheritance, so a body of only
-            `{"project_role": ...}` was a 422 and every client repeated them. The route sends
-            `exclude_unset=True` on.
+        body (ProjectMemberUpdate): The body of a project-member update. Every field is optional
+            and omitted fields are left unchanged; `user_id` and `project_id` come from the path and
+            need not be repeated.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -243,15 +243,15 @@ async def asyncio(
 ) -> Problem | ProjectMemberInDB | None:
     """Change a project member's role
 
+     Change a project member's role.
+
     Args:
         user_id (str):
         project_id (str):
         if_match (str | Unset):
-        body (ProjectMemberUpdate): `PUT /project-members/{user_id}/{project_id}` body — a true
-            partial (3.15 audit). The two keys
-            are the URL path; they were required here through inheritance, so a body of only
-            `{"project_role": ...}` was a 422 and every client repeated them. The route sends
-            `exclude_unset=True` on.
+        body (ProjectMemberUpdate): The body of a project-member update. Every field is optional
+            and omitted fields are left unchanged; `user_id` and `project_id` come from the path and
+            need not be repeated.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

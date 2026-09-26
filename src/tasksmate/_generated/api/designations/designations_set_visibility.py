@@ -125,10 +125,12 @@ def sync_detailed(
 ) -> Response[DesignationVisibility | Problem]:
     """Hide / pin a designation for an org
 
+     Hide / pin a designation for an org.
+
     Args:
         designation_id (str):
         org_id (str):
-        body (VisibilityUpdate):
+        body (VisibilityUpdate): The request body of `designations.set_visibility`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -160,10 +162,12 @@ def sync(
 ) -> DesignationVisibility | Problem | None:
     """Hide / pin a designation for an org
 
+     Hide / pin a designation for an org.
+
     Args:
         designation_id (str):
         org_id (str):
-        body (VisibilityUpdate):
+        body (VisibilityUpdate): The request body of `designations.set_visibility`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -190,10 +194,12 @@ async def asyncio_detailed(
 ) -> Response[DesignationVisibility | Problem]:
     """Hide / pin a designation for an org
 
+     Hide / pin a designation for an org.
+
     Args:
         designation_id (str):
         org_id (str):
-        body (VisibilityUpdate):
+        body (VisibilityUpdate): The request body of `designations.set_visibility`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -223,10 +229,12 @@ async def asyncio(
 ) -> DesignationVisibility | Problem | None:
     """Hide / pin a designation for an org
 
+     Hide / pin a designation for an org.
+
     Args:
         designation_id (str):
         org_id (str):
-        body (VisibilityUpdate):
+        body (VisibilityUpdate): The request body of `designations.set_visibility`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

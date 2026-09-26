@@ -23,7 +23,8 @@ T = TypeVar("T", bound="WhatsNewResponse")
 
 @_attrs_define
 class WhatsNewResponse:
-    """
+    """Returned by `releases.whats_new`.
+
     Attributes:
         latest_releases (list[Release]):
         summary (WhatsNewResponseSummary):

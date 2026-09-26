@@ -30,7 +30,8 @@ T = TypeVar("T", bound="ProjectInDB")
 
 @_attrs_define
 class ProjectInDB:
-    """
+    """Returned by `projects.read`, `projects.replace` and `projects.update`.
+
     Attributes:
         org_id (str): Organization ID (UUID) Example: a1b2c3d4-5678-1234-9abc-def012345678.
         name (str): Project name Example: Website Redesign.
@@ -50,13 +51,13 @@ class ProjectInDB:
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
         team_members (list[str] | None | Unset): List of user names to add as members
-        visibility (None | ProjectVisibilityEnum | Unset): public: every org member sees the project; private: members
-            only (enforced from task 2.2) Default: 'public'. Example: public.
-        team_id (None | str | Unset): Team the project is filed under (2.6a); an active team of the same org (422
-            otherwise). null = none.
-        editors_can_add_members (bool | Unset): Task 2.5: editors may add / remove / re-role members when true (owner /
-            org admin set it) Default: False.
-        leads (list[ProjectLeadOut] | Unset): 6.1c: the project's leads (several; optional — [] is the common case)
+        visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
+            project; `private`: only its members and org admins. Default: 'public'. Example: public.
+        team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
+            organization (422 otherwise). null = none.
+        editors_can_add_members (bool | Unset): When true, project editors may add and remove members and change their
+            roles. Set by the project owner or an org admin. Default: False.
+        leads (list[ProjectLeadOut] | Unset): The project's leads (there can be several); optional, usually empty.
     """
 
     org_id: str

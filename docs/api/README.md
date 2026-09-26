@@ -19,9 +19,9 @@ Every operation is `tm.<resource>.<method>(…)` on `TasksMate` (and `await` on 
 | [`tm.task_comments`](task-comments.md) | 6 | Comments on a task (threaded). |
 | [`tm.task_history`](task-history.md) | 2 | A task's change history. |
 | [`tm.project_stats`](project-stats.md) | 1 | A project's task statistics. |
-| [`tm.service_accounts`](service-accounts.md) | 4 | Non-human organization members that hold access tokens (4.2). They cannot sign in. |
-| [`tm.tokens`](tokens.md) | 6 | TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate (4.2). |
-| [`tm.webhooks`](webhooks.md) | 11 | Signed HTTP callbacks for audit events (4.4): subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries. |
+| [`tm.service_accounts`](service-accounts.md) | 4 | Non-human organization members that hold access tokens. They cannot sign in. |
+| [`tm.tokens`](tokens.md) | 6 | TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate. |
+| [`tm.webhooks`](webhooks.md) | 11 | Signed HTTP callbacks for audit events: subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries. |
 | [`tm.releases`](releases.md) | 1 | What's new in TasksMate. |
 | [`tm.sections`](sections.md) | 5 | Sections of a project, a team or a person's own list. |
 | [`tm.teams`](teams.md) | 11 | Teams, their members and their task list. |

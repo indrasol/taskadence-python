@@ -23,7 +23,8 @@ T = TypeVar("T", bound="TaskCommentCreate")
 
 @_attrs_define
 class TaskCommentCreate:
-    """
+    """The request body of `task-comments.create`.
+
     Attributes:
         task_id (str): Task ID (text) Example: task-1234.
         task_title (None | str | Unset): Task title snapshot at time of comment Example: Implement Login.

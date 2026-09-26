@@ -22,9 +22,8 @@ T = TypeVar("T", bound="ProjectMemberUpdate")
 
 @_attrs_define
 class ProjectMemberUpdate:
-    """`PUT /project-members/{user_id}/{project_id}` body — a true partial (3.15 audit). The two keys
-    are the URL path; they were required here through inheritance, so a body of only
-    `{"project_role": ...}` was a 422 and every client repeated them. The route sends `exclude_unset=True` on.
+    """The body of a project-member update. Every field is optional and omitted fields are left unchanged; `user_id` and
+    `project_id` come from the path and need not be repeated.
 
         Attributes:
             project_id (None | str | Unset): Project ID (text) — the path's; optional in the body Example: project-1234.
@@ -32,15 +31,15 @@ class ProjectMemberUpdate:
                 b3c1e2d4-1234-5678-9abc-def012345678.
             username (None | str | Unset): Username of the member Example: john_doe.
             designation (None | str | Unset): Designation name Example: developer.
-            designation_id (None | str | Unset): Task 2.8: a designations row id (DG… seed / DO… org row). Either this or
-                `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
-            role (None | str | Unset): Legacy role (owner / admin / member) — kept until S.20; derived from project_role
-                when omitted Example: owner.
-            project_role (None | ProjectRoleEnum | Unset): V2 project role (task 2.1); derived from role when omitted
-                Example: editor.
+            designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
+                this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
+            role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
+                omitted. Prefer `project_role`. Example: owner.
+            project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
+                omitted. Example: editor.
             created_by (None | str | Unset): Who created the membership (username)
             updated_by (None | str | Unset): Who last updated the membership (username)
-            is_active (bool | None | Unset): Is the member active? (4.1b: no default — omitted = unchanged) Example: True.
+            is_active (bool | None | Unset): Whether the member is active. Omit to leave it unchanged. Example: True.
             created_at (datetime.datetime | None | Unset): Creation timestamp
             updated_at (datetime.datetime | None | Unset): Last update timestamp
             deleted_at (datetime.datetime | None | Unset): When the member was deleted

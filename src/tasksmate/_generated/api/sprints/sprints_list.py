@@ -149,10 +149,9 @@ def sync_detailed(
 ) -> Response[Any | Problem | SprintListPage]:
     """List a team's sprints
 
-     The team's live sprints, latest time box first, each with `task_count` /
-    `completed_count` (one query for the page, never one per sprint) and the DERIVED
-    `duration_weeks` / `duration_label`. Completed sprints are included — the tab still
-    shows them; what completing buys is that they stop being offered as the current one.
+     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
+    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
+    the current sprint.
 
     Args:
         team_id (str):
@@ -199,10 +198,9 @@ def sync(
 ) -> Any | Problem | SprintListPage | None:
     """List a team's sprints
 
-     The team's live sprints, latest time box first, each with `task_count` /
-    `completed_count` (one query for the page, never one per sprint) and the DERIVED
-    `duration_weeks` / `duration_label`. Completed sprints are included — the tab still
-    shows them; what completing buys is that they stop being offered as the current one.
+     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
+    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
+    the current sprint.
 
     Args:
         team_id (str):
@@ -244,10 +242,9 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | SprintListPage]:
     """List a team's sprints
 
-     The team's live sprints, latest time box first, each with `task_count` /
-    `completed_count` (one query for the page, never one per sprint) and the DERIVED
-    `duration_weeks` / `duration_label`. Completed sprints are included — the tab still
-    shows them; what completing buys is that they stop being offered as the current one.
+     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
+    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
+    the current sprint.
 
     Args:
         team_id (str):
@@ -292,10 +289,9 @@ async def asyncio(
 ) -> Any | Problem | SprintListPage | None:
     """List a team's sprints
 
-     The team's live sprints, latest time box first, each with `task_count` /
-    `completed_count` (one query for the page, never one per sprint) and the DERIVED
-    `duration_weeks` / `duration_label`. Completed sprints are included — the tab still
-    shows them; what completing buys is that they stop being offered as the current one.
+     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
+    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
+    the current sprint.
 
     Args:
         team_id (str):

@@ -22,7 +22,8 @@ T = TypeVar("T", bound="DesignationUpdate")
 
 @_attrs_define
 class DesignationUpdate:
-    """
+    """The request body of `designations.replace` and `designations.update`.
+
     Attributes:
         label (None | str | Unset):
         name (None | str | Unset):

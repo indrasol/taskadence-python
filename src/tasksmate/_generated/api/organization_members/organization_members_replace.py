@@ -124,15 +124,15 @@ def sync_detailed(
 ) -> Response[OrganizationMemberInDB | Problem]:
     """Change a member's role / designation (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         user_id (str):
         org_id (str):
         if_match (str | Unset):
-        body (OrganizationMemberUpdate):
+        body (OrganizationMemberUpdate): The request body of `organization-members.replace` and
+            `organization-members.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -166,15 +166,15 @@ def sync(
 ) -> OrganizationMemberInDB | Problem | None:
     """Change a member's role / designation (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         user_id (str):
         org_id (str):
         if_match (str | Unset):
-        body (OrganizationMemberUpdate):
+        body (OrganizationMemberUpdate): The request body of `organization-members.replace` and
+            `organization-members.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -203,15 +203,15 @@ async def asyncio_detailed(
 ) -> Response[OrganizationMemberInDB | Problem]:
     """Change a member's role / designation (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         user_id (str):
         org_id (str):
         if_match (str | Unset):
-        body (OrganizationMemberUpdate):
+        body (OrganizationMemberUpdate): The request body of `organization-members.replace` and
+            `organization-members.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -243,15 +243,15 @@ async def asyncio(
 ) -> OrganizationMemberInDB | Problem | None:
     """Change a member's role / designation (PUT)
 
-     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for the
-    TasksMate app until the 4.5 SDK.
-
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
 
     Args:
         user_id (str):
         org_id (str):
         if_match (str | Unset):
-        body (OrganizationMemberUpdate):
+        body (OrganizationMemberUpdate): The request body of `organization-members.replace` and
+            `organization-members.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

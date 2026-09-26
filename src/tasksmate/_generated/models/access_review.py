@@ -23,7 +23,8 @@ T = TypeVar("T", bound="AccessReview")
 
 @_attrs_define
 class AccessReview:
-    """
+    """Returned by `organizations.access_review`.
+
     Attributes:
         org_id (str):
         generated_at (str):

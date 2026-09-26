@@ -16,7 +16,8 @@ T = TypeVar("T", bound="TeamDeleted")
 
 @_attrs_define
 class TeamDeleted:
-    """
+    """Returned by `teams.delete`.
+
     Attributes:
         ok (bool):
         team_id (str):

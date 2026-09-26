@@ -19,12 +19,12 @@ T = TypeVar("T", bound="TaskMilestoneSet")
 
 @_attrs_define
 class TaskMilestoneSet:
-    """`PUT /tasks/{task_id}/milestone` (6.5): file the task under a TEAM milestone, `null` to take it out.
-    6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one history entry.
+    """The body of `PUT /v1/tasks/{task_id}/milestone`: the team milestone to file the task under, or `null` to take it
+    out.
 
         Attributes:
-            milestone_id (None | str | Unset): The team milestone (`team_milestones.milestone_id`, MS-nnnnn) to file this
-                task under, or null for none Example: MS12345.
+            milestone_id (None | str | Unset): The team milestone to file this task under, or null for none. Example:
+                MS12345.
     """
 
     milestone_id: None | str | Unset = UNSET

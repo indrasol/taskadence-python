@@ -20,7 +20,8 @@ T = TypeVar("T", bound="RoadmapStopOut")
 
 @_attrs_define
 class RoadmapStopOut:
-    """
+    """Part of `RoadmapJourneyOut`.
+
     Attributes:
         stop_id (str):
         project_id (str):

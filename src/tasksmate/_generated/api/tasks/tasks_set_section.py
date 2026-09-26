@@ -116,10 +116,9 @@ def sync_detailed(
 ) -> Response[Problem | TaskSectionOut]:
     """Place a task in a section
 
-     Move the task into a section of one scope (`section_id: null` removes it
-    from that scope's section; tasks are never deleted). Requires `edit` on the
-    task (`has_edit_access`) **and** access to the scope; writes a
-    `tasks_history` entry ("moved to section X" / "removed from section X").
+     Move the task into a section of one scope (`section_id: null` takes it out of that scope's section;
+    the task is never deleted). Requires edit access to the task and access to the scope. The move is
+    recorded in the task's history.
 
     Args:
         task_id (str):
@@ -154,10 +153,9 @@ def sync(
 ) -> Problem | TaskSectionOut | None:
     """Place a task in a section
 
-     Move the task into a section of one scope (`section_id: null` removes it
-    from that scope's section; tasks are never deleted). Requires `edit` on the
-    task (`has_edit_access`) **and** access to the scope; writes a
-    `tasks_history` entry ("moved to section X" / "removed from section X").
+     Move the task into a section of one scope (`section_id: null` takes it out of that scope's section;
+    the task is never deleted). Requires edit access to the task and access to the scope. The move is
+    recorded in the task's history.
 
     Args:
         task_id (str):
@@ -187,10 +185,9 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskSectionOut]:
     """Place a task in a section
 
-     Move the task into a section of one scope (`section_id: null` removes it
-    from that scope's section; tasks are never deleted). Requires `edit` on the
-    task (`has_edit_access`) **and** access to the scope; writes a
-    `tasks_history` entry ("moved to section X" / "removed from section X").
+     Move the task into a section of one scope (`section_id: null` takes it out of that scope's section;
+    the task is never deleted). Requires edit access to the task and access to the scope. The move is
+    recorded in the task's history.
 
     Args:
         task_id (str):
@@ -223,10 +220,9 @@ async def asyncio(
 ) -> Problem | TaskSectionOut | None:
     """Place a task in a section
 
-     Move the task into a section of one scope (`section_id: null` removes it
-    from that scope's section; tasks are never deleted). Requires `edit` on the
-    task (`has_edit_access`) **and** access to the scope; writes a
-    `tasks_history` entry ("moved to section X" / "removed from section X").
+     Move the task into a section of one scope (`section_id: null` takes it out of that scope's section;
+    the task is never deleted). Requires edit access to the task and access to the scope. The move is
+    recorded in the task's history.
 
     Args:
         task_id (str):

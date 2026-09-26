@@ -23,7 +23,8 @@ T = TypeVar("T", bound="BodyUploadAttachmentV1TaskAttachmentsPost")
 
 @_attrs_define
 class BodyUploadAttachmentV1TaskAttachmentsPost:
-    """
+    """The request body of `task-attachments.create`.
+
     Attributes:
         task_id (str):
         file (File):

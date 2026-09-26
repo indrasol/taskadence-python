@@ -19,7 +19,8 @@ T = TypeVar("T", bound="MeOrganization")
 
 @_attrs_define
 class MeOrganization:
-    """
+    """Part of `MeOut`.
+
     Attributes:
         org_id (str):
         role (str): Org role: owner · admin · member · guest

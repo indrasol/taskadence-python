@@ -19,7 +19,8 @@ T = TypeVar("T", bound="SectionUpdate")
 
 @_attrs_define
 class SectionUpdate:
-    """
+    """The request body of `sections.update`.
+
     Attributes:
         name (None | str | Unset):
         position (float | None | Unset):

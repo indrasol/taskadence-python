@@ -106,6 +106,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Unpin a project
 
+     Unpin a project.
+
     Args:
         project_id (str):
 
@@ -135,6 +137,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Unpin a project
 
+     Unpin a project.
+
     Args:
         project_id (str):
 
@@ -158,6 +162,8 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
 ) -> Response[Acknowledgement | Problem]:
     """Unpin a project
+
+     Unpin a project.
 
     Args:
         project_id (str):
@@ -185,6 +191,8 @@ async def asyncio(
     client: AuthenticatedClient,
 ) -> Acknowledgement | Problem | None:
     """Unpin a project
+
+     Unpin a project.
 
     Args:
         project_id (str):

@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageProjectCard")
 
 @_attrs_define
 class PageProjectCard:
-    """
+    """Returned by `projects.list`.
+
     Attributes:
         data (list[ProjectCard]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

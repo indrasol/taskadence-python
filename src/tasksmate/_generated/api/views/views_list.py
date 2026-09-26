@@ -158,8 +158,9 @@ def sync_detailed(
 ) -> Response[Any | Problem | ViewListPage]:
     """Saved views you can read
 
-     Every view the caller may read: personal first, then team, then project.
-    Each carries `can_edit` (the scope's write rule) and `pinned` (personal). 4.1 list envelope.
+     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
+    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
+    next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
@@ -209,8 +210,9 @@ def sync(
 ) -> Any | Problem | ViewListPage | None:
     """Saved views you can read
 
-     Every view the caller may read: personal first, then team, then project.
-    Each carries `can_edit` (the scope's write rule) and `pinned` (personal). 4.1 list envelope.
+     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
+    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
+    next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
@@ -255,8 +257,9 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | ViewListPage]:
     """Saved views you can read
 
-     Every view the caller may read: personal first, then team, then project.
-    Each carries `can_edit` (the scope's write rule) and `pinned` (personal). 4.1 list envelope.
+     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
+    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
+    next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
@@ -304,8 +307,9 @@ async def asyncio(
 ) -> Any | Problem | ViewListPage | None:
     """Saved views you can read
 
-     Every view the caller may read: personal first, then team, then project.
-    Each carries `can_edit` (the scope's write rule) and `pinned` (personal). 4.1 list envelope.
+     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
+    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
+    next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).

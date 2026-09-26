@@ -167,8 +167,7 @@ def sync_detailed(
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """List an organization's pending invites
 
-     An org's invites in the 4.1 envelope; the page size still defaults to 20, as the list did before
-    4.1.
+     The organization's invites, paginated as `{data, next_cursor}`. The default page size is 20.
 
     Args:
         org_id (str):
@@ -221,8 +220,7 @@ def sync(
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """List an organization's pending invites
 
-     An org's invites in the 4.1 envelope; the page size still defaults to 20, as the list did before
-    4.1.
+     The organization's invites, paginated as `{data, next_cursor}`. The default page size is 20.
 
     Args:
         org_id (str):
@@ -270,8 +268,7 @@ async def asyncio_detailed(
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """List an organization's pending invites
 
-     An org's invites in the 4.1 envelope; the page size still defaults to 20, as the list did before
-    4.1.
+     The organization's invites, paginated as `{data, next_cursor}`. The default page size is 20.
 
     Args:
         org_id (str):
@@ -322,8 +319,7 @@ async def asyncio(
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """List an organization's pending invites
 
-     An org's invites in the 4.1 envelope; the page size still defaults to 20, as the list did before
-    4.1.
+     The organization's invites, paginated as `{data, next_cursor}`. The default page size is 20.
 
     Args:
         org_id (str):

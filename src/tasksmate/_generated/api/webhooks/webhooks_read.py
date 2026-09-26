@@ -118,6 +118,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | WebhookOut]:
     """Read a webhook (never its secret)
 
+     Read a webhook (never its secret).
+
     Args:
         subscription_id (str):
         if_none_match (str | Unset):
@@ -150,6 +152,8 @@ def sync(
 ) -> Any | Problem | WebhookOut | None:
     """Read a webhook (never its secret)
 
+     Read a webhook (never its secret).
+
     Args:
         subscription_id (str):
         if_none_match (str | Unset):
@@ -176,6 +180,8 @@ async def asyncio_detailed(
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | WebhookOut]:
     """Read a webhook (never its secret)
+
+     Read a webhook (never its secret).
 
     Args:
         subscription_id (str):
@@ -206,6 +212,8 @@ async def asyncio(
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | WebhookOut | None:
     """Read a webhook (never its secret)
+
+     Read a webhook (never its secret).
 
     Args:
         subscription_id (str):

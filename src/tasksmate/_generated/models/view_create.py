@@ -25,11 +25,12 @@ T = TypeVar("T", bound="ViewCreate")
 
 @_attrs_define
 class ViewCreate:
-    """
+    """The request body of `views.create`.
+
     Attributes:
         org_id (str):
         name (str): Unique among the scope's active views (case-insensitive) — 409 otherwise
-        scope_type (ViewScopeEnum | Unset):
+        scope_type (ViewScopeEnum | Unset): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
         scope_id (None | str | Unset): team_id for `team`, project_id for `project`; ignored for `user` (always the
             caller).
         query (ViewCreateQuery | Unset): GET /v1/tasks parameters, exactly as the list route accepts them; unknown key

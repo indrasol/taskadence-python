@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageDeliveryOut")
 
 @_attrs_define
 class PageDeliveryOut:
-    """
+    """Returned by `webhooks.deliveries`.
+
     Attributes:
         data (list[DeliveryOut]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

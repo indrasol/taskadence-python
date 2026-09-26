@@ -115,6 +115,8 @@ def sync_detailed(
 ) -> Response[GoalOut | Problem]:
     """Update a goal (JSON merge-patch)
 
+     Update a goal (JSON merge-patch).
+
     Args:
         project_id (str):
         goal_id (str):
@@ -153,6 +155,8 @@ def sync(
 ) -> GoalOut | Problem | None:
     """Update a goal (JSON merge-patch)
 
+     Update a goal (JSON merge-patch).
+
     Args:
         project_id (str):
         goal_id (str):
@@ -185,6 +189,8 @@ async def asyncio_detailed(
     body: GoalUpdate,
 ) -> Response[GoalOut | Problem]:
     """Update a goal (JSON merge-patch)
+
+     Update a goal (JSON merge-patch).
 
     Args:
         project_id (str):
@@ -221,6 +227,8 @@ async def asyncio(
     body: GoalUpdate,
 ) -> GoalOut | Problem | None:
     """Update a goal (JSON merge-patch)
+
+     Update a goal (JSON merge-patch).
 
     Args:
         project_id (str):

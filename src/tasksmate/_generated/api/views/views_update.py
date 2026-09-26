@@ -123,7 +123,7 @@ def sync_detailed(
     Args:
         view_id (str):
         if_match (str | Unset):
-        body (ViewUpdate):
+        body (ViewUpdate): The request body of `views.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -161,7 +161,7 @@ def sync(
     Args:
         view_id (str):
         if_match (str | Unset):
-        body (ViewUpdate):
+        body (ViewUpdate): The request body of `views.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,7 +194,7 @@ async def asyncio_detailed(
     Args:
         view_id (str):
         if_match (str | Unset):
-        body (ViewUpdate):
+        body (ViewUpdate): The request body of `views.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -230,7 +230,7 @@ async def asyncio(
     Args:
         view_id (str):
         if_match (str | Unset):
-        body (ViewUpdate):
+        body (ViewUpdate): The request body of `views.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

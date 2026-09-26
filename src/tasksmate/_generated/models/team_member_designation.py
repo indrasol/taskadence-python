@@ -19,7 +19,8 @@ T = TypeVar("T", bound="TeamMemberDesignation")
 
 @_attrs_define
 class TeamMemberDesignation:
-    """
+    """Part of `ProjectCreate` and `ProjectUpdate`.
+
     Attributes:
         id (str): Team member user ID
         designation (None | str | Unset): Team member designation

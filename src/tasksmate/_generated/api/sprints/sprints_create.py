@@ -112,13 +112,12 @@ def sync_detailed(
 ) -> Response[Problem | SprintOut]:
     """Create a sprint
 
-     Create a sprint. `edit` on the team. Send `end_date` OR `duration_weeks` (1–4 are
-    the form's presets, anything else is a custom range) — both is a 422, because the row
-    stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` — both is a
+    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
 
     Args:
         team_id (str):
-        body (SprintCreate):
+        body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -148,13 +147,12 @@ def sync(
 ) -> Problem | SprintOut | None:
     """Create a sprint
 
-     Create a sprint. `edit` on the team. Send `end_date` OR `duration_weeks` (1–4 are
-    the form's presets, anything else is a custom range) — both is a 422, because the row
-    stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` — both is a
+    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
 
     Args:
         team_id (str):
-        body (SprintCreate):
+        body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -179,13 +177,12 @@ async def asyncio_detailed(
 ) -> Response[Problem | SprintOut]:
     """Create a sprint
 
-     Create a sprint. `edit` on the team. Send `end_date` OR `duration_weeks` (1–4 are
-    the form's presets, anything else is a custom range) — both is a 422, because the row
-    stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` — both is a
+    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
 
     Args:
         team_id (str):
-        body (SprintCreate):
+        body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -213,13 +210,12 @@ async def asyncio(
 ) -> Problem | SprintOut | None:
     """Create a sprint
 
-     Create a sprint. `edit` on the team. Send `end_date` OR `duration_weeks` (1–4 are
-    the form's presets, anything else is a custom range) — both is a 422, because the row
-    stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` — both is a
+    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
 
     Args:
         team_id (str):
-        body (SprintCreate):
+        body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

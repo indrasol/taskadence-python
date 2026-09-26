@@ -22,19 +22,19 @@ T = TypeVar("T", bound="OrganizationInviteUpdate")
 
 @_attrs_define
 class OrganizationInviteUpdate:
-    """
+    """The request body of `organization-invites.update`.
+
     Attributes:
         designation (None | str | Unset): Designation ID (UUID) Example: d1e2f3g4-5678-1234-9abc-def012345678.
-        designation_id (None | str | Unset): Task 2.8: a designations row id (DG… seed / DO… org row). Either this or
-            `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
+        designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
+            this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
         role (None | str | Unset): Role ID (UUID) Example: r1e2f3g4-5678-1234-9abc-def012345678.
         invited_by (None | str | Unset): Inviter's User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
-        invite_status (InviteStatusEnum | None | Unset): Status of the invite (4.1b: no default — omitted = unchanged)
-            Example: pending.
+        invite_status (InviteStatusEnum | None | Unset): Status of the invite. Omit to leave it unchanged. Example:
+            pending.
         sent_at (datetime.datetime | None | Unset): When the invite was sent
         expires_at (datetime.datetime | None | Unset): When the invite expires
-        is_cancelled (bool | None | Unset): Is the invite cancelled? (4.1b: no default — omitted = unchanged) Example:
-            False.
+        is_cancelled (bool | None | Unset): Whether the invite is cancelled. Omit to leave it unchanged. Example: False.
         cancel_date (datetime.datetime | None | Unset): When the invite was cancelled
         updated_by (None | str | Unset): Who updates the invite
     """

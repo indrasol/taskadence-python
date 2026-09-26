@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageServiceAccountOut")
 
 @_attrs_define
 class PageServiceAccountOut:
-    """
+    """Returned by `service-accounts.list`.
+
     Attributes:
         data (list[ServiceAccountOut]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

@@ -16,7 +16,8 @@ T = TypeVar("T", bound="GoalTasksFiled")
 
 @_attrs_define
 class GoalTasksFiled:
-    """
+    """Returned by `goals.file_tasks`.
+
     Attributes:
         ok (bool):
         goal_id (str):

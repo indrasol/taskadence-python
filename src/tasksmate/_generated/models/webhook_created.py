@@ -22,7 +22,8 @@ T = TypeVar("T", bound="WebhookCreated")
 
 @_attrs_define
 class WebhookCreated:
-    """
+    """Returned by `webhooks.create` and `webhooks.rotate_secret`.
+
     Example:
         {'api_version': '2026-09-25', 'consecutive_failures': 0, 'created_at': '2026-09-25T12:00:00Z', 'created_by':
             '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'events': ['task.*'], 'key_version': 1, 'name': 'Deploy notifier',

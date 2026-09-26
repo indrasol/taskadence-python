@@ -21,10 +21,11 @@ T = TypeVar("T", bound="TeamMemberCreate")
 
 @_attrs_define
 class TeamMemberCreate:
-    """
+    """The request body of `teams.add_member`.
+
     Attributes:
         user_id (str): An active member of the team's org (422 otherwise); a guest may only be a `member`
-        team_role (TeamRoleEnum | Unset):
+        team_role (TeamRoleEnum | Unset): One of `owner`, `member`. Used by `TeamDetail` and 4 more.
     """
 
     user_id: str

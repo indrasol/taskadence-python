@@ -16,7 +16,8 @@ T = TypeVar("T", bound="TokenUpdate")
 
 @_attrs_define
 class TokenUpdate:
-    """
+    """The request body of `tokens.update`.
+
     Attributes:
         name (str): The new name (nothing else about a token changes; rotate or revoke it)
     """

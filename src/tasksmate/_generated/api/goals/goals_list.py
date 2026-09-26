@@ -153,7 +153,8 @@ def sync_detailed(
 ) -> Response[Any | Problem | ProjectGoalsOut]:
     """List a project's goals
 
-     The project's goals by position, in the 4.1 envelope; the project-level sums ride beside `data`.
+     The project's goals by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
         project_id (str):
@@ -204,7 +205,8 @@ def sync(
 ) -> Any | Problem | ProjectGoalsOut | None:
     """List a project's goals
 
-     The project's goals by position, in the 4.1 envelope; the project-level sums ride beside `data`.
+     The project's goals by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
         project_id (str):
@@ -250,7 +252,8 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | ProjectGoalsOut]:
     """List a project's goals
 
-     The project's goals by position, in the 4.1 envelope; the project-level sums ride beside `data`.
+     The project's goals by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
         project_id (str):
@@ -299,7 +302,8 @@ async def asyncio(
 ) -> Any | Problem | ProjectGoalsOut | None:
     """List a project's goals
 
-     The project's goals by position, in the 4.1 envelope; the project-level sums ride beside `data`.
+     The project's goals by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
         project_id (str):

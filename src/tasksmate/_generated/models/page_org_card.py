@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageOrgCard")
 
 @_attrs_define
 class PageOrgCard:
-    """
+    """Returned by `organizations.list`.
+
     Attributes:
         data (list[OrgCard]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

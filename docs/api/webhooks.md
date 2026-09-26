@@ -1,6 +1,6 @@
 # `tm.webhooks`
 
-Signed HTTP callbacks for audit events (4.4): subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries.
+Signed HTTP callbacks for audit events: subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

@@ -135,11 +135,13 @@ def sync_detailed(
 ) -> Response[Problem | TaskCommentInDB]:
     """Edit your comment
 
+     Edit your comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskCommentUpdate):
+        body (TaskCommentUpdate): The request body of `task-comments.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -173,11 +175,13 @@ def sync(
 ) -> Problem | TaskCommentInDB | None:
     """Edit your comment
 
+     Edit your comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskCommentUpdate):
+        body (TaskCommentUpdate): The request body of `task-comments.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -206,11 +210,13 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskCommentInDB]:
     """Edit your comment
 
+     Edit your comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskCommentUpdate):
+        body (TaskCommentUpdate): The request body of `task-comments.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -242,11 +248,13 @@ async def asyncio(
 ) -> Problem | TaskCommentInDB | None:
     """Edit your comment
 
+     Edit your comment.
+
     Args:
         comment_id (str):
         project_id (None | str | Unset):
         if_match (str | Unset):
-        body (TaskCommentUpdate):
+        body (TaskCommentUpdate): The request body of `task-comments.update`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

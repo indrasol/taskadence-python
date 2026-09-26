@@ -19,7 +19,8 @@ T = TypeVar("T", bound="UnattachedToken")
 
 @_attrs_define
 class UnattachedToken:
-    """
+    """Part of `AccessReview`.
+
     Attributes:
         token_id (str):
         name (str):

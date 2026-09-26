@@ -176,11 +176,9 @@ def sync_detailed(
 ) -> Response[Any | PageOrganizationMemberInDB | Problem]:
     """List an organization's members
 
-     An org's active members in the 4.1 envelope. The database sorts (`sort_by` from `MEMBER_SORTS`); the
-    page is cut from the whole set, which is what the app always read (it never sent `limit`).
-    `filter[role]` / `filter[designation]` (the display name) narrow it — the Members page's own
-    filters.
-    4.2: each row carries `kind` (`user` | `service_account`) so the app can badge service accounts.
+     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
+    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
+    `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -237,11 +235,9 @@ def sync(
 ) -> Any | PageOrganizationMemberInDB | Problem | None:
     """List an organization's members
 
-     An org's active members in the 4.1 envelope. The database sorts (`sort_by` from `MEMBER_SORTS`); the
-    page is cut from the whole set, which is what the app always read (it never sent `limit`).
-    `filter[role]` / `filter[designation]` (the display name) narrow it — the Members page's own
-    filters.
-    4.2: each row carries `kind` (`user` | `service_account`) so the app can badge service accounts.
+     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
+    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
+    `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -293,11 +289,9 @@ async def asyncio_detailed(
 ) -> Response[Any | PageOrganizationMemberInDB | Problem]:
     """List an organization's members
 
-     An org's active members in the 4.1 envelope. The database sorts (`sort_by` from `MEMBER_SORTS`); the
-    page is cut from the whole set, which is what the app always read (it never sent `limit`).
-    `filter[role]` / `filter[designation]` (the display name) narrow it — the Members page's own
-    filters.
-    4.2: each row carries `kind` (`user` | `service_account`) so the app can badge service accounts.
+     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
+    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
+    `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -352,11 +346,9 @@ async def asyncio(
 ) -> Any | PageOrganizationMemberInDB | Problem | None:
     """List an organization's members
 
-     An org's active members in the 4.1 envelope. The database sorts (`sort_by` from `MEMBER_SORTS`); the
-    page is cut from the whole set, which is what the app always read (it never sent `limit`).
-    `filter[role]` / `filter[designation]` (the display name) narrow it — the Members page's own
-    filters.
-    4.2: each row carries `kind` (`user` | `service_account`) so the app can badge service accounts.
+     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
+    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
+    `user` or `service_account`.
 
     Args:
         org_id (str):

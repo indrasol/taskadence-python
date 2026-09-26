@@ -16,11 +16,10 @@ T = TypeVar("T", bound="DependencyLink")
 
 @_attrs_define
 class DependencyLink:
-    """`POST /tasks/{task_id}/dependencies` (4.1b: named — it was FastAPI's `Body_add_dependency_to_task_…`; same wire
-    shape).
+    """The body of `POST /v1/tasks/{task_id}/dependencies`.
 
-        Attributes:
-            dependency_id (str): The task this one depends on (you need `read` on it) Example: T654321.
+    Attributes:
+        dependency_id (str): The task this one depends on (you need `read` on it) Example: T654321.
     """
 
     dependency_id: str

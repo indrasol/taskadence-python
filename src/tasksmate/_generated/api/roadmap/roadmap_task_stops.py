@@ -149,8 +149,8 @@ def sync_detailed(
 ) -> Response[Any | PageTaskRoadmapStop | Problem]:
     """The roadmap stops a task is on
 
-     The live stops this task is on — directly, or through its milestone's pin — among readable projects.
-    4.1 list envelope.
+     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
+    projects you can read, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -196,8 +196,8 @@ def sync(
 ) -> Any | PageTaskRoadmapStop | Problem | None:
     """The roadmap stops a task is on
 
-     The live stops this task is on — directly, or through its milestone's pin — among readable projects.
-    4.1 list envelope.
+     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
+    projects you can read, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -238,8 +238,8 @@ async def asyncio_detailed(
 ) -> Response[Any | PageTaskRoadmapStop | Problem]:
     """The roadmap stops a task is on
 
-     The live stops this task is on — directly, or through its milestone's pin — among readable projects.
-    4.1 list envelope.
+     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
+    projects you can read, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):
@@ -283,8 +283,8 @@ async def asyncio(
 ) -> Any | PageTaskRoadmapStop | Problem | None:
     """The roadmap stops a task is on
 
-     The live stops this task is on — directly, or through its milestone's pin — among readable projects.
-    4.1 list envelope.
+     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
+    projects you can read, paginated as `{data, next_cursor}`.
 
     Args:
         task_id (str):

@@ -22,7 +22,8 @@ T = TypeVar("T", bound="PageWebhookOut")
 
 @_attrs_define
 class PageWebhookOut:
-    """
+    """Returned by `webhooks.list`.
+
     Attributes:
         data (list[WebhookOut]):
         next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last

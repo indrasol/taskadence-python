@@ -172,7 +172,7 @@ def sync_detailed(
 ) -> Response[Any | PageProjectMemberInDB | Problem]:
     """List a project's members
 
-     A project's members in the 4.1 envelope. The page size still defaults to 20, as before 4.1 — follow
+     A project's members, paginated as `{data, next_cursor}`. The default page size is 20 — follow
     `next_cursor` (or send `limit`) for more.
 
     Args:
@@ -226,7 +226,7 @@ def sync(
 ) -> Any | PageProjectMemberInDB | Problem | None:
     """List a project's members
 
-     A project's members in the 4.1 envelope. The page size still defaults to 20, as before 4.1 — follow
+     A project's members, paginated as `{data, next_cursor}`. The default page size is 20 — follow
     `next_cursor` (or send `limit`) for more.
 
     Args:
@@ -275,7 +275,7 @@ async def asyncio_detailed(
 ) -> Response[Any | PageProjectMemberInDB | Problem]:
     """List a project's members
 
-     A project's members in the 4.1 envelope. The page size still defaults to 20, as before 4.1 — follow
+     A project's members, paginated as `{data, next_cursor}`. The default page size is 20 — follow
     `next_cursor` (or send `limit`) for more.
 
     Args:
@@ -327,7 +327,7 @@ async def asyncio(
 ) -> Any | PageProjectMemberInDB | Problem | None:
     """List a project's members
 
-     A project's members in the 4.1 envelope. The page size still defaults to 20, as before 4.1 — follow
+     A project's members, paginated as `{data, next_cursor}`. The default page size is 20 — follow
     `next_cursor` (or send `limit`) for more.
 
     Args:

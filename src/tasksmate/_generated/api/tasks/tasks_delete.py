@@ -114,8 +114,8 @@ def sync_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete a task
 
-     `read` to reach the task, then `delete` (task 2.2): project owner / org
-    admin, or — for anyone who may edit it — the task's creator or assignee.
+     You must be able to read the task, and to delete it: a project owner or org admin, or — when you may
+    edit the task — its creator or assignee.
 
     Args:
         task_id (str):
@@ -149,8 +149,8 @@ def sync(
 ) -> Acknowledgement | Problem | None:
     """Delete a task
 
-     `read` to reach the task, then `delete` (task 2.2): project owner / org
-    admin, or — for anyone who may edit it — the task's creator or assignee.
+     You must be able to read the task, and to delete it: a project owner or org admin, or — when you may
+    edit the task — its creator or assignee.
 
     Args:
         task_id (str):
@@ -179,8 +179,8 @@ async def asyncio_detailed(
 ) -> Response[Acknowledgement | Problem]:
     """Delete a task
 
-     `read` to reach the task, then `delete` (task 2.2): project owner / org
-    admin, or — for anyone who may edit it — the task's creator or assignee.
+     You must be able to read the task, and to delete it: a project owner or org admin, or — when you may
+    edit the task — its creator or assignee.
 
     Args:
         task_id (str):
@@ -212,8 +212,8 @@ async def asyncio(
 ) -> Acknowledgement | Problem | None:
     """Delete a task
 
-     `read` to reach the task, then `delete` (task 2.2): project owner / org
-    admin, or — for anyone who may edit it — the task's creator or assignee.
+     You must be able to read the task, and to delete it: a project owner or org admin, or — when you may
+    edit the task — its creator or assignee.
 
     Args:
         task_id (str):

@@ -106,6 +106,8 @@ def sync_detailed(
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Accept an invite addressed to you
 
+     Accept an invite addressed to you.
+
     Args:
         invite_id (str):
 
@@ -135,6 +137,8 @@ def sync(
 ) -> OrganizationInviteInDB | Problem | None:
     """Accept an invite addressed to you
 
+     Accept an invite addressed to you.
+
     Args:
         invite_id (str):
 
@@ -158,6 +162,8 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Accept an invite addressed to you
+
+     Accept an invite addressed to you.
 
     Args:
         invite_id (str):
@@ -185,6 +191,8 @@ async def asyncio(
     client: AuthenticatedClient,
 ) -> OrganizationInviteInDB | Problem | None:
     """Accept an invite addressed to you
+
+     Accept an invite addressed to you.
 
     Args:
         invite_id (str):
