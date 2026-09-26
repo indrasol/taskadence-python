@@ -20,6 +20,17 @@ if TYPE_CHECKING:
     import pandas as pd
 
 T = TypeVar("T")
+P = TypeVar("P", "Page[Any]", "AsyncPage[Any]")
+
+
+class PaginationError(RuntimeError):
+    """The API answered a cursor with that same cursor: following it would never end."""
+
+
+def _checked(cursor: str, page: P) -> P:
+    if page.next_cursor == cursor:
+        raise PaginationError("the API returned the cursor it was given as next_cursor; stopping instead of looping")
+    return page
 
 
 class Page(Generic[T]):
@@ -48,7 +59,7 @@ class Page(Generic[T]):
         """The next page, or None on the last one."""
         if self.next_cursor is None or self._fetch_next is None:
             return None
-        return self._fetch_next(self.next_cursor)
+        return _checked(self.next_cursor, self._fetch_next(self.next_cursor))
 
     def pages(self) -> Iterator[Page[T]]:
         """This page and every page after it."""
@@ -100,7 +111,7 @@ class AsyncPage(Generic[T]):
     async def next_page(self) -> AsyncPage[T] | None:
         if self.next_cursor is None or self._fetch_next is None:
             return None
-        return await self._fetch_next(self.next_cursor)
+        return _checked(self.next_cursor, await self._fetch_next(self.next_cursor))
 
     async def pages(self) -> AsyncIterator[AsyncPage[T]]:
         page: AsyncPage[T] | None = self

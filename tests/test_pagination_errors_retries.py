@@ -84,6 +84,14 @@ def test_a_last_page_does_not_fetch_again(tm: TasksMate, api: respx.MockRouter) 
     assert [t.task_id for t in page] == ["T1"] and page.next_page() is None and route.call_count == 1
 
 
+def test_a_cursor_that_never_advances_stops_instead_of_looping(tm: TasksMate, api: respx.MockRouter) -> None:
+    from tasksmate.pagination import PaginationError
+
+    api.get("/v1/tasks").respond(json={"data": [card("T1")], "next_cursor": "same"})
+    with pytest.raises(PaginationError):
+        list(tm.tasks.list(org_id="O0020"))
+
+
 def test_a_bare_array_is_read_as_one_page(tm: TasksMate, api: respx.MockRouter) -> None:
     """The pre-4.1 shape, tolerated exactly as the app's `unwrapList` tolerates it."""
     api.get("/v1/tasks").respond(json=[card("T1"), card("T2")])
