@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+sbom*.json
+
+# Secrets: never committed (the CLI's token lives in the OS keyring or ~/.config/tasksmate/, never in the repo)
+.env
+.env.*
+*.token
+config.toml
+.streamlit/secrets.toml
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

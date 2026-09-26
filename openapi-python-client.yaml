@@ -1,0 +1,8 @@
+# openapi-python-client configuration (scripts/generate.py passes it). The output is the private package
+# `tasksmate._generated`; the public surface is the hand-written facade in `src/tasksmate/`.
+project_name_override: tasksmate-generated
+package_name_override: _generated
+# Enums as `Literal[...]` strings: callers pass "in_progress", not TaskStatusEnum.IN_PROGRESS.
+literal_enums: true
+# Formatting after generation is scripts/generate.py's job (one pinned ruff, same result everywhere).
+post_hooks: []
