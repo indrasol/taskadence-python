@@ -1,0 +1,127 @@
+# tasksmate-python CI (task 4.5 Part E). Every job runs offline except `integration`, which runs only when the
+# TASKSMATE_TOKEN secret exists. Nothing here publishes anything (that is release.yml, and PyPI is gated on S.23).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: ruff + mypy --strict
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests scripts examples
+      - run: ruff format --check src tests scripts examples
+      # src/tasksmate/_generated is excluded (pyproject [tool.mypy]): generated code is its generator's to type-check;
+      # every call into it is typed at the facade's boundary.
+      - run: mypy
+
+  test:
+    name: pytest (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: pytest   # respx-mocked; `integration` tests are deselected (pyproject addopts)
+
+  regen:
+    name: regenerate from spec/openapi.public.json (fails on drift)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: python scripts/generate.py
+      - name: The committed code is what the committed spec generates
+        run: |
+          git status --porcelain
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
+
+  audit:
+    name: pip-audit (runtime + extras)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m venv /tmp/audit
+          /tmp/audit/bin/pip install --upgrade pip pip-audit
+          /tmp/audit/bin/pip install ".[cli,pandas]"
+          # tasksmate itself is not on PyPI (yet): audit everything it pulls in, pinned as installed
+          /tmp/audit/bin/pip freeze --exclude tasksmate --exclude pip-audit > /tmp/audit-requirements.txt
+          /tmp/audit/bin/pip-audit --strict --desc=off -r /tmp/audit-requirements.txt
+
+  build:
+    name: build + twine check + SBOM
+    runs-on: ubuntu-latest
+    needs: [lint, test, regen]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine cyclonedx-bom
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - name: CycloneDX SBOM of the installed wheel (S.2)
+        run: |
+          python -m venv /tmp/sbom
+          /tmp/sbom/bin/pip install dist/*.whl
+          cyclonedx-py environment /tmp/sbom/bin/python --of JSON -o dist/sbom.cdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 14
+
+  integration:
+    name: quickstart against a live API (skipped without the secret)
+    runs-on: ubuntu-latest
+    needs: [test]
+    env:
+      TASKSMATE_TOKEN: ${{ secrets.TASKSMATE_TOKEN }}
+      TASKSMATE_API_URL: ${{ vars.TASKSMATE_API_URL }}
+      TASKSMATE_ORG: ${{ vars.TASKSMATE_ORG }}
+    steps:
+      - name: Skip when no token is configured
+        if: env.TASKSMATE_TOKEN == ''
+        run: echo "TASKSMATE_TOKEN is not set for this repository — the integration job is skipped."
+      - uses: actions/checkout@v4
+        if: env.TASKSMATE_TOKEN != ''
+      - uses: actions/setup-python@v5
+        if: env.TASKSMATE_TOKEN != ''
+        with:
+          python-version: "3.12"
+      - if: env.TASKSMATE_TOKEN != ''
+        run: pip install -e ".[dev]"
+      - if: env.TASKSMATE_TOKEN != ''
+        run: pytest -m integration -o addopts="" -v

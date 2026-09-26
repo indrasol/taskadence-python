@@ -59,6 +59,7 @@ def run(*cmd: str, cwd: Path = ROOT) -> None:
 
 def request_only_schemas(spec: dict[str, Any]) -> set[str]:
     """Component schemas a request body references and no response does."""
+
     def refs(node: Any, found: set[str]) -> set[str]:
         if isinstance(node, dict):
             ref = node.get("$ref")

@@ -261,3 +261,11 @@ def test_tokens_list_shows_prefixes_only(signed_in: None, api: respx.MockRouter)
     result = invoke("tokens", "list", "--org", "O0020")
     assert result.exit_code == 0 and example("tokens.list")["data"][0]["token_prefix"] in result.output
     no_token_in(result)
+
+
+def test_timestamps_print_to_the_minute_in_utc() -> None:
+    from tasksmate.cli import _cell
+
+    assert _cell("2026-09-28T04:10:59.221500+00:00") == "2026-09-28 04:10Z"
+    assert _cell("2026-09-28T04:10:59Z") == "2026-09-28 04:10Z"
+    assert _cell("2026-09-28") == "2026-09-28" and _cell(["a", "b"]) == "a, b" and _cell(None) == ""

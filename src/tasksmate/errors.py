@@ -106,8 +106,10 @@ class TasksMateError(APIError):
         return text
 
     def __repr__(self) -> str:
-        return (f"{type(self).__name__}(status={self.status}, type={self.type!r}, detail={self.detail!r}, "
-                f"request_id={self.request_id!r})")
+        return (
+            f"{type(self).__name__}(status={self.status}, type={self.type!r}, detail={self.detail!r}, "
+            f"request_id={self.request_id!r})"
+        )
 
 
 class BadRequestError(TasksMateError):

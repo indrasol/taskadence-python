@@ -16,6 +16,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import sys
 from collections.abc import Callable, Iterable, Sequence
 from typing import Annotated, Any, TypeVar
@@ -132,12 +133,17 @@ def _print_json(value: Any) -> None:
     out.print_json(json.dumps(_plain(value), default=str))
 
 
+_TIMESTAMP = re.compile(r"^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[\d:.]*(Z|[+-]00:00)$")
+
+
 def _cell(value: Any) -> str:
     if value is None or type(value).__name__ == "Unset":
         return ""
     if isinstance(value, list):
         return ", ".join(str(v) for v in value)
-    return str(value)
+    text = str(value)
+    stamp = _TIMESTAMP.match(text)  # a UTC timestamp, to the minute: 2026-09-28 04:10Z
+    return f"{stamp.group(1)} {stamp.group(2)}Z" if stamp else text
 
 
 def _table(rows: Iterable[Any], columns: Sequence[str], title: str | None = None) -> None:

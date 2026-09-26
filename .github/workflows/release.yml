@@ -1,0 +1,114 @@
+# tasksmate-python release (task 4.5 Part E) — BUILT, NOT PUBLISHED (user decision 2026-09-21).
+#
+# - A tag `v0.*` (a pre-release; `0.x` carries no compatibility promise) builds, checks, and publishes to TestPyPI
+#   through trusted publishing (OIDC: no long-lived token anywhere).
+# - `workflow_dispatch` with target=testpypi does the same for the current version.
+# - target=pypi is DISABLED until the stability gate, task S.23: the `gate` job fails with "S.23 gate", and every
+#   publish job needs it. Opening the gate is S.23's change to this file (and PyPI's trusted-publisher setup).
+#
+# One-time setup outside this repo (owner, at S.23 / first TestPyPI upload): on test.pypi.org add a pending trusted
+# publisher — project `tasksmate`, owner `indrasol`, repo `tasksmate-python`, workflow `release.yml`, environment
+# `testpypi`; and a GitHub environment `testpypi` (and later `pypi`, with a required reviewer).
+name: release
+
+on:
+  push:
+    tags: ["v0.*"]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Where to publish"
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: S.23 gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: PyPI is closed until S.23
+        if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
+        run: |
+          echo "::error::S.23 gate — publishing to PyPI is disabled until the stability gate (task S.23). Use target=testpypi."
+          exit 1
+      - run: echo "target=${{ inputs.target || 'testpypi' }} — allowed"
+
+  build:
+    name: build, verify, SBOM
+    runs-on: ubuntu-latest
+    needs: [gate]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Stamp the version from the tag (v0.2.0 → 0.2.0)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          case "$version" in 0.*) ;; *) echo "::error::only 0.x pre-releases are released before S.23 (got $version)"; exit 1 ;; esac
+          sed -i "s/^__version__ = .*/__version__ = \"$version\"/" src/tasksmate/_version.py
+          grep __version__ src/tasksmate/_version.py
+      - run: pip install -e ".[dev]" cyclonedx-bom
+      - name: The code is what the spec generates
+        run: |
+          python scripts/generate.py
+          git diff --exit-code -- src docs
+      - run: pytest
+      - run: mypy
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - name: CycloneDX SBOM of the installed wheel (S.2)
+        run: |
+          python -m venv /tmp/sbom
+          /tmp/sbom/bin/pip install dist/*.whl
+          cyclonedx-py environment /tmp/sbom/bin/python --of JSON -o sbom.cdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cdx.json
+
+  testpypi:
+    name: publish to TestPyPI (trusted publishing)
+    runs-on: ubuntu-latest
+    needs: [gate, build]
+    if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/tasksmate
+    permissions:
+      id-token: write   # OIDC for trusted publishing — the only permission it gets
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  pypi:
+    name: publish to PyPI (closed until S.23)
+    runs-on: ubuntu-latest
+    needs: [gate, build]
+    # Unreachable while `gate` fails on target=pypi. S.23 removes the gate step and keeps this job.
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/tasksmate
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
