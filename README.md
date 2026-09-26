@@ -241,4 +241,4 @@ See [SECURITY.md](SECURITY.md). Report vulnerabilities privately; never paste a 
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The licence grants no right to use the TasksMate or Indrasol names or marks (§6).

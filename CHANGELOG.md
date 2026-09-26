@@ -15,6 +15,9 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Changed (4.1b — licence)
+- Licensed under **Apache-2.0** (was MIT): an explicit patent grant and no trademark rights; `NOTICE` added.
+
 ### Changed (4.1b — spec from backend `6b75d01`)
 - `webhooks.parse` returns the **generated** `WebhookEvent` (the spec now describes the webhook body and has a `webhooks`
   map); the event type is `event.type_`, extra fields land in `additional_properties`, and a body that is not an event

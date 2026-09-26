@@ -7,8 +7,8 @@ name = "tasksmate"
 dynamic = ["version"]
 description = "The TasksMate API for Python: a typed client generated from the public OpenAPI, a `tm` CLI, and pandas helpers."
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "Indrasol" }]
 keywords = ["tasksmate", "tasks", "project management", "api", "sdk"]
@@ -68,7 +68,7 @@ path = "src/tasksmate/_version.py"
 packages = ["src/tasksmate"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/tasksmate", "spec", "tests", "README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md"]
+include = ["src/tasksmate", "spec", "tests", "README.md", "CHANGELOG.md", "LICENSE", "NOTICE", "SECURITY.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
