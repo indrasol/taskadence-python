@@ -29,10 +29,11 @@ for task in tm.tasks.list(org_id="O0020"):           # every task, page after pa
 tm.views.rows("V123456").to_dataframe()               # a saved view as a pandas DataFrame
 ```
 
-Mint the token in TasksMate → **Developers → Tokens** (it is shown once). A token belongs to one organization and
-carries **scopes** (`tasks:read`, `tasks:write`, `projects:read`, …); each method's docstring names the scope it needs.
-[`examples/quickstart.py`](examples/quickstart.py) runs a full round trip — create, conditional update, filtered list,
-DataFrame, delete — and leaves nothing behind.
+- **Token:** mint it in TasksMate → **Developers → Tokens** (it is shown once).
+- **Reach:** a token belongs to one organization and carries **scopes** (`tasks:read`, `tasks:write`,
+  `projects:read`, …); each method's docstring names the scope it needs.
+- **Try it:** [`examples/quickstart.py`](examples/quickstart.py) runs a full round trip — create, conditional update,
+  filtered list, DataFrame, delete — and leaves nothing behind.
 
 ## The client
 
@@ -156,9 +157,13 @@ tm.tasks.list(org_id="O0020").to_dataframe()             # every page; to_datafr
 tm.views.rows("V123456").to_dataframe()
 ```
 
-One row per item, the API's own field names. A nested object becomes dotted columns (`type_data.severity`); a list of
-scalars one comma-separated string (`tags` → `"api, backend"`); `*_at` columns are timezone-aware datetimes, `*_date`
-columns `datetime.date` (missing → `None`). Needs the `pandas` extra — without it you get an `ImportError` saying so.
+One row per item, with the API's own field names:
+
+- a nested object becomes dotted columns (`type_data.severity`);
+- a list of scalars becomes one comma-separated string (`tags` → `"api, backend"`);
+- `*_at` columns are timezone-aware datetimes, `*_date` columns `datetime.date` (missing → `None`).
+
+Needs the `pandas` extra — without it you get an `ImportError` saying so.
 
 ### Webhooks
 
@@ -173,11 +178,13 @@ def receive(headers, raw_body: bytes):
     return 200
 ```
 
-`verify` implements the Standard Webhooks recipe TasksMate signs with (`v1,` HMAC-SHA256 over
-`id.timestamp.body`, keyed by the base64-decoded part of the `whsec_…` secret), refuses timestamps more than
-`tolerance` seconds (300) away, and is rotation-aware both ways: during the 24 h after a secret rotation TasksMate
-sends two signatures, and you may pass both secrets — `verify([new, old], …)` — while you switch over.
-`raise_on_failure=True` raises `WebhookVerificationError` with the reason instead of returning `False`.
+`verify` implements the Standard Webhooks recipe TasksMate signs with:
+
+- **Signature:** `v1,` HMAC-SHA256 over `id.timestamp.body`, keyed by the base64-decoded part of the `whsec_…` secret.
+- **Replay window:** timestamps more than `tolerance` seconds (300) away are refused.
+- **Rotation, both ways:** during the 24 h after a secret rotation TasksMate sends two signatures, and you may pass
+  both secrets — `verify([new, old], …)` — while you switch over.
+- **Errors:** `raise_on_failure=True` raises `WebhookVerificationError` with the reason instead of returning `False`.
 
 ### Logging
 
@@ -200,11 +207,12 @@ tm tokens list --org O0020
 tm --version
 ```
 
-A table by default, `--json` for raw objects. `--org` falls back to `TASKSMATE_ORG`, or to your organization when you
-have exactly one. The token comes from `TASKSMATE_TOKEN`, else the OS keyring, else
-`~/.config/tasksmate/config.toml` (mode 600, written only when no keyring is available or with `--no-keyring`); `tm`
-only ever prints its 12-character prefix. Exit codes: **0** success, **1** an API or connection error (the problem is
-printed with its `request_id`), **2** a usage error.
+- **Output:** a table by default, `--json` for raw objects.
+- **Organization:** `--org` falls back to `TASKSMATE_ORG`, or to your organization when you have exactly one.
+- **Token:** from `TASKSMATE_TOKEN`, else the OS keyring, else `~/.config/tasksmate/config.toml` (mode 600, written
+  only when no keyring is available or with `--no-keyring`); `tm` only ever prints its 12-character prefix.
+- **Exit codes:** **0** success, **1** an API or connection error (the problem is printed with its `request_id`),
+  **2** a usage error.
 
 ## Streamlit example
 
