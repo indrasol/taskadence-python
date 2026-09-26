@@ -12,7 +12,6 @@ from ... import errors
 
 from ...models.goal_task_unfiled import GoalTaskUnfiled
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -20,19 +19,7 @@ def _get_kwargs(
     project_id: str,
     goal_id: str,
     task_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
@@ -41,10 +28,8 @@ def _get_kwargs(
             goal_id=quote(str(goal_id), safe=""),
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -124,8 +109,6 @@ def sync_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[GoalTaskUnfiled | Problem]:
     """Take a task out of a goal
 
@@ -135,8 +118,6 @@ def sync_detailed(
         project_id (str):
         goal_id (str):
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -150,8 +131,6 @@ def sync_detailed(
         project_id=project_id,
         goal_id=goal_id,
         task_id=task_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -167,8 +146,6 @@ def sync(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> GoalTaskUnfiled | Problem | None:
     """Take a task out of a goal
 
@@ -178,8 +155,6 @@ def sync(
         project_id (str):
         goal_id (str):
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,8 +169,6 @@ def sync(
         goal_id=goal_id,
         task_id=task_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -205,8 +178,6 @@ async def asyncio_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[GoalTaskUnfiled | Problem]:
     """Take a task out of a goal
 
@@ -216,8 +187,6 @@ async def asyncio_detailed(
         project_id (str):
         goal_id (str):
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -231,8 +200,6 @@ async def asyncio_detailed(
         project_id=project_id,
         goal_id=goal_id,
         task_id=task_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -246,8 +213,6 @@ async def asyncio(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> GoalTaskUnfiled | Problem | None:
     """Take a task out of a goal
 
@@ -257,8 +222,6 @@ async def asyncio(
         project_id (str):
         goal_id (str):
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -274,7 +237,5 @@ async def asyncio(
             goal_id=goal_id,
             task_id=task_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

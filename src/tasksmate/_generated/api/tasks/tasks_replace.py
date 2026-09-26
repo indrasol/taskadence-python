@@ -21,29 +21,17 @@ def _get_kwargs(
     task_id: str,
     *,
     body: TaskUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
         "url": "/v1/tasks/{task_id}".format(
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -125,8 +113,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Update a task (PUT; partial since 3.15)
@@ -140,8 +126,6 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
             `pass`, so it inherited
@@ -167,8 +151,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -184,8 +166,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TaskUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Update a task (PUT; partial since 3.15)
@@ -199,8 +179,6 @@ def sync(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
             `pass`, so it inherited
@@ -227,8 +205,6 @@ def sync(
         task_id=task_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -238,8 +214,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Update a task (PUT; partial since 3.15)
@@ -253,8 +227,6 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
             `pass`, so it inherited
@@ -280,8 +252,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -295,8 +265,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TaskUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Update a task (PUT; partial since 3.15)
@@ -310,8 +278,6 @@ async def asyncio(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskUpdate): `PUT /tasks/{id}` body — a TRUE partial (3.15). Until 3.15 this was
             `pass`, so it inherited
@@ -339,8 +305,6 @@ async def asyncio(
             task_id=task_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

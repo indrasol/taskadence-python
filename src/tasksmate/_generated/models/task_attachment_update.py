@@ -32,7 +32,8 @@ class TaskAttachmentUpdate:
             uploaded_at (datetime.datetime | None | Unset): When the attachment was uploaded
             deleted_at (datetime.datetime | None | Unset): When the attachment was deleted
             deleted_by (None | str | Unset): Who deleted the attachment
-            is_inline (bool | None | Unset): Is the attachment inline? Example: False.
+            is_inline (bool | None | Unset): Is the attachment inline? (4.1b: no default — omitted = unchanged) Example:
+                False.
     """
 
     task_id: None | str | Unset = UNSET

@@ -13,30 +13,18 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.team_create import TeamCreate
 from ...models.team_detail import TeamDetail
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: TeamCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/teams",
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -119,8 +107,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TeamDetail]:
     """Create a team
 
@@ -128,8 +114,6 @@ def sync_detailed(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamCreate):
 
     Raises:
@@ -142,8 +126,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -157,8 +139,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TeamCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TeamDetail | None:
     """Create a team
 
@@ -166,8 +146,6 @@ def sync(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamCreate):
 
     Raises:
@@ -181,8 +159,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -190,8 +166,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TeamDetail]:
     """Create a team
 
@@ -199,8 +173,6 @@ async def asyncio_detailed(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamCreate):
 
     Raises:
@@ -213,8 +185,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -226,8 +196,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TeamCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TeamDetail | None:
     """Create a team
 
@@ -235,8 +203,6 @@ async def asyncio(
     team's `owner`. 409 when an active team of the org already has the name.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamCreate):
 
     Raises:
@@ -251,7 +217,5 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

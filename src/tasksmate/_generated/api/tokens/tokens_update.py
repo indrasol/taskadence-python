@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.token_out import TokenOut
 from ...models.token_update import TokenUpdate
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,25 +20,14 @@ def _get_kwargs(
     token_id: str,
     *,
     body: TokenUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "patch",
         "url": "/v1/tokens/{token_id}".format(
             token_id=quote(str(token_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -121,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TokenUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TokenOut]:
     """Rename an access token
 
@@ -130,8 +116,6 @@ def sync_detailed(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TokenUpdate):
 
     Raises:
@@ -145,8 +129,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         token_id=token_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -161,8 +143,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TokenUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TokenOut | None:
     """Rename an access token
 
@@ -170,8 +150,6 @@ def sync(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TokenUpdate):
 
     Raises:
@@ -186,8 +164,6 @@ def sync(
         token_id=token_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -196,8 +172,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TokenUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TokenOut]:
     """Rename an access token
 
@@ -205,8 +179,6 @@ async def asyncio_detailed(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TokenUpdate):
 
     Raises:
@@ -220,8 +192,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         token_id=token_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -234,8 +204,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TokenUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TokenOut | None:
     """Rename an access token
 
@@ -243,8 +211,6 @@ async def asyncio(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TokenUpdate):
 
     Raises:
@@ -260,7 +226,5 @@ async def asyncio(
             token_id=token_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

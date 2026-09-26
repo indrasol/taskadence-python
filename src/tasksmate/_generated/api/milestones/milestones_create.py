@@ -13,7 +13,6 @@ from ... import errors
 from ...models.milestone_create import MilestoneCreate
 from ...models.milestone_out import MilestoneOut
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,25 +20,14 @@ def _get_kwargs(
     team_id: str,
     *,
     body: MilestoneCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/teams/{team_id}/milestones".format(
             team_id=quote(str(team_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -123,8 +111,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[MilestoneOut | Problem]:
     """Create a milestone
 
@@ -133,8 +119,6 @@ def sync_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (MilestoneCreate):
 
     Raises:
@@ -148,8 +132,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -164,8 +146,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> MilestoneOut | Problem | None:
     """Create a milestone
 
@@ -174,8 +154,6 @@ def sync(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (MilestoneCreate):
 
     Raises:
@@ -190,8 +168,6 @@ def sync(
         team_id=team_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -200,8 +176,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[MilestoneOut | Problem]:
     """Create a milestone
 
@@ -210,8 +184,6 @@ async def asyncio_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (MilestoneCreate):
 
     Raises:
@@ -225,8 +197,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -239,8 +209,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> MilestoneOut | Problem | None:
     """Create a milestone
 
@@ -249,8 +217,6 @@ async def asyncio(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (MilestoneCreate):
 
     Raises:
@@ -266,7 +232,5 @@ async def asyncio(
             team_id=team_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

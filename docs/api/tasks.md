@@ -101,7 +101,7 @@ Place a task in a section.
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskSectionOut`
 
-## `tm.tasks.add_subtask(task_id: str, body: BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost | Mapping[str, Any])`
+## `tm.tasks.add_subtask(task_id: str, body: SubtaskLink | Mapping[str, Any])`
 
 Add a subtask link.
 
@@ -119,7 +119,7 @@ Remove a subtask link.
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
 
-## `tm.tasks.add_dependency(task_id: str, body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost | Mapping[str, Any])`
+## `tm.tasks.add_dependency(task_id: str, body: DependencyLink | Mapping[str, Any])`
 
 Add a dependency.
 

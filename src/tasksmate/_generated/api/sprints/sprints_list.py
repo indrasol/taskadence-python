@@ -19,24 +19,17 @@ from typing import cast
 def _get_kwargs(
     team_id: str,
     *,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
 
     params["limit"] = limit
 
@@ -148,12 +141,10 @@ def sync_detailed(
     team_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | SprintListPage]:
     """List a team's sprints
@@ -165,13 +156,11 @@ def sync_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
             list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -184,12 +173,10 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         team_id=team_id,
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -204,12 +191,10 @@ def sync(
     team_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | SprintListPage | None:
     """List a team's sprints
@@ -221,13 +206,11 @@ def sync(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
             list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -241,12 +224,10 @@ def sync(
     return sync_detailed(
         team_id=team_id,
         client=client,
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -255,12 +236,10 @@ async def asyncio_detailed(
     team_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | SprintListPage]:
     """List a team's sprints
@@ -272,13 +251,11 @@ async def asyncio_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
             list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -291,12 +268,10 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         team_id=team_id,
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -309,12 +284,10 @@ async def asyncio(
     team_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | SprintListPage | None:
     """List a team's sprints
@@ -326,13 +299,11 @@ async def asyncio(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
             list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -347,12 +318,10 @@ async def asyncio(
         await asyncio_detailed(
             team_id=team_id,
             client=client,
-            is_registration=is_registration,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,
             sort_order=sort_order,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

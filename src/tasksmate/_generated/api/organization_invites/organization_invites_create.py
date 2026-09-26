@@ -13,30 +13,18 @@ from ... import errors
 from ...models.organization_invite_create import OrganizationInviteCreate
 from ...models.organization_invite_in_db import OrganizationInviteInDB
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: OrganizationInviteCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/organization-invites",
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -121,14 +109,10 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: OrganizationInviteCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Invite someone to an organization
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (OrganizationInviteCreate):
 
     Raises:
@@ -141,8 +125,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -156,14 +138,10 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: OrganizationInviteCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> OrganizationInviteInDB | Problem | None:
     """Invite someone to an organization
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (OrganizationInviteCreate):
 
     Raises:
@@ -177,8 +155,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -186,14 +162,10 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: OrganizationInviteCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[OrganizationInviteInDB | Problem]:
     """Invite someone to an organization
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (OrganizationInviteCreate):
 
     Raises:
@@ -206,8 +178,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -219,14 +189,10 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: OrganizationInviteCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> OrganizationInviteInDB | Problem | None:
     """Invite someone to an organization
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (OrganizationInviteCreate):
 
     Raises:
@@ -241,7 +207,5 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

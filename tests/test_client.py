@@ -105,7 +105,8 @@ def test_an_unknown_filter_key_names_the_allowed_ones(tm: TasksMate) -> None:
 def test_a_model_body_sends_only_what_was_set(tm: TasksMate, api: respx.MockRouter) -> None:
     route = api.patch("/v1/tasks/T1").respond(json=task("T1", status="completed"))
     tm.tasks.update("T1", models.TaskUpdate(status="completed", due_date=None))
-    # null clears; nothing else is sent — not the `priority` / `task_type` defaults the spec declares on TaskUpdate
+    # null clears; nothing else is sent. 4.1b: the spec's TaskUpdate carries no defaults any more (the generator's strip
+    # is gone), so this is the generated model as-is — a regression in the backend fails here and in test_drift.py
     assert json.loads(route.calls.last.request.content) == {"status": "completed", "due_date": None}
 
 
@@ -128,11 +129,14 @@ def test_uploads_are_multipart_with_the_file(tm: TasksMate, api: respx.MockRoute
     assert route.calls.last.request.headers["content-type"].startswith("multipart/form-data")
 
 
-def test_a_field_in_both_query_and_form_is_sent_in_both(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_the_upload_sends_project_id_once_as_the_query(tm: TasksMate, api: respx.MockRouter) -> None:
+    """4.1b: the spec declares `project_id` once (the query the permission check reads); it used to be a form field too,
+    and the facade sent it in both places."""
     route = api.post("/v1/project-resources/upload").respond(201, json=example("project-resources.upload"))
     tm.project_resources.upload(project_id="P1", file=b"x")
     request = route.calls.last.request
-    assert request.url.params["project_id"] == "P1" and b'name="project_id"' in request.content
+    assert request.url.params["project_id"] == "P1" and b'name="project_id"' not in request.content
+    assert b'name="file"' in request.content
 
 
 # ---------------------------------------------------------------------------

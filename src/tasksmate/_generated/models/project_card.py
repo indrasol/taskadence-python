@@ -38,7 +38,8 @@ class ProjectCard:
         project_id (str): Project ID Example: P00001.
         tasks_total (int): Total number of tasks in the project Example: 25.
         tasks_completed (int): Number of completed tasks Example: 15.
-        progress_percent (str): Project completion percentage Example: 60.0.
+        progress_percent (float): Project completion percentage, 0–100 (a JSON number since 4.1b; was a decimal string)
+            Example: 60.0.
         description (None | str | Unset): Project description Example: Redesign the company website..
         metadata (None | ProjectCardMetadataType0 | Unset): Additional metadata Example: {'budget': 10000}.
         status (None | ProjectStatusEnum | Unset): Project status Default: 'not_started'. Example: not_started.
@@ -68,7 +69,7 @@ class ProjectCard:
     project_id: str
     tasks_total: int
     tasks_completed: int
-    progress_percent: str
+    progress_percent: float
     description: None | str | Unset = UNSET
     metadata: None | ProjectCardMetadataType0 | Unset = UNSET
     status: None | ProjectStatusEnum | Unset = "not_started"

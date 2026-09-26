@@ -31,6 +31,7 @@ class TokenCreate:
             `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. `admin`
             implies every scope; `<ns>:write` implies `<ns>:read`.
         kind (TokenCreateKind | Unset): `live` (tm_live_…) or `test` (tm_test_…: authenticates and reads, never writes)
+            Default: 'live'.
         project_ids (list[str] | None | Unset): Restrict the token to these projects (and their tasks; no unfiled task).
             Omit / null = every project the principal can reach.
         expires_at (datetime.datetime | None | Unset): When the token stops working; required when the org's policy says
@@ -42,7 +43,7 @@ class TokenCreate:
     org_id: str
     name: str
     scopes: list[str]
-    kind: TokenCreateKind | Unset = UNSET
+    kind: TokenCreateKind | Unset = "live"
     project_ids: list[str] | None | Unset = UNSET
     expires_at: datetime.datetime | None | Unset = UNSET
     principal_user_id: None | Unset | UUID = UNSET

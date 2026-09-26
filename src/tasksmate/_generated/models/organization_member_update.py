@@ -27,7 +27,7 @@ class OrganizationMemberUpdate:
             `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
         role (None | str | Unset): Role ID (UUID) Example: r1e2f3g4-5678-1234-9abc-def012345678.
         invited_by (None | str | Unset): Inviter's User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
-        is_active (bool | None | Unset): Is the member active? Example: True.
+        is_active (bool | None | Unset): Is the member active? (4.1b: no default — omitted = unchanged) Example: True.
         invited_at (datetime.datetime | None | Unset): When the invite was sent
         accepted_at (datetime.datetime | None | Unset): When the invite was accepted
         updated_by (None | str | Unset): Who updates the member

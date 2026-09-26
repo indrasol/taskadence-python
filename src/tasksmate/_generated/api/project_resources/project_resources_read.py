@@ -20,22 +20,15 @@ def _get_kwargs(
     resource_id: str,
     *,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
 
     params["project_id"] = project_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -130,8 +123,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ProjectResourceInDB]:
     """Read a project resource
@@ -139,8 +130,6 @@ def sync_detailed(
     Args:
         resource_id (str):
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -154,8 +143,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         resource_id=resource_id,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -171,8 +158,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ProjectResourceInDB | None:
     """Read a project resource
@@ -180,8 +165,6 @@ def sync(
     Args:
         resource_id (str):
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -196,8 +179,6 @@ def sync(
         resource_id=resource_id,
         client=client,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -207,8 +188,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ProjectResourceInDB]:
     """Read a project resource
@@ -216,8 +195,6 @@ async def asyncio_detailed(
     Args:
         resource_id (str):
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -231,8 +208,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         resource_id=resource_id,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -246,8 +221,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ProjectResourceInDB | None:
     """Read a project resource
@@ -255,8 +228,6 @@ async def asyncio(
     Args:
         resource_id (str):
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -272,8 +243,6 @@ async def asyncio(
             resource_id=resource_id,
             client=client,
             project_id=project_id,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

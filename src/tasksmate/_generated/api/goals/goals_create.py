@@ -21,29 +21,17 @@ def _get_kwargs(
     project_id: str,
     *,
     body: GoalCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(idempotency_key, Unset):
         headers["Idempotency-Key"] = idempotency_key
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/projects/{project_id}/goals".format(
             project_id=quote(str(project_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -125,16 +113,12 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: GoalCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Response[GoalOut | Problem]:
     """Create a goal in a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (GoalCreate):
 
@@ -149,8 +133,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     )
 
@@ -166,16 +148,12 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: GoalCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> GoalOut | Problem | None:
     """Create a goal in a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (GoalCreate):
 
@@ -191,8 +169,6 @@ def sync(
         project_id=project_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     ).parsed
 
@@ -202,16 +178,12 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: GoalCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Response[GoalOut | Problem]:
     """Create a goal in a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (GoalCreate):
 
@@ -226,8 +198,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     )
 
@@ -241,16 +211,12 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: GoalCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> GoalOut | Problem | None:
     """Create a goal in a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (GoalCreate):
 
@@ -267,8 +233,6 @@ async def asyncio(
             project_id=project_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             idempotency_key=idempotency_key,
         )
     ).parsed

@@ -29,10 +29,12 @@ class OrganizationInviteUpdate:
             `designation` (legacy enum value, name, label or alias); both columns are written Example: DG0001.
         role (None | str | Unset): Role ID (UUID) Example: r1e2f3g4-5678-1234-9abc-def012345678.
         invited_by (None | str | Unset): Inviter's User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
-        invite_status (InviteStatusEnum | None | Unset): Status of the invite Example: pending.
+        invite_status (InviteStatusEnum | None | Unset): Status of the invite (4.1b: no default — omitted = unchanged)
+            Example: pending.
         sent_at (datetime.datetime | None | Unset): When the invite was sent
         expires_at (datetime.datetime | None | Unset): When the invite expires
-        is_cancelled (bool | None | Unset): Is the invite cancelled? Example: False.
+        is_cancelled (bool | None | Unset): Is the invite cancelled? (4.1b: no default — omitted = unchanged) Example:
+            False.
         cancel_date (datetime.datetime | None | Unset): When the invite was cancelled
         updated_by (None | str | Unset): Who updates the invite
     """

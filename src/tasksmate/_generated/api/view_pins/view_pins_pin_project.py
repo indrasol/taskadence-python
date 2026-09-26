@@ -12,7 +12,6 @@ from ... import errors
 
 from ...models.pin_out import PinOut
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -20,18 +19,11 @@ def _get_kwargs(
     project_id: str,
     *,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
 
     params: dict[str, Any] = {}
 
     params["org_id"] = org_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -43,7 +35,6 @@ def _get_kwargs(
         "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -118,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[PinOut | Problem]:
     """Pin a project
 
@@ -128,8 +117,6 @@ def sync_detailed(
     Args:
         project_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -142,8 +129,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -158,8 +143,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> PinOut | Problem | None:
     """Pin a project
 
@@ -168,8 +151,6 @@ def sync(
     Args:
         project_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -183,8 +164,6 @@ def sync(
         project_id=project_id,
         client=client,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -193,8 +172,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[PinOut | Problem]:
     """Pin a project
 
@@ -203,8 +180,6 @@ async def asyncio_detailed(
     Args:
         project_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -217,8 +192,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -231,8 +204,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> PinOut | Problem | None:
     """Pin a project
 
@@ -241,8 +212,6 @@ async def asyncio(
     Args:
         project_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -257,7 +226,5 @@ async def asyncio(
             project_id=project_id,
             client=client,
             org_id=org_id,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

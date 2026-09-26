@@ -13,7 +13,6 @@ from ... import errors
 from ...models.designation_visibility import DesignationVisibility
 from ...models.problem import Problem
 from ...models.visibility_update import VisibilityUpdate
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -22,18 +21,12 @@ def _get_kwargs(
     *,
     body: VisibilityUpdate,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
 
     params: dict[str, Any] = {}
 
     params["org_id"] = org_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -129,16 +122,12 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: VisibilityUpdate,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[DesignationVisibility | Problem]:
     """Hide / pin a designation for an org
 
     Args:
         designation_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (VisibilityUpdate):
 
     Raises:
@@ -153,8 +142,6 @@ def sync_detailed(
         designation_id=designation_id,
         body=body,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -170,16 +157,12 @@ def sync(
     client: AuthenticatedClient,
     body: VisibilityUpdate,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> DesignationVisibility | Problem | None:
     """Hide / pin a designation for an org
 
     Args:
         designation_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (VisibilityUpdate):
 
     Raises:
@@ -195,8 +178,6 @@ def sync(
         client=client,
         body=body,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -206,16 +187,12 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: VisibilityUpdate,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[DesignationVisibility | Problem]:
     """Hide / pin a designation for an org
 
     Args:
         designation_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (VisibilityUpdate):
 
     Raises:
@@ -230,8 +207,6 @@ async def asyncio_detailed(
         designation_id=designation_id,
         body=body,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -245,16 +220,12 @@ async def asyncio(
     client: AuthenticatedClient,
     body: VisibilityUpdate,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> DesignationVisibility | Problem | None:
     """Hide / pin a designation for an org
 
     Args:
         designation_id (str):
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (VisibilityUpdate):
 
     Raises:
@@ -271,7 +242,5 @@ async def asyncio(
             client=client,
             body=body,
             org_id=org_id,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

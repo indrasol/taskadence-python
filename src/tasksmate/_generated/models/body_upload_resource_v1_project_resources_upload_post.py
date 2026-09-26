@@ -12,7 +12,9 @@ from .. import types
 
 from ..types import UNSET, Unset
 
+from ..types import File, FileTypes
 from ..types import UNSET, Unset
+from io import BytesIO
 from typing import cast
 
 
@@ -23,14 +25,12 @@ T = TypeVar("T", bound="BodyUploadResourceV1ProjectResourcesUploadPost")
 class BodyUploadResourceV1ProjectResourcesUploadPost:
     """
     Attributes:
-        project_id (str):
-        file (str):
+        file (File):
         project_name (None | str | Unset):
         title (None | str | Unset):
     """
 
-    project_id: str
-    file: str
+    file: File
     project_name: None | str | Unset = UNSET
     title: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -39,9 +39,7 @@ class BodyUploadResourceV1ProjectResourcesUploadPost:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        project_id = self.project_id
-
-        file = self.file
+        file = self.file.to_tuple()
 
         project_name: None | str | Unset
         if isinstance(self.project_name, Unset):
@@ -59,7 +57,6 @@ class BodyUploadResourceV1ProjectResourcesUploadPost:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "project_id": project_id,
                 "file": file,
             }
         )
@@ -73,9 +70,7 @@ class BodyUploadResourceV1ProjectResourcesUploadPost:
     def to_multipart(self) -> types.RequestFiles:
         files: types.RequestFiles = []
 
-        files.append(("project_id", (None, str(self.project_id).encode(), "text/plain")))
-
-        files.append(("file", (None, str(self.file).encode(), "text/plain")))
+        files.append(("file", self.file.to_tuple()))
 
         if not isinstance(self.project_name, Unset):
             if isinstance(self.project_name, str):
@@ -97,9 +92,7 @@ class BodyUploadResourceV1ProjectResourcesUploadPost:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        project_id = d.pop("project_id")
-
-        file = d.pop("file")
+        file = File(payload=BytesIO(d.pop("file")))
 
         def _parse_project_name(data: object) -> None | str | Unset:
             if data is None:
@@ -120,7 +113,6 @@ class BodyUploadResourceV1ProjectResourcesUploadPost:
         title = _parse_title(d.pop("title", UNSET))
 
         body_upload_resource_v1_project_resources_upload_post = cls(
-            project_id=project_id,
             file=file,
             project_name=project_name,
             title=title,

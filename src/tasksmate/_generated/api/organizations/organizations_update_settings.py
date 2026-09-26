@@ -21,29 +21,17 @@ def _get_kwargs(
     org_id: str,
     *,
     body: OrganizationSettingsUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
         "url": "/v1/organizations/{org_id}/settings".format(
             org_id=quote(str(org_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -129,8 +117,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: OrganizationSettingsUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[OrganizationSettingsOut | Problem]:
     """Update an organization's settings
@@ -139,8 +125,6 @@ def sync_detailed(
 
     Args:
         org_id (str): Organization ID
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (OrganizationSettingsUpdate): `PUT /organizations/{org_id}/settings` body. Every
             field optional; omitted ones keep their value.
@@ -156,8 +140,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -173,8 +155,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: OrganizationSettingsUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> OrganizationSettingsOut | Problem | None:
     """Update an organization's settings
@@ -183,8 +163,6 @@ def sync(
 
     Args:
         org_id (str): Organization ID
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (OrganizationSettingsUpdate): `PUT /organizations/{org_id}/settings` body. Every
             field optional; omitted ones keep their value.
@@ -201,8 +179,6 @@ def sync(
         org_id=org_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -212,8 +188,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: OrganizationSettingsUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[OrganizationSettingsOut | Problem]:
     """Update an organization's settings
@@ -222,8 +196,6 @@ async def asyncio_detailed(
 
     Args:
         org_id (str): Organization ID
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (OrganizationSettingsUpdate): `PUT /organizations/{org_id}/settings` body. Every
             field optional; omitted ones keep their value.
@@ -239,8 +211,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -254,8 +224,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: OrganizationSettingsUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> OrganizationSettingsOut | Problem | None:
     """Update an organization's settings
@@ -264,8 +232,6 @@ async def asyncio(
 
     Args:
         org_id (str): Organization ID
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (OrganizationSettingsUpdate): `PUT /organizations/{org_id}/settings` body. Every
             field optional; omitted ones keep their value.
@@ -283,8 +249,6 @@ async def asyncio(
             org_id=org_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

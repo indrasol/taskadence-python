@@ -12,10 +12,6 @@ from .availability_entry import AvailabilityEntry
 from .availability_member import AvailabilityMember
 from .availability_range import AvailabilityRange
 from .availability_update import AvailabilityUpdate
-from .body_add_dependency_to_task_v1_tasks_task_id_dependencies_post import (
-    BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-)
-from .body_add_subtask_to_task_v1_tasks_task_id_subtasks_post import BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost
 from .body_upload_attachment_v1_task_attachments_post import BodyUploadAttachmentV1TaskAttachmentsPost
 from .body_upload_resource_v1_project_resources_upload_post import BodyUploadResourceV1ProjectResourcesUploadPost
 from .commit_type import CommitType
@@ -26,6 +22,7 @@ from .delivery_detail_request_headers import DeliveryDetailRequestHeaders
 from .delivery_detail_status import DeliveryDetailStatus
 from .delivery_out import DeliveryOut
 from .delivery_out_status import DeliveryOutStatus
+from .dependency_link import DependencyLink
 from .designation import Designation
 from .designation_catalog import DesignationCatalog
 from .designation_create import DesignationCreate
@@ -152,6 +149,7 @@ from .sprint_deleted import SprintDeleted
 from .sprint_list_page import SprintListPage
 from .sprint_out import SprintOut
 from .sprint_update import SprintUpdate
+from .subtask_link import SubtaskLink
 from .task_attachment_in_db import TaskAttachmentInDB
 from .task_attachment_update import TaskAttachmentUpdate
 from .task_card_view import TaskCardView
@@ -218,9 +216,14 @@ from .view_update import ViewUpdate
 from .view_update_display_type_0 import ViewUpdateDisplayType0
 from .view_update_query_type_0 import ViewUpdateQueryType0
 from .visibility_update import VisibilityUpdate
+from .webhook_actor import WebhookActor
 from .webhook_create import WebhookCreate
 from .webhook_created import WebhookCreated
 from .webhook_created_status import WebhookCreatedStatus
+from .webhook_event import WebhookEvent
+from .webhook_event_data import WebhookEventData
+from .webhook_event_data_after_type_0 import WebhookEventDataAfterType0
+from .webhook_event_data_before_type_0 import WebhookEventDataBeforeType0
 from .webhook_event_type import WebhookEventType
 from .webhook_out import WebhookOut
 from .webhook_out_status import WebhookOutStatus
@@ -240,8 +243,6 @@ __all__ = (
     "AvailabilityMember",
     "AvailabilityRange",
     "AvailabilityUpdate",
-    "BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost",
-    "BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost",
     "BodyUploadAttachmentV1TaskAttachmentsPost",
     "BodyUploadResourceV1ProjectResourcesUploadPost",
     "CommitType",
@@ -252,6 +253,7 @@ __all__ = (
     "DeliveryDetailStatus",
     "DeliveryOut",
     "DeliveryOutStatus",
+    "DependencyLink",
     "Designation",
     "DesignationCatalog",
     "DesignationCreate",
@@ -378,6 +380,7 @@ __all__ = (
     "SprintListPage",
     "SprintOut",
     "SprintUpdate",
+    "SubtaskLink",
     "TaskAttachmentInDB",
     "TaskAttachmentUpdate",
     "TaskCardView",
@@ -444,9 +447,14 @@ __all__ = (
     "ViewUpdateDisplayType0",
     "ViewUpdateQueryType0",
     "VisibilityUpdate",
+    "WebhookActor",
     "WebhookCreate",
     "WebhookCreated",
     "WebhookCreatedStatus",
+    "WebhookEvent",
+    "WebhookEventData",
+    "WebhookEventDataAfterType0",
+    "WebhookEventDataBeforeType0",
     "WebhookEventType",
     "WebhookOut",
     "WebhookOutStatus",

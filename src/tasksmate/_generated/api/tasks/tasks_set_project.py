@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.task_in_db import TaskInDB
 from ...models.task_project_set import TaskProjectSet
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,25 +20,14 @@ def _get_kwargs(
     task_id: str,
     *,
     body: TaskProjectSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/tasks/{task_id}/project".format(
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -121,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskProjectSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Move a task to another project (or unfile it)
 
@@ -132,8 +118,6 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
             the task.
 
@@ -148,8 +132,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -164,8 +146,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TaskProjectSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Move a task to another project (or unfile it)
 
@@ -175,8 +155,6 @@ def sync(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
             the task.
 
@@ -192,8 +170,6 @@ def sync(
         task_id=task_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -202,8 +178,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskProjectSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Move a task to another project (or unfile it)
 
@@ -213,8 +187,6 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
             the task.
 
@@ -229,8 +201,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -243,8 +213,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TaskProjectSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Move a task to another project (or unfile it)
 
@@ -254,8 +222,6 @@ async def asyncio(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskProjectSet): `POST /tasks/{task_id}/project` (1.11): `project_id: null` unfiles
             the task.
 
@@ -272,7 +238,5 @@ async def asyncio(
             task_id=task_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

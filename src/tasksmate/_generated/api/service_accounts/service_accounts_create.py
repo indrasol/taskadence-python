@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.service_account_create import ServiceAccountCreate
 from ...models.service_account_out import ServiceAccountOut
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,25 +20,14 @@ def _get_kwargs(
     org_id: str,
     *,
     body: ServiceAccountCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/organizations/{org_id}/service-accounts".format(
             org_id=quote(str(org_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -125,8 +113,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ServiceAccountCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ServiceAccountOut]:
     """Create a service account (owner / admin)
 
@@ -136,8 +122,6 @@ def sync_detailed(
 
     Args:
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ServiceAccountCreate):
 
     Raises:
@@ -151,8 +135,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -167,8 +149,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: ServiceAccountCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ServiceAccountOut | None:
     """Create a service account (owner / admin)
 
@@ -178,8 +158,6 @@ def sync(
 
     Args:
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ServiceAccountCreate):
 
     Raises:
@@ -194,8 +172,6 @@ def sync(
         org_id=org_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -204,8 +180,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ServiceAccountCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ServiceAccountOut]:
     """Create a service account (owner / admin)
 
@@ -215,8 +189,6 @@ async def asyncio_detailed(
 
     Args:
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ServiceAccountCreate):
 
     Raises:
@@ -230,8 +202,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -244,8 +214,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ServiceAccountCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ServiceAccountOut | None:
     """Create a service account (owner / admin)
 
@@ -255,8 +223,6 @@ async def asyncio(
 
     Args:
         org_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ServiceAccountCreate):
 
     Raises:
@@ -272,7 +238,5 @@ async def asyncio(
             org_id=org_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

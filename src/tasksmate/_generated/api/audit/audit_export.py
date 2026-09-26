@@ -27,14 +27,9 @@ def _get_kwargs(
     from_: datetime.datetime | None | Unset = UNSET,
     to: datetime.datetime | None | Unset = UNSET,
     limit: int | Unset = 50,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -96,8 +91,6 @@ def _get_kwargs(
     params["to"] = json_to
 
     params["limit"] = limit
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -192,8 +185,6 @@ def sync_detailed(
     from_: datetime.datetime | None | Unset = UNSET,
     to: datetime.datetime | None | Unset = UNSET,
     limit: int | Unset = 50,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | str]:
     """Export the audit log as CSV (owner / admin)
@@ -213,8 +204,6 @@ def sync_detailed(
         from_ (datetime.datetime | None | Unset): ISO 8601; inclusive
         to (datetime.datetime | None | Unset): ISO 8601; inclusive
         limit (int | Unset):  Default: 50.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -235,8 +224,6 @@ def sync_detailed(
         from_=from_,
         to=to,
         limit=limit,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -259,8 +246,6 @@ def sync(
     from_: datetime.datetime | None | Unset = UNSET,
     to: datetime.datetime | None | Unset = UNSET,
     limit: int | Unset = 50,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | str | None:
     """Export the audit log as CSV (owner / admin)
@@ -280,8 +265,6 @@ def sync(
         from_ (datetime.datetime | None | Unset): ISO 8601; inclusive
         to (datetime.datetime | None | Unset): ISO 8601; inclusive
         limit (int | Unset):  Default: 50.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -303,8 +286,6 @@ def sync(
         from_=from_,
         to=to,
         limit=limit,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -321,8 +302,6 @@ async def asyncio_detailed(
     from_: datetime.datetime | None | Unset = UNSET,
     to: datetime.datetime | None | Unset = UNSET,
     limit: int | Unset = 50,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | str]:
     """Export the audit log as CSV (owner / admin)
@@ -342,8 +321,6 @@ async def asyncio_detailed(
         from_ (datetime.datetime | None | Unset): ISO 8601; inclusive
         to (datetime.datetime | None | Unset): ISO 8601; inclusive
         limit (int | Unset):  Default: 50.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -364,8 +341,6 @@ async def asyncio_detailed(
         from_=from_,
         to=to,
         limit=limit,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -386,8 +361,6 @@ async def asyncio(
     from_: datetime.datetime | None | Unset = UNSET,
     to: datetime.datetime | None | Unset = UNSET,
     limit: int | Unset = 50,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | str | None:
     """Export the audit log as CSV (owner / admin)
@@ -407,8 +380,6 @@ async def asyncio(
         from_ (datetime.datetime | None | Unset): ISO 8601; inclusive
         to (datetime.datetime | None | Unset): ISO 8601; inclusive
         limit (int | Unset):  Default: 50.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -431,8 +402,6 @@ async def asyncio(
             from_=from_,
             to=to,
             limit=limit,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

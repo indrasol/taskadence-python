@@ -21,14 +21,9 @@ def _get_kwargs(
     *,
     detach: bool | Unset = False,
     reason: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
 
@@ -42,8 +37,6 @@ def _get_kwargs(
     else:
         json_reason = reason
     params["reason"] = json_reason
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -133,8 +126,6 @@ def sync_detailed(
     client: AuthenticatedClient,
     detach: bool | Unset = False,
     reason: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TeamDeleted]:
     """Delete a team
@@ -148,8 +139,6 @@ def sync_detailed(
             the team first; without it the delete is refused (409) while anything still points at the
             team. Default: False.
         reason (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -164,8 +153,6 @@ def sync_detailed(
         team_id=team_id,
         detach=detach,
         reason=reason,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -182,8 +169,6 @@ def sync(
     client: AuthenticatedClient,
     detach: bool | Unset = False,
     reason: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TeamDeleted | None:
     """Delete a team
@@ -197,8 +182,6 @@ def sync(
             the team first; without it the delete is refused (409) while anything still points at the
             team. Default: False.
         reason (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -214,8 +197,6 @@ def sync(
         client=client,
         detach=detach,
         reason=reason,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -226,8 +207,6 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     detach: bool | Unset = False,
     reason: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TeamDeleted]:
     """Delete a team
@@ -241,8 +220,6 @@ async def asyncio_detailed(
             the team first; without it the delete is refused (409) while anything still points at the
             team. Default: False.
         reason (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -257,8 +234,6 @@ async def asyncio_detailed(
         team_id=team_id,
         detach=detach,
         reason=reason,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -273,8 +248,6 @@ async def asyncio(
     client: AuthenticatedClient,
     detach: bool | Unset = False,
     reason: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TeamDeleted | None:
     """Delete a team
@@ -288,8 +261,6 @@ async def asyncio(
             the team first; without it the delete is refused (409) while anything still points at the
             team. Default: False.
         reason (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -306,8 +277,6 @@ async def asyncio(
             client=client,
             detach=detach,
             reason=reason,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

@@ -12,35 +12,20 @@ from ... import errors
 
 from ...models.acknowledgement import Acknowledgement
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     section_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
         "url": "/v1/sections/{section_id}".format(
             section_id=quote(str(section_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -118,8 +103,6 @@ def sync_detailed(
     section_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete a section
 
@@ -128,8 +111,6 @@ def sync_detailed(
 
     Args:
         section_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -141,8 +122,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         section_id=section_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -156,8 +135,6 @@ def sync(
     section_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete a section
 
@@ -166,8 +143,6 @@ def sync(
 
     Args:
         section_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -180,8 +155,6 @@ def sync(
     return sync_detailed(
         section_id=section_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -189,8 +162,6 @@ async def asyncio_detailed(
     section_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete a section
 
@@ -199,8 +170,6 @@ async def asyncio_detailed(
 
     Args:
         section_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -212,8 +181,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         section_id=section_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -225,8 +192,6 @@ async def asyncio(
     section_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete a section
 
@@ -235,8 +200,6 @@ async def asyncio(
 
     Args:
         section_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -250,7 +213,5 @@ async def asyncio(
         await asyncio_detailed(
             section_id=section_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

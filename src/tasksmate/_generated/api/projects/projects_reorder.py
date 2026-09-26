@@ -13,30 +13,18 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.project_order import ProjectOrder
 from ...models.projects_reordered import ProjectsReordered
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: ProjectOrder,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/projects/reorder",
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -121,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ProjectOrder,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectsReordered]:
     """Reorder the organization's projects (owner / admin)
 
@@ -130,8 +116,6 @@ def sync_detailed(
     slots.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
@@ -147,8 +131,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -162,8 +144,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: ProjectOrder,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectsReordered | None:
     """Reorder the organization's projects (owner / admin)
 
@@ -171,8 +151,6 @@ def sync(
     slots.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
@@ -189,8 +167,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -198,8 +174,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ProjectOrder,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectsReordered]:
     """Reorder the organization's projects (owner / admin)
 
@@ -207,8 +181,6 @@ async def asyncio_detailed(
     slots.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
@@ -224,8 +196,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -237,8 +207,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ProjectOrder,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectsReordered | None:
     """Reorder the organization's projects (owner / admin)
 
@@ -246,8 +214,6 @@ async def asyncio(
     slots.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
@@ -265,7 +231,5 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

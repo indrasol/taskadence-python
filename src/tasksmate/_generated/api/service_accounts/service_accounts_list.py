@@ -23,14 +23,9 @@ def _get_kwargs(
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -53,8 +48,6 @@ def _get_kwargs(
     params["sort_by"] = json_sort_by
 
     params["sort_order"] = sort_order
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -152,8 +145,6 @@ def sync_detailed(
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | PageServiceAccountOut | Problem]:
     """List an organization's service accounts (owner / admin)
@@ -168,8 +159,6 @@ def sync_detailed(
         sort_by (None | str | Unset): One of: name, username, created_at. Default: the list's
             natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -186,8 +175,6 @@ def sync_detailed(
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -206,8 +193,6 @@ def sync(
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | PageServiceAccountOut | Problem | None:
     """List an organization's service accounts (owner / admin)
@@ -222,8 +207,6 @@ def sync(
         sort_by (None | str | Unset): One of: name, username, created_at. Default: the list's
             natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -241,8 +224,6 @@ def sync(
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -255,8 +236,6 @@ async def asyncio_detailed(
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | PageServiceAccountOut | Problem]:
     """List an organization's service accounts (owner / admin)
@@ -271,8 +250,6 @@ async def asyncio_detailed(
         sort_by (None | str | Unset): One of: name, username, created_at. Default: the list's
             natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -289,8 +266,6 @@ async def asyncio_detailed(
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -307,8 +282,6 @@ async def asyncio(
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | PageServiceAccountOut | Problem | None:
     """List an organization's service accounts (owner / admin)
@@ -323,8 +296,6 @@ async def asyncio(
         sort_by (None | str | Unset): One of: name, username, created_at. Default: the list's
             natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -343,8 +314,6 @@ async def asyncio(
             cursor=cursor,
             sort_by=sort_by,
             sort_order=sort_order,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

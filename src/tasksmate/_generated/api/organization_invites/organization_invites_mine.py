@@ -18,24 +18,17 @@ from typing import cast
 
 def _get_kwargs(
     *,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
 
     params["limit"] = limit
 
@@ -144,24 +137,20 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
             invite_status. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -173,12 +162,10 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -192,24 +179,20 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
             invite_status. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -222,12 +205,10 @@ def sync(
 
     return sync_detailed(
         client=client,
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -235,24 +216,20 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
             invite_status. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -264,12 +241,10 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        is_registration=is_registration,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -281,24 +256,20 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
             invite_status. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -312,12 +283,10 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
-            is_registration=is_registration,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,
             sort_order=sort_order,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

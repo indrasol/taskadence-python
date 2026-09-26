@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.sprint_out import SprintOut
 from ...models.sprint_update import SprintUpdate
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -22,18 +21,8 @@ def _get_kwargs(
     sprint_id: str,
     *,
     body: SprintUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
@@ -41,7 +30,6 @@ def _get_kwargs(
             team_id=quote(str(team_id), safe=""),
             sprint_id=quote(str(sprint_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -124,8 +112,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | SprintOut]:
     """Update a sprint
 
@@ -136,8 +122,6 @@ def sync_detailed(
     Args:
         team_id (str):
         sprint_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
 
     Raises:
@@ -152,8 +136,6 @@ def sync_detailed(
         team_id=team_id,
         sprint_id=sprint_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -169,8 +151,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | SprintOut | None:
     """Update a sprint
 
@@ -181,8 +161,6 @@ def sync(
     Args:
         team_id (str):
         sprint_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
 
     Raises:
@@ -198,8 +176,6 @@ def sync(
         sprint_id=sprint_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -209,8 +185,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | SprintOut]:
     """Update a sprint
 
@@ -221,8 +195,6 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         sprint_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
 
     Raises:
@@ -237,8 +209,6 @@ async def asyncio_detailed(
         team_id=team_id,
         sprint_id=sprint_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -252,8 +222,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | SprintOut | None:
     """Update a sprint
 
@@ -264,8 +232,6 @@ async def asyncio(
     Args:
         team_id (str):
         sprint_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
 
     Raises:
@@ -282,7 +248,5 @@ async def asyncio(
             sprint_id=sprint_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

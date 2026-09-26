@@ -10,38 +10,24 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.body_add_dependency_to_task_v1_tasks_task_id_dependencies_post import (
-    BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-)
+from ...models.dependency_link import DependencyLink
 from ...models.problem import Problem
 from ...models.task_in_db import TaskInDB
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     task_id: str,
     *,
-    body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
+    body: DependencyLink,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/tasks/{task_id}/dependencies".format(
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -122,9 +108,7 @@ def sync_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
+    body: DependencyLink,
 ) -> Response[Problem | TaskInDB]:
     """Add a dependency
 
@@ -132,9 +116,8 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
-        body (BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost):
+        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
+            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -147,8 +130,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -162,9 +143,7 @@ def sync(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
+    body: DependencyLink,
 ) -> Problem | TaskInDB | None:
     """Add a dependency
 
@@ -172,9 +151,8 @@ def sync(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
-        body (BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost):
+        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
+            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -188,8 +166,6 @@ def sync(
         task_id=task_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -197,9 +173,7 @@ async def asyncio_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
+    body: DependencyLink,
 ) -> Response[Problem | TaskInDB]:
     """Add a dependency
 
@@ -207,9 +181,8 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
-        body (BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost):
+        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
+            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -222,8 +195,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -235,9 +206,7 @@ async def asyncio(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    body: BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
+    body: DependencyLink,
 ) -> Problem | TaskInDB | None:
     """Add a dependency
 
@@ -245,9 +214,8 @@ async def asyncio(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
-        body (BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost):
+        body (DependencyLink): `POST /tasks/{task_id}/dependencies` (4.1b: named — it was
+            FastAPI's `Body_add_dependency_to_task_…`; same wire shape).
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -262,7 +230,5 @@ async def asyncio(
             task_id=task_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

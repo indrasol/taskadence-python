@@ -27,7 +27,7 @@ class ProjectResourceCreate:
         resource_url (None | str | Unset): Resource URL Example: https://example.com/api-docs.pdf.
         resource_type (None | str | Unset): Type of resource Example: pdf.
         storage_path (None | str | Unset): Original File Storage Path
-        is_active (bool | None | Unset): Is the resource active? Example: True.
+        is_active (bool | None | Unset): Is the resource active? Default: True. Example: True.
         created_by (None | str | Unset): Who created the resource
         updated_by (None | str | Unset): Who last updated the resource
         delete_reason (None | str | Unset): Reason for deletion
@@ -39,7 +39,7 @@ class ProjectResourceCreate:
     resource_url: None | str | Unset = UNSET
     resource_type: None | str | Unset = UNSET
     storage_path: None | str | Unset = UNSET
-    is_active: bool | None | Unset = UNSET
+    is_active: bool | None | Unset = True
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     delete_reason: None | str | Unset = UNSET

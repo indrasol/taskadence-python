@@ -12,26 +12,13 @@ from ... import errors
 
 from ...models.problem import Problem
 from ...models.task_in_db import TaskInDB
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     task_id: str,
     subtask_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
@@ -39,10 +26,8 @@ def _get_kwargs(
             task_id=quote(str(task_id), safe=""),
             subtask_id=quote(str(subtask_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -117,8 +102,6 @@ def sync_detailed(
     subtask_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Remove a subtask link
 
@@ -127,8 +110,6 @@ def sync_detailed(
     Args:
         task_id (str):
         subtask_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -141,8 +122,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         subtask_id=subtask_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -157,8 +136,6 @@ def sync(
     subtask_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Remove a subtask link
 
@@ -167,8 +144,6 @@ def sync(
     Args:
         task_id (str):
         subtask_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -182,8 +157,6 @@ def sync(
         task_id=task_id,
         subtask_id=subtask_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -192,8 +165,6 @@ async def asyncio_detailed(
     subtask_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Remove a subtask link
 
@@ -202,8 +173,6 @@ async def asyncio_detailed(
     Args:
         task_id (str):
         subtask_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -216,8 +185,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         subtask_id=subtask_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -230,8 +197,6 @@ async def asyncio(
     subtask_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Remove a subtask link
 
@@ -240,8 +205,6 @@ async def asyncio(
     Args:
         task_id (str):
         subtask_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -256,7 +219,5 @@ async def asyncio(
             task_id=task_id,
             subtask_id=subtask_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

@@ -45,13 +45,13 @@ class TaskUpdate:
             title (None | str | Unset): Task title. Omit to leave it; an explicit blank is refused (422). Example: Implement
                 Login.
             description (None | str | Unset): Task description Example: Implement OAuth2 login flow..
-            status (None | TaskStatusEnum | Unset): Task status Example: not_started.
+            status (None | TaskStatusEnum | Unset): Task status Example: in_progress.
             assignee (None | str | Unset): Assignee user name
             start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
             due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
             priority (None | PriorityEnum | Unset): Task priority Example: high.
-            task_type (None | TaskTypeEnum | Unset): Kind of row (3.3): task (default) · bug · agent. A label, not a
-                permission. 6.12: `goal` is retired — a goal is a project container (`goal_id`), not a task type. Example: task.
+            task_type (None | TaskTypeEnum | Unset): Kind of row (3.3): task · bug · agent. A label, not a permission. 6.12:
+                `goal` is retired. Example: task.
             tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
             type_data (None | TaskUpdateTypeDataType0 | Unset): Per-type extras (3.4). Bug keys: bug_status, bug_kind,
                 environment, steps_to_reproduce, expected_result, actual_result, recommendation (writable); legacy_bug_id,
@@ -67,9 +67,8 @@ class TaskUpdate:
             tracker_id (None | str | Unset): On create (3.13): the sprint to file a bug under (`test_trackers.tracker_id`);
                 refused (422) for a non-bug or a sprint of another project. Re-file through PUT /tasks/{id}/test-run. Example:
                 TR1234.
-            restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership). The
-                API contract stays usernames in and out; since 2.2b the server also keeps `restricted_to_user_ids` (response
-                only).
+            restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
+                Setting it needs `restrict` on the task.
             team_id (None | str | Unset): Team the task is filed under (2.6a). Unfiled + team = that team's Intake. null =
                 none.
             sprint_id (None | str | Unset): Team sprint this task is filed into (6.3, `team_sprints.sprint_id`). One per

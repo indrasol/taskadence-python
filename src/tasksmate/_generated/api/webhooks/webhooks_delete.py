@@ -19,29 +19,17 @@ from typing import cast
 def _get_kwargs(
     subscription_id: str,
     *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
         "url": "/v1/webhooks/{subscription_id}".format(
             subscription_id=quote(str(subscription_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["headers"] = headers
@@ -120,8 +108,6 @@ def sync_detailed(
     subscription_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | WebhookOut]:
     """Delete a webhook
@@ -130,8 +116,6 @@ def sync_detailed(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -144,8 +128,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -160,8 +142,6 @@ def sync(
     subscription_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | WebhookOut | None:
     """Delete a webhook
@@ -170,8 +150,6 @@ def sync(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -185,8 +163,6 @@ def sync(
     return sync_detailed(
         subscription_id=subscription_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -195,8 +171,6 @@ async def asyncio_detailed(
     subscription_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | WebhookOut]:
     """Delete a webhook
@@ -205,8 +179,6 @@ async def asyncio_detailed(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -219,8 +191,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -233,8 +203,6 @@ async def asyncio(
     subscription_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | WebhookOut | None:
     """Delete a webhook
@@ -243,8 +211,6 @@ async def asyncio(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -259,8 +225,6 @@ async def asyncio(
         await asyncio_detailed(
             subscription_id=subscription_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

@@ -11,30 +11,32 @@ from attrs import field as _attrs_field
 from ..types import UNSET, Unset
 
 
-T = TypeVar("T", bound="BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost")
+T = TypeVar("T", bound="DependencyLink")
 
 
 @_attrs_define
-class BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost:
-    """
-    Attributes:
-        subtask_id (str):
+class DependencyLink:
+    """`POST /tasks/{task_id}/dependencies` (4.1b: named — it was FastAPI's `Body_add_dependency_to_task_…`; same wire
+    shape).
+
+        Attributes:
+            dependency_id (str): The task this one depends on (you need `read` on it) Example: T654321.
     """
 
-    subtask_id: str
+    dependency_id: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        subtask_id = self.subtask_id
+        dependency_id = self.dependency_id
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "subtask_id": subtask_id,
+                "dependency_id": dependency_id,
             }
         )
 
@@ -43,14 +45,14 @@ class BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        subtask_id = d.pop("subtask_id")
+        dependency_id = d.pop("dependency_id")
 
-        body_add_subtask_to_task_v1_tasks_task_id_subtasks_post = cls(
-            subtask_id=subtask_id,
+        dependency_link = cls(
+            dependency_id=dependency_id,
         )
 
-        body_add_subtask_to_task_v1_tasks_task_id_subtasks_post.additional_properties = d
-        return body_add_subtask_to_task_v1_tasks_task_id_subtasks_post
+        dependency_link.additional_properties = d
+        return dependency_link
 
     @property
     def additional_keys(self) -> list[str]:

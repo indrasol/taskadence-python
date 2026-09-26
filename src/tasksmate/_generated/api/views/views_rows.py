@@ -22,14 +22,9 @@ def _get_kwargs(
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -45,8 +40,6 @@ def _get_kwargs(
     params["cursor"] = json_cursor
 
     params["include_inaccessible"] = include_inaccessible
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -143,8 +136,6 @@ def sync_detailed(
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """The tasks a saved view shows (task-list envelope)
@@ -162,8 +153,6 @@ def sync_detailed(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             list's flag). Default: False.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -179,8 +168,6 @@ def sync_detailed(
         limit=limit,
         cursor=cursor,
         include_inaccessible=include_inaccessible,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -198,8 +185,6 @@ def sync(
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """The tasks a saved view shows (task-list envelope)
@@ -217,8 +202,6 @@ def sync(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             list's flag). Default: False.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -235,8 +218,6 @@ def sync(
         limit=limit,
         cursor=cursor,
         include_inaccessible=include_inaccessible,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -248,8 +229,6 @@ async def asyncio_detailed(
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """The tasks a saved view shows (task-list envelope)
@@ -267,8 +246,6 @@ async def asyncio_detailed(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             list's flag). Default: False.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -284,8 +261,6 @@ async def asyncio_detailed(
         limit=limit,
         cursor=cursor,
         include_inaccessible=include_inaccessible,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -301,8 +276,6 @@ async def asyncio(
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """The tasks a saved view shows (task-list envelope)
@@ -320,8 +293,6 @@ async def asyncio(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             list's flag). Default: False.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -339,8 +310,6 @@ async def asyncio(
             limit=limit,
             cursor=cursor,
             include_inaccessible=include_inaccessible,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

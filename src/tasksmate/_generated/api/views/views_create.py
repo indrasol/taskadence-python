@@ -13,30 +13,18 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.view_create import ViewCreate
 from ...models.view_out import ViewOut
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: ViewCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/views",
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -117,8 +105,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ViewCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ViewOut]:
     """Save a view
 
@@ -128,8 +114,6 @@ def sync_detailed(
     a duplicate name within the scope.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ViewCreate):
 
     Raises:
@@ -142,8 +126,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -157,8 +139,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: ViewCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ViewOut | None:
     """Save a view
 
@@ -168,8 +148,6 @@ def sync(
     a duplicate name within the scope.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ViewCreate):
 
     Raises:
@@ -183,8 +161,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -192,8 +168,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ViewCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ViewOut]:
     """Save a view
 
@@ -203,8 +177,6 @@ async def asyncio_detailed(
     a duplicate name within the scope.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ViewCreate):
 
     Raises:
@@ -217,8 +189,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -230,8 +200,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ViewCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ViewOut | None:
     """Save a view
 
@@ -241,8 +209,6 @@ async def asyncio(
     a duplicate name within the scope.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ViewCreate):
 
     Raises:
@@ -257,7 +223,5 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

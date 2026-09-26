@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import builtins
 import datetime as dt
+import json
 from typing import Any
 
 import httpx
@@ -78,13 +79,39 @@ def test_a_malformed_secret_is_named_without_echoing_it() -> None:
 
 
 def test_parse_gives_a_typed_event() -> None:
+    """4.1b: the event is the spec's `WebhookEvent`, generated (the hand-written pydantic model is gone)."""
+    from tasksmate._generated.models import WebhookEvent
+
     event = webhooks.parse(BODY)
-    assert (event.id, event.type, event.org_id, event.project_id) == ("WD000042", "task.updated", "O0020", "P96441")
+    assert isinstance(event, WebhookEvent) and webhooks.WebhookEvent is WebhookEvent
+    assert (event.id, event.type_, event.org_id, event.project_id) == ("WD000042", "task.updated", "O0020", "P96441")
     assert event.created_at == dt.datetime(2026, 9, 26, 1, 59, 5, tzinfo=dt.timezone.utc)
-    assert event.actor is not None and event.actor.username == "rithin"
-    assert event.data.resource_id == "T869658" and event.data.after == {"status": "in_progress"}
-    later = webhooks.parse({**webhooks.parse(BODY).model_dump(mode="json"), "new_field": 1})
-    assert later.model_extra == {"new_field": 1}  # forward compatible
+    assert event.actor.username == "rithin"
+    assert event.data.resource_id == "T869658"
+    assert event.data.after is not None and event.data.after.to_dict() == {"status": "in_progress"}
+    later = webhooks.parse({**webhooks.parse(BODY).to_dict(), "new_field": 1})
+    assert later.additional_properties == {"new_field": 1}  # forward compatible
+
+
+@pytest.mark.parametrize(
+    ("stamp", "want"),
+    [
+        ("2026-09-26T01:59:05Z", dt.datetime(2026, 9, 26, 1, 59, 5, tzinfo=dt.timezone.utc)),
+        ("2026-09-26T01:59:13.8361+00:00", dt.datetime(2026, 9, 26, 1, 59, 13, 836100, tzinfo=dt.timezone.utc)),
+        ("2026-09-26T01:59:13.836+00:00", dt.datetime(2026, 9, 26, 1, 59, 13, 836000, tzinfo=dt.timezone.utc)),
+        ("2026-09-26T01:59:13.1234567Z", dt.datetime(2026, 9, 26, 1, 59, 13, 123456, tzinfo=dt.timezone.utc)),
+    ],
+)
+def test_parse_reads_the_timestamps_postgres_writes_on_every_python(stamp: str, want: dt.datetime) -> None:
+    """`fromisoformat` on 3.10 refuses `Z` and 4-5 digit fractions (Postgres trims trailing zeros)."""
+    body = json.loads(BODY)
+    assert webhooks.parse({**body, "created_at": stamp}).created_at == want
+
+
+@pytest.mark.parametrize("body", [b"[]", b"not json", b'{"id": "WD1"}', {"id": "WD1", "type": "x"}])
+def test_parse_refuses_what_is_not_an_event(body: Any) -> None:
+    with pytest.raises(webhooks.WebhookParseError):
+        webhooks.parse(body)
 
 
 # ---------------------------------------------------------------------------

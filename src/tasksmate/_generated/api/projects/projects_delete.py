@@ -19,29 +19,17 @@ from typing import cast
 def _get_kwargs(
     project_id: str,
     *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
         "url": "/v1/projects/{project_id}".format(
             project_id=quote(str(project_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["headers"] = headers
@@ -122,16 +110,12 @@ def sync_detailed(
     project_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete (archive) a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -144,8 +128,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -160,16 +142,12 @@ def sync(
     project_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete (archive) a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -183,8 +161,6 @@ def sync(
     return sync_detailed(
         project_id=project_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -193,16 +169,12 @@ async def asyncio_detailed(
     project_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete (archive) a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -215,8 +187,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -229,16 +199,12 @@ async def asyncio(
     project_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete (archive) a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -253,8 +219,6 @@ async def asyncio(
         await asyncio_detailed(
             project_id=project_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

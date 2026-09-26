@@ -168,7 +168,7 @@ from tasksmate import webhooks
 def receive(headers, raw_body: bytes):
     if not webhooks.verify(SECRET, headers, raw_body):     # the RAW body, not re-serialized JSON
         return 400
-    event = webhooks.parse(raw_body)                         # WebhookEvent: .id .type .org_id .data.resource_id …
+    event = webhooks.parse(raw_body)                         # WebhookEvent: .id .type_ .org_id .data.resource_id …
     ...                                                      # dedupe on event.id — delivery is at-least-once
     return 200
 ```

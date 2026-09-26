@@ -7,11 +7,11 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `71a97a4` — "fix(webhooks): KEK env is WEBHOOK_SECRET_KEK_TM; docs(api): 4.4 workflow + 4.5 spec typing" (task 4.5 A0) |
-| Served by | `uvicorn app.main:app` on `http://localhost:8000` (`ENV=dev`, supabase-dev), 2026-09-25 |
+| Backend commit | `6b75d01` — "fix(api): 4.1b B-D - spec hygiene (auth params, examples, uploads, named bodies, update defaults), webhooks in the spec" (task 4.1b; on `ef0e127`, 4.1b A) |
+| Served by | `uvicorn app.main:app` on `http://localhost:8000` (`ENV=dev`, supabase-dev), 2026-09-26 |
 | `info.version` | `2026-09-25` |
-| Size | 94 paths · 152 operations · 177 component schemas |
-| SHA-256 | `1acfedc840539456deb8f3e6467f426651e6f562d0e45e0cea3b0a61490ef9a4` |
+| Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) |
+| SHA-256 | `41a61eb3587f40474d4b568472c46a9565cc4fa4f0d96e7c5a416c46e214a496` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it (here: the deployed dev API first, then `http://localhost:8000`). The first one is the SDK's default base URL

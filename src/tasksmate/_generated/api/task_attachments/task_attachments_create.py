@@ -13,30 +13,18 @@ from ... import errors
 from ...models.body_upload_attachment_v1_task_attachments_post import BodyUploadAttachmentV1TaskAttachmentsPost
 from ...models.problem import Problem
 from ...models.task_attachment_in_db import TaskAttachmentInDB
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: BodyUploadAttachmentV1TaskAttachmentsPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/task-attachments",
-        "params": params,
     }
 
     _kwargs["files"] = body.to_multipart()
@@ -121,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyUploadAttachmentV1TaskAttachmentsPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskAttachmentInDB]:
     """Upload an attachment to a task (multipart)
 
@@ -130,8 +116,6 @@ def sync_detailed(
     Enforces per-task limit.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (BodyUploadAttachmentV1TaskAttachmentsPost):
 
     Raises:
@@ -144,8 +128,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -159,8 +141,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: BodyUploadAttachmentV1TaskAttachmentsPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskAttachmentInDB | None:
     """Upload an attachment to a task (multipart)
 
@@ -168,8 +148,6 @@ def sync(
     Enforces per-task limit.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (BodyUploadAttachmentV1TaskAttachmentsPost):
 
     Raises:
@@ -183,8 +161,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -192,8 +168,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyUploadAttachmentV1TaskAttachmentsPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskAttachmentInDB]:
     """Upload an attachment to a task (multipart)
 
@@ -201,8 +175,6 @@ async def asyncio_detailed(
     Enforces per-task limit.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (BodyUploadAttachmentV1TaskAttachmentsPost):
 
     Raises:
@@ -215,8 +187,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -228,8 +198,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: BodyUploadAttachmentV1TaskAttachmentsPost,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskAttachmentInDB | None:
     """Upload an attachment to a task (multipart)
 
@@ -237,8 +205,6 @@ async def asyncio(
     Enforces per-task limit.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (BodyUploadAttachmentV1TaskAttachmentsPost):
 
     Raises:
@@ -253,7 +219,5 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

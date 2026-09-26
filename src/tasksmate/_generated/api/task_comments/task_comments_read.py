@@ -20,14 +20,9 @@ def _get_kwargs(
     comment_id: str,
     *,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -39,8 +34,6 @@ def _get_kwargs(
     else:
         json_project_id = project_id
     params["project_id"] = json_project_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -135,8 +128,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskCommentInDB]:
     """Read a comment
@@ -144,8 +135,6 @@ def sync_detailed(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -159,8 +148,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         comment_id=comment_id,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -176,8 +163,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskCommentInDB | None:
     """Read a comment
@@ -185,8 +170,6 @@ def sync(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -201,8 +184,6 @@ def sync(
         comment_id=comment_id,
         client=client,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -212,8 +193,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskCommentInDB]:
     """Read a comment
@@ -221,8 +200,6 @@ async def asyncio_detailed(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -236,8 +213,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         comment_id=comment_id,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -251,8 +226,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskCommentInDB | None:
     """Read a comment
@@ -260,8 +233,6 @@ async def asyncio(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -277,8 +248,6 @@ async def asyncio(
             comment_id=comment_id,
             client=client,
             project_id=project_id,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

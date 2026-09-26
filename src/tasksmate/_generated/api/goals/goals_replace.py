@@ -13,7 +13,6 @@ from ... import errors
 from ...models.goal_out import GoalOut
 from ...models.goal_update import GoalUpdate
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -22,18 +21,8 @@ def _get_kwargs(
     goal_id: str,
     *,
     body: GoalUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
@@ -41,7 +30,6 @@ def _get_kwargs(
             project_id=quote(str(project_id), safe=""),
             goal_id=quote(str(goal_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -124,8 +112,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: GoalUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[GoalOut | Problem]:
     """Update a goal (PUT; partial)
 
@@ -136,8 +122,6 @@ def sync_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
@@ -155,8 +139,6 @@ def sync_detailed(
         project_id=project_id,
         goal_id=goal_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -172,8 +154,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: GoalUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> GoalOut | Problem | None:
     """Update a goal (PUT; partial)
 
@@ -184,8 +164,6 @@ def sync(
     Args:
         project_id (str):
         goal_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
@@ -204,8 +182,6 @@ def sync(
         goal_id=goal_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -215,8 +191,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: GoalUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[GoalOut | Problem]:
     """Update a goal (PUT; partial)
 
@@ -227,8 +201,6 @@ async def asyncio_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
@@ -246,8 +218,6 @@ async def asyncio_detailed(
         project_id=project_id,
         goal_id=goal_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -261,8 +231,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: GoalUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> GoalOut | Problem | None:
     """Update a goal (PUT; partial)
 
@@ -273,8 +241,6 @@ async def asyncio(
     Args:
         project_id (str):
         goal_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
@@ -294,7 +260,5 @@ async def asyncio(
             goal_id=goal_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

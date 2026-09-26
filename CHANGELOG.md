@@ -14,3 +14,12 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - `tasksmate.webhooks.verify` / `parse` (Standard Webhooks signatures, rotation aware).
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
+
+### Changed (4.1b — spec from backend `6b75d01`)
+- `webhooks.parse` returns the **generated** `WebhookEvent` (the spec now describes the webhook body and has a `webhooks`
+  map); the event type is `event.type_`, extra fields land in `additional_properties`, and a body that is not an event
+  raises `webhooks.WebhookParseError`. `pydantic` is no longer a dependency.
+- `tasks.add_subtask` / `tasks.add_dependency` take the named `SubtaskLink` / `DependencyLink` bodies.
+- `project_resources.upload` sends `project_id` once (the query); the API no longer declares it as a form field.
+- The generator no longer strips update-body defaults (the API stopped advertising them) and reads list / create from
+  the spec's `x-kind`; it refuses a spec that regresses on either.

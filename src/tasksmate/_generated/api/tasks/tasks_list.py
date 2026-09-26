@@ -44,14 +44,9 @@ def _get_kwargs(
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
     offset: int | Unset = 0,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -235,8 +230,6 @@ def _get_kwargs(
 
     params["offset"] = offset
 
-    params["is_registration"] = is_registration
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
@@ -352,8 +345,6 @@ def sync_detailed(
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
     offset: int | Unset = 0,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """List / search tasks (the filter grammar; `filter[search]` is search)
@@ -459,8 +450,6 @@ def sync_detailed(
             when project_id is given).
         offset (int | Unset): Deprecated; use `cursor`. Ignored when a cursor is given. Default:
             0.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -498,8 +487,6 @@ def sync_detailed(
         status=status,
         unfiled=unfiled,
         offset=offset,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -539,8 +526,6 @@ def sync(
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
     offset: int | Unset = 0,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """List / search tasks (the filter grammar; `filter[search]` is search)
@@ -646,8 +631,6 @@ def sync(
             when project_id is given).
         offset (int | Unset): Deprecated; use `cursor`. Ignored when a cursor is given. Default:
             0.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -686,8 +669,6 @@ def sync(
         status=status,
         unfiled=unfiled,
         offset=offset,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -721,8 +702,6 @@ async def asyncio_detailed(
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
     offset: int | Unset = 0,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """List / search tasks (the filter grammar; `filter[search]` is search)
@@ -828,8 +807,6 @@ async def asyncio_detailed(
             when project_id is given).
         offset (int | Unset): Deprecated; use `cursor`. Ignored when a cursor is given. Default:
             0.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -867,8 +844,6 @@ async def asyncio_detailed(
         status=status,
         unfiled=unfiled,
         offset=offset,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -906,8 +881,6 @@ async def asyncio(
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
     offset: int | Unset = 0,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """List / search tasks (the filter grammar; `filter[search]` is search)
@@ -1013,8 +986,6 @@ async def asyncio(
             when project_id is given).
         offset (int | Unset): Deprecated; use `cursor`. Ignored when a cursor is given. Default:
             0.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -1054,8 +1025,6 @@ async def asyncio(
             status=status,
             unfiled=unfiled,
             offset=offset,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

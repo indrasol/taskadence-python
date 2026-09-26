@@ -12,26 +12,13 @@ from ... import errors
 
 from ...models.availability_deleted import AvailabilityDeleted
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     team_id: str,
     entry_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
@@ -39,10 +26,8 @@ def _get_kwargs(
             team_id=quote(str(team_id), safe=""),
             entry_id=quote(str(entry_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -121,8 +106,6 @@ def sync_detailed(
     entry_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[AvailabilityDeleted | Problem]:
     """Remove an unavailability entry
 
@@ -131,8 +114,6 @@ def sync_detailed(
     Args:
         team_id (str):
         entry_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -145,8 +126,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         entry_id=entry_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -161,8 +140,6 @@ def sync(
     entry_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> AvailabilityDeleted | Problem | None:
     """Remove an unavailability entry
 
@@ -171,8 +148,6 @@ def sync(
     Args:
         team_id (str):
         entry_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -186,8 +161,6 @@ def sync(
         team_id=team_id,
         entry_id=entry_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -196,8 +169,6 @@ async def asyncio_detailed(
     entry_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[AvailabilityDeleted | Problem]:
     """Remove an unavailability entry
 
@@ -206,8 +177,6 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         entry_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -220,8 +189,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         entry_id=entry_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -234,8 +201,6 @@ async def asyncio(
     entry_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> AvailabilityDeleted | Problem | None:
     """Remove an unavailability entry
 
@@ -244,8 +209,6 @@ async def asyncio(
     Args:
         team_id (str):
         entry_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -260,7 +223,5 @@ async def asyncio(
             team_id=team_id,
             entry_id=entry_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

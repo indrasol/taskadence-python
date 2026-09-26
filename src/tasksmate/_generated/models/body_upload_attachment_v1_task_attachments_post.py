@@ -12,7 +12,9 @@ from .. import types
 
 from ..types import UNSET, Unset
 
+from ..types import File, FileTypes
 from ..types import UNSET, Unset
+from io import BytesIO
 from typing import cast
 
 
@@ -24,14 +26,14 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
     """
     Attributes:
         task_id (str):
-        file (str):
+        file (File):
         project_id (None | str | Unset):
         title (None | str | Unset):
         is_inline (bool | None | Unset):
     """
 
     task_id: str
-    file: str
+    file: File
     project_id: None | str | Unset = UNSET
     title: None | str | Unset = UNSET
     is_inline: bool | None | Unset = UNSET
@@ -43,7 +45,7 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
     def to_dict(self) -> dict[str, Any]:
         task_id = self.task_id
 
-        file = self.file
+        file = self.file.to_tuple()
 
         project_id: None | str | Unset
         if isinstance(self.project_id, Unset):
@@ -85,7 +87,7 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
 
         files.append(("task_id", (None, str(self.task_id).encode(), "text/plain")))
 
-        files.append(("file", (None, str(self.file).encode(), "text/plain")))
+        files.append(("file", self.file.to_tuple()))
 
         if not isinstance(self.project_id, Unset):
             if isinstance(self.project_id, str):
@@ -115,7 +117,7 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
         d = dict(src_dict)
         task_id = d.pop("task_id")
 
-        file = d.pop("file")
+        file = File(payload=BytesIO(d.pop("file")))
 
         def _parse_project_id(data: object) -> None | str | Unset:
             if data is None:

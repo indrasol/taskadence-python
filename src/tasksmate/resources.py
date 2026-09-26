@@ -356,9 +356,7 @@ class TasksResource:
         """
         return cast("models.TaskSectionOut", self._client._call(_OPS["tasks.set_section"], path=(task_id,), body=body))
 
-    def add_subtask(
-        self, task_id: str, body: models.BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost | Mapping[str, Any]
-    ) -> models.TaskInDB:
+    def add_subtask(self, task_id: str, body: models.SubtaskLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a subtask link.
 
         `POST /v1/tasks/{task_id}/subtasks` · scope `tasks:write`
@@ -372,9 +370,7 @@ class TasksResource:
         """
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.remove_subtask"], path=(task_id, subtask_id)))
 
-    def add_dependency(
-        self, task_id: str, body: models.BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost | Mapping[str, Any]
-    ) -> models.TaskInDB:
+    def add_dependency(self, task_id: str, body: models.DependencyLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a dependency.
 
         `POST /v1/tasks/{task_id}/dependencies` · scope `tasks:write`
@@ -992,7 +988,7 @@ class ProjectResourcesResource:
             self._client._call(
                 _OPS["project-resources.upload"],
                 query={"project_id": project_id},
-                form={"project_id": project_id, "project_name": project_name, "title": title, "file": file},
+                form={"project_name": project_name, "title": title, "file": file},
             ),
         )
 
@@ -2898,9 +2894,7 @@ class AsyncTasksResource:
             "models.TaskSectionOut", await self._client._call(_OPS["tasks.set_section"], path=(task_id,), body=body)
         )
 
-    async def add_subtask(
-        self, task_id: str, body: models.BodyAddSubtaskToTaskV1TasksTaskIdSubtasksPost | Mapping[str, Any]
-    ) -> models.TaskInDB:
+    async def add_subtask(self, task_id: str, body: models.SubtaskLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a subtask link.
 
         `POST /v1/tasks/{task_id}/subtasks` · scope `tasks:write`
@@ -2916,9 +2910,7 @@ class AsyncTasksResource:
             "models.TaskInDB", await self._client._call(_OPS["tasks.remove_subtask"], path=(task_id, subtask_id))
         )
 
-    async def add_dependency(
-        self, task_id: str, body: models.BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost | Mapping[str, Any]
-    ) -> models.TaskInDB:
+    async def add_dependency(self, task_id: str, body: models.DependencyLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a dependency.
 
         `POST /v1/tasks/{task_id}/dependencies` · scope `tasks:write`
@@ -3549,7 +3541,7 @@ class AsyncProjectResourcesResource:
             await self._client._call(
                 _OPS["project-resources.upload"],
                 query={"project_id": project_id},
-                form={"project_id": project_id, "project_name": project_name, "title": title, "file": file},
+                form={"project_name": project_name, "title": title, "file": file},
             ),
         )
 

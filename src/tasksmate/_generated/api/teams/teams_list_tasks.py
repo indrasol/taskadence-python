@@ -25,14 +25,9 @@ def _get_kwargs(
     sort_order: str | Unset = "asc",
     include_inaccessible: bool | Unset = False,
     section_scope: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
@@ -59,8 +54,6 @@ def _get_kwargs(
     else:
         json_section_scope = section_scope
     params["section_scope"] = json_section_scope
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -160,8 +153,6 @@ def sync_detailed(
     sort_order: str | Unset = "asc",
     include_inaccessible: bool | Unset = False,
     section_scope: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """A team's unfiled tasks (the team List's read; task-list envelope)
@@ -183,8 +174,6 @@ def sync_detailed(
             task list's flag). Default: False.
         section_scope (None | str | Unset): `team:<id>`, `user:me` or `project:<id>`: annotate
             rows with `section_id` / `section_position` for that scope. Usually `team:<this team>`.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -203,8 +192,6 @@ def sync_detailed(
         sort_order=sort_order,
         include_inaccessible=include_inaccessible,
         section_scope=section_scope,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -225,8 +212,6 @@ def sync(
     sort_order: str | Unset = "asc",
     include_inaccessible: bool | Unset = False,
     section_scope: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """A team's unfiled tasks (the team List's read; task-list envelope)
@@ -248,8 +233,6 @@ def sync(
             task list's flag). Default: False.
         section_scope (None | str | Unset): `team:<id>`, `user:me` or `project:<id>`: annotate
             rows with `section_id` / `section_position` for that scope. Usually `team:<this team>`.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -269,8 +252,6 @@ def sync(
         sort_order=sort_order,
         include_inaccessible=include_inaccessible,
         section_scope=section_scope,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -285,8 +266,6 @@ async def asyncio_detailed(
     sort_order: str | Unset = "asc",
     include_inaccessible: bool | Unset = False,
     section_scope: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | TaskListPage]:
     """A team's unfiled tasks (the team List's read; task-list envelope)
@@ -308,8 +287,6 @@ async def asyncio_detailed(
             task list's flag). Default: False.
         section_scope (None | str | Unset): `team:<id>`, `user:me` or `project:<id>`: annotate
             rows with `section_id` / `section_position` for that scope. Usually `team:<this team>`.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -328,8 +305,6 @@ async def asyncio_detailed(
         sort_order=sort_order,
         include_inaccessible=include_inaccessible,
         section_scope=section_scope,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -348,8 +323,6 @@ async def asyncio(
     sort_order: str | Unset = "asc",
     include_inaccessible: bool | Unset = False,
     section_scope: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | TaskListPage | None:
     """A team's unfiled tasks (the team List's read; task-list envelope)
@@ -371,8 +344,6 @@ async def asyncio(
             task list's flag). Default: False.
         section_scope (None | str | Unset): `team:<id>`, `user:me` or `project:<id>`: annotate
             rows with `section_id` / `section_position` for that scope. Usually `team:<this team>`.
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -393,8 +364,6 @@ async def asyncio(
             sort_order=sort_order,
             include_inaccessible=include_inaccessible,
             section_scope=section_scope,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

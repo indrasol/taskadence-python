@@ -38,13 +38,14 @@ class TaskCreate:
         sub_tasks (list[str] | None | Unset): List of sub-task IDs Example: ['task-5678'].
         dependencies (list[str] | None | Unset): List of dependency task IDs Example: ['task-4321'].
         description (None | str | Unset): Task description Example: Implement OAuth2 login flow..
-        status (None | TaskStatusEnum | Unset): Task status Example: not_started.
+        status (None | TaskStatusEnum | Unset): Task status Default: 'not_started'. Example: not_started.
         assignee (None | str | Unset): Assignee user name
         start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
         due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
-        priority (None | PriorityEnum | Unset): Task priority Example: high.
+        priority (None | PriorityEnum | Unset): Task priority Default: 'none'. Example: high.
         task_type (None | TaskTypeEnum | Unset): Kind of row (3.3): task (default) · bug · agent. A label, not a
-            permission. 6.12: `goal` is retired — a goal is a project container (`goal_id`), not a task type. Example: task.
+            permission. 6.12: `goal` is retired — a goal is a project container (`goal_id`), not a task type. Default:
+            'task'. Example: task.
         tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
         type_data (None | TaskCreateTypeDataType0 | Unset): Per-type extras (3.4). Bug keys: bug_status, bug_kind,
             environment, steps_to_reproduce, expected_result, actual_result, recommendation (writable); legacy_bug_id,
@@ -56,6 +57,7 @@ class TaskCreate:
         created_by (None | str | Unset): Who created the task
         updated_by (None | str | Unset): Who last updated the task
         is_subtask (bool | Unset): Is Sub Task (default false; a subtask is linked through POST /tasks/{id}/subtasks)
+            Default: False.
         bug_id (None | str | Unset): Bug ID (text) Example: B1234.
         tracker_id (None | str | Unset): On create (3.13): the sprint to file a bug under (`test_trackers.tracker_id`);
             refused (422) for a non-bug or a sprint of another project. Re-file through PUT /tasks/{id}/test-run. Example:
@@ -81,18 +83,18 @@ class TaskCreate:
     sub_tasks: list[str] | None | Unset = UNSET
     dependencies: list[str] | None | Unset = UNSET
     description: None | str | Unset = UNSET
-    status: None | TaskStatusEnum | Unset = UNSET
+    status: None | TaskStatusEnum | Unset = "not_started"
     assignee: None | str | Unset = UNSET
     start_date: datetime.date | None | Unset = UNSET
     due_date: datetime.date | None | Unset = UNSET
-    priority: None | PriorityEnum | Unset = UNSET
-    task_type: None | TaskTypeEnum | Unset = UNSET
+    priority: None | PriorityEnum | Unset = "none"
+    task_type: None | TaskTypeEnum | Unset = "task"
     tags: list[str] | None | Unset = UNSET
     type_data: None | TaskCreateTypeDataType0 | Unset = UNSET
     metadata: list[TaskCreateMetadataType0Item] | None | Unset = UNSET
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
-    is_subtask: bool | Unset = UNSET
+    is_subtask: bool | Unset = False
     bug_id: None | str | Unset = UNSET
     tracker_id: None | str | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET

@@ -21,29 +21,17 @@ def _get_kwargs(
     project_id: str,
     *,
     body: ProjectUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "patch",
         "url": "/v1/projects/{project_id}".format(
             project_id=quote(str(project_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -127,16 +115,12 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ProjectUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | ProjectInDB]:
     """Update a project (JSON merge-patch)
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (ProjectUpdate):
 
@@ -151,8 +135,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -168,16 +150,12 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: ProjectUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | ProjectInDB | None:
     """Update a project (JSON merge-patch)
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (ProjectUpdate):
 
@@ -193,8 +171,6 @@ def sync(
         project_id=project_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -204,16 +180,12 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ProjectUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | ProjectInDB]:
     """Update a project (JSON merge-patch)
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (ProjectUpdate):
 
@@ -228,8 +200,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         project_id=project_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -243,16 +213,12 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ProjectUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | ProjectInDB | None:
     """Update a project (JSON merge-patch)
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (ProjectUpdate):
 
@@ -269,8 +235,6 @@ async def asyncio(
             project_id=project_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

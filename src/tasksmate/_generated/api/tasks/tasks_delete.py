@@ -19,29 +19,17 @@ from typing import cast
 def _get_kwargs(
     task_id: str,
     *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
         "url": "/v1/tasks/{task_id}".format(
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["headers"] = headers
@@ -122,8 +110,6 @@ def sync_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete a task
@@ -133,8 +119,6 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -147,8 +131,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         task_id=task_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -163,8 +145,6 @@ def sync(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete a task
@@ -174,8 +154,6 @@ def sync(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -189,8 +167,6 @@ def sync(
     return sync_detailed(
         task_id=task_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -199,8 +175,6 @@ async def asyncio_detailed(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Acknowledgement | Problem]:
     """Delete a task
@@ -210,8 +184,6 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -224,8 +196,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         task_id=task_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -238,8 +208,6 @@ async def asyncio(
     task_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Acknowledgement | Problem | None:
     """Delete a task
@@ -249,8 +217,6 @@ async def asyncio(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
 
     Raises:
@@ -265,8 +231,6 @@ async def asyncio(
         await asyncio_detailed(
             task_id=task_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

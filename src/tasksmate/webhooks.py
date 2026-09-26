@@ -5,8 +5,8 @@
     def handle(request):                         # any framework: you need the headers and the RAW body bytes
         if not webhooks.verify(SECRET, request.headers, request.body):
             return 400
-        event = webhooks.parse(request.body)     # a typed WebhookEvent
-        if event.type == "task.updated":
+        event = webhooks.parse(request.body)     # a typed WebhookEvent, generated from the spec
+        if event.type_ == "task.updated":
             ...
         return 200
 
@@ -18,6 +18,10 @@ ROTATION, both ways. After "rotate secret" TasksMate signs with the old AND the 
 header), so a receiver still holding the old secret keeps verifying; and a receiver may pass BOTH secrets
 (`verify([new, old], …)`) while it switches over. A timestamp further than `tolerance` seconds from now is refused
 (a replayed capture). Compare in constant time; verify the raw bytes — never a re-serialized JSON.
+
+THE EVENT is the spec's `WebhookEvent` (`components.schemas.WebhookEvent`; the spec's `webhooks` map has one entry per
+event type), generated like every other model: `type_` (the generator's name for `type`), `created_at` a datetime,
+`actor`, `data.before` / `data.after`, and `additional_properties` keeping any field a newer API version adds.
 """
 
 from __future__ import annotations
@@ -27,12 +31,12 @@ import binascii
 import hashlib
 import hmac
 import json
+import re
 import time
 from collections.abc import Mapping, Sequence
-from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from ._generated.models import WebhookActor, WebhookEvent, WebhookEventData
 
 SECRET_PREFIX = "whsec_"  # noqa: S105 - the prefix, not a secret
 DEFAULT_TOLERANCE = 300
@@ -42,42 +46,20 @@ class WebhookVerificationError(ValueError):
     """Raised by `verify(..., raise_on_failure=True)`; the message says which check failed (never the secret)."""
 
 
-class WebhookActor(BaseModel):
-    """Who caused the event: a person, a service account (4.2), or the system."""
-
-    model_config = ConfigDict(extra="allow")
-
-    kind: str
-    id: str | None = None
-    username: str | None = None
+class WebhookParseError(ValueError):
+    """Raised by `parse` when the body is not a TasksMate webhook event (not a JSON object, or a field missing)."""
 
 
-class WebhookEventData(BaseModel):
-    """What changed: the audit row's scrubbed `before` / `after` diffs — never a whole resource, never a secret."""
-
-    model_config = ConfigDict(extra="allow")
-
-    resource_type: str
-    resource_id: str
-    before: dict[str, Any] | None = None
-    after: dict[str, Any] | None = None
+# The generated models parse with `datetime.fromisoformat`, which on Python 3.10 accepts neither a `Z` suffix nor a
+# fraction other than 3 or 6 digits — and Postgres trims trailing zeros (`…:13.8361+00:00`). Normalized before parsing.
+_ISO_FRACTION = re.compile(r"(\.\d{1,6})\d*(?=[+-]\d{2}:\d{2}$|$)")
 
 
-class WebhookEvent(BaseModel):
-    """One delivery's body. `id` is the delivery id (`WD…`), the same as the `webhook-id` header: dedupe on it —
-    delivery is at-least-once. Fetch the full resource with the API (`tm.tasks.read(event.data.resource_id)`)."""
-
-    model_config = ConfigDict(extra="allow")
-
-    id: str
-    type: str
-    api_version: str | None = None
-    created_at: datetime
-    org_id: str
-    project_id: str | None = None
-    actor: WebhookActor | None = None
-    data: WebhookEventData
-    request_id: str | None = None
+def _iso(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    text = value[:-1] + "+00:00" if value.endswith(("Z", "z")) else value
+    return _ISO_FRACTION.sub(lambda m: m.group(1).ljust(7, "0"), text, count=1)
 
 
 def _header(headers: Mapping[str, str], name: str) -> str | None:
@@ -142,9 +124,16 @@ def verify(
 
 
 def parse(body: bytes | str | Mapping[str, Any]) -> WebhookEvent:
-    """The event, typed. Parse only a body `verify` accepted."""
-    data = dict(body) if isinstance(body, Mapping) else json.loads(body)
-    return WebhookEvent.model_validate(data)
+    """The event, typed (the generated `WebhookEvent`). Parse only a body `verify` accepted."""
+    try:
+        data = dict(body) if isinstance(body, Mapping) else json.loads(body)
+        if not isinstance(data, dict):
+            raise WebhookParseError("a webhook body is a JSON object")
+        return WebhookEvent.from_dict({**data, "created_at": _iso(data.get("created_at"))})
+    except WebhookParseError:
+        raise
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        raise WebhookParseError(f"not a TasksMate webhook event ({type(exc).__name__}: {exc})") from None
 
 
 __all__ = [
@@ -152,6 +141,7 @@ __all__ = [
     "WebhookActor",
     "WebhookEvent",
     "WebhookEventData",
+    "WebhookParseError",
     "WebhookVerificationError",
     "parse",
     "sign",

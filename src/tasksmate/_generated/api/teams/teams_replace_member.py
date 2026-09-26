@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.team_member_out import TeamMemberOut
 from ...models.team_member_update import TeamMemberUpdate
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -22,18 +21,8 @@ def _get_kwargs(
     user_id: str,
     *,
     body: TeamMemberUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
@@ -41,7 +30,6 @@ def _get_kwargs(
             team_id=quote(str(team_id), safe=""),
             user_id=quote(str(user_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -128,8 +116,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamMemberUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TeamMemberOut]:
     """Change a team member's role (PUT)
 
@@ -141,8 +127,6 @@ def sync_detailed(
     Args:
         team_id (str):
         user_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamMemberUpdate):
 
     Raises:
@@ -157,8 +141,6 @@ def sync_detailed(
         team_id=team_id,
         user_id=user_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -174,8 +156,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TeamMemberUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TeamMemberOut | None:
     """Change a team member's role (PUT)
 
@@ -187,8 +167,6 @@ def sync(
     Args:
         team_id (str):
         user_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamMemberUpdate):
 
     Raises:
@@ -204,8 +182,6 @@ def sync(
         user_id=user_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -215,8 +191,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamMemberUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TeamMemberOut]:
     """Change a team member's role (PUT)
 
@@ -228,8 +202,6 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         user_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamMemberUpdate):
 
     Raises:
@@ -244,8 +216,6 @@ async def asyncio_detailed(
         team_id=team_id,
         user_id=user_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -259,8 +229,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TeamMemberUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TeamMemberOut | None:
     """Change a team member's role (PUT)
 
@@ -272,8 +240,6 @@ async def asyncio(
     Args:
         team_id (str):
         user_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TeamMemberUpdate):
 
     Raises:
@@ -290,7 +256,5 @@ async def asyncio(
             user_id=user_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

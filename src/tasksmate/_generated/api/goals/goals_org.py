@@ -19,22 +19,15 @@ from typing import cast
 def _get_kwargs(
     *,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
 
     params["org_id"] = org_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -126,8 +119,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | OrgGoalsOut | Problem]:
     """Every goal you can read in an organization, grouped by project
@@ -140,8 +131,6 @@ def sync_detailed(
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
             projects' goals).
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -154,8 +143,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -170,8 +157,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | OrgGoalsOut | Problem | None:
     """Every goal you can read in an organization, grouped by project
@@ -184,8 +169,6 @@ def sync(
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
             projects' goals).
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -199,8 +182,6 @@ def sync(
     return sync_detailed(
         client=client,
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -209,8 +190,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | OrgGoalsOut | Problem]:
     """Every goal you can read in an organization, grouped by project
@@ -223,8 +202,6 @@ async def asyncio_detailed(
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
             projects' goals).
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -237,8 +214,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -251,8 +226,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | OrgGoalsOut | Problem | None:
     """Every goal you can read in an organization, grouped by project
@@ -265,8 +238,6 @@ async def asyncio(
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest sees only its
             projects' goals).
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -281,8 +252,6 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             org_id=org_id,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

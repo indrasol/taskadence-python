@@ -12,26 +12,13 @@ from ... import errors
 
 from ...models.delivery_out import DeliveryOut
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     subscription_id: str,
     delivery_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
@@ -39,10 +26,8 @@ def _get_kwargs(
             subscription_id=quote(str(subscription_id), safe=""),
             delivery_id=quote(str(delivery_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -119,8 +104,6 @@ def sync_detailed(
     delivery_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[DeliveryOut | Problem]:
     """Send a delivery again as a new delivery
 
@@ -131,8 +114,6 @@ def sync_detailed(
     Args:
         subscription_id (str):
         delivery_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -145,8 +126,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
         delivery_id=delivery_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -161,8 +140,6 @@ def sync(
     delivery_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> DeliveryOut | Problem | None:
     """Send a delivery again as a new delivery
 
@@ -173,8 +150,6 @@ def sync(
     Args:
         subscription_id (str):
         delivery_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -188,8 +163,6 @@ def sync(
         subscription_id=subscription_id,
         delivery_id=delivery_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -198,8 +171,6 @@ async def asyncio_detailed(
     delivery_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[DeliveryOut | Problem]:
     """Send a delivery again as a new delivery
 
@@ -210,8 +181,6 @@ async def asyncio_detailed(
     Args:
         subscription_id (str):
         delivery_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -224,8 +193,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
         delivery_id=delivery_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -238,8 +205,6 @@ async def asyncio(
     delivery_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> DeliveryOut | Problem | None:
     """Send a delivery again as a new delivery
 
@@ -250,8 +215,6 @@ async def asyncio(
     Args:
         subscription_id (str):
         delivery_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -266,7 +229,5 @@ async def asyncio(
             subscription_id=subscription_id,
             delivery_id=delivery_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

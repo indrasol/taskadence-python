@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.project_resource_create import ProjectResourceCreate
 from ...models.project_resource_in_db import ProjectResourceInDB
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,18 +20,12 @@ def _get_kwargs(
     *,
     body: ProjectResourceCreate,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
 
     params: dict[str, Any] = {}
 
     params["project_id"] = project_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -125,15 +118,11 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: ProjectResourceCreate,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectResourceInDB]:
     """Add a link resource to a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectResourceCreate):
 
     Raises:
@@ -147,8 +136,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -163,15 +150,11 @@ def sync(
     client: AuthenticatedClient,
     body: ProjectResourceCreate,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectResourceInDB | None:
     """Add a link resource to a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectResourceCreate):
 
     Raises:
@@ -186,8 +169,6 @@ def sync(
         client=client,
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -196,15 +177,11 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: ProjectResourceCreate,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectResourceInDB]:
     """Add a link resource to a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectResourceCreate):
 
     Raises:
@@ -218,8 +195,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -232,15 +207,11 @@ async def asyncio(
     client: AuthenticatedClient,
     body: ProjectResourceCreate,
     project_id: str,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectResourceInDB | None:
     """Add a link resource to a project
 
     Args:
         project_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (ProjectResourceCreate):
 
     Raises:
@@ -256,7 +227,5 @@ async def asyncio(
             client=client,
             body=body,
             project_id=project_id,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

@@ -21,29 +21,17 @@ def _get_kwargs(
     team_id: str,
     *,
     body: TeamUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "patch",
         "url": "/v1/teams/{team_id}".format(
             team_id=quote(str(team_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -127,8 +115,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TeamDetail]:
     """Update a team (JSON merge-patch)
@@ -137,8 +123,6 @@ def sync_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TeamUpdate):
 
@@ -153,8 +137,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -170,8 +152,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TeamUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TeamDetail | None:
     """Update a team (JSON merge-patch)
@@ -180,8 +160,6 @@ def sync(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TeamUpdate):
 
@@ -197,8 +175,6 @@ def sync(
         team_id=team_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -208,8 +184,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TeamUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TeamDetail]:
     """Update a team (JSON merge-patch)
@@ -218,8 +192,6 @@ async def asyncio_detailed(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TeamUpdate):
 
@@ -234,8 +206,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         team_id=team_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -249,8 +219,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TeamUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TeamDetail | None:
     """Update a team (JSON merge-patch)
@@ -259,8 +227,6 @@ async def asyncio(
 
     Args:
         team_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TeamUpdate):
 
@@ -277,8 +243,6 @@ async def asyncio(
             team_id=team_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

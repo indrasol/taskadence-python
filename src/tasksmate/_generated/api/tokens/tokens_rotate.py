@@ -12,35 +12,20 @@ from ... import errors
 
 from ...models.problem import Problem
 from ...models.token_created import TokenCreated
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     token_id: str,
-    *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/tokens/{token_id}/rotate".format(
             token_id=quote(str(token_id), safe=""),
         ),
-        "params": params,
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -116,8 +101,6 @@ def sync_detailed(
     token_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TokenCreated]:
     """Rotate: a new token with the same grant; the old one works 60 s more
 
@@ -127,8 +110,6 @@ def sync_detailed(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -140,8 +121,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         token_id=token_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -155,8 +134,6 @@ def sync(
     token_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TokenCreated | None:
     """Rotate: a new token with the same grant; the old one works 60 s more
 
@@ -166,8 +143,6 @@ def sync(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -180,8 +155,6 @@ def sync(
     return sync_detailed(
         token_id=token_id,
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -189,8 +162,6 @@ async def asyncio_detailed(
     token_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TokenCreated]:
     """Rotate: a new token with the same grant; the old one works 60 s more
 
@@ -200,8 +171,6 @@ async def asyncio_detailed(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -213,8 +182,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         token_id=token_id,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -226,8 +193,6 @@ async def asyncio(
     token_id: str,
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TokenCreated | None:
     """Rotate: a new token with the same grant; the old one works 60 s more
 
@@ -237,8 +202,6 @@ async def asyncio(
 
     Args:
         token_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -252,7 +215,5 @@ async def asyncio(
         await asyncio_detailed(
             token_id=token_id,
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

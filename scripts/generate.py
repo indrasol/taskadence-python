@@ -38,8 +38,8 @@ HEADER = (
     "# Change the spec snapshot (or the generator) and run `python scripts/generate.py`.\n"
 )
 
-# Parameters the spec declares on every operation that are not part of the API: `is_registration` and the
-# `authorization` header leak from the backend's `verify_token` signature (reported for 4.1 / 4.6).
+# 4.1b: these used to leak from the backend's `verify_token` signature onto every operation and were dropped here;
+# the backend no longer declares them, and generation now refuses a spec that does (they would become method arguments).
 LEAKED = {"is_registration", "authorization"}
 # Friendlier names on top of the operationId verbs (the verbs stay; these are aliases).
 ALIASES = {"tasks": {"move": "set_project"}}
@@ -58,42 +58,29 @@ def run(*cmd: str, cwd: Path = ROOT) -> None:
 # ---------------------------------------------------------------------------
 
 
-def request_only_schemas(spec: dict[str, Any]) -> set[str]:
-    """Component schemas a request body references and no response does."""
-
-    def refs(node: Any, found: set[str]) -> set[str]:
-        if isinstance(node, dict):
-            ref = node.get("$ref")
-            if isinstance(ref, str):
-                found.add(ref.rsplit("/", 1)[-1])
-            for value in node.values():
-                refs(value, found)
-        elif isinstance(node, list):
-            for value in node:
-                refs(value, found)
-        return found
-
-    requests: set[str] = set()
-    responses: set[str] = set()
-    for item in spec["paths"].values():
-        for op in item.values():
-            refs(op.get("requestBody", {}), requests)
-            refs(op.get("responses", {}), responses)
-    return requests - responses
-
-
-def normalized(spec: dict[str, Any]) -> dict[str, Any]:
-    """The spec as the generator sees it. ONE transform, reported for 4.1 / 4.6: request-body schemas lose their
-    `default`s. The backend's update models inherit defaults (`TaskUpdate.priority = "none"`, `task_type = "task"`,
-    `OrganizationInviteUpdate.invite_status = "pending"`, `…Update.is_active = true`) that the server never applies —
-    every update route reads `exclude_unset=True` — but a generated model sends a default as if the caller had set it,
-    so a PATCH of `status` alone would also reset priority and type. Without the defaults an unset field is UNSET and
-    is left out of the body; creates are unaffected (the server applies the same defaults itself)."""
-    out = json.loads(json.dumps(spec))
-    for name in request_only_schemas(out):
-        for prop in out["components"]["schemas"][name].get("properties", {}).values():
-            prop.pop("default", None)
-    return out
+def check_spec(spec: dict[str, Any]) -> None:
+    """Refuse a spec with the defects 4.1b fixed at the source, instead of patching around them again:
+    - an update body (PATCH / PUT) whose schema advertises a `default`: every update route writes only what the body
+      set, so the server never applies it — but a generated model sends a default as though the caller had set it
+      (`TaskUpdate(status=...)` also reset priority and type; 4.5 stripped the defaults here until 4.1b);
+    - `authorization` / `is_registration` declared as operation parameters."""
+    problems = []
+    schemas = spec["components"]["schemas"]
+    for path, item in spec["paths"].items():
+        for method, op in item.items():
+            where = f"{method.upper()} {path}"
+            problems += [f"{where}: parameter {p['name']}" for p in op.get("parameters", []) if p["name"] in LEAKED]
+            if method not in ("patch", "put"):
+                continue
+            for body in op.get("requestBody", {}).get("content", {}).values():
+                name = body.get("schema", {}).get("$ref", "").rsplit("/", 1)[-1]
+                for prop, sub in schemas.get(name, {}).get("properties", {}).items():
+                    if sub.get("default") is not None:
+                        problems.append(f"{where}: {name}.{prop} has default {sub['default']!r}")
+    if problems:
+        sys.exit(
+            "the spec regressed on 4.1b (fix the backend, not the generator):\n  " + "\n  ".join(sorted(set(problems)))
+        )
 
 
 def generate_client(spec: dict[str, Any]) -> None:
@@ -111,7 +98,7 @@ def generate_client(spec: dict[str, Any]) -> None:
         shutil.rmtree(GEN)
     with tempfile.TemporaryDirectory() as tmp:
         source = Path(tmp) / "openapi.public.json"
-        source.write_text(json.dumps(normalized(spec), indent=2))
+        source.write_text(json.dumps(spec, indent=2))
         run(
             bin_("openapi-python-client"),
             "generate",
@@ -268,23 +255,21 @@ class Facade:
             list(raw.get("x-scopes", [])),
             self.modules[key],
         )
-        has_cursor = False
+        # 4.1b: the spec says which operations are lists / creates (`x-kind`, from the backend's surface table)
+        kind = raw.get("x-kind", "")
+        op.is_create = kind == "create"
         for prm in raw.get("parameters", []):
             name, where = prm["name"], prm["in"]
-            if name in LEAKED:
-                continue
             if where == "path":
                 op.path_params.append(name)
             elif where == "header":
                 op.if_match |= name == "If-Match"
                 op.if_none_match |= name == "If-None-Match"
-                op.is_create |= name == "Idempotency-Key"
             elif name.startswith("filter["):
                 op.filters.append(name[len("filter[") : -1])
             elif prm.get("deprecated") or (prm.get("description") or "").lower().startswith("deprecated"):
                 continue
             else:
-                has_cursor |= name == "cursor"
                 op.query.append(
                     Param(
                         name,
@@ -313,14 +298,18 @@ class Facade:
                         op.form.append(Param(name, py_name(name), "FileInput", name in required))
                     else:
                         op.form.append(Param(name, py_name(name), self.annotation(prop), name in required))
-        self.response(op, raw, has_cursor)
+        self.response(op, raw, kind == "list")
+        if op.is_create and not any(p["name"] == "Idempotency-Key" for p in raw.get("parameters", [])):
+            sys.exit(f"{op_id}: x-kind create without an Idempotency-Key parameter")
+        if kind == "list" and not op.is_list:
+            sys.exit(f"{op_id}: x-kind list without a {{data, next_cursor}} envelope")
         if op.is_list:
             op.if_none_match = (
                 False  # a page is re-read, not revalidated: the facade offers If-None-Match on single reads
             )
         return op
 
-    def response(self, op: Op, raw: dict[str, Any], has_cursor: bool) -> None:
+    def response(self, op: Op, raw: dict[str, Any], is_list: bool) -> None:
         status = next((s for s in raw["responses"] if s.startswith("2")), None)
         content = raw["responses"].get(status or "", {}).get("content") or {}
         if not content or status == "204":
@@ -336,7 +325,7 @@ class Facade:
             if member.get("type") == "array":
                 types.append(f"builtins.list[models.{self.cls(member['items']['$ref'])}]")
                 continue
-            item = self.envelope_item(member["$ref"]) if has_cursor else None
+            item = self.envelope_item(member["$ref"]) if is_list else None
             if item:
                 op.is_list, op.item = True, item
                 types.append(f"Page[models.{item}]")
@@ -618,6 +607,7 @@ class Facade:
 
 def main() -> None:
     spec = json.loads(SPEC.read_text())
+    check_spec(spec)
     generate_client(spec)
     facade = Facade(spec)
     facade.build()

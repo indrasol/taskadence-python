@@ -13,7 +13,6 @@ from ... import errors
 from ...models.problem import Problem
 from ...models.task_in_db import TaskInDB
 from ...models.task_milestone_set import TaskMilestoneSet
-from ...types import UNSET, Unset
 from typing import cast
 
 
@@ -21,25 +20,14 @@ def _get_kwargs(
     task_id: str,
     *,
     body: TaskMilestoneSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "put",
         "url": "/v1/tasks/{task_id}/milestone".format(
             task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -121,8 +109,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
@@ -135,8 +121,6 @@ def sync_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
             TEAM milestone, `null` to take it out.
             6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
@@ -153,8 +137,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -169,8 +151,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
@@ -183,8 +163,6 @@ def sync(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
             TEAM milestone, `null` to take it out.
             6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
@@ -202,8 +180,6 @@ def sync(
         task_id=task_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     ).parsed
 
 
@@ -212,8 +188,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | TaskInDB]:
     """Attach a task to a team milestone (or none)
 
@@ -226,8 +200,6 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
             TEAM milestone, `null` to take it out.
             6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
@@ -244,8 +216,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         task_id=task_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -258,8 +228,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
 ) -> Problem | TaskInDB | None:
     """Attach a task to a team milestone (or none)
 
@@ -272,8 +240,6 @@ async def asyncio(
 
     Args:
         task_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         body (TaskMilestoneSet): `PUT /tasks/{task_id}/milestone` (6.5): file the task under a
             TEAM milestone, `null` to take it out.
             6.3's `TaskSprintSet` copied: only the task's own `edit`, plus the reachability rule; one
@@ -292,7 +258,5 @@ async def asyncio(
             task_id=task_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
         )
     ).parsed

@@ -18,27 +18,15 @@ from typing import cast
 
 def _get_kwargs(
     *,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_none_match, Unset):
         headers["If-None-Match"] = if_none_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "get",
         "url": "/v1/me",
-        "params": params,
     }
 
     _kwargs["headers"] = headers
@@ -120,8 +108,6 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | MeOut | Problem]:
     """The authenticated principal and its organizations / roles
@@ -132,8 +118,6 @@ def sync_detailed(
     organization, and `auth` — the token's id, scopes, projects and expiry.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -145,8 +129,6 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -160,8 +142,6 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | MeOut | Problem | None:
     """The authenticated principal and its organizations / roles
@@ -172,8 +152,6 @@ def sync(
     organization, and `auth` — the token's id, scopes, projects and expiry.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -186,8 +164,6 @@ def sync(
 
     return sync_detailed(
         client=client,
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     ).parsed
 
@@ -195,8 +171,6 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | MeOut | Problem]:
     """The authenticated principal and its organizations / roles
@@ -207,8 +181,6 @@ async def asyncio_detailed(
     organization, and `auth` — the token's id, scopes, projects and expiry.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -220,8 +192,6 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        is_registration=is_registration,
-        authorization=authorization,
         if_none_match=if_none_match,
     )
 
@@ -233,8 +203,6 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | MeOut | Problem | None:
     """The authenticated principal and its organizations / roles
@@ -245,8 +213,6 @@ async def asyncio(
     organization, and `auth` — the token's id, scopes, projects and expiry.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_none_match (str | Unset):
 
     Raises:
@@ -260,8 +226,6 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
-            is_registration=is_registration,
-            authorization=authorization,
             if_none_match=if_none_match,
         )
     ).parsed

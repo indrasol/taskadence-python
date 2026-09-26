@@ -15,24 +15,17 @@ from ...models.body_upload_resource_v1_project_resources_upload_post import (
 )
 from ...models.problem import Problem
 from ...models.project_resource_in_db import ProjectResourceInDB
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     *,
     body: BodyUploadResourceV1ProjectResourcesUploadPost,
-    is_registration: bool | Unset = False,
     project_id: str,
-    authorization: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
 
     params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
 
     params["project_id"] = project_id
 
@@ -126,19 +119,20 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyUploadResourceV1ProjectResourcesUploadPost,
-    is_registration: bool | Unset = False,
     project_id: str,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectResourceInDB]:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+     Upload a file to storage and create a project resource row.
+
+    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
+    `project_id` form
+    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
+    value is used
+    for both the check and the write (4.1b — they used to be read from different places).
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         project_id (str):
-        authorization (str | Unset):
         body (BodyUploadResourceV1ProjectResourcesUploadPost):
 
     Raises:
@@ -151,9 +145,7 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
         project_id=project_id,
-        authorization=authorization,
     )
 
     response = client.get_httpx_client().request(
@@ -167,19 +159,20 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: BodyUploadResourceV1ProjectResourcesUploadPost,
-    is_registration: bool | Unset = False,
     project_id: str,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectResourceInDB | None:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+     Upload a file to storage and create a project resource row.
+
+    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
+    `project_id` form
+    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
+    value is used
+    for both the check and the write (4.1b — they used to be read from different places).
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         project_id (str):
-        authorization (str | Unset):
         body (BodyUploadResourceV1ProjectResourcesUploadPost):
 
     Raises:
@@ -193,9 +186,7 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
         project_id=project_id,
-        authorization=authorization,
     ).parsed
 
 
@@ -203,19 +194,20 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyUploadResourceV1ProjectResourcesUploadPost,
-    is_registration: bool | Unset = False,
     project_id: str,
-    authorization: str | Unset = UNSET,
 ) -> Response[Problem | ProjectResourceInDB]:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+     Upload a file to storage and create a project resource row.
+
+    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
+    `project_id` form
+    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
+    value is used
+    for both the check and the write (4.1b — they used to be read from different places).
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         project_id (str):
-        authorization (str | Unset):
         body (BodyUploadResourceV1ProjectResourcesUploadPost):
 
     Raises:
@@ -228,9 +220,7 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
         project_id=project_id,
-        authorization=authorization,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -242,19 +232,20 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: BodyUploadResourceV1ProjectResourcesUploadPost,
-    is_registration: bool | Unset = False,
     project_id: str,
-    authorization: str | Unset = UNSET,
 ) -> Problem | ProjectResourceInDB | None:
     """Upload a file resource (multipart)
 
-     Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+     Upload a file to storage and create a project resource row.
+
+    `project_id` is the query parameter — the one the permission check reads. **Deprecated:** a
+    `project_id` form
+    field (older clients, the TasksMate app until its next release) is accepted and ignored; the query
+    value is used
+    for both the check and the write (4.1b — they used to be read from different places).
 
     Args:
-        is_registration (bool | Unset):  Default: False.
         project_id (str):
-        authorization (str | Unset):
         body (BodyUploadResourceV1ProjectResourcesUploadPost):
 
     Raises:
@@ -269,8 +260,6 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
             project_id=project_id,
-            authorization=authorization,
         )
     ).parsed

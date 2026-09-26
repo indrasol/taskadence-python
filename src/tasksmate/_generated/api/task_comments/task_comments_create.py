@@ -20,27 +20,15 @@ from typing import cast
 def _get_kwargs(
     *,
     body: TaskCommentCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(idempotency_key, Unset):
         headers["Idempotency-Key"] = idempotency_key
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/v1/task-comments",
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -125,8 +113,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskCommentCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Response[Problem | TaskCommentInDB]:
     """Comment on a task
@@ -134,8 +120,6 @@ def sync_detailed(
      Create a new top-level comment on a task.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (TaskCommentCreate):
 
@@ -149,8 +133,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     )
 
@@ -165,8 +147,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: TaskCommentCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Problem | TaskCommentInDB | None:
     """Comment on a task
@@ -174,8 +154,6 @@ def sync(
      Create a new top-level comment on a task.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (TaskCommentCreate):
 
@@ -190,8 +168,6 @@ def sync(
     return sync_detailed(
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     ).parsed
 
@@ -200,8 +176,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: TaskCommentCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Response[Problem | TaskCommentInDB]:
     """Comment on a task
@@ -209,8 +183,6 @@ async def asyncio_detailed(
      Create a new top-level comment on a task.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (TaskCommentCreate):
 
@@ -224,8 +196,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         idempotency_key=idempotency_key,
     )
 
@@ -238,8 +208,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: TaskCommentCreate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     idempotency_key: str | Unset = UNSET,
 ) -> Problem | TaskCommentInDB | None:
     """Comment on a task
@@ -247,8 +215,6 @@ async def asyncio(
      Create a new top-level comment on a task.
 
     Args:
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         idempotency_key (str | Unset):
         body (TaskCommentCreate):
 
@@ -264,8 +230,6 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             idempotency_key=idempotency_key,
         )
     ).parsed

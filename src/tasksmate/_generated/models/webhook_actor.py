@@ -10,31 +10,46 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from typing import cast
 
-T = TypeVar("T", bound="BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost")
+
+T = TypeVar("T", bound="WebhookActor")
 
 
 @_attrs_define
-class BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost:
-    """
+class WebhookActor:
+    """Who caused the event.
+
     Attributes:
-        dependency_id (str):
+        kind (str): `user`, `service_account` (a 4.2 access token's service account) or `system`
+        id (None | str): The user's id (null for `system`)
+        username (None | str): Their username at the time
     """
 
-    dependency_id: str
+    kind: str
+    id: None | str
+    username: None | str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        dependency_id = self.dependency_id
+        kind = self.kind
+
+        id: None | str
+        id = self.id
+
+        username: None | str
+        username = self.username
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "dependency_id": dependency_id,
+                "kind": kind,
+                "id": id,
+                "username": username,
             }
         )
 
@@ -43,14 +58,30 @@ class BodyAddDependencyToTaskV1TasksTaskIdDependenciesPost:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        dependency_id = d.pop("dependency_id")
+        kind = d.pop("kind")
 
-        body_add_dependency_to_task_v1_tasks_task_id_dependencies_post = cls(
-            dependency_id=dependency_id,
+        def _parse_id(data: object) -> None | str:
+            if data is None:
+                return data
+            return cast(None | str, data)
+
+        id = _parse_id(d.pop("id"))
+
+        def _parse_username(data: object) -> None | str:
+            if data is None:
+                return data
+            return cast(None | str, data)
+
+        username = _parse_username(d.pop("username"))
+
+        webhook_actor = cls(
+            kind=kind,
+            id=id,
+            username=username,
         )
 
-        body_add_dependency_to_task_v1_tasks_task_id_dependencies_post.additional_properties = d
-        return body_add_dependency_to_task_v1_tasks_task_id_dependencies_post
+        webhook_actor.additional_properties = d
+        return webhook_actor
 
     @property
     def additional_keys(self) -> list[str]:

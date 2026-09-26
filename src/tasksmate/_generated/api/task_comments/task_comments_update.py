@@ -22,14 +22,9 @@ def _get_kwargs(
     *,
     body: TaskCommentUpdate,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
 
@@ -41,8 +36,6 @@ def _get_kwargs(
     else:
         json_project_id = project_id
     params["project_id"] = json_project_id
-
-    params["is_registration"] = is_registration
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -138,8 +131,6 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: TaskCommentUpdate,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TaskCommentInDB]:
     """Edit your comment
@@ -147,8 +138,6 @@ def sync_detailed(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskCommentUpdate):
 
@@ -164,8 +153,6 @@ def sync_detailed(
         comment_id=comment_id,
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -182,8 +169,6 @@ def sync(
     client: AuthenticatedClient,
     body: TaskCommentUpdate,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TaskCommentInDB | None:
     """Edit your comment
@@ -191,8 +176,6 @@ def sync(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskCommentUpdate):
 
@@ -209,8 +192,6 @@ def sync(
         client=client,
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -221,8 +202,6 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: TaskCommentUpdate,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | TaskCommentInDB]:
     """Edit your comment
@@ -230,8 +209,6 @@ async def asyncio_detailed(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskCommentUpdate):
 
@@ -247,8 +224,6 @@ async def asyncio_detailed(
         comment_id=comment_id,
         body=body,
         project_id=project_id,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -263,8 +238,6 @@ async def asyncio(
     client: AuthenticatedClient,
     body: TaskCommentUpdate,
     project_id: None | str | Unset = UNSET,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | TaskCommentInDB | None:
     """Edit your comment
@@ -272,8 +245,6 @@ async def asyncio(
     Args:
         comment_id (str):
         project_id (None | str | Unset):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (TaskCommentUpdate):
 
@@ -291,8 +262,6 @@ async def asyncio(
             client=client,
             body=body,
             project_id=project_id,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

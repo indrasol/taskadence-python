@@ -21,29 +21,17 @@ def _get_kwargs(
     subscription_id: str,
     *,
     body: WebhookUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(authorization, Unset):
-        headers["authorization"] = authorization
-
     if not isinstance(if_match, Unset):
         headers["If-Match"] = if_match
-
-    params: dict[str, Any] = {}
-
-    params["is_registration"] = is_registration
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "patch",
         "url": "/v1/webhooks/{subscription_id}".format(
             subscription_id=quote(str(subscription_id), safe=""),
         ),
-        "params": params,
     }
 
     _kwargs["json"] = body.to_dict()
@@ -127,8 +115,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: WebhookUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | WebhookOut]:
     """Change, pause, resume or re-enable a webhook
@@ -139,8 +125,6 @@ def sync_detailed(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (WebhookUpdate):
 
@@ -155,8 +139,6 @@ def sync_detailed(
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -172,8 +154,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: WebhookUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | WebhookOut | None:
     """Change, pause, resume or re-enable a webhook
@@ -184,8 +164,6 @@ def sync(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (WebhookUpdate):
 
@@ -201,8 +179,6 @@ def sync(
         subscription_id=subscription_id,
         client=client,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     ).parsed
 
@@ -212,8 +188,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: WebhookUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Response[Problem | WebhookOut]:
     """Change, pause, resume or re-enable a webhook
@@ -224,8 +198,6 @@ async def asyncio_detailed(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (WebhookUpdate):
 
@@ -240,8 +212,6 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         subscription_id=subscription_id,
         body=body,
-        is_registration=is_registration,
-        authorization=authorization,
         if_match=if_match,
     )
 
@@ -255,8 +225,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: WebhookUpdate,
-    is_registration: bool | Unset = False,
-    authorization: str | Unset = UNSET,
     if_match: str | Unset = UNSET,
 ) -> Problem | WebhookOut | None:
     """Change, pause, resume or re-enable a webhook
@@ -267,8 +235,6 @@ async def asyncio(
 
     Args:
         subscription_id (str):
-        is_registration (bool | Unset):  Default: False.
-        authorization (str | Unset):
         if_match (str | Unset):
         body (WebhookUpdate):
 
@@ -285,8 +251,6 @@ async def asyncio(
             subscription_id=subscription_id,
             client=client,
             body=body,
-            is_registration=is_registration,
-            authorization=authorization,
             if_match=if_match,
         )
     ).parsed

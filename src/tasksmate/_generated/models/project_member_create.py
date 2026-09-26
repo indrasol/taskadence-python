@@ -36,7 +36,7 @@ class ProjectMemberCreate:
             Example: editor.
         created_by (None | str | Unset): Who created the membership (username)
         updated_by (None | str | Unset): Who last updated the membership (username)
-        is_active (bool | None | Unset): Is the member active? Example: True.
+        is_active (bool | None | Unset): Is the member active? Default: True. Example: True.
         created_at (datetime.datetime | None | Unset): Creation timestamp
         updated_at (datetime.datetime | None | Unset): Last update timestamp
         deleted_at (datetime.datetime | None | Unset): When the member was deleted
@@ -52,7 +52,7 @@ class ProjectMemberCreate:
     project_role: None | ProjectRoleEnum | Unset = UNSET
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
-    is_active: bool | None | Unset = UNSET
+    is_active: bool | None | Unset = True
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
     deleted_at: datetime.datetime | None | Unset = UNSET

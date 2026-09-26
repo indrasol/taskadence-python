@@ -36,18 +36,18 @@ class ProjectCreate:
         name (str): Project name Example: Website Redesign.
         description (None | str | Unset): Project description Example: Redesign the company website..
         metadata (None | ProjectCreateMetadataType0 | Unset): Additional metadata Example: {'budget': 10000}.
-        status (None | ProjectStatusEnum | Unset): Project status Example: not_started.
-        priority (None | PriorityEnum | Unset): Project priority Example: high.
+        status (None | ProjectStatusEnum | Unset): Project status Default: 'not_started'. Example: not_started.
+        priority (None | PriorityEnum | Unset): Project priority Default: 'none'. Example: high.
         start_date (datetime.date | None | Unset): Start date Example: 2024-07-01.
         end_date (datetime.date | None | Unset): End date Example: 2024-12-31.
         created_by (None | str | Unset): Who created the project
         updated_by (None | str | Unset): Who last updated the project
-        is_active (bool | None | Unset): Is the project active? Example: True.
+        is_active (bool | None | Unset): Is the project active? Default: True. Example: True.
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
         team_members (list[str] | None | Unset): List of user names to add as members
         visibility (None | ProjectVisibilityEnum | Unset): public: every org member sees the project; private: members
-            only (enforced from task 2.2) Example: public.
+            only (enforced from task 2.2) Default: 'public'. Example: public.
         team_id (None | str | Unset): Team the project is filed under (2.6a); an active team of the same org (422
             otherwise). null = none.
         owner_designation (None | str | Unset): Designation of the project owner Example: manager.
@@ -58,17 +58,17 @@ class ProjectCreate:
     name: str
     description: None | str | Unset = UNSET
     metadata: None | ProjectCreateMetadataType0 | Unset = UNSET
-    status: None | ProjectStatusEnum | Unset = UNSET
-    priority: None | PriorityEnum | Unset = UNSET
+    status: None | ProjectStatusEnum | Unset = "not_started"
+    priority: None | PriorityEnum | Unset = "none"
     start_date: datetime.date | None | Unset = UNSET
     end_date: datetime.date | None | Unset = UNSET
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
-    is_active: bool | None | Unset = UNSET
+    is_active: bool | None | Unset = True
     delete_reason: None | str | Unset = UNSET
     owner: None | str | Unset = UNSET
     team_members: list[str] | None | Unset = UNSET
-    visibility: None | ProjectVisibilityEnum | Unset = UNSET
+    visibility: None | ProjectVisibilityEnum | Unset = "public"
     team_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
