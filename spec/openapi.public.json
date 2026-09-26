@@ -63497,5 +63497,188 @@
       "name": "releases",
       "description": "What's new in TasksMate."
     }
-  ]
+  ],
+  "x-problem-types": [
+    {
+      "type": "about:blank",
+      "statuses": [],
+      "description": "A plain HTTP error; the status and `detail` say everything."
+    },
+    {
+      "type": "urn:tasksmate:problem:validation",
+      "statuses": [
+        422
+      ],
+      "description": "The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`)."
+    },
+    {
+      "type": "urn:tasksmate:problem:invalid-parameter",
+      "statuses": [
+        400
+      ],
+      "description": "A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values."
+    },
+    {
+      "type": "urn:tasksmate:problem:precondition-failed",
+      "statuses": [
+        412
+      ],
+      "description": "`If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry."
+    },
+    {
+      "type": "urn:tasksmate:problem:idempotency-key-reused",
+      "statuses": [
+        422
+      ],
+      "description": "This `Idempotency-Key` was first used for a different request (method, path or body)."
+    },
+    {
+      "type": "urn:tasksmate:problem:idempotency-key-in-flight",
+      "statuses": [
+        409
+      ],
+      "description": "The first request with this `Idempotency-Key` has not finished; retry shortly."
+    },
+    {
+      "type": "urn:tasksmate:problem:idempotency-key-invalid",
+      "statuses": [
+        400
+      ],
+      "description": "`Idempotency-Key` must be 1\u2013255 printable ASCII characters."
+    },
+    {
+      "type": "urn:tasksmate:problem:rate-limit",
+      "statuses": [
+        429
+      ],
+      "description": "Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand)."
+    },
+    {
+      "type": "urn:tasksmate:problem:internal",
+      "statuses": [
+        500
+      ],
+      "description": "An unexpected server error. Quote `request_id` to support."
+    },
+    {
+      "type": "urn:tasksmate:problem:token-invalid",
+      "statuses": [
+        401
+      ],
+      "description": "The access token is unknown or malformed (or its principal no longer exists)."
+    },
+    {
+      "type": "urn:tasksmate:problem:token-expired",
+      "statuses": [
+        401
+      ],
+      "description": "The access token is past its `expires_at`; mint a new one."
+    },
+    {
+      "type": "urn:tasksmate:problem:token-revoked",
+      "statuses": [
+        401
+      ],
+      "description": "The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation)."
+    },
+    {
+      "type": "urn:tasksmate:problem:insufficient-scope",
+      "statuses": [
+        403
+      ],
+      "description": "The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens)."
+    },
+    {
+      "type": "urn:tasksmate:problem:test-token-read-only",
+      "statuses": [
+        403
+      ],
+      "description": "A `tm_test_` token can authenticate and read, never write."
+    },
+    {
+      "type": "urn:tasksmate:problem:token-policy",
+      "statuses": [
+        403,
+        422
+      ],
+      "description": "The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime)."
+    },
+    {
+      "type": "urn:tasksmate:problem:url-refused",
+      "statuses": [
+        422
+      ],
+      "description": "The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`)."
+    }
+  ],
+  "x-scope-descriptions": [
+    {
+      "scope": "tasks:read",
+      "description": "Read tasks, their comments, attachments, history, sections and saved views."
+    },
+    {
+      "scope": "tasks:write",
+      "description": "Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read)."
+    },
+    {
+      "scope": "projects:read",
+      "description": "Read projects, their members, resources, statistics, goals and roadmaps."
+    },
+    {
+      "scope": "projects:write",
+      "description": "Create, update and delete projects, their members, resources and goals (implies projects:read)."
+    },
+    {
+      "scope": "teams:read",
+      "description": "Read teams, their members, sprints, milestones and availability."
+    },
+    {
+      "scope": "teams:write",
+      "description": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read)."
+    },
+    {
+      "scope": "org:read",
+      "description": "Read the organization, its settings, members, invites, designations, access tokens and access review."
+    },
+    {
+      "scope": "org:write",
+      "description": "Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read)."
+    },
+    {
+      "scope": "webhooks:read",
+      "description": "Read the organization's webhooks and their delivery logs (owner / admin, or a service account)."
+    },
+    {
+      "scope": "webhooks:write",
+      "description": "Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read)."
+    },
+    {
+      "scope": "admin",
+      "description": "Every scope, including the audit log."
+    }
+  ],
+  "x-limits": {
+    "rate_limit_per_minute": {
+      "live": 600,
+      "test": 60
+    },
+    "idempotency_key_ttl_hours": 24,
+    "webhook_delivery": {
+      "max_attempts": 8,
+      "retry_schedule_seconds": [
+        0,
+        30,
+        120,
+        600,
+        1800,
+        7200,
+        21600,
+        43200
+      ],
+      "response_timeout_seconds": 20,
+      "secret_rotation_grace_hours": 24,
+      "retry_after_cap_seconds": 21600,
+      "disable_after_consecutive_failures": 10
+    }
+  }
 }

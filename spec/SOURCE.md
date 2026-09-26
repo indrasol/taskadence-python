@@ -7,11 +7,11 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `6b75d01` — "fix(api): 4.1b B-D - spec hygiene (auth params, examples, uploads, named bodies, update defaults), webhooks in the spec" (task 4.1b; on `ef0e127`, 4.1b A) |
-| Served by | `uvicorn app.main:app` on `http://localhost:8000` (`ENV=dev`, supabase-dev), 2026-09-26 |
+| Backend commit | `4148026` — "feat(api): 4.6 - x-problem-types, x-scope-descriptions, x-limits in the public spec" (task 4.6; on `f277980`, S.9 — the served document is `6b75d01`'s (4.1b) byte for byte plus the three top-level `x-` extensions) |
+| Served by | `app.main:app` via `TestClient` (`ENV=dev`, the same settings as a local uvicorn), 2026-09-26 |
 | `info.version` | `2026-09-25` |
-| Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) |
-| SHA-256 | `41a61eb3587f40474d4b568472c46a9565cc4fa4f0d96e7c5a416c46e214a496` |
+| Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `da53d76fb8c6650e22485a675a771822a17a145c56ecd58740ff2ebc9ac03ed2` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it (here: the deployed dev API first, then `http://localhost:8000`). The first one is the SDK's default base URL
