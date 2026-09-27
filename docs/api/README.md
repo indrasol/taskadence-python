@@ -9,7 +9,7 @@ Every operation is `tm.<resource>.<method>(…)` on `TasksMate` (and `await` on 
 | [`tm.health`](health.md) | 1 | Liveness. |
 | [`tm.organizations`](organizations.md) | 5 | Organizations you belong to, and their settings. |
 | [`tm.projects`](projects.md) | 7 | Projects: create, read, update, delete, reorder. |
-| [`tm.tasks`](tasks.md) | 14 | Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links. |
+| [`tm.tasks`](tasks.md) | 15 | Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links. |
 | [`tm.organization_members`](organization-members.md) | 5 | The members of an organization and their roles. |
 | [`tm.organization_invites`](organization-invites.md) | 7 | Invitations into an organization. |
 | [`tm.designations`](designations.md) | 7 | Job designations (global and per-organization). |
@@ -33,6 +33,7 @@ Every operation is `tm.<resource>.<method>(…)` on `TasksMate` (and `await` on 
 | [`tm.roadmap`](roadmap.md) | 4 | Roadmaps (read): organization, project, team, and a task's stops. |
 | [`tm.goals`](goals.md) | 10 | Goals: named containers of a project's tasks. |
 | [`tm.me`](me.md) | 1 | Who the caller is: the principal and its organizations / roles. |
+| [`tm.mcp`](mcp.md) | 1 | The MCP server's clients table: how to add `/mcp` to each AI client (remote URL or local package), the tool groups and the scopes each needs. The server itself is `/mcp` (Streamable HTTP), outside this API. |
 | [`tm.audit`](audit.md) | 2 | The organization's audit log (owners and admins). |
 | [`tm.views`](views.md) | 7 | Saved views and the tasks they show. |
 | [`tm.view_pins`](view-pins.md) | 6 | Your sidebar pins (views and projects). |

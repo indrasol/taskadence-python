@@ -33,6 +33,7 @@ class AuthorizationServerMetadata:
         code_challenge_methods_supported (list[str]):
         token_endpoint_auth_methods_supported (list[str]):
         revocation_endpoint_auth_methods_supported (list[str]):
+        registration_endpoint (None | str | Unset): Dynamic client registration (RFC 7591)
         service_documentation (None | str | Unset):
     """
 
@@ -47,6 +48,7 @@ class AuthorizationServerMetadata:
     code_challenge_methods_supported: list[str]
     token_endpoint_auth_methods_supported: list[str]
     revocation_endpoint_auth_methods_supported: list[str]
+    registration_endpoint: None | str | Unset = UNSET
     service_documentation: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -76,6 +78,12 @@ class AuthorizationServerMetadata:
 
         revocation_endpoint_auth_methods_supported = self.revocation_endpoint_auth_methods_supported
 
+        registration_endpoint: None | str | Unset
+        if isinstance(self.registration_endpoint, Unset):
+            registration_endpoint = UNSET
+        else:
+            registration_endpoint = self.registration_endpoint
+
         service_documentation: None | str | Unset
         if isinstance(self.service_documentation, Unset):
             service_documentation = UNSET
@@ -99,6 +107,8 @@ class AuthorizationServerMetadata:
                 "revocation_endpoint_auth_methods_supported": revocation_endpoint_auth_methods_supported,
             }
         )
+        if registration_endpoint is not UNSET:
+            field_dict["registration_endpoint"] = registration_endpoint
         if service_documentation is not UNSET:
             field_dict["service_documentation"] = service_documentation
 
@@ -131,6 +141,15 @@ class AuthorizationServerMetadata:
             list[str], d.pop("revocation_endpoint_auth_methods_supported")
         )
 
+        def _parse_registration_endpoint(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        registration_endpoint = _parse_registration_endpoint(d.pop("registration_endpoint", UNSET))
+
         def _parse_service_documentation(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -152,6 +171,7 @@ class AuthorizationServerMetadata:
             code_challenge_methods_supported=code_challenge_methods_supported,
             token_endpoint_auth_methods_supported=token_endpoint_auth_methods_supported,
             revocation_endpoint_auth_methods_supported=revocation_endpoint_auth_methods_supported,
+            registration_endpoint=registration_endpoint,
             service_documentation=service_documentation,
         )
 

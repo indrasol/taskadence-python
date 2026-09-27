@@ -23,7 +23,7 @@ List / search tasks (the filter grammar; `filter[search]` is search).
 - **Token scope:** `tasks:read`
 - **Returns:** `Page[TaskCardView]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
-- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `team`, `task_type`
+- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `team`, `task_type`, `created_via`, `review`
 
 ## `tm.tasks.read(task_id: str, if_none_match: str | None = None)`
 
@@ -71,6 +71,15 @@ Move a task to another project (or unfile it).
 
 - **HTTP:** `POST /v1/tasks/{task_id}/project`
 - **operationId:** `tasks.set_project`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskInDB`
+
+## `tm.tasks.review(task_id: str, body: TaskReviewDecision | Mapping[str, Any])`
+
+Accept or reject a task an agent created.
+
+- **HTTP:** `POST /v1/tasks/{task_id}/review`
+- **operationId:** `tasks.review`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
 

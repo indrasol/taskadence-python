@@ -15,6 +15,14 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Changed (5.5 — spec from backend `7de395c`: 5.2 registration, 5.4 agent-task review, 5.3 MCP clients)
+- 162 operations (was 160): `tasks.review(task_id, {"decision": "accept" | "reject"})` (accept or reject a task an agent
+  created) and `mcp.clients()` (the MCP server's clients table). `tasks.list` takes `filter={"created_via": …,
+  "review": …}`; tasks carry `created_via` / `review_state` / `proposed_project_id`; organization settings carry
+  `agent_task_review`; the `task.reviewed` webhook event.
+- `TaskTypeEnum` is `task` · `bug` — `agent` is retired (who made a task is `created_via`).
+- `POST /oauth/register` (RFC 7591, `x-kind: oauth`) is protocol, not a method — like the other `/oauth/*` routes.
+
 ### Added (5.3 — the stdio MCP packages, `packages/`)
 - `tasksmate-mcp` (Python, `uvx tasksmate-mcp`) and `@tasksmate/mcp` (Node, `npx -y @tasksmate/mcp`): stdio ↔
   Streamable HTTP proxies to TasksMate's remote MCP server — no tool code of their own. `TASKSMATE_TOKEN` (required),

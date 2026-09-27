@@ -164,7 +164,8 @@ def test_list_and_create_come_from_x_kind() -> None:
 
 def test_the_oauth_protocol_operations_are_not_methods() -> None:
     """4.7: `/oauth/*` and `/.well-known/*` (`x-kind: oauth`) are the browser authorization flow, not SDK methods —
-    the access token it returns is used as `TasksMate(token=...)`. Everything else in the snapshot is a method."""
+    the access token it returns is used as `TasksMate(token=...)`. Everything else in the snapshot is a method.
+    5.5: `/oauth/register` (RFC 7591 dynamic client registration, what an MCP client calls) joins them."""
     oauth = {
         op["operationId"]: path
         for path, item in FULL_SPEC["paths"].items()
@@ -175,6 +176,7 @@ def test_the_oauth_protocol_operations_are_not_methods() -> None:
         "/.well-known/oauth-authorization-server",
         "/.well-known/oauth-protected-resource",
         "/oauth/authorize",
+        "/oauth/register",
         "/oauth/revoke",
         "/oauth/token",
     ]
@@ -183,3 +185,17 @@ def test_the_oauth_protocol_operations_are_not_methods() -> None:
     everything_else = {op["operationId"] for item in FULL_SPEC["paths"].values() for op in item.values()} - set(oauth)
     assert everything_else == set(OPERATIONS)
     assert not hasattr(TasksMate(token=TOKEN), "oauth")
+
+
+def test_the_5_5_surface_agent_task_review_mcp_clients_and_no_agent_type() -> None:
+    """5.5 (backend 7de395c): 5.4's review step and 5.3's MCP clients table are methods; `agent` is not a task type
+    any more (who made a task is `created_via`), and `tasks.list` filters on both new facets."""
+    from tasksmate._generated.models import TaskReviewDecision
+
+    review, clients = OPERATIONS["tasks.review"], OPERATIONS["mcp.clients"]
+    assert (review.method, review.path) == ("POST", "/v1/tasks/{task_id}/review")
+    assert (clients.method, clients.path) == ("GET", "/v1/mcp/clients")
+    assert callable(TasksMate(token=TOKEN).tasks.review) and callable(TasksMate(token=TOKEN).mcp.clients)
+    assert TaskReviewDecision(decision="accept").to_dict() == {"decision": "accept"}
+    assert SPEC["components"]["schemas"]["TaskTypeEnum"]["enum"] == ["task", "bug"]
+    assert {"created_via", "review"} <= set(OPERATIONS["tasks.list"].filters)

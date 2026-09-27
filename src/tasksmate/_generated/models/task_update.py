@@ -46,8 +46,8 @@ class TaskUpdate:
             start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
             due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
             priority (None | PriorityEnum | Unset): Task priority Example: high.
-            task_type (None | TaskTypeEnum | Unset): The kind of task: `task`, `bug` or `agent`. A label, not a permission.
-                Example: task.
+            task_type (None | TaskTypeEnum | Unset): The kind of task: `task` or `bug`. A label, not a permission. Example:
+                task.
             tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
             type_data (None | TaskUpdateTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
 

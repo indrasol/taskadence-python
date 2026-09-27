@@ -7,11 +7,11 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `8b86aa0` — "feat(security): 4.7 - ALLOWED_HOSTS_TM: a Host header allowlist (the OAuth issuer is derived from it)" (task 4.7; the public spec is byte-identical to `28fb27b`'s — 4.8 OAuth apps and 4.9 views of projects moved it from `073e120`) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`), 2026-09-27 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
+| Backend commit | `7de395c` — "feat(mcp): 5.3 - CLIENTS table (one source: app/mcp/clients.py → docs/api/mcp-clients.json, GET /v1/mcp/clients), health names the packages" (task 5.5; the public spec moved at 5.2 `f3cf68e` — `/oauth/register`, 5.4 `89d4d52` — the review step, `created_via` / `review` filters, `agent` type retired, and 5.3 — `GET /v1/mcp/clients`) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-09-27 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
-| Size | 104 paths · 165 operations (160 SDK methods: the 5 `x-kind: oauth` protocol operations are not generated) · 195 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `0ef4181629983f77504005e59d527490ef8d237bcb67c66f5c5ac64891a50b3a` |
+| Size | 107 paths · 168 operations (162 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 206 component schemas · 100 `webhooks` (99 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `6300e915d95126ee6dfd89d76aecf109a7c06cb8c25db97f850ae0ceb7cb18b2` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

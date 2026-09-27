@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.agent_task_review_enum import AgentTaskReviewEnum
+from ..models.agent_task_review_enum import check_agent_task_review_enum
 from ..models.org_join_mode_enum import check_org_join_mode_enum
 from ..models.org_join_mode_enum import OrgJoinModeEnum
 from ..models.project_visibility_enum import check_project_visibility_enum
@@ -37,6 +39,8 @@ class OrganizationSettingsUpdate:
         max_token_ttl_days (int | None | Unset): The longest lifetime a new token may have, in days; send null for no
             cap (the default).
         require_token_expiry (bool | None | Unset): Whether every new token must carry an `expires_at` (default false).
+        agent_task_review (AgentTaskReviewEnum | None | Unset): Which tasks created by an agent wait for a person's
+            review: `private_projects` (default), `always` or `never`.
     """
 
     default_visibility: None | ProjectVisibilityEnum | Unset = UNSET
@@ -45,6 +49,7 @@ class OrganizationSettingsUpdate:
     allow_personal_tokens: bool | None | Unset = UNSET
     max_token_ttl_days: int | None | Unset = UNSET
     require_token_expiry: bool | None | Unset = UNSET
+    agent_task_review: AgentTaskReviewEnum | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -91,6 +96,14 @@ class OrganizationSettingsUpdate:
         else:
             require_token_expiry = self.require_token_expiry
 
+        agent_task_review: None | str | Unset
+        if isinstance(self.agent_task_review, Unset):
+            agent_task_review = UNSET
+        elif isinstance(self.agent_task_review, str):
+            agent_task_review = self.agent_task_review
+        else:
+            agent_task_review = self.agent_task_review
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
@@ -106,6 +119,8 @@ class OrganizationSettingsUpdate:
             field_dict["max_token_ttl_days"] = max_token_ttl_days
         if require_token_expiry is not UNSET:
             field_dict["require_token_expiry"] = require_token_expiry
+        if agent_task_review is not UNSET:
+            field_dict["agent_task_review"] = agent_task_review
 
         return field_dict
 
@@ -183,6 +198,23 @@ class OrganizationSettingsUpdate:
 
         require_token_expiry = _parse_require_token_expiry(d.pop("require_token_expiry", UNSET))
 
+        def _parse_agent_task_review(data: object) -> AgentTaskReviewEnum | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                agent_task_review_type_0 = check_agent_task_review_enum(data)
+
+                return agent_task_review_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(AgentTaskReviewEnum | None | Unset, data)
+
+        agent_task_review = _parse_agent_task_review(d.pop("agent_task_review", UNSET))
+
         organization_settings_update = cls(
             default_visibility=default_visibility,
             domain_join_mode=domain_join_mode,
@@ -190,6 +222,7 @@ class OrganizationSettingsUpdate:
             allow_personal_tokens=allow_personal_tokens,
             max_token_ttl_days=max_token_ttl_days,
             require_token_expiry=require_token_expiry,
+            agent_task_review=agent_task_review,
         )
 
         organization_settings_update.additional_properties = d

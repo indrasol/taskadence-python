@@ -32,6 +32,7 @@ from ._generated.api.goals import goals_replace as _goals_replace
 from ._generated.api.goals import goals_unfile_task as _goals_unfile_task
 from ._generated.api.goals import goals_update as _goals_update
 from ._generated.api.health import health_read as _health_read
+from ._generated.api.mcp import mcp_clients as _mcp_clients
 from ._generated.api.me import me_read as _me_read
 from ._generated.api.milestones import milestones_create as _milestones_create
 from ._generated.api.milestones import milestones_delete as _milestones_delete
@@ -120,6 +121,7 @@ from ._generated.api.tasks import tasks_read as _tasks_read
 from ._generated.api.tasks import tasks_remove_dependency as _tasks_remove_dependency
 from ._generated.api.tasks import tasks_remove_subtask as _tasks_remove_subtask
 from ._generated.api.tasks import tasks_replace as _tasks_replace
+from ._generated.api.tasks import tasks_review as _tasks_review
 from ._generated.api.tasks import tasks_set_milestone as _tasks_set_milestone
 from ._generated.api.tasks import tasks_set_project as _tasks_set_project
 from ._generated.api.tasks import tasks_set_section as _tasks_set_section
@@ -334,6 +336,8 @@ OPERATIONS: dict[str, Operation] = {
             "search_fields",
             "team",
             "task_type",
+            "created_via",
+            "review",
         ),
         is_list=True,
         parse=_tasks_list._parse_response,
@@ -392,6 +396,16 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_set_project._parse_response,
         scopes=("tasks:write",),
         summary="Move a task to another project (or unfile it)",
+    ),
+    "tasks.review": Operation(
+        op_id="tasks.review",
+        method="POST",
+        path="/v1/tasks/{task_id}/review",
+        path_params=("task_id",),
+        body="json",
+        parse=_tasks_review._parse_response,
+        scopes=("tasks:write",),
+        summary="Accept or reject a task an agent created",
     ),
     "tasks.set_sprint": Operation(
         op_id="tasks.set_sprint",
@@ -1717,6 +1731,14 @@ OPERATIONS: dict[str, Operation] = {
         if_none_match=True,
         parse=_me_read._parse_response,
         summary="The authenticated principal and its organizations / roles",
+    ),
+    "mcp.clients": Operation(
+        op_id="mcp.clients",
+        method="GET",
+        path="/v1/mcp/clients",
+        if_none_match=True,
+        parse=_mcp_clients._parse_response,
+        summary="How to add the MCP server to each client: the clients table, tool groups and scopes",
     ),
     "audit.list": Operation(
         op_id="audit.list",

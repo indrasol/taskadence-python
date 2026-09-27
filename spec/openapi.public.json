@@ -2528,6 +2528,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -2734,7 +2739,7 @@
           "tasks"
         ],
         "summary": "List / search tasks (the filter grammar; `filter[search]` is search)",
-        "description": "List the tasks you can see, one page at a time.\n\n**Pagination**\n- The response is `{\"data\": [TaskCardView\u2026], \"next_cursor\": \"<opaque>\" | null}`; pass `next_cursor` back as `cursor` for the next page. `null` means the end.\n- A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) \u2014 keep following the cursor until it is null.\n- A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different query is a 400.\n\n**Scope and visibility**\n- `project_id`: you must be able to read the project (it is public, you are a member, or you are an org admin).\n- `org_id`: you must be a member of the organization; tasks come from the projects you can read, plus tasks filed in no project.\n- Private projects you are not a member of never appear.\n- Restricted tasks you may not open are left out \u2014 or returned with `has_access: false` when `include_inaccessible=true`.\n\n**Filters**\n- Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are AND-ed.\n- An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority or type is a 400 naming the value.\n- `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only narrows what you can already see.\n- `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title` for the title only.\n\n**Sort**\n- `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or `desc`.\n- Ties break on `task_id`; empty values sort last.\n- `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog > in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.\n\n**Sections**\n- `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position` for that scope (`null` when the task is in no section there).\n- `section_scope=own` uses each task's own home: its project, or its team when it has no project; a task with neither is unsectioned. `own` works on this operation only.",
+        "description": "List the tasks you can see, one page at a time.\n\n**Pagination**\n- The response is `{\"data\": [TaskCardView\u2026], \"next_cursor\": \"<opaque>\" | null}`; pass `next_cursor` back as `cursor` for the next page. `null` means the end.\n- A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) \u2014 keep following the cursor until it is null.\n- A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different query is a 400.\n\n**Scope and visibility**\n- `project_id`: you must be able to read the project (it is public, you are a member, or you are an org admin).\n- `org_id`: you must be a member of the organization; tasks come from the projects you can read, plus tasks filed in no project.\n- Private projects you are not a member of never appear.\n- Restricted tasks you may not open are left out \u2014 or returned with `has_access: false` when `include_inaccessible=true`.\n\n**Filters**\n- Repeat `filter[...]` as needed: comma-separated values are OR-ed within a key; different keys are AND-ed.\n- An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority or type is a 400 naming the value.\n- `filter[task_type]` takes `task`, `bug`. A type is a label, not a permission: it only narrows what you can already see.\n- `filter[created_via]` (`app`, `api`, `sdk`, `mcp`, `none`) and `filter[review]` (`pending`, `accepted`, `rejected`, `none`) find the tasks agents created and the ones waiting for a person's review. Labels too, never permissions.\n- `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title` for the title only.\n\n**Sort**\n- `sort_by`: `task_id`, `title`, `status`, `priority`, `due_date`, `start_date`, `created_at`, `assignee`, `project_id`, `priority_rank`, `status_rank`, `task_type`; `sort_order`: `asc` or `desc`.\n- Ties break on `task_id`; empty values sort last.\n- `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog > in_progress > not_started > blocked > completed. `task_type`: task, bug.\n\n**Sections**\n- `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position` for that scope (`null` when the task is in no section there).\n- `section_scope=own` uses each task's own home: its project, or its team when it has no project; a task with neither is unsectioned. `own` works on this operation only.",
         "operationId": "tasks.list",
         "parameters": [
           {
@@ -3108,10 +3113,52 @@
                   "type": "null"
                 }
               ],
-              "description": "One or more of `task`, `bug`, `agent`, comma-separated or repeated; any other value (including `goal`) is a 400.",
+              "description": "One or more of `task`, `bug`, comma-separated or repeated; any other value (including `goal` and `agent`) is a 400.",
               "title": "Filter[Task Type]"
             },
-            "description": "One or more of `task`, `bug`, `agent`, comma-separated or repeated; any other value (including `goal`) is a 400."
+            "description": "One or more of `task`, `bug`, comma-separated or repeated; any other value (including `goal` and `agent`) is a 400."
+          },
+          {
+            "name": "filter[created_via]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Which kind of client created the task: one or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for tasks created before this was recorded (mixable).",
+              "title": "Filter[Created Via]"
+            },
+            "description": "Which kind of client created the task: one or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for tasks created before this was recorded (mixable)."
+          },
+          {
+            "name": "filter[review]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Review state: one or more of `pending`, `accepted`, `rejected`, or `none` for tasks never in review (mixable).",
+              "title": "Filter[Review]"
+            },
+            "description": "Review state: one or more of `pending`, `accepted`, `rejected`, or `none` for tasks never in review (mixable)."
           },
           {
             "name": "section_scope",
@@ -3268,6 +3315,11 @@
                       "task_id": "string",
                       "created_at": "2026-09-25T12:00:00Z",
                       "updated_at": "2026-09-25T12:00:00Z",
+                      "created_via": "mcp",
+                      "review_state": "pending",
+                      "proposed_project_id": "string",
+                      "reviewed_at": "2026-09-25T12:00:00Z",
+                      "reviewed_by": "string",
                       "restricted_to_user_ids": [
                         "string"
                       ],
@@ -3542,6 +3594,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -3861,6 +3918,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -4177,6 +4239,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -4664,6 +4731,285 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
+                  "restricted_to_user_ids": [
+                    "string"
+                  ],
+                  "has_access": false,
+                  "has_edit_access": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}/review": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Accept or reject a task an agent created",
+        "description": "Accept or reject a task an agent created while it waits for review (`review_state: pending`).\n\n- **Who:** a person who may edit the task \u2014 signed in, or with their own access token. A service account's token, or a call made through the MCP server, is a 403: agents do not review their own work.\n- **accept:** the task counts as ordinary work. A task held back from a private project (`proposed_project_id`) is filed into that project, which needs edit rights there (403 otherwise, and nothing moves).\n- **reject:** the task is archived where it is; it is never deleted.\n- **Errors:** 409 when the task is not waiting for review; the problem's `errors[0].review_state` names its state.",
+        "operationId": "tasks.review",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReviewDecision"
+              },
+              "example": {
+                "decision": "accept"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInDB"
+                },
+                "example": {
+                  "project_id": "project-1234",
+                  "org_id": "org-1234",
+                  "sub_tasks": [
+                    "task-5678"
+                  ],
+                  "dependencies": [
+                    "task-4321"
+                  ],
+                  "title": "Implement Login",
+                  "description": "Implement OAuth2 login flow.",
+                  "status": "not_started",
+                  "assignee": "",
+                  "start_date": "2024-07-31",
+                  "due_date": "2024-08-01",
+                  "priority": "high",
+                  "task_type": "task",
+                  "tags": [
+                    "backend",
+                    "auth"
+                  ],
+                  "type_data": {},
+                  "metadata": [
+                    {
+                      "field": "status",
+                      "new": "in_progress",
+                      "old": "not_started"
+                    }
+                  ],
+                  "created_by": "string",
+                  "updated_by": "string",
+                  "is_subtask": false,
+                  "bug_id": "B1234",
+                  "tracker_id": "TR1234",
+                  "restricted_to": [],
+                  "team_id": "string",
+                  "sprint_id": "SP12345",
+                  "milestone_id": "MS12345",
+                  "goal_id": "G12345",
+                  "task_id": "string",
+                  "created_at": "2026-09-25T12:00:00Z",
+                  "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -4933,6 +5279,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5202,6 +5553,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5702,6 +6058,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5967,6 +6328,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6236,6 +6602,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6501,6 +6872,11 @@
                   "task_id": "string",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
+                  "created_via": "mcp",
+                  "review_state": "pending",
+                  "proposed_project_id": "string",
+                  "reviewed_at": "2026-09-25T12:00:00Z",
+                  "reviewed_by": "string",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6694,7 +7070,7 @@
           "organization-members"
         ],
         "summary": "List an organization's members",
-        "description": "The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`: `user` or `service_account`.",
+        "description": "The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.",
         "operationId": "organization-members.list",
         "parameters": [
           {
@@ -18511,6 +18887,7 @@
                   "allow_personal_tokens": true,
                   "max_token_ttl_days": 0,
                   "require_token_expiry": false,
+                  "agent_task_review": "private_projects",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "updated_by": "string",
@@ -18741,7 +19118,8 @@
                 "audit_retention_days": 1,
                 "allow_personal_tokens": false,
                 "max_token_ttl_days": 1,
-                "require_token_expiry": false
+                "require_token_expiry": false,
+                "agent_task_review": "private_projects"
               }
             }
           }
@@ -18762,6 +19140,7 @@
                   "allow_personal_tokens": true,
                   "max_token_ttl_days": 0,
                   "require_token_expiry": false,
+                  "agent_task_review": "private_projects",
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "updated_by": "string",
@@ -30700,6 +31079,11 @@
                       "task_id": "string",
                       "created_at": "2026-09-25T12:00:00Z",
                       "updated_at": "2026-09-25T12:00:00Z",
+                      "created_via": "mcp",
+                      "review_state": "pending",
+                      "proposed_project_id": "string",
+                      "reviewed_at": "2026-09-25T12:00:00Z",
+                      "reviewed_by": "string",
                       "restricted_to_user_ids": [
                         "string"
                       ],
@@ -38035,6 +38419,260 @@
         ]
       }
     },
+    "/v1/mcp/clients": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "How to add the MCP server to each client: the clients table, tool groups and scopes",
+        "description": "How to add the TasksMate MCP server to each client: a remote (URL) and a local (stdio package) artefact per\nclient, with the server URL for this API, the tool groups (`default`, `requires_scope`) and the scopes each\ngroup's read and write tools need.",
+        "operationId": "mcp.clients",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpClientsOut"
+                },
+                "example": {
+                  "mcp_url": "string",
+                  "docs_url": "string",
+                  "groups": [
+                    {
+                      "name": "string",
+                      "title": "string",
+                      "description": "string",
+                      "default": false,
+                      "always_on": false,
+                      "requires_scope": "string"
+                    }
+                  ],
+                  "scopes_for_group": {},
+                  "stdio": {
+                    "packages": {},
+                    "default_api_url": "string",
+                    "env": {},
+                    "flags": {}
+                  },
+                  "clients": [
+                    {
+                      "id": "string",
+                      "label": "string",
+                      "supports_oauth": false,
+                      "docs_url": "string",
+                      "other": false,
+                      "env_flag": "string",
+                      "remote": {
+                        "kind": "command",
+                        "where": "string",
+                        "lang": "bash",
+                        "template": "string",
+                        "auth": "string"
+                      },
+                      "stdio": {
+                        "kind": "command",
+                        "where": "string",
+                        "lang": "bash",
+                        "template": "string",
+                        "auth": "string"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ]
+      }
+    },
     "/v1/audit": {
       "get": {
         "tags": [
@@ -40433,6 +41071,11 @@
                       "task_id": "string",
                       "created_at": "2026-09-25T12:00:00Z",
                       "updated_at": "2026-09-25T12:00:00Z",
+                      "created_via": "mcp",
+                      "review_state": "pending",
+                      "proposed_project_id": "string",
+                      "reviewed_at": "2026-09-25T12:00:00Z",
+                      "reviewed_by": "string",
                       "restricted_to_user_ids": [
                         "string"
                       ],
@@ -42042,6 +42685,7 @@
                   "authorization_endpoint": "string",
                   "token_endpoint": "string",
                   "revocation_endpoint": "string",
+                  "registration_endpoint": "string",
                   "scopes_supported": [
                     "string"
                   ],
@@ -42102,6 +42746,7 @@
                   "bearer_methods_supported": [
                     "string"
                   ],
+                  "resource_name": "string",
                   "resource_documentation": "string"
                 }
               }
@@ -42405,6 +43050,375 @@
         "security": []
       }
     },
+    "/oauth/register": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Register a client (RFC 7591 dynamic client registration)",
+        "description": "Register a client (RFC 7591) \u2014 how MCP clients connect without a developer account. The client is public: no\nsecret, PKCE on every authorization. No authentication; limited per address.",
+        "operationId": "oauth.register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "client_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "title": "Client Name",
+                    "description": "Shown on the consent screen",
+                    "examples": [
+                      "Claude Code"
+                    ]
+                  },
+                  "redirect_uris": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "maxItems": 10,
+                    "minItems": 1,
+                    "title": "Redirect Uris",
+                    "description": "Exact strings: https, http on a loopback host (localhost, any port), or a desktop client's scheme (cursor, vscode, vscode-insiders, claude)",
+                    "examples": [
+                      [
+                        "http://localhost:53682/callback"
+                      ]
+                    ]
+                  },
+                  "token_endpoint_auth_method": {
+                    "type": "string",
+                    "const": "none",
+                    "title": "Token Endpoint Auth Method",
+                    "description": "Must be `none`: a registered client is public and proves itself with PKCE; it never gets a secret",
+                    "default": "none"
+                  },
+                  "grant_types": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "authorization_code",
+                            "refresh_token"
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Grant Types",
+                    "examples": [
+                      [
+                        "authorization_code",
+                        "refresh_token"
+                      ]
+                    ]
+                  },
+                  "response_types": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string",
+                          "const": "code"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Response Types",
+                    "examples": [
+                      [
+                        "code"
+                      ]
+                    ]
+                  },
+                  "scope": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Scope",
+                    "description": "Space-separated, within: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. Omitted \u2192 `tasks:read tasks:write projects:read teams:read`",
+                    "examples": [
+                      "tasks:read tasks:write"
+                    ]
+                  },
+                  "client_uri": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Client Uri",
+                    "description": "https URL of the client's homepage"
+                  },
+                  "logo_uri": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Logo Uri",
+                    "description": "https URL of a square logo"
+                  },
+                  "policy_uri": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Policy Uri",
+                    "description": "https URL of the client's privacy policy"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "client_name",
+                  "redirect_uris"
+                ],
+                "title": "ClientRegistrationRequest",
+                "description": "The metadata a client sends to register itself. Unknown fields are ignored (RFC 7591 \u00a72)."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientRegistrationResponse"
+                },
+                "example": {
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_id_issued_at": 1790500000,
+                  "client_name": "Claude Code",
+                  "grant_types": [
+                    "authorization_code",
+                    "refresh_token"
+                  ],
+                  "redirect_uris": [
+                    "http://localhost:53682/callback"
+                  ],
+                  "response_types": [
+                    "code"
+                  ],
+                  "scope": "tasks:read tasks:write projects:read teams:read",
+                  "token_endpoint_auth_method": "none"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The metadata is refused: `invalid_client_metadata` or `invalid_redirect_uri` (RFC 7591)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationErrorBody"
+                },
+                "example": {
+                  "error": "invalid_client_metadata",
+                  "error_description": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many registrations from this address; wait `Retry-After` seconds",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "about:blank",
+                        "urn:tasksmate:problem:validation",
+                        "urn:tasksmate:problem:invalid-parameter",
+                        "urn:tasksmate:problem:precondition-failed",
+                        "urn:tasksmate:problem:idempotency-key-reused",
+                        "urn:tasksmate:problem:idempotency-key-in-flight",
+                        "urn:tasksmate:problem:idempotency-key-invalid",
+                        "urn:tasksmate:problem:rate-limit",
+                        "urn:tasksmate:problem:internal",
+                        "urn:tasksmate:problem:token-invalid",
+                        "urn:tasksmate:problem:token-expired",
+                        "urn:tasksmate:problem:token-revoked",
+                        "urn:tasksmate:problem:insufficient-scope",
+                        "urn:tasksmate:problem:test-token-read-only",
+                        "urn:tasksmate:problem:token-policy",
+                        "urn:tasksmate:problem:url-refused"
+                      ],
+                      "description": "`about:blank` or a `urn:tasksmate:problem:*` identifier"
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "detail": {
+                      "description": "Human-readable explanation (a string; for a 422, the list of validation errors)",
+                      "example": "This task is restricted to other users"
+                    },
+                    "instance": {
+                      "type": "string",
+                      "example": "/v1/tasks/T123"
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "example": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                    },
+                    "errors": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array",
+                      "description": "Structured failures: validation errors, or `{loc, msg, allowed}` for a bad parameter"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "description": "An RFC 9457 problem details object \u2014 the body of every error response. `detail` is the human-readable explanation; `request_id` identifies the request for support."
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "This task is restricted to other users",
+                  "instance": "/v1/tasks/T123",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11",
+                  "errors": [
+                    {}
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Registration is closed for now (too many registered clients)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "about:blank",
+                        "urn:tasksmate:problem:validation",
+                        "urn:tasksmate:problem:invalid-parameter",
+                        "urn:tasksmate:problem:precondition-failed",
+                        "urn:tasksmate:problem:idempotency-key-reused",
+                        "urn:tasksmate:problem:idempotency-key-in-flight",
+                        "urn:tasksmate:problem:idempotency-key-invalid",
+                        "urn:tasksmate:problem:rate-limit",
+                        "urn:tasksmate:problem:internal",
+                        "urn:tasksmate:problem:token-invalid",
+                        "urn:tasksmate:problem:token-expired",
+                        "urn:tasksmate:problem:token-revoked",
+                        "urn:tasksmate:problem:insufficient-scope",
+                        "urn:tasksmate:problem:test-token-read-only",
+                        "urn:tasksmate:problem:token-policy",
+                        "urn:tasksmate:problem:url-refused"
+                      ],
+                      "description": "`about:blank` or a `urn:tasksmate:problem:*` identifier"
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "detail": {
+                      "description": "Human-readable explanation (a string; for a 422, the list of validation errors)",
+                      "example": "This task is restricted to other users"
+                    },
+                    "instance": {
+                      "type": "string",
+                      "example": "/v1/tasks/T123"
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "example": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                    },
+                    "errors": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array",
+                      "description": "Structured failures: validation errors, or `{loc, msg, allowed}` for a bad parameter"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "description": "An RFC 9457 problem details object \u2014 the body of every error response. `detail` is the human-readable explanation; `request_id` identifies the request for support."
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "This task is restricted to other users",
+                  "instance": "/v1/tasks/T123",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11",
+                  "errors": [
+                    {}
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
+    },
     "/oauth/revoke": {
       "post": {
         "tags": [
@@ -42551,6 +43565,16 @@
           "ok": true
         }
       },
+      "AgentTaskReviewEnum": {
+        "type": "string",
+        "enum": [
+          "private_projects",
+          "always",
+          "never"
+        ],
+        "title": "AgentTaskReviewEnum",
+        "description": "Which tasks created by an agent (through the MCP server, the API or the SDK) wait for a person's review.\n\n- `private_projects` (default): only a task aimed at a private project. It is created with no project, the project kept as `proposed_project_id`, until a person accepts it.\n- `always`: every agent task, where it was asked to go.\n- `never`: none (agent tasks stay marked by `created_via`)."
+      },
       "AuditPage": {
         "properties": {
           "data": {
@@ -42597,6 +43621,18 @@
           "revocation_endpoint": {
             "type": "string",
             "title": "Revocation Endpoint"
+          },
+          "registration_endpoint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Endpoint",
+            "description": "Dynamic client registration (RFC 7591)"
           },
           "scopes_supported": {
             "items": {
@@ -43048,6 +44084,118 @@
         ],
         "title": "Body_upload_resource_v1_project_resources_upload_post",
         "description": "The request body of `project-resources.upload`."
+      },
+      "ClientRegistrationResponse": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id",
+            "description": "Public identifier (`tmc_\u2026`). There is no client secret."
+          },
+          "client_id_issued_at": {
+            "type": "integer",
+            "title": "Client Id Issued At",
+            "description": "Unix seconds"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "redirect_uris": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Redirect Uris"
+          },
+          "grant_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Grant Types"
+          },
+          "response_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Response Types"
+          },
+          "token_endpoint_auth_method": {
+            "type": "string",
+            "const": "none",
+            "title": "Token Endpoint Auth Method",
+            "default": "none"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "description": "The scopes the client may ask for, space-separated"
+          },
+          "client_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Uri"
+          },
+          "logo_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Uri"
+          },
+          "policy_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Uri"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "client_id_issued_at",
+          "client_name",
+          "redirect_uris",
+          "grant_types",
+          "response_types",
+          "scope"
+        ],
+        "title": "ClientRegistrationResponse",
+        "example": {
+          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_id_issued_at": 1790500000,
+          "client_name": "Claude Code",
+          "grant_types": [
+            "authorization_code",
+            "refresh_token"
+          ],
+          "redirect_uris": [
+            "http://localhost:53682/callback"
+          ],
+          "response_types": [
+            "code"
+          ],
+          "scope": "tasks:read tasks:write projects:read teams:read",
+          "token_endpoint_auth_method": "none"
+        },
+        "description": "Returned by `oauth.register`."
       },
       "CommitType": {
         "type": "string",
@@ -44776,6 +45924,333 @@
         ],
         "title": "InviteStatusEnum",
         "description": "Invite status enum"
+      },
+      "McpArtefact": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "command",
+              "file",
+              "settings"
+            ],
+            "title": "Kind",
+            "description": "Run it, add it to a file, or enter it in the client's settings"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where",
+            "description": "The file (`file`) or the settings path (`settings`)"
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "bash",
+              "json",
+              "text"
+            ],
+            "title": "Lang"
+          },
+          "template": {
+            "type": "string",
+            "title": "Template",
+            "description": "With `{url}`, `{token}`, `{command}`, `{args}`, `{args_json}`, `{env_json}`, `{env_args}`"
+          },
+          "auth": {
+            "type": "string",
+            "title": "Auth",
+            "description": "What happens after the paste"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "lang",
+          "template",
+          "auth"
+        ],
+        "title": "McpArtefact",
+        "description": "Part of `McpClientRow`."
+      },
+      "McpClientRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "supports_oauth": {
+            "type": "boolean",
+            "title": "Supports Oauth",
+            "description": "The client signs in by itself; otherwise its remote artefact carries `{token}`"
+          },
+          "docs_url": {
+            "type": "string",
+            "title": "Docs Url",
+            "description": "The client's own MCP documentation"
+          },
+          "other": {
+            "type": "boolean",
+            "title": "Other",
+            "description": "A generic row (Other), listed last"
+          },
+          "env_flag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Env Flag",
+            "description": "The flag a `command` stdio artefact passes each variable with (`{env_args}`)"
+          },
+          "remote": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/McpArtefact"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The Streamable HTTP artefact; null when the row is stdio only"
+          },
+          "stdio": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/McpArtefact"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The local-package artefact; null when the client cannot start a process"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "supports_oauth",
+          "docs_url",
+          "other"
+        ],
+        "title": "McpClientRow",
+        "description": "Part of `McpClientsOut`."
+      },
+      "McpClientsOut": {
+        "properties": {
+          "mcp_url": {
+            "type": "string",
+            "title": "Mcp Url",
+            "description": "This API's MCP server URL (derived from the request's host, as `/.well-known/*` is)"
+          },
+          "docs_url": {
+            "type": "string",
+            "title": "Docs Url",
+            "description": "The docs site's Connect page"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/McpGroupOut"
+            },
+            "type": "array",
+            "title": "Groups"
+          },
+          "scopes_for_group": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/McpGroupScopes"
+            },
+            "type": "object",
+            "title": "Scopes For Group"
+          },
+          "stdio": {
+            "$ref": "#/components/schemas/McpStdio"
+          },
+          "clients": {
+            "items": {
+              "$ref": "#/components/schemas/McpClientRow"
+            },
+            "type": "array",
+            "title": "Clients"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mcp_url",
+          "docs_url",
+          "groups",
+          "scopes_for_group",
+          "stdio",
+          "clients"
+        ],
+        "title": "McpClientsOut",
+        "description": "Returned by `mcp.clients`."
+      },
+      "McpGroupOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "default": {
+            "type": "boolean",
+            "title": "Default",
+            "description": "Enabled when the URL names no `groups`"
+          },
+          "always_on": {
+            "type": "boolean",
+            "title": "Always On",
+            "description": "`me`: on whatever `groups` says"
+          },
+          "requires_scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requires Scope",
+            "description": "A scope the group needs on top of each tool's own (`admin`)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "title",
+          "description",
+          "default",
+          "always_on"
+        ],
+        "title": "McpGroupOut",
+        "description": "Part of `McpClientsOut`."
+      },
+      "McpGroupScopes": {
+        "properties": {
+          "read": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Read",
+            "description": "The scopes the group's read tools need"
+          },
+          "write": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Write",
+            "description": "The scopes every tool of the group needs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "read",
+          "write"
+        ],
+        "title": "McpGroupScopes",
+        "description": "Part of `McpClientsOut`."
+      },
+      "McpPackage": {
+        "properties": {
+          "package": {
+            "type": "string",
+            "title": "Package"
+          },
+          "registry": {
+            "type": "string",
+            "enum": [
+              "npm",
+              "PyPI"
+            ],
+            "title": "Registry"
+          },
+          "command": {
+            "type": "string",
+            "title": "Command"
+          },
+          "args": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Args"
+          }
+        },
+        "type": "object",
+        "required": [
+          "package",
+          "registry",
+          "command",
+          "args"
+        ],
+        "title": "McpPackage",
+        "description": "Part of `McpStdio`."
+      },
+      "McpStdio": {
+        "properties": {
+          "packages": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/McpPackage"
+            },
+            "type": "object",
+            "title": "Packages",
+            "description": "`npx` and `uvx`"
+          },
+          "default_api_url": {
+            "type": "string",
+            "title": "Default Api Url",
+            "description": "The API the packages call when `TASKSMATE_API_URL` is unset"
+          },
+          "env": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Env",
+            "description": "The packages' environment variables: token, api_url, readonly, groups"
+          },
+          "flags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Flags",
+            "description": "The same as command-line flags (flags win)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "packages",
+          "default_api_url",
+          "env",
+          "flags"
+        ],
+        "title": "McpStdio",
+        "description": "Part of `McpClientsOut`."
       },
       "MeAuth": {
         "properties": {
@@ -47442,6 +48917,11 @@
             "description": "Every new token must carry an `expires_at`.",
             "default": false
           },
+          "agent_task_review": {
+            "$ref": "#/components/schemas/AgentTaskReviewEnum",
+            "description": "Which tasks created by an agent wait for a person's review.",
+            "default": "private_projects"
+          },
           "created_at": {
             "anyOf": [
               {
@@ -47565,6 +49045,17 @@
             ],
             "title": "Require Token Expiry",
             "description": "Whether every new token must carry an `expires_at` (default false)."
+          },
+          "agent_task_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentTaskReviewEnum"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Which tasks created by an agent wait for a person's review: `private_projects` (default), `always` or `never`."
           }
         },
         "type": "object",
@@ -50465,6 +51956,17 @@
             "type": "array",
             "title": "Bearer Methods Supported"
           },
+          "resource_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Name"
+          },
           "resource_documentation": {
             "anyOf": [
               {
@@ -50486,6 +51988,35 @@
         ],
         "title": "ProtectedResourceMetadata",
         "description": "Returned by `oauth.resource_metadata`."
+      },
+      "RegistrationErrorBody": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "enum": [
+              "invalid_client_metadata",
+              "invalid_redirect_uri"
+            ],
+            "title": "Error"
+          },
+          "error_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "RegistrationErrorBody",
+        "description": "A `RegistrationErrorBody` object."
       },
       "Release": {
         "properties": {
@@ -52362,7 +53893,7 @@
                 "type": "null"
               }
             ],
-            "description": "The kind of task: `task` (default), `bug` or `agent`. A label, not a permission.",
+            "description": "The kind of task: `task` (default) or `bug`. A label, not a permission.",
             "default": "task",
             "example": "task"
           },
@@ -52579,6 +54110,69 @@
               }
             ],
             "title": "Updated At"
+          },
+          "created_via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created Via",
+            "description": "Which kind of client created the task: `app` (the web app), `api` (an access token), `sdk` (the Python SDK) or `mcp` (the MCP server); null for older tasks.",
+            "example": "mcp"
+          },
+          "review_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review State",
+            "description": "null when the task was never in review; `pending` while a task an agent created waits for a person; then `accepted` or `rejected`. A label, never a permission.",
+            "example": "pending"
+          },
+          "proposed_project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Project Id",
+            "description": "The private project an agent asked for while the task is held for review with no project; cleared when the task is accepted into it."
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At",
+            "description": "When the review was decided."
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By",
+            "description": "Who decided the review (username)."
           },
           "restricted_to_user_ids": {
             "anyOf": [
@@ -53204,7 +54798,7 @@
                 "type": "null"
               }
             ],
-            "description": "The kind of task: `task` (default), `bug` or `agent`. A label, not a permission.",
+            "description": "The kind of task: `task` (default) or `bug`. A label, not a permission.",
             "default": "task",
             "example": "task"
           },
@@ -53663,7 +55257,7 @@
                 "type": "null"
               }
             ],
-            "description": "The kind of task: `task` (default), `bug` or `agent`. A label, not a permission.",
+            "description": "The kind of task: `task` (default) or `bug`. A label, not a permission.",
             "default": "task",
             "example": "task"
           },
@@ -53881,6 +55475,69 @@
             ],
             "title": "Updated At"
           },
+          "created_via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created Via",
+            "description": "Which kind of client created the task: `app` (the web app), `api` (an access token), `sdk` (the Python SDK) or `mcp` (the MCP server); null for older tasks.",
+            "example": "mcp"
+          },
+          "review_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review State",
+            "description": "null when the task was never in review; `pending` while a task an agent created waits for a person; then `accepted` or `rejected`. A label, never a permission.",
+            "example": "pending"
+          },
+          "proposed_project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Project Id",
+            "description": "The private project an agent asked for while the task is held for review with no project; cleared when the task is accepted into it."
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At",
+            "description": "When the review was decided."
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By",
+            "description": "Who decided the review (username)."
+          },
           "restricted_to_user_ids": {
             "anyOf": [
               {
@@ -53929,7 +55586,7 @@
           "updated_at"
         ],
         "title": "TaskInDB",
-        "description": "Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 7 more."
+        "description": "Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 8 more."
       },
       "TaskListPage": {
         "properties": {
@@ -53998,6 +55655,26 @@
         "type": "object",
         "title": "TaskProjectSet",
         "description": "The body of `POST /v1/tasks/{task_id}/project`: the project to move the task to, or `project_id: null` to take it out of its project."
+      },
+      "TaskReviewDecision": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "reject"
+            ],
+            "title": "Decision",
+            "description": "accept: the task counts as ordinary work (a held task is filed into its proposed project \u2014 you need edit rights there); reject: the task is archived where it is (never deleted)",
+            "example": "accept"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision"
+        ],
+        "title": "TaskReviewDecision",
+        "description": "The body of a review: accept or reject a task an agent created."
       },
       "TaskRoadmapStop": {
         "properties": {
@@ -54164,11 +55841,10 @@
         "type": "string",
         "enum": [
           "task",
-          "bug",
-          "agent"
+          "bug"
         ],
         "title": "TaskTypeEnum",
-        "description": "The kind of task: `task`, `bug` or `agent`, in sort order (`sort_by=task_type`).\n\n- A label, never a permission.\n- A goal is not a task type but a container of a project's tasks (`goal_id`): `task_type=goal` is refused on write (422) and in `filter[task_type]` (400)."
+        "description": "The kind of task: `task` or `bug`, in sort order (`sort_by=task_type`). Who made a task is `created_via`, not its type.\n\n- A label, never a permission.\n- A goal is not a task type but a container of a project's tasks (`goal_id`): `task_type=goal` is refused on write (422) and in `filter[task_type]` (400)."
       },
       "TaskUpdate": {
         "properties": {
@@ -54335,7 +56011,7 @@
                 "type": "null"
               }
             ],
-            "description": "The kind of task: `task`, `bug` or `agent`. A label, not a permission.",
+            "description": "The kind of task: `task` or `bug`. A label, not a permission.",
             "example": "task"
           },
           "tags": {
@@ -64955,6 +66631,110 @@
         }
       }
     },
+    "task.reviewed": {
+      "post": {
+        "summary": "task.reviewed",
+        "description": "A person accepted or rejected a task an agent created (`data.after.decision`); an accepted held task moved into the project it was proposed for.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.task.reviewed",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-TasksMate-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TasksMate-Webhooks/1",
+            "description": "Identifies TasksMate's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "task.reviewed",
+                "api_version": "2026-09-25",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O0020",
+                "project_id": "P30104",
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "task",
+                  "resource_id": "T869658",
+                  "before": {
+                    "name": "Before"
+                  },
+                  "after": {
+                    "name": "After"
+                  }
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+          }
+        }
+      }
+    },
     "task.subtask_added": {
       "post": {
         "summary": "task.subtask_added",
@@ -67442,6 +69222,10 @@
     {
       "name": "releases",
       "description": "What's new in TasksMate."
+    },
+    {
+      "name": "mcp",
+      "description": "The MCP server's clients table: how to add `/mcp` to each AI client (remote URL or local package), the tool groups and the scopes each needs. The server itself is `/mcp` (Streamable HTTP), outside this API."
     },
     {
       "name": "oauth-clients",

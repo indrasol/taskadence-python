@@ -44,8 +44,8 @@ class TaskCreate:
         start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
         due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
         priority (None | PriorityEnum | Unset): Task priority Default: 'none'. Example: high.
-        task_type (None | TaskTypeEnum | Unset): The kind of task: `task` (default), `bug` or `agent`. A label, not a
-            permission. Default: 'task'. Example: task.
+        task_type (None | TaskTypeEnum | Unset): The kind of task: `task` (default) or `bug`. A label, not a permission.
+            Default: 'task'. Example: task.
         tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
         type_data (None | TaskCreateTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
 

@@ -4,6 +4,7 @@
 
 from .access_review import AccessReview
 from .acknowledgement import Acknowledgement
+from .agent_task_review_enum import AgentTaskReviewEnum
 from .audit_page import AuditPage
 from .audit_page_data_item import AuditPageDataItem
 from .authorization_server_metadata import AuthorizationServerMetadata
@@ -15,6 +16,7 @@ from .availability_range import AvailabilityRange
 from .availability_update import AvailabilityUpdate
 from .body_upload_attachment_v1_task_attachments_post import BodyUploadAttachmentV1TaskAttachmentsPost
 from .body_upload_resource_v1_project_resources_upload_post import BodyUploadResourceV1ProjectResourcesUploadPost
+from .client_registration_response import ClientRegistrationResponse
 from .commit_type import CommitType
 from .connected_app import ConnectedApp
 from .connected_app_revoked import ConnectedAppRevoked
@@ -54,6 +56,20 @@ from .goals_reordered import GoalsReordered
 from .health import Health
 from .http_validation_error import HTTPValidationError
 from .invite_status_enum import InviteStatusEnum
+from .mcp_artefact import McpArtefact
+from .mcp_artefact_kind import McpArtefactKind
+from .mcp_artefact_lang import McpArtefactLang
+from .mcp_client_row import McpClientRow
+from .mcp_clients_out import McpClientsOut
+from .mcp_clients_out_scopes_for_group import McpClientsOutScopesForGroup
+from .mcp_group_out import McpGroupOut
+from .mcp_group_scopes import McpGroupScopes
+from .mcp_package import McpPackage
+from .mcp_package_registry import McpPackageRegistry
+from .mcp_stdio import McpStdio
+from .mcp_stdio_env import McpStdioEnv
+from .mcp_stdio_flags import McpStdioFlags
+from .mcp_stdio_packages import McpStdioPackages
 from .me_auth import MeAuth
 from .me_auth_grant_type import MeAuthGrantType
 from .me_auth_token_kind import MeAuthTokenKind
@@ -144,6 +160,8 @@ from .project_update_metadata_type_0 import ProjectUpdateMetadataType0
 from .project_visibility_enum import ProjectVisibilityEnum
 from .projects_reordered import ProjectsReordered
 from .protected_resource_metadata import ProtectedResourceMetadata
+from .registration_error_body import RegistrationErrorBody
+from .registration_error_body_error import RegistrationErrorBodyError
 from .release import Release
 from .release_note_item import ReleaseNoteItem
 from .release_summary import ReleaseSummary
@@ -191,6 +209,8 @@ from .task_in_db_type_data_type_0 import TaskInDBTypeDataType0
 from .task_list_page import TaskListPage
 from .task_milestone_set import TaskMilestoneSet
 from .task_project_set import TaskProjectSet
+from .task_review_decision import TaskReviewDecision
+from .task_review_decision_decision import TaskReviewDecisionDecision
 from .task_roadmap_stop import TaskRoadmapStop
 from .task_roadmap_stop_journeys_item import TaskRoadmapStopJourneysItem
 from .task_section_out import TaskSectionOut
@@ -261,6 +281,7 @@ from .whats_new_response_summary import WhatsNewResponseSummary
 __all__ = (
     "AccessReview",
     "Acknowledgement",
+    "AgentTaskReviewEnum",
     "AuditPage",
     "AuditPageDataItem",
     "AuthorizationServerMetadata",
@@ -272,6 +293,7 @@ __all__ = (
     "AvailabilityUpdate",
     "BodyUploadAttachmentV1TaskAttachmentsPost",
     "BodyUploadResourceV1ProjectResourcesUploadPost",
+    "ClientRegistrationResponse",
     "CommitType",
     "ConnectedApp",
     "ConnectedAppRevoked",
@@ -311,6 +333,20 @@ __all__ = (
     "Health",
     "HTTPValidationError",
     "InviteStatusEnum",
+    "McpArtefact",
+    "McpArtefactKind",
+    "McpArtefactLang",
+    "McpClientRow",
+    "McpClientsOut",
+    "McpClientsOutScopesForGroup",
+    "McpGroupOut",
+    "McpGroupScopes",
+    "McpPackage",
+    "McpPackageRegistry",
+    "McpStdio",
+    "McpStdioEnv",
+    "McpStdioFlags",
+    "McpStdioPackages",
     "MeAuth",
     "MeAuthGrantType",
     "MeAuthTokenKind",
@@ -401,6 +437,8 @@ __all__ = (
     "ProjectUpdateMetadataType0",
     "ProjectVisibilityEnum",
     "ProtectedResourceMetadata",
+    "RegistrationErrorBody",
+    "RegistrationErrorBodyError",
     "Release",
     "ReleaseNoteItem",
     "ReleaseSummary",
@@ -448,6 +486,8 @@ __all__ = (
     "TaskListPage",
     "TaskMilestoneSet",
     "TaskProjectSet",
+    "TaskReviewDecision",
+    "TaskReviewDecisionDecision",
     "TaskRoadmapStop",
     "TaskRoadmapStopJourneysItem",
     "TaskSectionOut",

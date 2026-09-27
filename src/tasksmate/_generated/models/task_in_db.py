@@ -30,7 +30,7 @@ T = TypeVar("T", bound="TaskInDB")
 
 @_attrs_define
 class TaskInDB:
-    """Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 7 more.
+    """Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 8 more.
 
     Attributes:
         title (str): Task title Example: Implement Login.
@@ -47,8 +47,8 @@ class TaskInDB:
         start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
         due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
         priority (None | PriorityEnum | Unset): Task priority Default: 'none'. Example: high.
-        task_type (None | TaskTypeEnum | Unset): The kind of task: `task` (default), `bug` or `agent`. A label, not a
-            permission. Default: 'task'. Example: task.
+        task_type (None | TaskTypeEnum | Unset): The kind of task: `task` (default) or `bug`. A label, not a permission.
+            Default: 'task'. Example: task.
         tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
         type_data (None | TaskInDBTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
 
@@ -77,6 +77,14 @@ class TaskInDB:
         goal_id (None | str | Unset): The project goal this task is filed under. One per task; refused (422) unless it
             is a live goal of the task's own project. Moving the task to another project clears it. null = none. Example:
             G12345.
+        created_via (None | str | Unset): Which kind of client created the task: `app` (the web app), `api` (an access
+            token), `sdk` (the Python SDK) or `mcp` (the MCP server); null for older tasks. Example: mcp.
+        review_state (None | str | Unset): null when the task was never in review; `pending` while a task an agent
+            created waits for a person; then `accepted` or `rejected`. A label, never a permission. Example: pending.
+        proposed_project_id (None | str | Unset): The private project an agent asked for while the task is held for
+            review with no project; cleared when the task is accepted into it.
+        reviewed_at (datetime.datetime | None | Unset): When the review was decided.
+        reviewed_by (None | str | Unset): Who decided the review (username).
         restricted_to_user_ids (list[str] | None | Unset): User ids allowed on this task (authoritative when set; null =
             decided by `restricted_to` usernames). Response only.
         has_access (bool | None | Unset): Whether the current user can access this task based on restrictions
@@ -112,6 +120,11 @@ class TaskInDB:
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
+    created_via: None | str | Unset = UNSET
+    review_state: None | str | Unset = UNSET
+    proposed_project_id: None | str | Unset = UNSET
+    reviewed_at: datetime.datetime | None | Unset = UNSET
+    reviewed_by: None | str | Unset = UNSET
     restricted_to_user_ids: list[str] | None | Unset = UNSET
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
@@ -314,6 +327,38 @@ class TaskInDB:
         else:
             goal_id = self.goal_id
 
+        created_via: None | str | Unset
+        if isinstance(self.created_via, Unset):
+            created_via = UNSET
+        else:
+            created_via = self.created_via
+
+        review_state: None | str | Unset
+        if isinstance(self.review_state, Unset):
+            review_state = UNSET
+        else:
+            review_state = self.review_state
+
+        proposed_project_id: None | str | Unset
+        if isinstance(self.proposed_project_id, Unset):
+            proposed_project_id = UNSET
+        else:
+            proposed_project_id = self.proposed_project_id
+
+        reviewed_at: None | str | Unset
+        if isinstance(self.reviewed_at, Unset):
+            reviewed_at = UNSET
+        elif isinstance(self.reviewed_at, datetime.datetime):
+            reviewed_at = self.reviewed_at.isoformat()
+        else:
+            reviewed_at = self.reviewed_at
+
+        reviewed_by: None | str | Unset
+        if isinstance(self.reviewed_by, Unset):
+            reviewed_by = UNSET
+        else:
+            reviewed_by = self.reviewed_by
+
         restricted_to_user_ids: list[str] | None | Unset
         if isinstance(self.restricted_to_user_ids, Unset):
             restricted_to_user_ids = UNSET
@@ -393,6 +438,16 @@ class TaskInDB:
             field_dict["milestone_id"] = milestone_id
         if goal_id is not UNSET:
             field_dict["goal_id"] = goal_id
+        if created_via is not UNSET:
+            field_dict["created_via"] = created_via
+        if review_state is not UNSET:
+            field_dict["review_state"] = review_state
+        if proposed_project_id is not UNSET:
+            field_dict["proposed_project_id"] = proposed_project_id
+        if reviewed_at is not UNSET:
+            field_dict["reviewed_at"] = reviewed_at
+        if reviewed_by is not UNSET:
+            field_dict["reviewed_by"] = reviewed_by
         if restricted_to_user_ids is not UNSET:
             field_dict["restricted_to_user_ids"] = restricted_to_user_ids
         if has_access is not UNSET:
@@ -751,6 +806,59 @@ class TaskInDB:
 
         goal_id = _parse_goal_id(d.pop("goal_id", UNSET))
 
+        def _parse_created_via(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        created_via = _parse_created_via(d.pop("created_via", UNSET))
+
+        def _parse_review_state(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        review_state = _parse_review_state(d.pop("review_state", UNSET))
+
+        def _parse_proposed_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        proposed_project_id = _parse_proposed_project_id(d.pop("proposed_project_id", UNSET))
+
+        def _parse_reviewed_at(data: object) -> datetime.datetime | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                reviewed_at_type_0 = datetime.datetime.fromisoformat(data)
+
+                return reviewed_at_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(datetime.datetime | None | Unset, data)
+
+        reviewed_at = _parse_reviewed_at(d.pop("reviewed_at", UNSET))
+
+        def _parse_reviewed_by(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        reviewed_by = _parse_reviewed_by(d.pop("reviewed_by", UNSET))
+
         def _parse_restricted_to_user_ids(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -815,6 +923,11 @@ class TaskInDB:
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
+            created_via=created_via,
+            review_state=review_state,
+            proposed_project_id=proposed_project_id,
+            reviewed_at=reviewed_at,
+            reviewed_by=reviewed_by,
             restricted_to_user_ids=restricted_to_user_ids,
             has_access=has_access,
             has_edit_access=has_edit_access,

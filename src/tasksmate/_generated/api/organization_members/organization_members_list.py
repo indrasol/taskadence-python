@@ -177,8 +177,8 @@ def sync_detailed(
     """List an organization's members
 
      The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
-    `user` or `service_account`.
+    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
+    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -236,8 +236,8 @@ def sync(
     """List an organization's members
 
      The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
-    `user` or `service_account`.
+    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
+    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -290,8 +290,8 @@ async def asyncio_detailed(
     """List an organization's members
 
      The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
-    `user` or `service_account`.
+    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
+    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
 
     Args:
         org_id (str):
@@ -347,8 +347,8 @@ async def asyncio(
     """List an organization's members
 
      The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the designation's display name) narrow the list. Each member carries `kind`:
-    `user` or `service_account`.
+    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
+    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
 
     Args:
         org_id (str):

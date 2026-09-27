@@ -26,6 +26,7 @@ class ProtectedResourceMetadata:
         authorization_servers (list[str]):
         scopes_supported (list[str]):
         bearer_methods_supported (list[str]):
+        resource_name (None | str | Unset):
         resource_documentation (None | str | Unset):
     """
 
@@ -33,6 +34,7 @@ class ProtectedResourceMetadata:
     authorization_servers: list[str]
     scopes_supported: list[str]
     bearer_methods_supported: list[str]
+    resource_name: None | str | Unset = UNSET
     resource_documentation: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -47,6 +49,12 @@ class ProtectedResourceMetadata:
         scopes_supported = self.scopes_supported
 
         bearer_methods_supported = self.bearer_methods_supported
+
+        resource_name: None | str | Unset
+        if isinstance(self.resource_name, Unset):
+            resource_name = UNSET
+        else:
+            resource_name = self.resource_name
 
         resource_documentation: None | str | Unset
         if isinstance(self.resource_documentation, Unset):
@@ -64,6 +72,8 @@ class ProtectedResourceMetadata:
                 "bearer_methods_supported": bearer_methods_supported,
             }
         )
+        if resource_name is not UNSET:
+            field_dict["resource_name"] = resource_name
         if resource_documentation is not UNSET:
             field_dict["resource_documentation"] = resource_documentation
 
@@ -80,6 +90,15 @@ class ProtectedResourceMetadata:
 
         bearer_methods_supported = cast(list[str], d.pop("bearer_methods_supported"))
 
+        def _parse_resource_name(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        resource_name = _parse_resource_name(d.pop("resource_name", UNSET))
+
         def _parse_resource_documentation(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -94,6 +113,7 @@ class ProtectedResourceMetadata:
             authorization_servers=authorization_servers,
             scopes_supported=scopes_supported,
             bearer_methods_supported=bearer_methods_supported,
+            resource_name=resource_name,
             resource_documentation=resource_documentation,
         )
 

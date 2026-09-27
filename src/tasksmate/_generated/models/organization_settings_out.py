@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.agent_task_review_enum import AgentTaskReviewEnum
+from ..models.agent_task_review_enum import check_agent_task_review_enum
 from ..models.org_join_mode_enum import check_org_join_mode_enum
 from ..models.org_join_mode_enum import OrgJoinModeEnum
 from ..models.project_visibility_enum import check_project_visibility_enum
@@ -37,6 +39,13 @@ class OrganizationSettingsOut:
         allow_personal_tokens (bool | Unset): Members may mint personal access tokens. Default: True.
         max_token_ttl_days (int | None | Unset): The longest lifetime of a new token, in days; null = no cap.
         require_token_expiry (bool | Unset): Every new token must carry an `expires_at`. Default: False.
+        agent_task_review (AgentTaskReviewEnum | Unset): Which tasks created by an agent (through the MCP server, the
+            API or the SDK) wait for a person's review.
+
+            - `private_projects` (default): only a task aimed at a private project. It is created with no project, the
+            project kept as `proposed_project_id`, until a person accepts it.
+            - `always`: every agent task, where it was asked to go.
+            - `never`: none (agent tasks stay marked by `created_via`).
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         updated_by (None | str | Unset):
@@ -50,6 +59,7 @@ class OrganizationSettingsOut:
     allow_personal_tokens: bool | Unset = True
     max_token_ttl_days: int | None | Unset = UNSET
     require_token_expiry: bool | Unset = False
+    agent_task_review: AgentTaskReviewEnum | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
     updated_by: None | str | Unset = UNSET
@@ -85,6 +95,10 @@ class OrganizationSettingsOut:
             max_token_ttl_days = self.max_token_ttl_days
 
         require_token_expiry = self.require_token_expiry
+
+        agent_task_review: str | Unset = UNSET
+        if not isinstance(self.agent_task_review, Unset):
+            agent_task_review = self.agent_task_review
 
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
@@ -129,6 +143,8 @@ class OrganizationSettingsOut:
             field_dict["max_token_ttl_days"] = max_token_ttl_days
         if require_token_expiry is not UNSET:
             field_dict["require_token_expiry"] = require_token_expiry
+        if agent_task_review is not UNSET:
+            field_dict["agent_task_review"] = agent_task_review
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
         if updated_at is not UNSET:
@@ -180,6 +196,13 @@ class OrganizationSettingsOut:
         max_token_ttl_days = _parse_max_token_ttl_days(d.pop("max_token_ttl_days", UNSET))
 
         require_token_expiry = d.pop("require_token_expiry", UNSET)
+
+        _agent_task_review = d.pop("agent_task_review", UNSET)
+        agent_task_review: AgentTaskReviewEnum | Unset
+        if isinstance(_agent_task_review, Unset):
+            agent_task_review = UNSET
+        else:
+            agent_task_review = check_agent_task_review_enum(_agent_task_review)
 
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
@@ -234,6 +257,7 @@ class OrganizationSettingsOut:
             allow_personal_tokens=allow_personal_tokens,
             max_token_ttl_days=max_token_ttl_days,
             require_token_expiry=require_token_expiry,
+            agent_task_review=agent_task_review,
             created_at=created_at,
             updated_at=updated_at,
             updated_by=updated_by,

@@ -263,7 +263,7 @@ class TasksResource:
     ) -> Page[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review
         """
         return cast(
             "Page[models.TaskCardView]",
@@ -334,6 +334,13 @@ class TasksResource:
         `POST /v1/tasks/{task_id}/project` · scope `tasks:write`
         """
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.set_project"], path=(task_id,), body=body))
+
+    def review(self, task_id: str, body: models.TaskReviewDecision | Mapping[str, Any]) -> models.TaskInDB:
+        """Accept or reject a task an agent created.
+
+        `POST /v1/tasks/{task_id}/review` · scope `tasks:write`
+        """
+        return cast("models.TaskInDB", self._client._call(_OPS["tasks.review"], path=(task_id,), body=body))
 
     def set_sprint(self, task_id: str, body: models.TaskSprintSet | Mapping[str, Any]) -> models.TaskInDB:
         """File a task in a team sprint (or none).
@@ -2368,6 +2375,27 @@ class MeResource:
     """`tm.me()` is `tm.me.read()`."""
 
 
+class McpResource:
+    """The MCP server's clients table: how to add `/mcp` to each AI client (remote URL or local package), the tool groups and the scopes each needs. The server itself is `/mcp` (Streamable HTTP), outside this API."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def clients(self, *, if_none_match: None = None) -> models.McpClientsOut: ...
+    @overload
+    def clients(self, *, if_none_match: str) -> models.McpClientsOut | NotModifiedType: ...
+    def clients(self, *, if_none_match: str | None = None) -> models.McpClientsOut | NotModifiedType:
+        """How to add the MCP server to each client: the clients table, tool groups and scopes.
+
+        `GET /v1/mcp/clients` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.McpClientsOut | NotModifiedType",
+            self._client._call(_OPS["mcp.clients"], if_none_match=if_none_match),
+        )
+
+
 class AuditResource:
     """The organization's audit log (owners and admins)."""
 
@@ -2914,7 +2942,7 @@ class AsyncTasksResource:
     ) -> AsyncPage[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review
         """
         return cast(
             "AsyncPage[models.TaskCardView]",
@@ -2987,6 +3015,13 @@ class AsyncTasksResource:
         `POST /v1/tasks/{task_id}/project` · scope `tasks:write`
         """
         return cast("models.TaskInDB", await self._client._call(_OPS["tasks.set_project"], path=(task_id,), body=body))
+
+    async def review(self, task_id: str, body: models.TaskReviewDecision | Mapping[str, Any]) -> models.TaskInDB:
+        """Accept or reject a task an agent created.
+
+        `POST /v1/tasks/{task_id}/review` · scope `tasks:write`
+        """
+        return cast("models.TaskInDB", await self._client._call(_OPS["tasks.review"], path=(task_id,), body=body))
 
     async def set_sprint(self, task_id: str, body: models.TaskSprintSet | Mapping[str, Any]) -> models.TaskInDB:
         """File a task in a team sprint (or none).
@@ -5098,6 +5133,27 @@ class AsyncMeResource:
     """`tm.me()` is `tm.me.read()`."""
 
 
+class AsyncMcpResource:
+    """The MCP server's clients table: how to add `/mcp` to each AI client (remote URL or local package), the tool groups and the scopes each needs. The server itself is `/mcp` (Streamable HTTP), outside this API."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def clients(self, *, if_none_match: None = None) -> models.McpClientsOut: ...
+    @overload
+    async def clients(self, *, if_none_match: str) -> models.McpClientsOut | NotModifiedType: ...
+    async def clients(self, *, if_none_match: str | None = None) -> models.McpClientsOut | NotModifiedType:
+        """How to add the MCP server to each client: the clients table, tool groups and scopes.
+
+        `GET /v1/mcp/clients` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.McpClientsOut | NotModifiedType",
+            await self._client._call(_OPS["mcp.clients"], if_none_match=if_none_match),
+        )
+
+
 class AsyncAuditResource:
     """The organization's audit log (owners and admins)."""
 
@@ -5424,6 +5480,7 @@ class SyncResources:
     roadmap: RoadmapResource
     goals: GoalsResource
     me: MeResource
+    mcp: McpResource
     audit: AuditResource
     views: ViewsResource
     view_pins: ViewPinsResource
@@ -5456,6 +5513,7 @@ class SyncResources:
         self.roadmap = RoadmapResource(core)
         self.goals = GoalsResource(core)
         self.me = MeResource(core)
+        self.mcp = McpResource(core)
         self.audit = AuditResource(core)
         self.views = ViewsResource(core)
         self.view_pins = ViewPinsResource(core)
@@ -5491,6 +5549,7 @@ class AsyncResources:
     roadmap: AsyncRoadmapResource
     goals: AsyncGoalsResource
     me: AsyncMeResource
+    mcp: AsyncMcpResource
     audit: AsyncAuditResource
     views: AsyncViewsResource
     view_pins: AsyncViewPinsResource
@@ -5523,6 +5582,7 @@ class AsyncResources:
         self.roadmap = AsyncRoadmapResource(core)
         self.goals = AsyncGoalsResource(core)
         self.me = AsyncMeResource(core)
+        self.mcp = AsyncMcpResource(core)
         self.audit = AsyncAuditResource(core)
         self.views = AsyncViewsResource(core)
         self.view_pins = AsyncViewPinsResource(core)
@@ -5545,6 +5605,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "tasks.update": ("tasks", "update"),
     "tasks.delete": ("tasks", "delete"),
     "tasks.set_project": ("tasks", "set_project"),
+    "tasks.review": ("tasks", "review"),
     "tasks.set_sprint": ("tasks", "set_sprint"),
     "tasks.set_milestone": ("tasks", "set_milestone"),
     "tasks.set_section": ("tasks", "set_section"),
@@ -5674,6 +5735,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "goals.file_tasks": ("goals", "file_tasks"),
     "goals.unfile_task": ("goals", "unfile_task"),
     "me.read": ("me", "read"),
+    "mcp.clients": ("mcp", "clients"),
     "audit.list": ("audit", "list"),
     "audit.export": ("audit", "export"),
     "views.list": ("views", "list"),

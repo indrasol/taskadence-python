@@ -32,6 +32,7 @@ tm.views.rows("V123456").to_dataframe()               # a saved view as a pandas
 - **Token:** mint it in TasksMate → **Developers → Tokens** (it is shown once).
 - **OAuth apps:** the authorization flow (`/oauth/authorize`, `/oauth/token`, `/.well-known/*`) is not wrapped here —
   run it with any OAuth 2.1 library; the access token it returns is a token like any other: `TasksMate(token=…)`.
+  `/oauth/register` (dynamic client registration, what an MCP client calls) is protocol too, not a method.
 - **Reach:** a token belongs to one organization and carries **scopes** (`tasks:read`, `tasks:write`,
   `projects:read`, …); each method's docstring names the scope it needs.
 - **Try it:** [`examples/quickstart.py`](examples/quickstart.py) runs a full round trip — create, conditional update,
@@ -39,7 +40,7 @@ tm.views.rows("V123456").to_dataframe()               # a saved view as a pandas
 
 ## The client
 
-`tm.<resource>.<verb>(…)` exists for **every** public operation of the API (160 today — all but the OAuth
+`tm.<resource>.<verb>(…)` exists for **every** public operation of the API (162 today — all but the OAuth
 authorization-flow routes, see above), named after its
 `operationId`: `tasks.create`, `tasks.list`, `tasks.read` (alias `get`), `tasks.update` (PATCH), `tasks.replace` (PUT),
 `tasks.delete`, `tasks.set_project` (alias `move`), `projects.list`, `views.rows`, `webhooks.test`, … The full list,

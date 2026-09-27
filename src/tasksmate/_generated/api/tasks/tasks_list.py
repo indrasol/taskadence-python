@@ -39,6 +39,8 @@ def _get_kwargs(
     filtersearch_fields: None | str | Unset = UNSET,
     filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
+    filtercreated_via: list[str] | None | Unset = UNSET,
+    filterreview: list[str] | None | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -200,6 +202,26 @@ def _get_kwargs(
         json_filtertask_type = filtertask_type
     params["filter[task_type]"] = json_filtertask_type
 
+    json_filtercreated_via: list[str] | None | Unset
+    if isinstance(filtercreated_via, Unset):
+        json_filtercreated_via = UNSET
+    elif isinstance(filtercreated_via, list):
+        json_filtercreated_via = filtercreated_via
+
+    else:
+        json_filtercreated_via = filtercreated_via
+    params["filter[created_via]"] = json_filtercreated_via
+
+    json_filterreview: list[str] | None | Unset
+    if isinstance(filterreview, Unset):
+        json_filterreview = UNSET
+    elif isinstance(filterreview, list):
+        json_filterreview = filterreview
+
+    else:
+        json_filterreview = filterreview
+    params["filter[review]"] = json_filterreview
+
     json_section_scope: None | str | Unset
     if isinstance(section_scope, Unset):
         json_section_scope = UNSET
@@ -340,6 +362,8 @@ def sync_detailed(
     filtersearch_fields: None | str | Unset = UNSET,
     filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
+    filtercreated_via: list[str] | None | Unset = UNSET,
+    filterreview: list[str] | None | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -373,8 +397,11 @@ def sync_detailed(
     AND-ed.
     - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
     or type is a 400 naming the value.
-    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
-    narrows what you can already see.
+    - `filter[task_type]` takes `task`, `bug`. A type is a label, not a permission: it only narrows what
+    you can already see.
+    - `filter[created_via]` (`app`, `api`, `sdk`, `mcp`, `none`) and `filter[review]` (`pending`,
+    `accepted`, `rejected`, `none`) find the tasks agents created and the ones waiting for a person's
+    review. Labels too, never permissions.
     - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
     for the title only.
 
@@ -384,7 +411,7 @@ def sync_detailed(
     `desc`.
     - Ties break on `task_id`; empty values sort last.
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
-    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
+    in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
     **Sections**
     - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
@@ -426,8 +453,13 @@ def sync_detailed(
             only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
             (the two can be mixed).
-        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
-            separated or repeated; any other value (including `goal`) is a 400.
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
+            or repeated; any other value (including `goal` and `agent`) is a 400.
+        filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
+            or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for
+            tasks created before this was recorded (mixable).
+        filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
+            `accepted`, `rejected`, or `none` for tasks never in review (mixable).
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -468,6 +500,8 @@ def sync_detailed(
         filtersearch_fields=filtersearch_fields,
         filterteam=filterteam,
         filtertask_type=filtertask_type,
+        filtercreated_via=filtercreated_via,
+        filterreview=filterreview,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -507,6 +541,8 @@ def sync(
     filtersearch_fields: None | str | Unset = UNSET,
     filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
+    filtercreated_via: list[str] | None | Unset = UNSET,
+    filterreview: list[str] | None | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -540,8 +576,11 @@ def sync(
     AND-ed.
     - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
     or type is a 400 naming the value.
-    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
-    narrows what you can already see.
+    - `filter[task_type]` takes `task`, `bug`. A type is a label, not a permission: it only narrows what
+    you can already see.
+    - `filter[created_via]` (`app`, `api`, `sdk`, `mcp`, `none`) and `filter[review]` (`pending`,
+    `accepted`, `rejected`, `none`) find the tasks agents created and the ones waiting for a person's
+    review. Labels too, never permissions.
     - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
     for the title only.
 
@@ -551,7 +590,7 @@ def sync(
     `desc`.
     - Ties break on `task_id`; empty values sort last.
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
-    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
+    in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
     **Sections**
     - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
@@ -593,8 +632,13 @@ def sync(
             only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
             (the two can be mixed).
-        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
-            separated or repeated; any other value (including `goal`) is a 400.
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
+            or repeated; any other value (including `goal` and `agent`) is a 400.
+        filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
+            or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for
+            tasks created before this was recorded (mixable).
+        filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
+            `accepted`, `rejected`, or `none` for tasks never in review (mixable).
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -636,6 +680,8 @@ def sync(
         filtersearch_fields=filtersearch_fields,
         filterteam=filterteam,
         filtertask_type=filtertask_type,
+        filtercreated_via=filtercreated_via,
+        filterreview=filterreview,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -669,6 +715,8 @@ async def asyncio_detailed(
     filtersearch_fields: None | str | Unset = UNSET,
     filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
+    filtercreated_via: list[str] | None | Unset = UNSET,
+    filterreview: list[str] | None | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -702,8 +750,11 @@ async def asyncio_detailed(
     AND-ed.
     - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
     or type is a 400 naming the value.
-    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
-    narrows what you can already see.
+    - `filter[task_type]` takes `task`, `bug`. A type is a label, not a permission: it only narrows what
+    you can already see.
+    - `filter[created_via]` (`app`, `api`, `sdk`, `mcp`, `none`) and `filter[review]` (`pending`,
+    `accepted`, `rejected`, `none`) find the tasks agents created and the ones waiting for a person's
+    review. Labels too, never permissions.
     - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
     for the title only.
 
@@ -713,7 +764,7 @@ async def asyncio_detailed(
     `desc`.
     - Ties break on `task_id`; empty values sort last.
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
-    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
+    in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
     **Sections**
     - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
@@ -755,8 +806,13 @@ async def asyncio_detailed(
             only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
             (the two can be mixed).
-        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
-            separated or repeated; any other value (including `goal`) is a 400.
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
+            or repeated; any other value (including `goal` and `agent`) is a 400.
+        filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
+            or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for
+            tasks created before this was recorded (mixable).
+        filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
+            `accepted`, `rejected`, or `none` for tasks never in review (mixable).
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -797,6 +853,8 @@ async def asyncio_detailed(
         filtersearch_fields=filtersearch_fields,
         filterteam=filterteam,
         filtertask_type=filtertask_type,
+        filtercreated_via=filtercreated_via,
+        filterreview=filterreview,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -834,6 +892,8 @@ async def asyncio(
     filtersearch_fields: None | str | Unset = UNSET,
     filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
+    filtercreated_via: list[str] | None | Unset = UNSET,
+    filterreview: list[str] | None | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -867,8 +927,11 @@ async def asyncio(
     AND-ed.
     - An unknown key, a malformed date, a non-boolean `filter[overdue]`, or an unknown status, priority
     or type is a 400 naming the value.
-    - `filter[task_type]` takes `task`, `bug`, `agent`. A type is a label, not a permission: it only
-    narrows what you can already see.
+    - `filter[task_type]` takes `task`, `bug`. A type is a label, not a permission: it only narrows what
+    you can already see.
+    - `filter[created_via]` (`app`, `api`, `sdk`, `mcp`, `none`) and `filter[review]` (`pending`,
+    `accepted`, `rejected`, `none`) find the tasks agents created and the ones waiting for a person's
+    review. Labels too, never permissions.
     - `filter[search]` matches title, description, task id and tags; add `filter[search_fields]=title`
     for the title only.
 
@@ -878,7 +941,7 @@ async def asyncio(
     `desc`.
     - Ties break on `task_id`; empty values sort last.
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
-    in_progress > not_started > blocked > completed. `task_type`: task, bug, agent.
+    in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
     **Sections**
     - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
@@ -920,8 +983,13 @@ async def asyncio(
             only.
         filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
             (the two can be mixed).
-        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, `agent`, comma-
-            separated or repeated; any other value (including `goal`) is a 400.
+        filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
+            or repeated; any other value (including `goal` and `agent`) is a 400.
+        filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
+            or more of `app` (a person in the web app), `api`, `sdk`, `mcp` (agents), or `none` for
+            tasks created before this was recorded (mixable).
+        filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
+            `accepted`, `rejected`, or `none` for tasks never in review (mixable).
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -964,6 +1032,8 @@ async def asyncio(
             filtersearch_fields=filtersearch_fields,
             filterteam=filterteam,
             filtertask_type=filtertask_type,
+            filtercreated_via=filtercreated_via,
+            filterreview=filterreview,
             section_scope=section_scope,
             search=search,
             status=status,
