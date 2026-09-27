@@ -10,11 +10,16 @@
 # - target=pypi and target=npm are DISABLED until the stability gate, task S.23: the `gate` job fails with "S.23 gate",
 #   and every publish job needs it. Opening the gate is S.23's change to this file (and the registries' setup).
 #
-# One-time setup outside this repo (owner, at S.23 / first TestPyPI upload): on test.pypi.org add a pending trusted
-# publisher for EACH project — `tasksmate` and `tasksmate-mcp` — owner `indrasol`, repo `tasksmate-python`, workflow
-# `release.yml`, environment `testpypi`; a GitHub environment `testpypi` (and later `pypi` and `npm`, each with a required
-# reviewer). npm: the `@tasksmate` org (scope) must exist and `@tasksmate/mcp` be configured for trusted publishing from
-# this workflow — then `npm publish --provenance` (below) needs no token.
+# 5.5: ONE GitHub environment per distribution and registry. PyPI refuses two pending trusted publishers with the same
+# (owner, repo, workflow, environment), so the four registered on 2026-09-27 (account `Rithin2569`, repo
+# `indrasol/tasksmate-python`, workflow `release.yml`) each name their own environment, and each publish job below
+# uploads one distribution under its own environment:
+#   TestPyPI `tasksmate` → `testpypi`   TestPyPI `tasksmate-mcp` → `testpypi-mcp`
+#   PyPI     `tasksmate` → `pypi`       PyPI     `tasksmate-mcp` → `pypi-mcp`
+# plus `npm` for `@tasksmate/mcp`. The GitHub environments (Settings → Environments) are the owner's to create:
+# `testpypi` and `testpypi-mcp` with no reviewer; `pypi`, `pypi-mcp` and `npm` with a required reviewer.
+# npm: the `tasksmate` org exists (owner `rithin2569`); trusted publishing for `@tasksmate/mcp` is set up at S.23a, after
+# its first publish — then `npm publish --provenance` (below) needs no token.
 name: release
 
 on:
@@ -74,16 +79,17 @@ jobs:
       - run: mypy
       - run: pytest && mypy   # its own pyproject (config, testpaths)
         working-directory: packages/tasksmate-mcp
-      - run: python -m build
-      - run: python -m build packages/tasksmate-mcp --outdir dist/
-      - run: twine check --strict dist/*
+      # One directory (and one artifact) per distribution: each publish job uploads exactly its own files.
+      - run: python -m build --outdir dist/tasksmate
+      - run: python -m build packages/tasksmate-mcp --outdir dist/tasksmate-mcp
+      - run: twine check --strict dist/tasksmate/* dist/tasksmate-mcp/*
       - name: CycloneDX SBOM of each installed wheel (S.2)
         run: |
           python -m venv /tmp/sbom
-          /tmp/sbom/bin/pip install dist/tasksmate-*.whl
+          /tmp/sbom/bin/pip install dist/tasksmate/tasksmate-*.whl
           cyclonedx-py environment /tmp/sbom/bin/python --of JSON -o sbom.cdx.json
           python -m venv /tmp/sbom-mcp
-          /tmp/sbom-mcp/bin/pip install dist/tasksmate_mcp-*.whl
+          /tmp/sbom-mcp/bin/pip install dist/tasksmate-mcp/tasksmate_mcp-*.whl
           cyclonedx-py environment /tmp/sbom-mcp/bin/python --of JSON -o sbom-tasksmate-mcp.cdx.json
       - name: "@tasksmate/mcp: check, pack, SBOM"
         working-directory: packages/mcp-node
@@ -96,8 +102,12 @@ jobs:
           npx --yes @cyclonedx/cyclonedx-npm@6 --omit dev --output-format JSON --output-file ../../sbom-mcp-node.cdx.json
       - uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
+          name: dist-tasksmate
+          path: dist/tasksmate/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-tasksmate-mcp
+          path: dist/tasksmate-mcp/
       - uses: actions/upload-artifact@v4
         with:
           name: npm-dist
@@ -108,7 +118,7 @@ jobs:
           path: sbom*.cdx.json
 
   testpypi:
-    name: publish tasksmate + tasksmate-mcp to TestPyPI (trusted publishing)
+    name: publish tasksmate to TestPyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
     if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
@@ -120,14 +130,33 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: dist-tasksmate
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  testpypi-mcp:
+    name: publish tasksmate-mcp to TestPyPI (trusted publishing)
+    runs-on: ubuntu-latest
+    needs: [gate, build]
+    if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
+    environment:
+      name: testpypi-mcp
+      url: https://test.pypi.org/p/tasksmate-mcp
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tasksmate-mcp
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
 
   pypi:
-    name: publish to PyPI (closed until S.23)
+    name: publish tasksmate to PyPI (closed until S.23)
     runs-on: ubuntu-latest
     needs: [gate, build]
     # Unreachable while `gate` fails on target=pypi. S.23 removes the gate step and keeps this job.
@@ -140,7 +169,25 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: dist-tasksmate
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  pypi-mcp:
+    name: publish tasksmate-mcp to PyPI (closed until S.23)
+    runs-on: ubuntu-latest
+    needs: [gate, build]
+    # Unreachable while `gate` fails on target=pypi — exactly as `pypi`.
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
+    environment:
+      name: pypi-mcp
+      url: https://pypi.org/p/tasksmate-mcp
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-tasksmate-mcp
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
 
