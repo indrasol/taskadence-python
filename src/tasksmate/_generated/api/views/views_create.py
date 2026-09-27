@@ -106,12 +106,17 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: ViewCreate,
 ) -> Response[Problem | ViewOut]:
-    """Save a view
+    """Save a view of the task list or the projects list (`resource`)
 
-     Save a view into a scope the caller may write: personal (always, any org role),
-    team (team owner / org admin), project (owner / editor / org admin). `query` is
-    validated through the list parser — an unknown key or value is its own 400. 409 on
-    a duplicate name within the scope.
+     Save a view.
+
+    - `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores
+    `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
+    - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
+    gives.
+    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
+    (project owners and editors; task views only).
+    - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
         body (ViewCreate): The request body of `views.create`.
@@ -140,12 +145,17 @@ def sync(
     client: AuthenticatedClient,
     body: ViewCreate,
 ) -> Problem | ViewOut | None:
-    """Save a view
+    """Save a view of the task list or the projects list (`resource`)
 
-     Save a view into a scope the caller may write: personal (always, any org role),
-    team (team owner / org admin), project (owner / editor / org admin). `query` is
-    validated through the list parser — an unknown key or value is its own 400. 409 on
-    a duplicate name within the scope.
+     Save a view.
+
+    - `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores
+    `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
+    - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
+    gives.
+    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
+    (project owners and editors; task views only).
+    - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
         body (ViewCreate): The request body of `views.create`.
@@ -169,12 +179,17 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: ViewCreate,
 ) -> Response[Problem | ViewOut]:
-    """Save a view
+    """Save a view of the task list or the projects list (`resource`)
 
-     Save a view into a scope the caller may write: personal (always, any org role),
-    team (team owner / org admin), project (owner / editor / org admin). `query` is
-    validated through the list parser — an unknown key or value is its own 400. 409 on
-    a duplicate name within the scope.
+     Save a view.
+
+    - `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores
+    `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
+    - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
+    gives.
+    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
+    (project owners and editors; task views only).
+    - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
         body (ViewCreate): The request body of `views.create`.
@@ -201,12 +216,17 @@ async def asyncio(
     client: AuthenticatedClient,
     body: ViewCreate,
 ) -> Problem | ViewOut | None:
-    """Save a view
+    """Save a view of the task list or the projects list (`resource`)
 
-     Save a view into a scope the caller may write: personal (always, any org role),
-    team (team owner / org admin), project (owner / editor / org admin). `query` is
-    validated through the list parser — an unknown key or value is its own 400. 409 on
-    a duplicate name within the scope.
+     Save a view.
+
+    - `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores
+    `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
+    - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
+    gives.
+    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
+    (project owners and editors; task views only).
+    - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
         body (ViewCreate): The request body of `views.create`.

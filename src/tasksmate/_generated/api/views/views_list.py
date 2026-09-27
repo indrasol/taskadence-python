@@ -20,6 +20,7 @@ def _get_kwargs(
     *,
     org_id: str,
     scope: None | str | Unset = UNSET,
+    resource: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -40,6 +41,13 @@ def _get_kwargs(
     else:
         json_scope = scope
     params["scope"] = json_scope
+
+    json_resource: None | str | Unset
+    if isinstance(resource, Unset):
+        json_resource = UNSET
+    else:
+        json_resource = resource
+    params["resource"] = json_resource
 
     params["limit"] = limit
 
@@ -150,21 +158,24 @@ def sync_detailed(
     client: AuthenticatedClient,
     org_id: str,
     scope: None | str | Unset = UNSET,
+    resource: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ViewListPage]:
-    """Saved views you can read
+    """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
-    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
-    next_cursor}`.
+     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
+    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
+    paginated as `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
         scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
+            both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, created_at, updated_at. Default: the list's
@@ -183,6 +194,7 @@ def sync_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         scope=scope,
+        resource=resource,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -202,21 +214,24 @@ def sync(
     client: AuthenticatedClient,
     org_id: str,
     scope: None | str | Unset = UNSET,
+    resource: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ViewListPage | None:
-    """Saved views you can read
+    """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
-    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
-    next_cursor}`.
+     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
+    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
+    paginated as `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
         scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
+            both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, created_at, updated_at. Default: the list's
@@ -236,6 +251,7 @@ def sync(
         client=client,
         org_id=org_id,
         scope=scope,
+        resource=resource,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -249,21 +265,24 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     org_id: str,
     scope: None | str | Unset = UNSET,
+    resource: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ViewListPage]:
-    """Saved views you can read
+    """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
-    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
-    next_cursor}`.
+     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
+    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
+    paginated as `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
         scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
+            both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, created_at, updated_at. Default: the list's
@@ -282,6 +301,7 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         scope=scope,
+        resource=resource,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -299,21 +319,24 @@ async def asyncio(
     client: AuthenticatedClient,
     org_id: str,
     scope: None | str | Unset = UNSET,
+    resource: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ViewListPage | None:
-    """Saved views you can read
+    """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `can_edit`
-    (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data,
-    next_cursor}`.
+     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
+    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
+    paginated as `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
         scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
+            both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, created_at, updated_at. Default: the list's
@@ -334,6 +357,7 @@ async def asyncio(
             client=client,
             org_id=org_id,
             scope=scope,
+            resource=resource,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

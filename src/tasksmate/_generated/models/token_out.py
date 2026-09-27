@@ -55,7 +55,8 @@ class TokenOut:
         use_count (int | Unset):  Default: 0.
         revoked_at (datetime.datetime | None | Unset):
         revoked_by (None | str | Unset):
-        revoke_reason (None | str | Unset): revoked_by_user · revoked_by_admin · rotated · service_account_deactivated
+        revoke_reason (None | str | Unset): revoked_by_user · revoked_by_admin · rotated · service_account_deactivated;
+            an app's token also client_revoked · org_exit · reuse_detected · revoked_by_app
         rotated_from (None | str | Unset):
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):

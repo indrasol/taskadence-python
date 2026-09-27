@@ -12,6 +12,8 @@ from ..types import UNSET, Unset
 
 from ..models.pin_type_enum import check_pin_type_enum
 from ..models.pin_type_enum import PinTypeEnum
+from ..models.view_resource_enum import check_view_resource_enum
+from ..models.view_resource_enum import ViewResourceEnum
 from ..models.view_scope_enum import check_view_scope_enum
 from ..models.view_scope_enum import ViewScopeEnum
 from ..types import UNSET, Unset
@@ -33,6 +35,8 @@ class PinOut:
         position (float):
         label (str): The view's name or the project's name, resolved server-side
         scope_type (None | Unset | ViewScopeEnum): For a view pin: the view's scope
+        resource (None | Unset | ViewResourceEnum): For a view pin: the list the view queries, `task` or `project`.
+            Empty for a project pin.
         created_at (datetime.datetime | None | Unset):
     """
 
@@ -42,6 +46,7 @@ class PinOut:
     position: float
     label: str
     scope_type: None | Unset | ViewScopeEnum = UNSET
+    resource: None | Unset | ViewResourceEnum = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -67,6 +72,14 @@ class PinOut:
         else:
             scope_type = self.scope_type
 
+        resource: None | str | Unset
+        if isinstance(self.resource, Unset):
+            resource = UNSET
+        elif isinstance(self.resource, str):
+            resource = self.resource
+        else:
+            resource = self.resource
+
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
             created_at = UNSET
@@ -88,6 +101,8 @@ class PinOut:
         )
         if scope_type is not UNSET:
             field_dict["scope_type"] = scope_type
+        if resource is not UNSET:
+            field_dict["resource"] = resource
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
 
@@ -123,6 +138,23 @@ class PinOut:
 
         scope_type = _parse_scope_type(d.pop("scope_type", UNSET))
 
+        def _parse_resource(data: object) -> None | Unset | ViewResourceEnum:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                resource_type_0 = check_view_resource_enum(data)
+
+                return resource_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | Unset | ViewResourceEnum, data)
+
+        resource = _parse_resource(d.pop("resource", UNSET))
+
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
                 return data
@@ -147,6 +179,7 @@ class PinOut:
             position=position,
             label=label,
             scope_type=scope_type,
+            resource=resource,
             created_at=created_at,
         )
 

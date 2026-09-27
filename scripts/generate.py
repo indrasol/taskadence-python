@@ -41,6 +41,10 @@ HEADER = (
 # 4.1b: these used to leak from the backend's `verify_token` signature onto every operation and were dropped here;
 # the backend no longer declares them, and generation now refuses a spec that does (they would become method arguments).
 LEAKED = {"is_registration", "authorization"}
+# 4.7: the OAuth 2.1 protocol operations (`/oauth/*`, `/.well-known/*`, `x-kind: oauth`) are NOT SDK methods.
+# They are the browser authorization flow a third-party app runs; what it gets back is an access token, and an
+# access token is simply `TasksMate(token=...)`. They are dropped before generation (client, facade and docs alike).
+SKIPPED_KINDS = {"oauth"}
 # Friendlier names on top of the operationId verbs (the verbs stay; these are aliases).
 ALIASES = {"tasks": {"move": "set_project"}}
 
@@ -81,6 +85,16 @@ def check_spec(spec: dict[str, Any]) -> None:
         sys.exit(
             "the spec regressed on 4.1b (fix the backend, not the generator):\n  " + "\n  ".join(sorted(set(problems)))
         )
+
+
+def sdk_spec(spec: dict[str, Any]) -> dict[str, Any]:
+    """The spec without the operations the SDK does not expose (`SKIPPED_KINDS`); a path left empty is dropped."""
+    paths = {}
+    for path, item in spec["paths"].items():
+        kept = {m: op for m, op in item.items() if op.get("x-kind") not in SKIPPED_KINDS}
+        if kept:
+            paths[path] = kept
+    return {**spec, "paths": paths}
 
 
 def generate_client(spec: dict[str, Any]) -> None:
@@ -606,7 +620,7 @@ class Facade:
 
 
 def main() -> None:
-    spec = json.loads(SPEC.read_text())
+    spec = sdk_spec(json.loads(SPEC.read_text()))
     check_spec(spec)
     generate_client(spec)
     facade = Facade(spec)

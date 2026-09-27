@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.me_auth_grant_type import check_me_auth_grant_type
+from ..models.me_auth_grant_type import MeAuthGrantType
 from ..models.me_auth_token_kind import check_me_auth_token_kind
 from ..models.me_auth_token_kind import MeAuthTokenKind
 from ..types import UNSET, Unset
@@ -30,8 +32,10 @@ class MeAuth:
         kind (Literal['token'] | Unset):  Default: 'token'.
         project_ids (list[str] | None | Unset): null = every project the principal can reach
         expires_at (None | str | Unset):
-        grant_type (str | Unset):  Default: 'personal'.
+        grant_type (MeAuthGrantType | Unset): personal · service_account · authorization_code (a third-party app acting
+            for a person) Default: 'personal'.
         token_kind (MeAuthTokenKind | Unset):  Default: 'live'.
+        client_id (None | str | Unset): The OAuth app the token was issued to (authorization_code); null otherwise
     """
 
     token_id: str
@@ -39,8 +43,9 @@ class MeAuth:
     kind: Literal["token"] | Unset = "token"
     project_ids: list[str] | None | Unset = UNSET
     expires_at: None | str | Unset = UNSET
-    grant_type: str | Unset = "personal"
+    grant_type: MeAuthGrantType | Unset = "personal"
     token_kind: MeAuthTokenKind | Unset = "live"
+    client_id: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -68,11 +73,19 @@ class MeAuth:
         else:
             expires_at = self.expires_at
 
-        grant_type = self.grant_type
+        grant_type: str | Unset = UNSET
+        if not isinstance(self.grant_type, Unset):
+            grant_type = self.grant_type
 
         token_kind: str | Unset = UNSET
         if not isinstance(self.token_kind, Unset):
             token_kind = self.token_kind
+
+        client_id: None | str | Unset
+        if isinstance(self.client_id, Unset):
+            client_id = UNSET
+        else:
+            client_id = self.client_id
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -92,6 +105,8 @@ class MeAuth:
             field_dict["grant_type"] = grant_type
         if token_kind is not UNSET:
             field_dict["token_kind"] = token_kind
+        if client_id is not UNSET:
+            field_dict["client_id"] = client_id
 
         return field_dict
 
@@ -132,7 +147,12 @@ class MeAuth:
 
         expires_at = _parse_expires_at(d.pop("expires_at", UNSET))
 
-        grant_type = d.pop("grant_type", UNSET)
+        _grant_type = d.pop("grant_type", UNSET)
+        grant_type: MeAuthGrantType | Unset
+        if isinstance(_grant_type, Unset):
+            grant_type = UNSET
+        else:
+            grant_type = check_me_auth_grant_type(_grant_type)
 
         _token_kind = d.pop("token_kind", UNSET)
         token_kind: MeAuthTokenKind | Unset
@@ -140,6 +160,15 @@ class MeAuth:
             token_kind = UNSET
         else:
             token_kind = check_me_auth_token_kind(_token_kind)
+
+        def _parse_client_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        client_id = _parse_client_id(d.pop("client_id", UNSET))
 
         me_auth = cls(
             token_id=token_id,
@@ -149,6 +178,7 @@ class MeAuth:
             expires_at=expires_at,
             grant_type=grant_type,
             token_kind=token_kind,
+            client_id=client_id,
         )
 
         me_auth.additional_properties = d

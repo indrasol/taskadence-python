@@ -4,9 +4,9 @@ Saved views and the tasks they show.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 
-## `tm.views.list(org_id: str, scope: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+## `tm.views.list(org_id: str, scope: str | None = None, resource: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 
-Saved views you can read.
+Saved views you can read (filter by `resource`: task or project).
 
 - **HTTP:** `GET /v1/views`
 - **operationId:** `views.list`
@@ -16,7 +16,7 @@ Saved views you can read.
 
 ## `tm.views.create(body: ViewCreate | Mapping[str, Any])`
 
-Save a view.
+Save a view of the task list or the projects list (`resource`).
 
 - **HTTP:** `POST /v1/views`
 - **operationId:** `views.create`
@@ -25,7 +25,7 @@ Save a view.
 
 ## `tm.views.read(view_id: str, if_none_match: str | None = None)`
 
-Read a saved view.
+Read a saved view (its `resource` says which list it queries).
 
 - **HTTP:** `GET /v1/views/{view_id}`
 - **operationId:** `views.read`
@@ -64,10 +64,10 @@ Duplicate a saved view.
 
 ## `tm.views.rows(view_id: str, limit: int | None = None, cursor: str | None = None, include_inaccessible: bool | None = None)`
 
-The tasks a saved view shows (task-list envelope).
+The rows a saved view shows: tasks or projects, per its `resource`.
 
 - **HTTP:** `GET /v1/views/{view_id}/rows`
 - **operationId:** `views.rows`
 - **Token scope:** `tasks:read`
-- **Returns:** `Page[TaskCardView]`
+- **Returns:** `Page[TaskCardView] | Page[ProjectCard]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.

@@ -17,7 +17,7 @@ from tasksmate import AsyncTasksMate, TasksMate
 from tasksmate._operations import OPERATIONS
 from tasksmate.resources import RESOURCE_METHODS
 
-from .conftest import SPEC, TOKEN
+from .conftest import FULL_SPEC, SPEC, TOKEN
 
 SPEC_OPS = {
     op["operationId"]: (method.upper(), path) for path, item in SPEC["paths"].items() for method, op in item.items()
@@ -160,3 +160,26 @@ def test_list_and_create_come_from_x_kind() -> None:
     kinds = {op["operationId"]: op.get("x-kind", "") for item in SPEC["paths"].values() for op in item.values()}
     assert {k for k, v in kinds.items() if v == "list"} == {k for k, op in OPERATIONS.items() if op.is_list}
     assert {k for k, v in kinds.items() if v == "create"} == {k for k, op in OPERATIONS.items() if op.is_create}
+
+
+def test_the_oauth_protocol_operations_are_not_methods() -> None:
+    """4.7: `/oauth/*` and `/.well-known/*` (`x-kind: oauth`) are the browser authorization flow, not SDK methods —
+    the access token it returns is used as `TasksMate(token=...)`. Everything else in the snapshot is a method."""
+    oauth = {
+        op["operationId"]: path
+        for path, item in FULL_SPEC["paths"].items()
+        for op in item.values()
+        if op.get("x-kind") == "oauth"
+    }
+    assert sorted(oauth.values()) == [
+        "/.well-known/oauth-authorization-server",
+        "/.well-known/oauth-protected-resource",
+        "/oauth/authorize",
+        "/oauth/revoke",
+        "/oauth/token",
+    ]
+    assert not set(oauth) & set(OPERATIONS)
+    assert not any(op.path.startswith(("/oauth/", "/.well-known/")) for op in OPERATIONS.values())
+    everything_else = {op["operationId"] for item in FULL_SPEC["paths"].values() for op in item.values()} - set(oauth)
+    assert everything_else == set(OPERATIONS)
+    assert not hasattr(TasksMate(token=TOKEN), "oauth")

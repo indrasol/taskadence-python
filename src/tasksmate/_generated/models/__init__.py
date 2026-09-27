@@ -6,6 +6,7 @@ from .access_review import AccessReview
 from .acknowledgement import Acknowledgement
 from .audit_page import AuditPage
 from .audit_page_data_item import AuditPageDataItem
+from .authorization_server_metadata import AuthorizationServerMetadata
 from .availability_create import AvailabilityCreate
 from .availability_deleted import AvailabilityDeleted
 from .availability_entry import AvailabilityEntry
@@ -15,6 +16,8 @@ from .availability_update import AvailabilityUpdate
 from .body_upload_attachment_v1_task_attachments_post import BodyUploadAttachmentV1TaskAttachmentsPost
 from .body_upload_resource_v1_project_resources_upload_post import BodyUploadResourceV1ProjectResourcesUploadPost
 from .commit_type import CommitType
+from .connected_app import ConnectedApp
+from .connected_app_revoked import ConnectedAppRevoked
 from .delivery_detail import DeliveryDetail
 from .delivery_detail_attempt_log_item import DeliveryDetailAttemptLogItem
 from .delivery_detail_payload import DeliveryDetailPayload
@@ -49,8 +52,10 @@ from .goal_tasks_filed import GoalTasksFiled
 from .goal_update import GoalUpdate
 from .goals_reordered import GoalsReordered
 from .health import Health
+from .http_validation_error import HTTPValidationError
 from .invite_status_enum import InviteStatusEnum
 from .me_auth import MeAuth
+from .me_auth_grant_type import MeAuthGrantType
 from .me_auth_token_kind import MeAuthTokenKind
 from .me_organization import MeOrganization
 from .me_out import MeOut
@@ -62,6 +67,20 @@ from .milestone_deleted import MilestoneDeleted
 from .milestone_list import MilestoneList
 from .milestone_out import MilestoneOut
 from .milestone_update import MilestoneUpdate
+from .o_auth_client_create import OAuthClientCreate
+from .o_auth_client_create_client_type import OAuthClientCreateClientType
+from .o_auth_client_created import OAuthClientCreated
+from .o_auth_client_created_client_type import OAuthClientCreatedClientType
+from .o_auth_client_created_registration import OAuthClientCreatedRegistration
+from .o_auth_client_created_review_state import OAuthClientCreatedReviewState
+from .o_auth_client_created_status import OAuthClientCreatedStatus
+from .o_auth_client_out import OAuthClientOut
+from .o_auth_client_out_client_type import OAuthClientOutClientType
+from .o_auth_client_out_registration import OAuthClientOutRegistration
+from .o_auth_client_out_review_state import OAuthClientOutReviewState
+from .o_auth_client_out_status import OAuthClientOutStatus
+from .o_auth_client_update import OAuthClientUpdate
+from .o_auth_error_body import OAuthErrorBody
 from .org_card import OrgCard
 from .org_goals_out import OrgGoalsOut
 from .org_join_mode_enum import OrgJoinModeEnum
@@ -74,8 +93,10 @@ from .organization_member_in_db import OrganizationMemberInDB
 from .organization_member_update import OrganizationMemberUpdate
 from .organization_settings_out import OrganizationSettingsOut
 from .organization_settings_update import OrganizationSettingsUpdate
+from .page_connected_app import PageConnectedApp
 from .page_delivery_out import PageDeliveryOut
 from .page_designation import PageDesignation
+from .page_o_auth_client_out import PageOAuthClientOut
 from .page_org_card import PageOrgCard
 from .page_organization_invite_in_db import PageOrganizationInviteInDB
 from .page_organization_member_in_db import PageOrganizationMemberInDB
@@ -122,6 +143,7 @@ from .project_update import ProjectUpdate
 from .project_update_metadata_type_0 import ProjectUpdateMetadataType0
 from .project_visibility_enum import ProjectVisibilityEnum
 from .projects_reordered import ProjectsReordered
+from .protected_resource_metadata import ProtectedResourceMetadata
 from .release import Release
 from .release_note_item import ReleaseNoteItem
 from .release_summary import ReleaseSummary
@@ -200,8 +222,11 @@ from .token_out import TokenOut
 from .token_out_grant_type import TokenOutGrantType
 from .token_out_kind import TokenOutKind
 from .token_out_status import TokenOutStatus
+from .token_response import TokenResponse
 from .token_update import TokenUpdate
 from .unattached_token import UnattachedToken
+from .validation_error import ValidationError
+from .validation_error_context import ValidationErrorContext
 from .view_create import ViewCreate
 from .view_create_display import ViewCreateDisplay
 from .view_create_query import ViewCreateQuery
@@ -211,6 +236,7 @@ from .view_list_page import ViewListPage
 from .view_out import ViewOut
 from .view_out_display import ViewOutDisplay
 from .view_out_query import ViewOutQuery
+from .view_resource_enum import ViewResourceEnum
 from .view_scope_enum import ViewScopeEnum
 from .view_update import ViewUpdate
 from .view_update_display_type_0 import ViewUpdateDisplayType0
@@ -237,6 +263,7 @@ __all__ = (
     "Acknowledgement",
     "AuditPage",
     "AuditPageDataItem",
+    "AuthorizationServerMetadata",
     "AvailabilityCreate",
     "AvailabilityDeleted",
     "AvailabilityEntry",
@@ -246,6 +273,8 @@ __all__ = (
     "BodyUploadAttachmentV1TaskAttachmentsPost",
     "BodyUploadResourceV1ProjectResourcesUploadPost",
     "CommitType",
+    "ConnectedApp",
+    "ConnectedAppRevoked",
     "DeliveryDetail",
     "DeliveryDetailAttemptLogItem",
     "DeliveryDetailPayload",
@@ -280,8 +309,10 @@ __all__ = (
     "GoalTaskUnfiled",
     "GoalUpdate",
     "Health",
+    "HTTPValidationError",
     "InviteStatusEnum",
     "MeAuth",
+    "MeAuthGrantType",
     "MeAuthTokenKind",
     "Mention",
     "MeOrganization",
@@ -293,6 +324,20 @@ __all__ = (
     "MilestoneList",
     "MilestoneOut",
     "MilestoneUpdate",
+    "OAuthClientCreate",
+    "OAuthClientCreateClientType",
+    "OAuthClientCreated",
+    "OAuthClientCreatedClientType",
+    "OAuthClientCreatedRegistration",
+    "OAuthClientCreatedReviewState",
+    "OAuthClientCreatedStatus",
+    "OAuthClientOut",
+    "OAuthClientOutClientType",
+    "OAuthClientOutRegistration",
+    "OAuthClientOutReviewState",
+    "OAuthClientOutStatus",
+    "OAuthClientUpdate",
+    "OAuthErrorBody",
     "OrganizationInDB",
     "OrganizationInDBMetadataType0",
     "OrganizationInviteCreate",
@@ -305,8 +350,10 @@ __all__ = (
     "OrgCard",
     "OrgGoalsOut",
     "OrgJoinModeEnum",
+    "PageConnectedApp",
     "PageDeliveryOut",
     "PageDesignation",
+    "PageOAuthClientOut",
     "PageOrganizationInviteInDB",
     "PageOrganizationMemberInDB",
     "PageOrgCard",
@@ -353,6 +400,7 @@ __all__ = (
     "ProjectUpdate",
     "ProjectUpdateMetadataType0",
     "ProjectVisibilityEnum",
+    "ProtectedResourceMetadata",
     "Release",
     "ReleaseNoteItem",
     "ReleaseSummary",
@@ -431,8 +479,11 @@ __all__ = (
     "TokenOutGrantType",
     "TokenOutKind",
     "TokenOutStatus",
+    "TokenResponse",
     "TokenUpdate",
     "UnattachedToken",
+    "ValidationError",
+    "ValidationErrorContext",
     "ViewCreate",
     "ViewCreateDisplay",
     "ViewCreateQuery",
@@ -442,6 +493,7 @@ __all__ = (
     "ViewOut",
     "ViewOutDisplay",
     "ViewOutQuery",
+    "ViewResourceEnum",
     "ViewScopeEnum",
     "ViewUpdate",
     "ViewUpdateDisplayType0",

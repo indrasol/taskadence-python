@@ -116,9 +116,9 @@ def sync_detailed(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ViewOut]:
-    """Read a saved view
+    """Read a saved view (its `resource` says which list it queries)
 
-     Read a saved view.
+     Read a saved view (its `resource` says which list it queries).
 
     Args:
         view_id (str):
@@ -150,9 +150,9 @@ def sync(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ViewOut | None:
-    """Read a saved view
+    """Read a saved view (its `resource` says which list it queries)
 
-     Read a saved view.
+     Read a saved view (its `resource` says which list it queries).
 
     Args:
         view_id (str):
@@ -179,9 +179,9 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | ViewOut]:
-    """Read a saved view
+    """Read a saved view (its `resource` says which list it queries)
 
-     Read a saved view.
+     Read a saved view (its `resource` says which list it queries).
 
     Args:
         view_id (str):
@@ -211,9 +211,9 @@ async def asyncio(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | ViewOut | None:
-    """Read a saved view
+    """Read a saved view (its `resource` says which list it queries)
 
-     Read a saved view.
+     Read a saved view (its `resource` says which list it queries).
 
     Args:
         view_id (str):

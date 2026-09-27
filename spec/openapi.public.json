@@ -1045,7 +1045,7 @@
           "projects"
         ],
         "summary": "List an organization's projects you can read",
-        "description": "The organization's projects, paginated as `{data, next_cursor}`.\n\n- `show_all=true` returns every project you can read: public projects, the projects you are a member of, and \u2014 for org owners and admins \u2014 all of them. Private projects you are not a member of never appear.\n- `show_all=false` returns only the projects you are a member of.\n- `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.",
+        "description": "The organization's projects, paginated as `{data, next_cursor}`.\n\n- `show_all=true` returns every project you can read: public projects, the projects you are a member of, and \u2014 for org owners and admins \u2014 all of them. Private projects you are not a member of never appear.\n- `show_all=false` returns only the projects you are a member of.\n- `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project ids) narrow the list.\n- `filter[search]` matches the name, description or id (case-insensitive substring).\n- `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date \u2014 the creation date when a project has none.",
         "operationId": "projects.list",
         "parameters": [
           {
@@ -1074,11 +1074,11 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[priority]`, `filter[team]` (comma-separated values are OR-ed).",
+              "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`, `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed).",
               "default": 1000,
               "title": "Limit"
             },
-            "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[priority]`, `filter[team]` (comma-separated values are OR-ed)."
+            "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`, `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed)."
           },
           {
             "name": "cursor",
@@ -1111,10 +1111,10 @@
                   "type": "null"
                 }
               ],
-              "description": "One of: name, position, status, priority, start_date, end_date, created_at, updated_at, progress_percent. Default: the list's natural order.",
+              "description": "One of: name, position, status, priority, start_date, end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the list's natural order.",
               "title": "Sort By"
             },
-            "description": "One of: name, position, status, priority, start_date, end_date, created_at, updated_at, progress_percent. Default: the list's natural order."
+            "description": "One of: name, position, status, priority, start_date, end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the list's natural order."
           },
           {
             "name": "sort_order",
@@ -24497,6 +24497,2019 @@
         ]
       }
     },
+    "/v1/oauth/clients": {
+      "get": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "An organization's OAuth apps (owner / admin)",
+        "description": "The organization's OAuth apps, newest first (owner / admin), with how many people are connected to each.\nNever a secret.",
+        "operationId": "oauth-clients.list",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The organization",
+              "title": "Org Id"
+            },
+            "description": "The organization"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[client_type]` (comma-separated values are OR-ed).",
+              "default": 1000,
+              "title": "Limit"
+            },
+            "description": "Page size; default 1000, capped at 1000. Filters: `filter[status]`, `filter[client_type]` (comma-separated values are OR-ed)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: created_at, name, last_used_at. Default: the list's natural order.",
+              "title": "Sort By"
+            },
+            "description": "One of: created_at, name, last_used_at. Default: the list's natural order."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OAuthClientOut_"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "allowed_scopes": [
+                        "tasks:write",
+                        "projects:read"
+                      ],
+                      "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                      "client_type": "confidential",
+                      "created_at": "2026-09-26T12:00:00Z",
+                      "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                      "grants_count": 3,
+                      "homepage_url": "https://hr.example.com",
+                      "last_used_at": "2026-09-26T12:00:00Z",
+                      "name": "Acme HR",
+                      "org_id": "O0020",
+                      "redirect_uris": [
+                        "https://hr.example.com/oauth/callback"
+                      ],
+                      "registration": "developer",
+                      "review_state": "private",
+                      "status": "active",
+                      "updated_at": "2026-09-26T12:00:00Z",
+                      "use_count": 1204
+                    }
+                  ],
+                  "next_cursor": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-kind": "list",
+        "x-scopes": [
+          "admin"
+        ]
+      },
+      "post": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "Register an OAuth app (a confidential app's secret is shown once)",
+        "description": "Register an app (owner / admin). A confidential app's `client_secret` is in this response only \u2014 store it now.",
+        "operationId": "oauth-clients.create",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthClientCreate"
+              },
+              "example": {
+                "org_id": "string",
+                "name": "Acme HR",
+                "client_type": "confidential",
+                "redirect_uris": [
+                  "https://hr.example.com/oauth/callback"
+                ],
+                "allowed_scopes": [
+                  "tasks:write",
+                  "projects:read"
+                ],
+                "logo_url": "string",
+                "homepage_url": "string",
+                "privacy_url": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientCreated"
+                },
+                "example": {
+                  "allowed_scopes": [
+                    "tasks:write",
+                    "projects:read"
+                  ],
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "client_type": "confidential",
+                  "created_at": "2026-09-26T12:00:00Z",
+                  "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                  "grants_count": 3,
+                  "homepage_url": "https://hr.example.com",
+                  "last_used_at": "2026-09-26T12:00:00Z",
+                  "name": "Acme HR",
+                  "org_id": "O0020",
+                  "redirect_uris": [
+                    "https://hr.example.com/oauth/callback"
+                  ],
+                  "registration": "developer",
+                  "review_state": "private",
+                  "status": "active",
+                  "updated_at": "2026-09-26T12:00:00Z",
+                  "use_count": 1204
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/oauth/clients/{client_id}": {
+      "get": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "Read an OAuth app (never its secret)",
+        "description": "One app (owner / admin of the organization that registered it). Never its secret.",
+        "operationId": "oauth-clients.read",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientOut"
+                },
+                "example": {
+                  "allowed_scopes": [
+                    "tasks:write",
+                    "projects:read"
+                  ],
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_type": "confidential",
+                  "created_at": "2026-09-26T12:00:00Z",
+                  "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                  "grants_count": 3,
+                  "homepage_url": "https://hr.example.com",
+                  "last_used_at": "2026-09-26T12:00:00Z",
+                  "name": "Acme HR",
+                  "org_id": "O0020",
+                  "redirect_uris": [
+                    "https://hr.example.com/oauth/callback"
+                  ],
+                  "registration": "developer",
+                  "review_state": "private",
+                  "status": "active",
+                  "updated_at": "2026-09-26T12:00:00Z",
+                  "use_count": 1204
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      },
+      "patch": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "Change an OAuth app's name, links, redirect URIs or scopes",
+        "description": "Change the name, links, redirect URIs or allowed scopes. The client type never changes.",
+        "operationId": "oauth-clients.update",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthClientUpdate"
+              },
+              "example": {
+                "name": "string",
+                "redirect_uris": [
+                  "string"
+                ],
+                "allowed_scopes": [
+                  "string"
+                ],
+                "logo_url": "string",
+                "homepage_url": "string",
+                "privacy_url": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientOut"
+                },
+                "example": {
+                  "allowed_scopes": [
+                    "tasks:write",
+                    "projects:read"
+                  ],
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_type": "confidential",
+                  "created_at": "2026-09-26T12:00:00Z",
+                  "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                  "grants_count": 3,
+                  "homepage_url": "https://hr.example.com",
+                  "last_used_at": "2026-09-26T12:00:00Z",
+                  "name": "Acme HR",
+                  "org_id": "O0020",
+                  "redirect_uris": [
+                    "https://hr.example.com/oauth/callback"
+                  ],
+                  "registration": "developer",
+                  "review_state": "private",
+                  "status": "active",
+                  "updated_at": "2026-09-26T12:00:00Z",
+                  "use_count": 1204
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "Revoke an OAuth app, every connection to it and its tokens",
+        "description": "Revoke the app: it stops authenticating, and every connection to it and every token it holds is revoked. The\nrecord stays for the audit trail.",
+        "operationId": "oauth-clients.delete",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientOut"
+                },
+                "example": {
+                  "allowed_scopes": [
+                    "tasks:write",
+                    "projects:read"
+                  ],
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_type": "confidential",
+                  "created_at": "2026-09-26T12:00:00Z",
+                  "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                  "grants_count": 3,
+                  "homepage_url": "https://hr.example.com",
+                  "last_used_at": "2026-09-26T12:00:00Z",
+                  "name": "Acme HR",
+                  "org_id": "O0020",
+                  "redirect_uris": [
+                    "https://hr.example.com/oauth/callback"
+                  ],
+                  "registration": "developer",
+                  "review_state": "private",
+                  "status": "active",
+                  "updated_at": "2026-09-26T12:00:00Z",
+                  "use_count": 1204
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/oauth/clients/{client_id}/rotate-secret": {
+      "post": {
+        "tags": [
+          "oauth-clients"
+        ],
+        "summary": "Rotate an app's secret (shown once; the old one works 24 h more)",
+        "description": "A new secret, shown once in this response. The old one keeps working for 24 hours.",
+        "operationId": "oauth-clients.rotate_secret",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientCreated"
+                },
+                "example": {
+                  "allowed_scopes": [
+                    "tasks:write",
+                    "projects:read"
+                  ],
+                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "client_type": "confidential",
+                  "created_at": "2026-09-26T12:00:00Z",
+                  "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+                  "grants_count": 3,
+                  "homepage_url": "https://hr.example.com",
+                  "last_used_at": "2026-09-26T12:00:00Z",
+                  "name": "Acme HR",
+                  "org_id": "O0020",
+                  "redirect_uris": [
+                    "https://hr.example.com/oauth/callback"
+                  ],
+                  "registration": "developer",
+                  "review_state": "private",
+                  "status": "active",
+                  "updated_at": "2026-09-26T12:00:00Z",
+                  "use_count": 1204
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/me/connected-apps": {
+      "get": {
+        "tags": [
+          "connected-apps"
+        ],
+        "summary": "The OAuth apps you have connected",
+        "description": "The apps you have connected, in every organization: scopes, connected on, last used.",
+        "operationId": "connected-apps.list",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 1000, capped at 1000. Filters: `filter[org_id]`, `filter[client_id]` (comma-separated values are OR-ed).",
+              "default": 1000,
+              "title": "Limit"
+            },
+            "description": "Page size; default 1000, capped at 1000. Filters: `filter[org_id]`, `filter[client_id]` (comma-separated values are OR-ed)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: created_at, last_used_at, client_name. Default: the list's natural order.",
+              "title": "Sort By"
+            },
+            "description": "One of: created_at, last_used_at, client_name. Default: the list's natural order."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ConnectedApp_"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                      "client_name": "Acme HR",
+                      "created_at": "2026-09-26T12:00:00Z",
+                      "grant_id": "tmg_Xy12Ab34Cd56",
+                      "homepage_url": "https://hr.example.com",
+                      "last_used_at": "2026-09-26T13:00:00Z",
+                      "org_id": "O0020",
+                      "org_name": "Indrasol",
+                      "scopes": [
+                        "tasks:write"
+                      ]
+                    }
+                  ],
+                  "next_cursor": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-kind": "list",
+        "x-scopes": []
+      }
+    },
+    "/v1/me/connected-apps/{grant_id}": {
+      "delete": {
+        "tags": [
+          "connected-apps"
+        ],
+        "summary": "Disconnect an app (its tokens for you are revoked)",
+        "description": "Disconnect an app: the connection and every token the app holds for you are revoked.",
+        "operationId": "connected-apps.delete",
+        "parameters": [
+          {
+            "name": "grant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Grant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectedAppRevoked"
+                },
+                "example": {
+                  "grant_id": "string",
+                  "status": "revoked",
+                  "access_revoked": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "admin"
+        ]
+      }
+    },
     "/v1/releases/whats-new": {
       "get": {
         "tags": [
@@ -36777,8 +38790,8 @@
         "tags": [
           "views"
         ],
-        "summary": "Saved views you can read",
-        "description": "Every saved view you can read: personal first, then team, then project. Each carries `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data, next_cursor}`.",
+        "summary": "Saved views you can read (filter by `resource`: task or project)",
+        "description": "Every saved view you can read: personal first, then team, then project. Each carries `resource` (the list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as `{data, next_cursor}`.",
         "operationId": "views.list",
         "parameters": [
           {
@@ -36809,6 +38822,24 @@
               "title": "Scope"
             },
             "description": "`user` | `team` | `project` \u2014 only that scope's views."
+          },
+          {
+            "name": "resource",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`task` or `project`: only views of that list. Omit it for both.",
+              "title": "Resource"
+            },
+            "description": "`task` or `project`: only views of that list. Omit it for both."
           },
           {
             "name": "limit",
@@ -36896,6 +38927,7 @@
                       "org_id": "string",
                       "scope_type": "user",
                       "scope_id": "string",
+                      "resource": "task",
                       "name": "string",
                       "query": {},
                       "display": {},
@@ -37098,8 +39130,8 @@
         "tags": [
           "views"
         ],
-        "summary": "Save a view",
-        "description": "Save a view into a scope the caller may write: personal (always, any org role),\nteam (team owner / org admin), project (owner / editor / org admin). `query` is\nvalidated through the list parser \u2014 an unknown key or value is its own 400. 409 on\na duplicate name within the scope.",
+        "summary": "Save a view of the task list or the projects list (`resource`)",
+        "description": "Save a view.\n\n- `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.\n- `query` is checked by that list's own rules: an unknown key or value is the same 400 the list gives.\n- Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project` (project owners and editors; task views only).\n- A name is unique among a scope's views of the same resource (409 otherwise).",
         "operationId": "views.create",
         "requestBody": {
           "required": true,
@@ -37112,6 +39144,7 @@
                 "org_id": "string",
                 "scope_type": "user",
                 "scope_id": "string",
+                "resource": "task",
                 "name": "string",
                 "query": {},
                 "display": {}
@@ -37132,6 +39165,7 @@
                   "org_id": "string",
                   "scope_type": "user",
                   "scope_id": "string",
+                  "resource": "task",
                   "name": "string",
                   "query": {},
                   "display": {},
@@ -37329,7 +39363,7 @@
         "tags": [
           "views"
         ],
-        "summary": "Read a saved view",
+        "summary": "Read a saved view (its `resource` says which list it queries)",
         "operationId": "views.read",
         "parameters": [
           {
@@ -37364,6 +39398,7 @@
                   "org_id": "string",
                   "scope_type": "user",
                   "scope_id": "string",
+                  "resource": "task",
                   "name": "string",
                   "query": {},
                   "display": {},
@@ -37557,14 +39592,14 @@
         "x-scopes": [
           "tasks:read"
         ],
-        "description": "Read a saved view."
+        "description": "Read a saved view (its `resource` says which list it queries)."
       },
       "patch": {
         "tags": [
           "views"
         ],
         "summary": "Update a saved view",
-        "description": "Rename, re-query or re-display. `edit`: the owner (personal), the team owner /\norg admin (team), a project owner / editor / org admin (project).",
+        "description": "Rename, re-query or re-display. `edit`: the owner (personal), the team owner /\norg admin (team), a project owner / editor / org admin (project). `resource` is\nread-only: a different value is a 400.",
         "operationId": "views.update",
         "parameters": [
           {
@@ -37594,6 +39629,7 @@
                 "$ref": "#/components/schemas/ViewUpdate"
               },
               "example": {
+                "resource": "task",
                 "name": "string",
                 "query": {},
                 "display": {}
@@ -37614,6 +39650,7 @@
                   "org_id": "string",
                   "scope_type": "user",
                   "scope_id": "string",
+                  "resource": "task",
                   "name": "string",
                   "query": {},
                   "display": {},
@@ -38031,7 +40068,7 @@
           "views"
         ],
         "summary": "Duplicate a saved view",
-        "description": "Copy the view into a scope the caller may write (default: personal). Needs `read` on the source.",
+        "description": "Copy the view (its `resource` included) into a scope the caller may write (default: personal). Needs `read` on the source.",
         "operationId": "views.duplicate",
         "parameters": [
           {
@@ -38072,6 +40109,7 @@
                   "org_id": "string",
                   "scope_type": "user",
                   "scope_id": "string",
+                  "resource": "task",
                   "name": "string",
                   "query": {},
                   "display": {},
@@ -38269,8 +40307,8 @@
         "tags": [
           "views"
         ],
-        "summary": "The tasks a saved view shows (task-list envelope)",
-        "description": "The tasks a saved view shows, as `{data, next_cursor}`.\n\n- The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened by a guest returns the guest's tasks.\n- Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`, `group_by` or `section_scope` here is a 400.",
+        "summary": "The rows a saved view shows: tasks or projects, per its `resource`",
+        "description": "The rows a saved view shows, as `{data, next_cursor}`: tasks for a `task` view, projects for a `project` view.\n\n- The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`), with **your** visibility: a team view opened by a guest returns the guest's rows.\n- Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`, `group_by`, `section_scope` or `show_all` here is a 400.",
         "operationId": "views.rows",
         "parameters": [
           {
@@ -38341,7 +40379,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskListPage"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskListPage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Page_ProjectCard_"
+                    }
+                  ],
+                  "title": "Response View Rows Route V1 Views  View Id  Rows Get"
                 },
                 "example": {
                   "data": [
@@ -38618,6 +40664,7 @@
                   "position": 0.0,
                   "label": "string",
                   "scope_type": "user",
+                  "resource": "task",
                   "created_at": "2026-09-25T12:00:00Z"
                 }
               }
@@ -39116,6 +41163,7 @@
                       "position": 0.0,
                       "label": "string",
                       "scope_type": "user",
+                      "resource": "task",
                       "created_at": "2026-09-25T12:00:00Z"
                     }
                   ],
@@ -39349,6 +41397,7 @@
                   "position": 0.0,
                   "label": "string",
                   "scope_type": "user",
+                  "resource": "task",
                   "created_at": "2026-09-25T12:00:00Z"
                 }
               }
@@ -39785,6 +41834,7 @@
                       "position": 0.0,
                       "label": "string",
                       "scope_type": "user",
+                      "resource": "task",
                       "created_at": "2026-09-25T12:00:00Z"
                     }
                   ],
@@ -39970,6 +42020,480 @@
           "tasks:write"
         ]
       }
+    },
+    "/.well-known/oauth-authorization-server": {
+      "get": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Authorization server metadata (RFC 8414)",
+        "description": "Authorization server metadata (RFC 8414): the endpoints, scopes, grant types and PKCE method.",
+        "operationId": "oauth.server_metadata",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationServerMetadata"
+                },
+                "example": {
+                  "issuer": "string",
+                  "authorization_endpoint": "string",
+                  "token_endpoint": "string",
+                  "revocation_endpoint": "string",
+                  "scopes_supported": [
+                    "string"
+                  ],
+                  "response_types_supported": [
+                    "string"
+                  ],
+                  "response_modes_supported": [
+                    "string"
+                  ],
+                  "grant_types_supported": [
+                    "string"
+                  ],
+                  "code_challenge_methods_supported": [
+                    "string"
+                  ],
+                  "token_endpoint_auth_methods_supported": [
+                    "string"
+                  ],
+                  "revocation_endpoint_auth_methods_supported": [
+                    "string"
+                  ],
+                  "service_documentation": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
+    },
+    "/.well-known/oauth-protected-resource": {
+      "get": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Protected resource metadata (RFC 9728)",
+        "description": "Protected resource metadata (RFC 9728): which authorization server issues tokens for this API.",
+        "operationId": "oauth.resource_metadata",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtectedResourceMetadata"
+                },
+                "example": {
+                  "resource": "string",
+                  "authorization_servers": [
+                    "string"
+                  ],
+                  "scopes_supported": [
+                    "string"
+                  ],
+                  "bearer_methods_supported": [
+                    "string"
+                  ],
+                  "resource_documentation": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
+    },
+    "/oauth/authorize": {
+      "get": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Start an authorization: sign-in and consent, then back to the app",
+        "description": "Start an authorization: the person signs in to TasksMate, picks the organization and approves the scopes; the\nbrowser then returns to `redirect_uri` with `code` and `state` (or `error` and `state`).",
+        "operationId": "oauth.authorize",
+        "parameters": [
+          {
+            "name": "response_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must be `code`",
+              "title": "Response Type"
+            },
+            "description": "Must be `code`"
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The app's `tmc_\u2026` id",
+              "title": "Client Id"
+            },
+            "description": "The app's `tmc_\u2026` id"
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exactly one of the app's registered redirect URIs",
+              "title": "Redirect Uri"
+            },
+            "description": "Exactly one of the app's registered redirect URIs"
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Space-separated scopes, within the app's allowed scopes",
+              "title": "Scope"
+            },
+            "description": "Space-separated scopes, within the app's allowed scopes"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required: an opaque value returned unchanged",
+              "title": "State"
+            },
+            "description": "Required: an opaque value returned unchanged"
+          },
+          {
+            "name": "code_challenge",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required: base64url(SHA-256(code_verifier)), 43 characters",
+              "title": "Code Challenge"
+            },
+            "description": "Required: base64url(SHA-256(code_verifier)), 43 characters"
+          },
+          {
+            "name": "code_challenge_method",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must be `S256`",
+              "title": "Code Challenge Method"
+            },
+            "description": "Must be `S256`"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "To the consent screen, or back to the app with `error` and `state`"
+          },
+          "400": {
+            "description": "An HTML error page: unknown app or unregistered redirect URI (never redirected)",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                },
+                "example": {
+                  "detail": [
+                    {
+                      "loc": [
+                        "string"
+                      ],
+                      "msg": "string",
+                      "type": "string",
+                      "ctx": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
+    },
+    "/oauth/token": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Exchange a code or a refresh token for tokens",
+        "description": "Exchange an authorization code (with its PKCE verifier) or a refresh token for an access token and a new\nrefresh token. Errors are OAuth JSON (`error`, `error_description`).",
+        "operationId": "oauth.token",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "authorization_code",
+                      "refresh_token"
+                    ]
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "authorization_code: the code from the redirect"
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "description": "authorization_code: exactly the one in the authorization request"
+                  },
+                  "code_verifier": {
+                    "type": "string",
+                    "description": "authorization_code: the PKCE verifier (43-128 characters)"
+                  },
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "refresh_token: the current refresh token (single use)"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "description": "refresh_token: optional, narrower scopes (space-separated)"
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Required for a public app; a confidential app may send it with `client_secret` instead of HTTP Basic"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "`client_secret_post` (or use HTTP Basic)"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "grant_type"
+                ],
+                "title": "TokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                },
+                "example": {
+                  "access_token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "expires_in": 3600,
+                  "refresh_token": "tmr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
+                  "scope": "tasks:write projects:read",
+                  "token_type": "Bearer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An OAuth error (`invalid_request`, `invalid_grant`, `invalid_scope`, `unsupported_grant_type`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorBody"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client authentication failed (`invalid_client`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorBody"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
+    },
+    "/oauth/revoke": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "summary": "Revoke a refresh token or an access token (RFC 7009)",
+        "description": "Revoke a refresh token (its whole family and the connection's access tokens) or an access token (RFC 7009).",
+        "operationId": "oauth.revoke",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "A refresh token (`tmr_\u2026`) or an access token (`tm_live_\u2026`)"
+                  },
+                  "token_type_hint": {
+                    "type": "string",
+                    "enum": [
+                      "refresh_token",
+                      "access_token"
+                    ]
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Required for a public app; a confidential app may send it with `client_secret` instead of HTTP Basic"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "`client_secret_post` (or use HTTP Basic)"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "title": "RevokeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Revoked, or nothing to revoke (always 200 for a known app)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "400": {
+            "description": "An OAuth error (`invalid_request`, `invalid_grant`, `invalid_scope`, `unsupported_grant_type`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorBody"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Client authentication failed (`invalid_client`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorBody"
+                },
+                "example": {
+                  "error": "invalid_grant",
+                  "error_description": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "x-kind": "oauth",
+        "security": []
+      }
     }
   },
   "components": {
@@ -40055,6 +42579,102 @@
         ],
         "title": "AuditPage",
         "description": "A page of the audit log, newest first: `{data, next_cursor}`."
+      },
+      "AuthorizationServerMetadata": {
+        "properties": {
+          "issuer": {
+            "type": "string",
+            "title": "Issuer"
+          },
+          "authorization_endpoint": {
+            "type": "string",
+            "title": "Authorization Endpoint"
+          },
+          "token_endpoint": {
+            "type": "string",
+            "title": "Token Endpoint"
+          },
+          "revocation_endpoint": {
+            "type": "string",
+            "title": "Revocation Endpoint"
+          },
+          "scopes_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scopes Supported"
+          },
+          "response_types_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Response Types Supported"
+          },
+          "response_modes_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Response Modes Supported"
+          },
+          "grant_types_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Grant Types Supported"
+          },
+          "code_challenge_methods_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Code Challenge Methods Supported"
+          },
+          "token_endpoint_auth_methods_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Token Endpoint Auth Methods Supported"
+          },
+          "revocation_endpoint_auth_methods_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Revocation Endpoint Auth Methods Supported"
+          },
+          "service_documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Documentation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "issuer",
+          "authorization_endpoint",
+          "token_endpoint",
+          "revocation_endpoint",
+          "scopes_supported",
+          "response_types_supported",
+          "response_modes_supported",
+          "grant_types_supported",
+          "code_challenge_methods_supported",
+          "token_endpoint_auth_methods_supported",
+          "revocation_endpoint_auth_methods_supported"
+        ],
+        "title": "AuthorizationServerMetadata",
+        "description": "Returned by `oauth.server_metadata`."
       },
       "AvailabilityCreate": {
         "properties": {
@@ -40446,6 +43066,147 @@
         ],
         "title": "CommitType",
         "description": "One of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`, `revert`. Used by `ReleaseNoteItem`."
+      },
+      "ConnectedApp": {
+        "properties": {
+          "grant_id": {
+            "type": "string",
+            "title": "Grant Id"
+          },
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "homepage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homepage Url"
+          },
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "org_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Org Name"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scopes"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "Connected on"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At",
+            "description": "Last token issued or refreshed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grant_id",
+          "client_id",
+          "org_id",
+          "scopes"
+        ],
+        "title": "ConnectedApp",
+        "example": {
+          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_name": "Acme HR",
+          "created_at": "2026-09-26T12:00:00Z",
+          "grant_id": "tmg_Xy12Ab34Cd56",
+          "homepage_url": "https://hr.example.com",
+          "last_used_at": "2026-09-26T13:00:00Z",
+          "org_id": "O0020",
+          "org_name": "Indrasol",
+          "scopes": [
+            "tasks:write"
+          ]
+        },
+        "description": "Part of `Page_ConnectedApp_`."
+      },
+      "ConnectedAppRevoked": {
+        "properties": {
+          "grant_id": {
+            "type": "string",
+            "title": "Grant Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "revoked",
+            "title": "Status",
+            "default": "revoked"
+          },
+          "access_revoked": {
+            "type": "integer",
+            "title": "Access Revoked",
+            "description": "How many of the app's live access tokens were revoked with it",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "grant_id"
+        ],
+        "title": "ConnectedAppRevoked",
+        "description": "Returned by `connected-apps.delete`."
       },
       "DeliveryDetail": {
         "properties": {
@@ -41991,6 +44752,20 @@
         "title": "GoalsReordered",
         "description": "Returned by `goals.reorder`."
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError",
+        "description": "A `HTTPValidationError` object."
+      },
       "InviteStatusEnum": {
         "type": "string",
         "enum": [
@@ -42050,7 +44825,13 @@
           },
           "grant_type": {
             "type": "string",
+            "enum": [
+              "personal",
+              "service_account",
+              "authorization_code"
+            ],
             "title": "Grant Type",
+            "description": "personal \u00b7 service_account \u00b7 authorization_code (a third-party app acting for a person)",
             "default": "personal"
           },
           "token_kind": {
@@ -42061,6 +44842,18 @@
             ],
             "title": "Token Kind",
             "default": "live"
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id",
+            "description": "The OAuth app the token was issued to (authorization_code); null otherwise"
           }
         },
         "type": "object",
@@ -42592,6 +45385,731 @@
         "type": "object",
         "title": "MilestoneUpdate",
         "description": "A partial update: fields you leave out are unchanged.\n\n- `description` / `owner_user_id` sent as null clear them.\n- `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.\n- The milestone's owner without team `edit` rights may send `status` only \u2014 anything else is a 403."
+      },
+      "OAuthClientCreate": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Org Id",
+            "description": "The organization that owns the app (you must be its owner or admin)"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "description": "Shown to people on the consent screen",
+            "examples": [
+              "Acme HR"
+            ]
+          },
+          "client_type": {
+            "type": "string",
+            "enum": [
+              "confidential",
+              "public"
+            ],
+            "title": "Client Type",
+            "description": "`confidential`: a server that keeps a secret. `public`: a native or single-page app with no secret (PKCE only).",
+            "default": "confidential"
+          },
+          "redirect_uris": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Redirect Uris",
+            "description": "Exact-match allow-list: https, or http on a loopback host (localhost, any port). No fragment.",
+            "examples": [
+              [
+                "https://hr.example.com/oauth/callback"
+              ]
+            ]
+          },
+          "allowed_scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Allowed Scopes",
+            "description": "The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.",
+            "examples": [
+              [
+                "tasks:write",
+                "projects:read"
+              ]
+            ]
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url",
+            "description": "https URL of a square logo"
+          },
+          "homepage_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homepage Url",
+            "description": "https URL of the app's homepage"
+          },
+          "privacy_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Url",
+            "description": "https URL of the app's privacy policy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id",
+          "name",
+          "redirect_uris",
+          "allowed_scopes"
+        ],
+        "title": "OAuthClientCreate",
+        "description": "The request body of `oauth-clients.create`."
+      },
+      "OAuthClientCreated": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id",
+            "description": "Public identifier (`tmc_\u2026`)"
+          },
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "homepage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homepage Url"
+          },
+          "privacy_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Url"
+          },
+          "redirect_uris": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Redirect Uris"
+          },
+          "client_type": {
+            "type": "string",
+            "enum": [
+              "confidential",
+              "public"
+            ],
+            "title": "Client Type"
+          },
+          "allowed_scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Scopes"
+          },
+          "registration": {
+            "type": "string",
+            "enum": [
+              "developer",
+              "dynamic"
+            ],
+            "title": "Registration",
+            "default": "developer"
+          },
+          "review_state": {
+            "type": "string",
+            "enum": [
+              "private",
+              "listed"
+            ],
+            "title": "Review State",
+            "description": "`private`: people outside your organization see an unreviewed-app warning when connecting",
+            "default": "private"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ],
+            "title": "Status"
+          },
+          "grants_count": {
+            "type": "integer",
+            "title": "Grants Count",
+            "description": "People connected to the app right now",
+            "default": 0
+          },
+          "use_count": {
+            "type": "integer",
+            "title": "Use Count",
+            "default": 0
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At",
+            "description": "Last API call with one of its tokens (updated at most once a minute)"
+          },
+          "secret_rotated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Rotated At"
+          },
+          "previous_secret_expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Secret Expires At",
+            "description": "After a rotation, the old secret works until then"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "revoked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked By"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Secret",
+            "description": "THE SECRET (`tmcs_\u2026`) of a confidential app \u2014 shown once, never stored (only its SHA-256 is). null for a public app."
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "org_id",
+          "name",
+          "redirect_uris",
+          "client_type",
+          "allowed_scopes",
+          "status"
+        ],
+        "title": "OAuthClientCreated",
+        "example": {
+          "allowed_scopes": [
+            "tasks:write",
+            "projects:read"
+          ],
+          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+          "client_type": "confidential",
+          "created_at": "2026-09-26T12:00:00Z",
+          "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+          "grants_count": 3,
+          "homepage_url": "https://hr.example.com",
+          "last_used_at": "2026-09-26T12:00:00Z",
+          "name": "Acme HR",
+          "org_id": "O0020",
+          "redirect_uris": [
+            "https://hr.example.com/oauth/callback"
+          ],
+          "registration": "developer",
+          "review_state": "private",
+          "status": "active",
+          "updated_at": "2026-09-26T12:00:00Z",
+          "use_count": 1204
+        },
+        "description": "Returned by `oauth-clients.create` and `oauth-clients.rotate_secret`."
+      },
+      "OAuthClientOut": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id",
+            "description": "Public identifier (`tmc_\u2026`)"
+          },
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "homepage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homepage Url"
+          },
+          "privacy_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Url"
+          },
+          "redirect_uris": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Redirect Uris"
+          },
+          "client_type": {
+            "type": "string",
+            "enum": [
+              "confidential",
+              "public"
+            ],
+            "title": "Client Type"
+          },
+          "allowed_scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Scopes"
+          },
+          "registration": {
+            "type": "string",
+            "enum": [
+              "developer",
+              "dynamic"
+            ],
+            "title": "Registration",
+            "default": "developer"
+          },
+          "review_state": {
+            "type": "string",
+            "enum": [
+              "private",
+              "listed"
+            ],
+            "title": "Review State",
+            "description": "`private`: people outside your organization see an unreviewed-app warning when connecting",
+            "default": "private"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ],
+            "title": "Status"
+          },
+          "grants_count": {
+            "type": "integer",
+            "title": "Grants Count",
+            "description": "People connected to the app right now",
+            "default": 0
+          },
+          "use_count": {
+            "type": "integer",
+            "title": "Use Count",
+            "default": 0
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At",
+            "description": "Last API call with one of its tokens (updated at most once a minute)"
+          },
+          "secret_rotated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Rotated At"
+          },
+          "previous_secret_expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Secret Expires At",
+            "description": "After a rotation, the old secret works until then"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "revoked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "org_id",
+          "name",
+          "redirect_uris",
+          "client_type",
+          "allowed_scopes",
+          "status"
+        ],
+        "title": "OAuthClientOut",
+        "example": {
+          "allowed_scopes": [
+            "tasks:write",
+            "projects:read"
+          ],
+          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_type": "confidential",
+          "created_at": "2026-09-26T12:00:00Z",
+          "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
+          "grants_count": 3,
+          "homepage_url": "https://hr.example.com",
+          "last_used_at": "2026-09-26T12:00:00Z",
+          "name": "Acme HR",
+          "org_id": "O0020",
+          "redirect_uris": [
+            "https://hr.example.com/oauth/callback"
+          ],
+          "registration": "developer",
+          "review_state": "private",
+          "status": "active",
+          "updated_at": "2026-09-26T12:00:00Z",
+          "use_count": 1204
+        },
+        "description": "Returned by `oauth-clients.delete`, `oauth-clients.read` and `oauth-clients.update`."
+      },
+      "OAuthClientUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Omit to leave it"
+          },
+          "redirect_uris": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 10,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redirect Uris",
+            "description": "Replaces the allow-list"
+          },
+          "allowed_scopes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed Scopes",
+            "description": "Replaces the scopes the app may ask for. Existing connections keep theirs until they next refresh."
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url",
+            "description": "null clears it"
+          },
+          "homepage_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homepage Url",
+            "description": "null clears it"
+          },
+          "privacy_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Url",
+            "description": "null clears it"
+          }
+        },
+        "type": "object",
+        "title": "OAuthClientUpdate",
+        "description": "The request body of `oauth-clients.update`."
+      },
+      "OAuthErrorBody": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error",
+            "description": "invalid_request \u00b7 invalid_client \u00b7 invalid_grant \u00b7 unauthorized_client \u00b7 unsupported_grant_type \u00b7 invalid_scope",
+            "examples": [
+              "invalid_grant"
+            ]
+          },
+          "error_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "OAuthErrorBody",
+        "description": "A `OAuthErrorBody` object."
       },
       "OrgCard": {
         "properties": {
@@ -44053,6 +47571,35 @@
         "title": "OrganizationSettingsUpdate",
         "description": "`PUT /organizations/{org_id}/settings` body. Every field optional; omitted ones keep their value."
       },
+      "Page_ConnectedApp_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectedApp"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[ConnectedApp]",
+        "description": "Returned by `connected-apps.list`."
+      },
       "Page_DeliveryOut_": {
         "properties": {
           "data": {
@@ -44110,6 +47657,35 @@
         ],
         "title": "Page[Designation]",
         "description": "Returned by `designations.list`."
+      },
+      "Page_OAuthClientOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/OAuthClientOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[OAuthClientOut]",
+        "description": "Returned by `oauth-clients.list`."
       },
       "Page_OrgCard_": {
         "properties": {
@@ -44225,7 +47801,7 @@
           "data"
         ],
         "title": "Page[ProjectCard]",
-        "description": "Returned by `projects.list`."
+        "description": "Returned by `projects.list` and `views.rows`."
       },
       "Page_ProjectMemberInDB_": {
         "properties": {
@@ -44629,6 +48205,17 @@
               }
             ],
             "description": "For a view pin: the view's scope"
+          },
+          "resource": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ViewResourceEnum"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a view pin: the list the view queries, `task` or `project`. Empty for a project pin."
           },
           "created_at": {
             "anyOf": [
@@ -46850,6 +50437,55 @@
         ],
         "title": "ProjectsReordered",
         "description": "Returned by `projects.reorder`."
+      },
+      "ProtectedResourceMetadata": {
+        "properties": {
+          "resource": {
+            "type": "string",
+            "title": "Resource"
+          },
+          "authorization_servers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Authorization Servers"
+          },
+          "scopes_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scopes Supported"
+          },
+          "bearer_methods_supported": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Bearer Methods Supported"
+          },
+          "resource_documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Documentation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resource",
+          "authorization_servers",
+          "scopes_supported",
+          "bearer_methods_supported"
+        ],
+        "title": "ProtectedResourceMetadata",
+        "description": "Returned by `oauth.resource_metadata`."
       },
       "Release": {
         "properties": {
@@ -51646,7 +55282,7 @@
               }
             ],
             "title": "Revoke Reason",
-            "description": "revoked_by_user \u00b7 revoked_by_admin \u00b7 rotated \u00b7 service_account_deactivated"
+            "description": "revoked_by_user \u00b7 revoked_by_admin \u00b7 rotated \u00b7 service_account_deactivated; an app's token also client_revoked \u00b7 org_exit \u00b7 reuse_detected \u00b7 revoked_by_app"
           },
           "rotated_from": {
             "anyOf": [
@@ -51888,7 +55524,7 @@
               }
             ],
             "title": "Revoke Reason",
-            "description": "revoked_by_user \u00b7 revoked_by_admin \u00b7 rotated \u00b7 service_account_deactivated"
+            "description": "revoked_by_user \u00b7 revoked_by_admin \u00b7 rotated \u00b7 service_account_deactivated; an app's token also client_revoked \u00b7 org_exit \u00b7 reuse_detected \u00b7 revoked_by_app"
           },
           "rotated_from": {
             "anyOf": [
@@ -51960,6 +55596,52 @@
           "use_count": 0
         },
         "description": "Returned by `tokens.delete`, `tokens.read` and `tokens.update`."
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token",
+            "description": "A TasksMate access token (`tm_live_\u2026`), 1 hour"
+          },
+          "token_type": {
+            "type": "string",
+            "const": "Bearer",
+            "title": "Token Type",
+            "default": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In",
+            "description": "Seconds"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token",
+            "description": "`tmr_\u2026` \u2014 single use: each refresh returns a new one"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "description": "Space-separated scopes this access token holds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "expires_in",
+          "refresh_token",
+          "scope"
+        ],
+        "title": "TokenResponse",
+        "example": {
+          "access_token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+          "expires_in": 3600,
+          "refresh_token": "tmr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
+          "scope": "tasks:write projects:read",
+          "token_type": "Bearer"
+        },
+        "description": "Returned by `oauth.token`."
       },
       "TokenUpdate": {
         "properties": {
@@ -52061,6 +55743,47 @@
         "title": "UnattachedToken",
         "description": "Part of `AccessReview`."
       },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "description": "Part of `HTTPValidationError`."
+      },
       "ViewCreate": {
         "properties": {
           "org_id": {
@@ -52083,12 +55806,17 @@
             "title": "Scope Id",
             "description": "team_id for `team`, project_id for `project`; ignored for `user` (always the caller)."
           },
+          "resource": {
+            "$ref": "#/components/schemas/ViewResourceEnum",
+            "description": "Which list the view queries: `task` (default; `GET /v1/tasks`) or `project` (`GET /v1/projects/{org_id}`). Fixed at create. A `project` view cannot be `project`-scoped.",
+            "default": "task"
+          },
           "name": {
             "type": "string",
             "maxLength": 120,
             "minLength": 1,
             "title": "Name",
-            "description": "Unique among the scope's active views (case-insensitive) \u2014 409 otherwise"
+            "description": "Unique among the scope's active views of the same resource (case-insensitive) \u2014 409 otherwise"
           },
           "query": {
             "additionalProperties": {
@@ -52106,7 +55834,7 @@
             },
             "type": "object",
             "title": "Query",
-            "description": "GET /v1/tasks parameters, exactly as the list route accepts them; unknown key or bad value \u2192 the parser's own 400."
+            "description": "The resource's list parameters, exactly as its list route accepts them (`GET /v1/tasks` for `task`; `GET /v1/projects/{org_id}`, with `show_all`, for `project`); unknown key or bad value \u2192 the parser's own 400."
           },
           "display": {
             "additionalProperties": true,
@@ -52224,6 +55952,11 @@
             "type": "string",
             "title": "Scope Id"
           },
+          "resource": {
+            "$ref": "#/components/schemas/ViewResourceEnum",
+            "description": "The list the view queries (`task` | `project`); `rows` returns that list's cards",
+            "default": "task"
+          },
           "name": {
             "type": "string",
             "title": "Name"
@@ -52313,6 +56046,15 @@
         "title": "ViewOut",
         "description": "Returned by `views.create`, `views.duplicate`, `views.read` and `views.update`."
       },
+      "ViewResourceEnum": {
+        "type": "string",
+        "enum": [
+          "task",
+          "project"
+        ],
+        "title": "ViewResourceEnum",
+        "description": "One of `task`, `project`. Used by `PinOut` and 3 more."
+      },
       "ViewScopeEnum": {
         "type": "string",
         "enum": [
@@ -52325,6 +56067,17 @@
       },
       "ViewUpdate": {
         "properties": {
+          "resource": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ViewResourceEnum"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Read-only after create: the view's own value is accepted, any other is a 400 `invalid-parameter`."
+          },
           "name": {
             "anyOf": [
               {
@@ -53336,6 +57089,30 @@
         "scheme": "bearer",
         "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
         "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review. |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "For third-party apps acting for a TasksMate user: the authorization-code flow with PKCE (S256, required). The access token it returns is a `tm_live_\u2026` token for one organization, valid 1 hour; refresh tokens rotate on every use.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "/oauth/authorize",
+            "tokenUrl": "/oauth/token",
+            "refreshUrl": "/oauth/token",
+            "scopes": {
+              "tasks:read": "Read tasks, their comments, attachments, history, sections and saved views.",
+              "tasks:write": "Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read).",
+              "projects:read": "Read projects, their members, resources, statistics, goals and roadmaps.",
+              "projects:write": "Create, update and delete projects, their members, resources and goals (implies projects:read).",
+              "teams:read": "Read teams, their members, sprints, milestones and availability.",
+              "teams:write": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read).",
+              "org:read": "Read the organization, its settings, members, invites, designations, access tokens and access review.",
+              "org:write": "Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read).",
+              "webhooks:read": "Read the organization's webhooks and their delivery logs (owner / admin, or a service account).",
+              "webhooks:write": "Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read).",
+              "admin": "Every scope, including the audit log."
+            }
+          }
+        }
       }
     }
   },
@@ -63665,6 +67442,18 @@
     {
       "name": "releases",
       "description": "What's new in TasksMate."
+    },
+    {
+      "name": "oauth-clients",
+      "description": "Third-party OAuth apps your organization registers: redirect URIs, allowed scopes, the client secret (shown once, rotated with a 24 h grace), revocation."
+    },
+    {
+      "name": "connected-apps",
+      "description": "The OAuth apps you have connected to TasksMate, and disconnecting them."
+    },
+    {
+      "name": "oauth",
+      "description": "The OAuth authorization server: discovery, authorize, token (authorization code with PKCE, refresh) and revocation. Errors here are OAuth JSON (`error`, `error_description`), not problem details."
     }
   ],
   "x-problem-types": [

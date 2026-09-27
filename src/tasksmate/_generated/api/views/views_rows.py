@@ -10,6 +10,7 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
+from ...models.page_project_card import PageProjectCard
 from ...models.problem import Problem
 from ...models.task_list_page import TaskListPage
 from ...types import UNSET, Unset
@@ -57,9 +58,25 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | Problem | TaskListPage | None:
+) -> Any | PageProjectCard | TaskListPage | Problem | None:
     if response.status_code == 200:
-        response_200 = TaskListPage.from_dict(response.json())
+
+        def _parse_response_200(data: object) -> PageProjectCard | TaskListPage:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                response_200_type_0 = TaskListPage.from_dict(data)
+
+                return response_200_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            response_200_type_1 = PageProjectCard.from_dict(data)
+
+            return response_200_type_1
+
+        response_200 = _parse_response_200(response.json())
 
         return response_200
 
@@ -120,7 +137,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | Problem | TaskListPage]:
+) -> Response[Any | PageProjectCard | TaskListPage | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -137,15 +154,16 @@ def sync_detailed(
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TaskListPage]:
-    """The tasks a saved view shows (task-list envelope)
+) -> Response[Any | PageProjectCard | TaskListPage | Problem]:
+    """The rows a saved view shows: tasks or projects, per its `resource`
 
-     The tasks a saved view shows, as `{data, next_cursor}`.
+     The rows a saved view shows, as `{data, next_cursor}`: tasks for a `task` view, projects for a
+    `project` view.
 
-    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
-    by a guest returns the guest's tasks.
+    - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
+    with **your** visibility: a team view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by` or `section_scope` here is a 400.
+    `group_by`, `section_scope` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -160,7 +178,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TaskListPage]
+        Response[Any | PageProjectCard | TaskListPage | Problem]
     """
 
     kwargs = _get_kwargs(
@@ -186,15 +204,16 @@ def sync(
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TaskListPage | None:
-    """The tasks a saved view shows (task-list envelope)
+) -> Any | PageProjectCard | TaskListPage | Problem | None:
+    """The rows a saved view shows: tasks or projects, per its `resource`
 
-     The tasks a saved view shows, as `{data, next_cursor}`.
+     The rows a saved view shows, as `{data, next_cursor}`: tasks for a `task` view, projects for a
+    `project` view.
 
-    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
-    by a guest returns the guest's tasks.
+    - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
+    with **your** visibility: a team view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by` or `section_scope` here is a 400.
+    `group_by`, `section_scope` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -209,7 +228,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TaskListPage
+        Any | PageProjectCard | TaskListPage | Problem
     """
 
     return sync_detailed(
@@ -230,15 +249,16 @@ async def asyncio_detailed(
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TaskListPage]:
-    """The tasks a saved view shows (task-list envelope)
+) -> Response[Any | PageProjectCard | TaskListPage | Problem]:
+    """The rows a saved view shows: tasks or projects, per its `resource`
 
-     The tasks a saved view shows, as `{data, next_cursor}`.
+     The rows a saved view shows, as `{data, next_cursor}`: tasks for a `task` view, projects for a
+    `project` view.
 
-    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
-    by a guest returns the guest's tasks.
+    - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
+    with **your** visibility: a team view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by` or `section_scope` here is a 400.
+    `group_by`, `section_scope` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -253,7 +273,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TaskListPage]
+        Response[Any | PageProjectCard | TaskListPage | Problem]
     """
 
     kwargs = _get_kwargs(
@@ -277,15 +297,16 @@ async def asyncio(
     cursor: None | str | Unset = UNSET,
     include_inaccessible: bool | Unset = False,
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TaskListPage | None:
-    """The tasks a saved view shows (task-list envelope)
+) -> Any | PageProjectCard | TaskListPage | Problem | None:
+    """The rows a saved view shows: tasks or projects, per its `resource`
 
-     The tasks a saved view shows, as `{data, next_cursor}`.
+     The rows a saved view shows, as `{data, next_cursor}`: tasks for a `task` view, projects for a
+    `project` view.
 
-    - The view's stored `query` runs like `GET /v1/tasks`, with **your** visibility: a team view opened
-    by a guest returns the guest's tasks.
+    - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
+    with **your** visibility: a team view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by` or `section_scope` here is a 400.
+    `group_by`, `section_scope` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -300,7 +321,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TaskListPage
+        Any | PageProjectCard | TaskListPage | Problem
     """
 
     return (

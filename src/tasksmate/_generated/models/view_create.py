@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.view_resource_enum import check_view_resource_enum
+from ..models.view_resource_enum import ViewResourceEnum
 from ..models.view_scope_enum import check_view_scope_enum
 from ..models.view_scope_enum import ViewScopeEnum
 from ..types import UNSET, Unset
@@ -29,12 +31,14 @@ class ViewCreate:
 
     Attributes:
         org_id (str):
-        name (str): Unique among the scope's active views (case-insensitive) — 409 otherwise
+        name (str): Unique among the scope's active views of the same resource (case-insensitive) — 409 otherwise
         scope_type (ViewScopeEnum | Unset): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
         scope_id (None | str | Unset): team_id for `team`, project_id for `project`; ignored for `user` (always the
             caller).
-        query (ViewCreateQuery | Unset): GET /v1/tasks parameters, exactly as the list route accepts them; unknown key
-            or bad value → the parser's own 400.
+        resource (ViewResourceEnum | Unset): One of `task`, `project`. Used by `PinOut` and 3 more.
+        query (ViewCreateQuery | Unset): The resource's list parameters, exactly as its list route accepts them (`GET
+            /v1/tasks` for `task`; `GET /v1/projects/{org_id}`, with `show_all`, for `project`); unknown key or bad value →
+            the parser's own 400.
         display (ViewCreateDisplay | Unset): Presentation only: columns, columnOrder, columnSizing, layout, boardOrder,
             collapsed.
     """
@@ -43,6 +47,7 @@ class ViewCreate:
     name: str
     scope_type: ViewScopeEnum | Unset = UNSET
     scope_id: None | str | Unset = UNSET
+    resource: ViewResourceEnum | Unset = UNSET
     query: ViewCreateQuery | Unset = UNSET
     display: ViewCreateDisplay | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -68,6 +73,10 @@ class ViewCreate:
         else:
             scope_id = self.scope_id
 
+        resource: str | Unset = UNSET
+        if not isinstance(self.resource, Unset):
+            resource = self.resource
+
         query: dict[str, Any] | Unset = UNSET
         if not isinstance(self.query, Unset):
             query = self.query.to_dict()
@@ -88,6 +97,8 @@ class ViewCreate:
             field_dict["scope_type"] = scope_type
         if scope_id is not UNSET:
             field_dict["scope_id"] = scope_id
+        if resource is not UNSET:
+            field_dict["resource"] = resource
         if query is not UNSET:
             field_dict["query"] = query
         if display is not UNSET:
@@ -121,6 +132,13 @@ class ViewCreate:
 
         scope_id = _parse_scope_id(d.pop("scope_id", UNSET))
 
+        _resource = d.pop("resource", UNSET)
+        resource: ViewResourceEnum | Unset
+        if isinstance(_resource, Unset):
+            resource = UNSET
+        else:
+            resource = check_view_resource_enum(_resource)
+
         _query = d.pop("query", UNSET)
         query: ViewCreateQuery | Unset
         if isinstance(_query, Unset):
@@ -140,6 +158,7 @@ class ViewCreate:
             name=name,
             scope_type=scope_type,
             scope_id=scope_id,
+            resource=resource,
             query=query,
             display=display,
         )

@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.view_resource_enum import check_view_resource_enum
+from ..models.view_resource_enum import ViewResourceEnum
 from ..models.view_scope_enum import check_view_scope_enum
 from ..models.view_scope_enum import ViewScopeEnum
 from ..types import UNSET, Unset
@@ -34,6 +36,7 @@ class ViewOut:
         scope_type (ViewScopeEnum): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
         scope_id (str):
         name (str):
+        resource (ViewResourceEnum | Unset): One of `task`, `project`. Used by `PinOut` and 3 more.
         query (ViewOutQuery | Unset):
         display (ViewOutDisplay | Unset):
         created_by (None | str | Unset):
@@ -50,6 +53,7 @@ class ViewOut:
     scope_type: ViewScopeEnum
     scope_id: str
     name: str
+    resource: ViewResourceEnum | Unset = UNSET
     query: ViewOutQuery | Unset = UNSET
     display: ViewOutDisplay | Unset = UNSET
     created_by: None | str | Unset = UNSET
@@ -77,6 +81,10 @@ class ViewOut:
         scope_id = self.scope_id
 
         name = self.name
+
+        resource: str | Unset = UNSET
+        if not isinstance(self.resource, Unset):
+            resource = self.resource
 
         query: dict[str, Any] | Unset = UNSET
         if not isinstance(self.query, Unset):
@@ -131,6 +139,8 @@ class ViewOut:
                 "name": name,
             }
         )
+        if resource is not UNSET:
+            field_dict["resource"] = resource
         if query is not UNSET:
             field_dict["query"] = query
         if display is not UNSET:
@@ -167,6 +177,13 @@ class ViewOut:
         scope_id = d.pop("scope_id")
 
         name = d.pop("name")
+
+        _resource = d.pop("resource", UNSET)
+        resource: ViewResourceEnum | Unset
+        if isinstance(_resource, Unset):
+            resource = UNSET
+        else:
+            resource = check_view_resource_enum(_resource)
 
         _query = d.pop("query", UNSET)
         query: ViewOutQuery | Unset
@@ -246,6 +263,7 @@ class ViewOut:
             scope_type=scope_type,
             scope_id=scope_id,
             name=name,
+            resource=resource,
             query=query,
             display=display,
             created_by=created_by,

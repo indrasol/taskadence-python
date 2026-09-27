@@ -22,7 +22,7 @@ T = TypeVar("T", bound="PageProjectCard")
 
 @_attrs_define
 class PageProjectCard:
-    """Returned by `projects.list`.
+    """Returned by `projects.list` and `views.rows`.
 
     Attributes:
         data (list[ProjectCard]):

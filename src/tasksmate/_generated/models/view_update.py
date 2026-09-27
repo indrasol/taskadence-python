@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.view_resource_enum import check_view_resource_enum
+from ..models.view_resource_enum import ViewResourceEnum
 from ..types import UNSET, Unset
 from typing import cast
 
@@ -26,11 +28,14 @@ class ViewUpdate:
     """The request body of `views.update`.
 
     Attributes:
+        resource (None | Unset | ViewResourceEnum): Read-only after create: the view's own value is accepted, any other
+            is a 400 `invalid-parameter`.
         name (None | str | Unset):
         query (None | Unset | ViewUpdateQueryType0):
         display (None | Unset | ViewUpdateDisplayType0):
     """
 
+    resource: None | Unset | ViewResourceEnum = UNSET
     name: None | str | Unset = UNSET
     query: None | Unset | ViewUpdateQueryType0 = UNSET
     display: None | Unset | ViewUpdateDisplayType0 = UNSET
@@ -42,6 +47,14 @@ class ViewUpdate:
     def to_dict(self) -> dict[str, Any]:
         from ..models.view_update_display_type_0 import ViewUpdateDisplayType0  # noqa: PLC0415
         from ..models.view_update_query_type_0 import ViewUpdateQueryType0  # noqa: PLC0415
+
+        resource: None | str | Unset
+        if isinstance(self.resource, Unset):
+            resource = UNSET
+        elif isinstance(self.resource, str):
+            resource = self.resource
+        else:
+            resource = self.resource
 
         name: None | str | Unset
         if isinstance(self.name, Unset):
@@ -68,6 +81,8 @@ class ViewUpdate:
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
+        if resource is not UNSET:
+            field_dict["resource"] = resource
         if name is not UNSET:
             field_dict["name"] = name
         if query is not UNSET:
@@ -83,6 +98,23 @@ class ViewUpdate:
         from ..models.view_update_query_type_0 import ViewUpdateQueryType0  # noqa: PLC0415
 
         d = dict(src_dict)
+
+        def _parse_resource(data: object) -> None | Unset | ViewResourceEnum:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                resource_type_0 = check_view_resource_enum(data)
+
+                return resource_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | Unset | ViewResourceEnum, data)
+
+        resource = _parse_resource(d.pop("resource", UNSET))
 
         def _parse_name(data: object) -> None | str | Unset:
             if data is None:
@@ -128,6 +160,7 @@ class ViewUpdate:
         display = _parse_display(d.pop("display", UNSET))
 
         view_update = cls(
+            resource=resource,
             name=name,
             query=query,
             display=display,

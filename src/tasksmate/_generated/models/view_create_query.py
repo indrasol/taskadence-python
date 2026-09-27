@@ -18,7 +18,10 @@ T = TypeVar("T", bound="ViewCreateQuery")
 
 @_attrs_define
 class ViewCreateQuery:
-    """GET /v1/tasks parameters, exactly as the list route accepts them; unknown key or bad value → the parser's own 400."""
+    """The resource's list parameters, exactly as its list route accepts them (`GET /v1/tasks` for `task`; `GET
+    /v1/projects/{org_id}`, with `show_all`, for `project`); unknown key or bad value → the parser's own 400.
+
+    """
 
     additional_properties: dict[str, list[str] | str] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is

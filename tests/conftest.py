@@ -16,7 +16,18 @@ from tasksmate import AsyncTasksMate, TasksMate
 
 BASE = "https://api.tasksmate.test"
 TOKEN = "tm_live_" + "x" * 43  # a well-formed, fake access token
-SPEC: dict[str, Any] = json.loads((Path(__file__).resolve().parent.parent / "spec" / "openapi.public.json").read_text())
+FULL_SPEC: dict[str, Any] = json.loads(
+    (Path(__file__).resolve().parent.parent / "spec" / "openapi.public.json").read_text()
+)
+# What the SDK is generated from (scripts/generate.py `sdk_spec`): the snapshot without the OAuth protocol operations.
+SPEC: dict[str, Any] = {
+    **FULL_SPEC,
+    "paths": {
+        path: kept
+        for path, item in FULL_SPEC["paths"].items()
+        if (kept := {m: op for m, op in item.items() if op.get("x-kind") != "oauth"})
+    },
+}
 
 
 def operation(op_id: str) -> tuple[str, str, dict[str, Any]]:

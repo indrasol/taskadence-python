@@ -112,7 +112,8 @@ def sync_detailed(
 ) -> Response[Problem | ViewOut]:
     """Duplicate a saved view
 
-     Copy the view into a scope the caller may write (default: personal). Needs `read` on the source.
+     Copy the view (its `resource` included) into a scope the caller may write (default: personal). Needs
+    `read` on the source.
 
     Args:
         view_id (str):
@@ -146,7 +147,8 @@ def sync(
 ) -> Problem | ViewOut | None:
     """Duplicate a saved view
 
-     Copy the view into a scope the caller may write (default: personal). Needs `read` on the source.
+     Copy the view (its `resource` included) into a scope the caller may write (default: personal). Needs
+    `read` on the source.
 
     Args:
         view_id (str):
@@ -175,7 +177,8 @@ async def asyncio_detailed(
 ) -> Response[Problem | ViewOut]:
     """Duplicate a saved view
 
-     Copy the view into a scope the caller may write (default: personal). Needs `read` on the source.
+     Copy the view (its `resource` included) into a scope the caller may write (default: personal). Needs
+    `read` on the source.
 
     Args:
         view_id (str):
@@ -207,7 +210,8 @@ async def asyncio(
 ) -> Problem | ViewOut | None:
     """Duplicate a saved view
 
-     Copy the view into a scope the caller may write (default: personal). Needs `read` on the source.
+     Copy the view (its `resource` included) into a scope the caller may write (default: personal). Needs
+    `read` on the source.
 
     Args:
         view_id (str):

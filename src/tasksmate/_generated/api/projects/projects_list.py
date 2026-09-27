@@ -159,16 +159,23 @@ def sync_detailed(
     of, and — for org owners and admins — all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
+    ids) narrow the list.
+    - `filter[search]` matches the name, description or id (case-insensitive substring).
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    the creation date when a project has none.
 
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]` (comma-separated values are OR-ed). Default: 1000.
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
+            1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, position, status, priority, start_date,
-            end_date, created_at, updated_at, progress_percent. Default: the list's natural order.
+            end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the
+            list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -216,16 +223,23 @@ def sync(
     of, and — for org owners and admins — all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
+    ids) narrow the list.
+    - `filter[search]` matches the name, description or id (case-insensitive substring).
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    the creation date when a project has none.
 
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]` (comma-separated values are OR-ed). Default: 1000.
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
+            1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, position, status, priority, start_date,
-            end_date, created_at, updated_at, progress_percent. Default: the list's natural order.
+            end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the
+            list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -268,16 +282,23 @@ async def asyncio_detailed(
     of, and — for org owners and admins — all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
+    ids) narrow the list.
+    - `filter[search]` matches the name, description or id (case-insensitive substring).
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    the creation date when a project has none.
 
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]` (comma-separated values are OR-ed). Default: 1000.
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
+            1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, position, status, priority, start_date,
-            end_date, created_at, updated_at, progress_percent. Default: the list's natural order.
+            end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the
+            list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -323,16 +344,23 @@ async def asyncio(
     of, and — for org owners and admins — all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]` and `filter[team]` (team ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
+    ids) narrow the list.
+    - `filter[search]` matches the name, description or id (case-insensitive substring).
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    the creation date when a project has none.
 
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]` (comma-separated values are OR-ed). Default: 1000.
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
+            1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: name, position, status, priority, start_date,
-            end_date, created_at, updated_at, progress_percent. Default: the list's natural order.
+            end_date, created_at, updated_at, progress_percent, project_id, visibility. Default: the
+            list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 

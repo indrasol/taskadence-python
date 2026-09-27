@@ -7,11 +7,11 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 | | |
 |---|---|
 | Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `073e120` — "feat(api): 4.6b D - public-spec prose as lists and tables (no walls of text)" (task 4.6b; on `af1cf48`: the public copy cleanup, then long descriptions restructured as lists and tables) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`), 2026-09-26 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
+| Backend commit | `8b86aa0` — "feat(security): 4.7 - ALLOWED_HOSTS_TM: a Host header allowlist (the OAuth issuer is derived from it)" (task 4.7; the public spec is byte-identical to `28fb27b`'s — 4.8 OAuth apps and 4.9 views of projects moved it from `073e120`) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`), 2026-09-27 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
-| Size | 94 paths · 152 operations · 180 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `12fb9ce99683f907c1ca58bdc007e3582524db2f0ca8486b28377520b2f0ed7f` |
+| Size | 104 paths · 165 operations (160 SDK methods: the 5 `x-kind: oauth` protocol operations are not generated) · 195 component schemas · 99 `webhooks` (98 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `0ef4181629983f77504005e59d527490ef8d237bcb67c66f5c5ac64891a50b3a` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

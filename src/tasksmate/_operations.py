@@ -12,6 +12,8 @@ from ._generated.api.availability import availability_create as _availability_cr
 from ._generated.api.availability import availability_delete as _availability_delete
 from ._generated.api.availability import availability_range as _availability_range
 from ._generated.api.availability import availability_update as _availability_update
+from ._generated.api.connected_apps import connected_apps_delete as _connected_apps_delete
+from ._generated.api.connected_apps import connected_apps_list as _connected_apps_list
 from ._generated.api.designations import designations_create as _designations_create
 from ._generated.api.designations import designations_delete as _designations_delete
 from ._generated.api.designations import designations_list as _designations_list
@@ -35,6 +37,12 @@ from ._generated.api.milestones import milestones_create as _milestones_create
 from ._generated.api.milestones import milestones_delete as _milestones_delete
 from ._generated.api.milestones import milestones_list as _milestones_list
 from ._generated.api.milestones import milestones_update as _milestones_update
+from ._generated.api.oauth_clients import oauth_clients_create as _oauth_clients_create
+from ._generated.api.oauth_clients import oauth_clients_delete as _oauth_clients_delete
+from ._generated.api.oauth_clients import oauth_clients_list as _oauth_clients_list
+from ._generated.api.oauth_clients import oauth_clients_read as _oauth_clients_read
+from ._generated.api.oauth_clients import oauth_clients_rotate_secret as _oauth_clients_rotate_secret
+from ._generated.api.oauth_clients import oauth_clients_update as _oauth_clients_update
 from ._generated.api.organization_invites import organization_invites_accept as _organization_invites_accept
 from ._generated.api.organization_invites import organization_invites_create as _organization_invites_create
 from ._generated.api.organization_invites import organization_invites_delete as _organization_invites_delete
@@ -160,10 +168,12 @@ from ._generated.api.webhooks import webhooks_test as _webhooks_test
 from ._generated.api.webhooks import webhooks_update as _webhooks_update
 from ._generated.models import (
     AuditPageDataItem,
+    ConnectedApp,
     DeliveryOut,
     Designation,
     GoalOut,
     MilestoneOut,
+    OAuthClientOut,
     OrganizationInviteInDB,
     OrganizationMemberInDB,
     OrgCard,
@@ -1175,6 +1185,83 @@ OPERATIONS: dict[str, Operation] = {
         scopes=("webhooks:write",),
         summary="Send a delivery again as a new delivery",
     ),
+    "oauth-clients.list": Operation(
+        op_id="oauth-clients.list",
+        method="GET",
+        path="/v1/oauth/clients",
+        query=("org_id", "limit", "cursor", "sort_by", "sort_order"),
+        is_list=True,
+        parse=_oauth_clients_list._parse_response,
+        item=OAuthClientOut.from_dict,
+        scopes=("admin",),
+        summary="An organization's OAuth apps (owner / admin)",
+    ),
+    "oauth-clients.create": Operation(
+        op_id="oauth-clients.create",
+        method="POST",
+        path="/v1/oauth/clients",
+        body="json",
+        parse=_oauth_clients_create._parse_response,
+        scopes=("admin",),
+        summary="Register an OAuth app (a confidential app's secret is shown once)",
+    ),
+    "oauth-clients.read": Operation(
+        op_id="oauth-clients.read",
+        method="GET",
+        path="/v1/oauth/clients/{client_id}",
+        path_params=("client_id",),
+        if_none_match=True,
+        parse=_oauth_clients_read._parse_response,
+        scopes=("admin",),
+        summary="Read an OAuth app (never its secret)",
+    ),
+    "oauth-clients.update": Operation(
+        op_id="oauth-clients.update",
+        method="PATCH",
+        path="/v1/oauth/clients/{client_id}",
+        path_params=("client_id",),
+        body="json",
+        parse=_oauth_clients_update._parse_response,
+        scopes=("admin",),
+        summary="Change an OAuth app's name, links, redirect URIs or scopes",
+    ),
+    "oauth-clients.delete": Operation(
+        op_id="oauth-clients.delete",
+        method="DELETE",
+        path="/v1/oauth/clients/{client_id}",
+        path_params=("client_id",),
+        parse=_oauth_clients_delete._parse_response,
+        scopes=("admin",),
+        summary="Revoke an OAuth app, every connection to it and its tokens",
+    ),
+    "oauth-clients.rotate_secret": Operation(
+        op_id="oauth-clients.rotate_secret",
+        method="POST",
+        path="/v1/oauth/clients/{client_id}/rotate-secret",
+        path_params=("client_id",),
+        parse=_oauth_clients_rotate_secret._parse_response,
+        scopes=("admin",),
+        summary="Rotate an app's secret (shown once; the old one works 24 h more)",
+    ),
+    "connected-apps.list": Operation(
+        op_id="connected-apps.list",
+        method="GET",
+        path="/v1/me/connected-apps",
+        query=("limit", "cursor", "sort_by", "sort_order"),
+        is_list=True,
+        parse=_connected_apps_list._parse_response,
+        item=ConnectedApp.from_dict,
+        summary="The OAuth apps you have connected",
+    ),
+    "connected-apps.delete": Operation(
+        op_id="connected-apps.delete",
+        method="DELETE",
+        path="/v1/me/connected-apps/{grant_id}",
+        path_params=("grant_id",),
+        parse=_connected_apps_delete._parse_response,
+        scopes=("admin",),
+        summary="Disconnect an app (its tokens for you are revoked)",
+    ),
     "releases.whats_new": Operation(
         op_id="releases.whats_new",
         method="GET",
@@ -1668,12 +1755,12 @@ OPERATIONS: dict[str, Operation] = {
         op_id="views.list",
         method="GET",
         path="/v1/views",
-        query=("org_id", "scope", "limit", "cursor", "sort_by", "sort_order"),
+        query=("org_id", "scope", "resource", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_views_list._parse_response,
         item=ViewOut.from_dict,
         scopes=("tasks:read",),
-        summary="Saved views you can read",
+        summary="Saved views you can read (filter by `resource`: task or project)",
     ),
     "views.create": Operation(
         op_id="views.create",
@@ -1682,7 +1769,7 @@ OPERATIONS: dict[str, Operation] = {
         body="json",
         parse=_views_create._parse_response,
         scopes=("tasks:write",),
-        summary="Save a view",
+        summary="Save a view of the task list or the projects list (`resource`)",
     ),
     "views.read": Operation(
         op_id="views.read",
@@ -1692,7 +1779,7 @@ OPERATIONS: dict[str, Operation] = {
         if_none_match=True,
         parse=_views_read._parse_response,
         scopes=("tasks:read",),
-        summary="Read a saved view",
+        summary="Read a saved view (its `resource` says which list it queries)",
     ),
     "views.update": Operation(
         op_id="views.update",
@@ -1733,9 +1820,9 @@ OPERATIONS: dict[str, Operation] = {
         query=("limit", "cursor", "include_inaccessible"),
         is_list=True,
         parse=_views_rows._parse_response,
-        item=TaskCardView.from_dict,
+        item=ProjectCard.from_dict,
         scopes=("tasks:read",),
-        summary="The tasks a saved view shows (task-list envelope)",
+        summary="The rows a saved view shows: tasks or projects, per its `resource`",
     ),
     "view-pins.pin_view": Operation(
         op_id="view-pins.pin_view",

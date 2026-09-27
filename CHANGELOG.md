@@ -15,6 +15,13 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Changed (4.7 — spec from backend `8b86aa0`: 4.8 OAuth apps, 4.9 views of projects)
+- 160 operations (was 152): `oauth_clients.*` (list, create, read, update, delete, rotate_secret) and
+  `connected_apps.list` / `connected_apps.delete`. The five OAuth 2.1 protocol operations (`x-kind: oauth` —
+  `/oauth/authorize`, `/oauth/token`, `/oauth/revoke`, the two `/.well-known/*` documents) are **not** methods: the
+  generator drops them; an app's access token is used as `TasksMate(token=…)` like any other.
+- `views.create` / `views.update` / `views.list` know `resource` (`ViewResourceEnum`: `task` | `project`).
+
 ### Changed (4.1b — licence)
 - Licensed under **Apache-2.0** (was MIT): an explicit patent grant and no trademark rights; `NOTICE` added.
 

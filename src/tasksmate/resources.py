@@ -1579,6 +1579,123 @@ class WebhooksResource:
     """Alias of `read`."""
 
 
+class OauthClientsResource:
+    """Third-party OAuth apps your organization registers: redirect URIs, allowed scopes, the client secret (shown once, rotated with a 24 h grace), revocation."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def list(
+        self,
+        *,
+        org_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.OAuthClientOut]:
+        """An organization's OAuth apps (owner / admin).
+
+        `GET /v1/oauth/clients` · scope `admin` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.OAuthClientOut]",
+            self._client._call(
+                _OPS["oauth-clients.list"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    def create(self, body: models.OAuthClientCreate | Mapping[str, Any]) -> models.OAuthClientCreated:
+        """Register an OAuth app (a confidential app's secret is shown once).
+
+        `POST /v1/oauth/clients` · scope `admin`
+        """
+        return cast("models.OAuthClientCreated", self._client._call(_OPS["oauth-clients.create"], body=body))
+
+    @overload
+    def read(self, client_id: str, *, if_none_match: None = None) -> models.OAuthClientOut: ...
+    @overload
+    def read(self, client_id: str, *, if_none_match: str) -> models.OAuthClientOut | NotModifiedType: ...
+    def read(self, client_id: str, *, if_none_match: str | None = None) -> models.OAuthClientOut | NotModifiedType:
+        """Read an OAuth app (never its secret).
+
+        `GET /v1/oauth/clients/{client_id}` · scope `admin` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.OAuthClientOut | NotModifiedType",
+            self._client._call(_OPS["oauth-clients.read"], path=(client_id,), if_none_match=if_none_match),
+        )
+
+    def update(self, client_id: str, body: models.OAuthClientUpdate | Mapping[str, Any]) -> models.OAuthClientOut:
+        """Change an OAuth app's name, links, redirect URIs or scopes.
+
+        `PATCH /v1/oauth/clients/{client_id}` · scope `admin`
+        """
+        return cast(
+            "models.OAuthClientOut", self._client._call(_OPS["oauth-clients.update"], path=(client_id,), body=body)
+        )
+
+    def delete(self, client_id: str) -> models.OAuthClientOut:
+        """Revoke an OAuth app, every connection to it and its tokens.
+
+        `DELETE /v1/oauth/clients/{client_id}` · scope `admin`
+        """
+        return cast("models.OAuthClientOut", self._client._call(_OPS["oauth-clients.delete"], path=(client_id,)))
+
+    def rotate_secret(self, client_id: str) -> models.OAuthClientCreated:
+        """Rotate an app's secret (shown once; the old one works 24 h more).
+
+        `POST /v1/oauth/clients/{client_id}/rotate-secret` · scope `admin`
+        """
+        return cast(
+            "models.OAuthClientCreated", self._client._call(_OPS["oauth-clients.rotate_secret"], path=(client_id,))
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class ConnectedAppsResource:
+    """The OAuth apps you have connected to TasksMate, and disconnecting them."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def list(
+        self,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ConnectedApp]:
+        """The OAuth apps you have connected.
+
+        `GET /v1/me/connected-apps` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ConnectedApp]",
+            self._client._call(
+                _OPS["connected-apps.list"],
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    def delete(self, grant_id: str) -> models.ConnectedAppRevoked:
+        """Disconnect an app (its tokens for you are revoked).
+
+        `DELETE /v1/me/connected-apps/{grant_id}` · scope `admin`
+        """
+        return cast("models.ConnectedAppRevoked", self._client._call(_OPS["connected-apps.delete"], path=(grant_id,)))
+
+
 class ReleasesResource:
     """What's new in TasksMate."""
 
@@ -2373,12 +2490,13 @@ class ViewsResource:
         *,
         org_id: str,
         scope: str | None = None,
+        resource: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
     ) -> Page[models.ViewOut]:
-        """Saved views you can read.
+        """Saved views you can read (filter by `resource`: task or project).
 
         `GET /v1/views` · scope `tasks:read` · a `Page` — iterate it for every item
         """
@@ -2389,6 +2507,7 @@ class ViewsResource:
                 query={
                     "org_id": org_id,
                     "scope": scope,
+                    "resource": resource,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -2398,7 +2517,7 @@ class ViewsResource:
         )
 
     def create(self, body: models.ViewCreate | Mapping[str, Any]) -> models.ViewOut:
-        """Save a view.
+        """Save a view of the task list or the projects list (`resource`).
 
         `POST /v1/views` · scope `tasks:write`
         """
@@ -2409,7 +2528,7 @@ class ViewsResource:
     @overload
     def read(self, view_id: str, *, if_none_match: str) -> models.ViewOut | NotModifiedType: ...
     def read(self, view_id: str, *, if_none_match: str | None = None) -> models.ViewOut | NotModifiedType:
-        """Read a saved view.
+        """Read a saved view (its `resource` says which list it queries).
 
         `GET /v1/views/{view_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -2450,13 +2569,13 @@ class ViewsResource:
         limit: int | None = None,
         cursor: str | None = None,
         include_inaccessible: bool | None = None,
-    ) -> Page[models.TaskCardView]:
-        """The tasks a saved view shows (task-list envelope).
+    ) -> Page[models.TaskCardView] | Page[models.ProjectCard]:
+        """The rows a saved view shows: tasks or projects, per its `resource`.
 
         `GET /v1/views/{view_id}/rows` · scope `tasks:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "Page[models.TaskCardView]",
+            "Page[models.TaskCardView] | Page[models.ProjectCard]",
             self._client._call(
                 _OPS["views.rows"],
                 path=(view_id,),
@@ -4147,6 +4266,129 @@ class AsyncWebhooksResource:
     """Alias of `read`."""
 
 
+class AsyncOauthClientsResource:
+    """Third-party OAuth apps your organization registers: redirect URIs, allowed scopes, the client secret (shown once, rotated with a 24 h grace), revocation."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def list(
+        self,
+        *,
+        org_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.OAuthClientOut]:
+        """An organization's OAuth apps (owner / admin).
+
+        `GET /v1/oauth/clients` · scope `admin` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.OAuthClientOut]",
+            await self._client._call(
+                _OPS["oauth-clients.list"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    async def create(self, body: models.OAuthClientCreate | Mapping[str, Any]) -> models.OAuthClientCreated:
+        """Register an OAuth app (a confidential app's secret is shown once).
+
+        `POST /v1/oauth/clients` · scope `admin`
+        """
+        return cast("models.OAuthClientCreated", await self._client._call(_OPS["oauth-clients.create"], body=body))
+
+    @overload
+    async def read(self, client_id: str, *, if_none_match: None = None) -> models.OAuthClientOut: ...
+    @overload
+    async def read(self, client_id: str, *, if_none_match: str) -> models.OAuthClientOut | NotModifiedType: ...
+    async def read(
+        self, client_id: str, *, if_none_match: str | None = None
+    ) -> models.OAuthClientOut | NotModifiedType:
+        """Read an OAuth app (never its secret).
+
+        `GET /v1/oauth/clients/{client_id}` · scope `admin` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.OAuthClientOut | NotModifiedType",
+            await self._client._call(_OPS["oauth-clients.read"], path=(client_id,), if_none_match=if_none_match),
+        )
+
+    async def update(self, client_id: str, body: models.OAuthClientUpdate | Mapping[str, Any]) -> models.OAuthClientOut:
+        """Change an OAuth app's name, links, redirect URIs or scopes.
+
+        `PATCH /v1/oauth/clients/{client_id}` · scope `admin`
+        """
+        return cast(
+            "models.OAuthClientOut",
+            await self._client._call(_OPS["oauth-clients.update"], path=(client_id,), body=body),
+        )
+
+    async def delete(self, client_id: str) -> models.OAuthClientOut:
+        """Revoke an OAuth app, every connection to it and its tokens.
+
+        `DELETE /v1/oauth/clients/{client_id}` · scope `admin`
+        """
+        return cast("models.OAuthClientOut", await self._client._call(_OPS["oauth-clients.delete"], path=(client_id,)))
+
+    async def rotate_secret(self, client_id: str) -> models.OAuthClientCreated:
+        """Rotate an app's secret (shown once; the old one works 24 h more).
+
+        `POST /v1/oauth/clients/{client_id}/rotate-secret` · scope `admin`
+        """
+        return cast(
+            "models.OAuthClientCreated",
+            await self._client._call(_OPS["oauth-clients.rotate_secret"], path=(client_id,)),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AsyncConnectedAppsResource:
+    """The OAuth apps you have connected to TasksMate, and disconnecting them."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def list(
+        self,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ConnectedApp]:
+        """The OAuth apps you have connected.
+
+        `GET /v1/me/connected-apps` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ConnectedApp]",
+            await self._client._call(
+                _OPS["connected-apps.list"],
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    async def delete(self, grant_id: str) -> models.ConnectedAppRevoked:
+        """Disconnect an app (its tokens for you are revoked).
+
+        `DELETE /v1/me/connected-apps/{grant_id}` · scope `admin`
+        """
+        return cast(
+            "models.ConnectedAppRevoked", await self._client._call(_OPS["connected-apps.delete"], path=(grant_id,))
+        )
+
+
 class AsyncReleasesResource:
     """What's new in TasksMate."""
 
@@ -4978,12 +5220,13 @@ class AsyncViewsResource:
         *,
         org_id: str,
         scope: str | None = None,
+        resource: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
     ) -> AsyncPage[models.ViewOut]:
-        """Saved views you can read.
+        """Saved views you can read (filter by `resource`: task or project).
 
         `GET /v1/views` · scope `tasks:read` · a `Page` — iterate it for every item
         """
@@ -4994,6 +5237,7 @@ class AsyncViewsResource:
                 query={
                     "org_id": org_id,
                     "scope": scope,
+                    "resource": resource,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -5003,7 +5247,7 @@ class AsyncViewsResource:
         )
 
     async def create(self, body: models.ViewCreate | Mapping[str, Any]) -> models.ViewOut:
-        """Save a view.
+        """Save a view of the task list or the projects list (`resource`).
 
         `POST /v1/views` · scope `tasks:write`
         """
@@ -5014,7 +5258,7 @@ class AsyncViewsResource:
     @overload
     async def read(self, view_id: str, *, if_none_match: str) -> models.ViewOut | NotModifiedType: ...
     async def read(self, view_id: str, *, if_none_match: str | None = None) -> models.ViewOut | NotModifiedType:
-        """Read a saved view.
+        """Read a saved view (its `resource` says which list it queries).
 
         `GET /v1/views/{view_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -5058,13 +5302,13 @@ class AsyncViewsResource:
         limit: int | None = None,
         cursor: str | None = None,
         include_inaccessible: bool | None = None,
-    ) -> AsyncPage[models.TaskCardView]:
-        """The tasks a saved view shows (task-list envelope).
+    ) -> AsyncPage[models.TaskCardView] | AsyncPage[models.ProjectCard]:
+        """The rows a saved view shows: tasks or projects, per its `resource`.
 
         `GET /v1/views/{view_id}/rows` · scope `tasks:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "AsyncPage[models.TaskCardView]",
+            "AsyncPage[models.TaskCardView] | AsyncPage[models.ProjectCard]",
             await self._client._call(
                 _OPS["views.rows"],
                 path=(view_id,),
@@ -5169,6 +5413,8 @@ class SyncResources:
     service_accounts: ServiceAccountsResource
     tokens: TokensResource
     webhooks: WebhooksResource
+    oauth_clients: OauthClientsResource
+    connected_apps: ConnectedAppsResource
     releases: ReleasesResource
     sections: SectionsResource
     teams: TeamsResource
@@ -5199,6 +5445,8 @@ class SyncResources:
         self.service_accounts = ServiceAccountsResource(core)
         self.tokens = TokensResource(core)
         self.webhooks = WebhooksResource(core)
+        self.oauth_clients = OauthClientsResource(core)
+        self.connected_apps = ConnectedAppsResource(core)
         self.releases = ReleasesResource(core)
         self.sections = SectionsResource(core)
         self.teams = TeamsResource(core)
@@ -5232,6 +5480,8 @@ class AsyncResources:
     service_accounts: AsyncServiceAccountsResource
     tokens: AsyncTokensResource
     webhooks: AsyncWebhooksResource
+    oauth_clients: AsyncOauthClientsResource
+    connected_apps: AsyncConnectedAppsResource
     releases: AsyncReleasesResource
     sections: AsyncSectionsResource
     teams: AsyncTeamsResource
@@ -5262,6 +5512,8 @@ class AsyncResources:
         self.service_accounts = AsyncServiceAccountsResource(core)
         self.tokens = AsyncTokensResource(core)
         self.webhooks = AsyncWebhooksResource(core)
+        self.oauth_clients = AsyncOauthClientsResource(core)
+        self.connected_apps = AsyncConnectedAppsResource(core)
         self.releases = AsyncReleasesResource(core)
         self.sections = AsyncSectionsResource(core)
         self.teams = AsyncTeamsResource(core)
@@ -5369,6 +5621,14 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "webhooks.deliveries": ("webhooks", "deliveries"),
     "webhooks.delivery": ("webhooks", "delivery"),
     "webhooks.replay": ("webhooks", "replay"),
+    "oauth-clients.list": ("oauth_clients", "list"),
+    "oauth-clients.create": ("oauth_clients", "create"),
+    "oauth-clients.read": ("oauth_clients", "read"),
+    "oauth-clients.update": ("oauth_clients", "update"),
+    "oauth-clients.delete": ("oauth_clients", "delete"),
+    "oauth-clients.rotate_secret": ("oauth_clients", "rotate_secret"),
+    "connected-apps.list": ("connected_apps", "list"),
+    "connected-apps.delete": ("connected_apps", "delete"),
     "releases.whats_new": ("releases", "whats_new"),
     "sections.list": ("sections", "list"),
     "sections.create": ("sections", "create"),
