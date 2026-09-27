@@ -1,0 +1,32 @@
+{
+  "name": "@tasksmate/mcp",
+  "version": "0.1.0-dev.0",
+  "description": "TasksMate's MCP server for clients that start a local process: a stdio proxy to the remote server.",
+  "license": "Apache-2.0",
+  "author": "Indrasol",
+  "homepage": "https://developers.tasksmate.indrasol.com/mcp/connect/",
+  "repository": { "type": "git", "url": "git+https://github.com/indrasol/tasksmate-python.git", "directory": "packages/mcp-node" },
+  "keywords": ["tasksmate", "mcp", "model context protocol", "claude", "agents"],
+  "type": "module",
+  "bin": { "tasksmate-mcp": "dist/cli.js" },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist", "README.md", "LICENSE", "NOTICE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "npm run build && vitest run",
+    "check": "npm run typecheck && npm test && npm pack --dry-run",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

@@ -222,6 +222,36 @@ tm --version
 [`examples/streamlit_dashboard`](examples/streamlit_dashboard/README.md) — an organization dashboard (tasks, charts,
 project drill-down, my open tasks) that needs nothing but `TASKSMATE_TOKEN`.
 
+## MCP server for local clients (`packages/`)
+
+Two more packages live in this repo — the same thing in two languages, for MCP clients that start a **local process**
+instead of calling a URL:
+
+| | Run | Source |
+|---|---|---|
+| `tasksmate-mcp` (PyPI) | `uvx tasksmate-mcp` | [`packages/tasksmate-mcp`](packages/tasksmate-mcp/README.md) |
+| `@tasksmate/mcp` (npm) | `npx -y @tasksmate/mcp` | [`packages/mcp-node`](packages/mcp-node/README.md) |
+
+Both are **proxies** to TasksMate's remote MCP server (`<api>/mcp`), not a second server: stdio in, Streamable HTTP out,
+with `Authorization: Bearer $TASKSMATE_TOKEN` — so they expose exactly the remote server's tools, and its read-only
+and tool-group enforcement and audit trail apply. Configuration (identical in both; flags win):
+
+| Variable | Flag | |
+|---|---|---|
+| `TASKSMATE_TOKEN` | — | required: an access token from **Developers → Tokens** |
+| `TASKSMATE_API_URL` | `--api-url` | the API's origin; default production (`/mcp` is added) |
+| `TASKSMATE_MCP_READONLY` | `--readonly` | `1` → `?readonly=1` (only read tools, enforced by the server) |
+| `TASKSMATE_MCP_GROUPS` | `--groups` | `tasks,projects` → `?groups=…` (default: all but `admin`) |
+
+```json
+{ "mcpServers": { "tasksmate": { "command": "uvx", "args": ["tasksmate-mcp"], "env": { "TASKSMATE_TOKEN": "tm_live_…" } } } }
+```
+
+`TASKSMATE_*`, not `…_TM`: these are the packages' (and `tm`'s) variables; the `_TM` suffix is the API server's own
+convention. Clients that can add a remote server by URL should use the URL instead (OAuth, no token) — TasksMate's
+**Developers → MCP** tab writes the right artefact for each client. **Not published yet** (npm and PyPI wait for the
+stability gate, S.23); `release.yml` builds and verifies both with the SDK.
+
 ## How it is built
 
 - [`spec/openapi.public.json`](spec/SOURCE.md) — a committed snapshot of the API's public contract; the **only** input.

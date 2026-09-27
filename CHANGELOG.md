@@ -15,6 +15,15 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Added (5.3 — the stdio MCP packages, `packages/`)
+- `tasksmate-mcp` (Python, `uvx tasksmate-mcp`) and `@tasksmate/mcp` (Node, `npx -y @tasksmate/mcp`): stdio ↔
+  Streamable HTTP proxies to TasksMate's remote MCP server — no tool code of their own. `TASKSMATE_TOKEN` (required),
+  `TASKSMATE_API_URL`, `TASKSMATE_MCP_READONLY`, `TASKSMATE_MCP_GROUPS` (or `--api-url`, `--readonly`, `--groups`). A
+  refused token / an HTTP refusal / an unreachable server is a JSON-RPC error (`-32001` / `-32002` / `-32003`) and one
+  stderr line, never the token.
+- CI tests both (Python 3.10–3.13, Node 20 / 22); `release.yml` builds, checks and SBOMs all three artefacts from one
+  tag, TestPyPI for both Python distributions, npm behind the same S.23 gate as PyPI. Nothing published.
+
 ### Changed (4.7 — spec from backend `8b86aa0`: 4.8 OAuth apps, 4.9 views of projects)
 - 160 operations (was 152): `oauth_clients.*` (list, create, read, update, delete, rotate_secret) and
   `connected_apps.list` / `connected_apps.delete`. The five OAuth 2.1 protocol operations (`x-kind: oauth` —

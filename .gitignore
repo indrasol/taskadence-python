@@ -23,3 +23,7 @@ sbom*.json
 .DS_Store
 .idea/
 .vscode/
+
+# Node (packages/mcp-node)
+node_modules/
+*.tgz
