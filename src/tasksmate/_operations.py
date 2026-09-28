@@ -37,6 +37,7 @@ from ._generated.api.me import me_read as _me_read
 from ._generated.api.milestones import milestones_create as _milestones_create
 from ._generated.api.milestones import milestones_delete as _milestones_delete
 from ._generated.api.milestones import milestones_list as _milestones_list
+from ._generated.api.milestones import milestones_list_org as _milestones_list_org
 from ._generated.api.milestones import milestones_update as _milestones_update
 from ._generated.api.oauth_clients import oauth_clients_create as _oauth_clients_create
 from ._generated.api.oauth_clients import oauth_clients_delete as _oauth_clients_delete
@@ -82,10 +83,6 @@ from ._generated.api.projects import projects_reorder as _projects_reorder
 from ._generated.api.projects import projects_replace as _projects_replace
 from ._generated.api.projects import projects_update as _projects_update
 from ._generated.api.releases import releases_whats_new as _releases_whats_new
-from ._generated.api.roadmap import roadmap_org as _roadmap_org
-from ._generated.api.roadmap import roadmap_project as _roadmap_project
-from ._generated.api.roadmap import roadmap_task_stops as _roadmap_task_stops
-from ._generated.api.roadmap import roadmap_team as _roadmap_team
 from ._generated.api.sections import sections_create as _sections_create
 from ._generated.api.sections import sections_delete as _sections_delete
 from ._generated.api.sections import sections_list as _sections_list
@@ -174,6 +171,7 @@ from ._generated.models import (
     DeliveryOut,
     Designation,
     GoalOut,
+    MilestoneOrgOut,
     MilestoneOut,
     OAuthClientOut,
     OrganizationInviteInDB,
@@ -190,7 +188,6 @@ from ._generated.models import (
     TaskCardView,
     TaskCommentInDB,
     TaskHistoryInDB,
-    TaskRoadmapStop,
     TeamOut,
     TokenOut,
     ViewOut,
@@ -1571,47 +1568,16 @@ OPERATIONS: dict[str, Operation] = {
         scopes=("teams:write",),
         summary="Delete a milestone",
     ),
-    "roadmap.org": Operation(
-        op_id="roadmap.org",
+    "milestones.list_org": Operation(
+        op_id="milestones.list_org",
         method="GET",
-        path="/v1/roadmap",
-        query=("org_id",),
-        if_none_match=True,
-        parse=_roadmap_org._parse_response,
-        scopes=("projects:read",),
-        summary="The organization's roadmap",
-    ),
-    "roadmap.project": Operation(
-        op_id="roadmap.project",
-        method="GET",
-        path="/v1/projects/{project_id}/roadmap",
-        path_params=("project_id",),
-        if_none_match=True,
-        parse=_roadmap_project._parse_response,
-        scopes=("projects:read",),
-        summary="A project's roadmap",
-    ),
-    "roadmap.team": Operation(
-        op_id="roadmap.team",
-        method="GET",
-        path="/v1/teams/{team_id}/roadmap",
-        path_params=("team_id",),
-        if_none_match=True,
-        parse=_roadmap_team._parse_response,
-        scopes=("projects:read",),
-        summary="A team's roadmap",
-    ),
-    "roadmap.task_stops": Operation(
-        op_id="roadmap.task_stops",
-        method="GET",
-        path="/v1/tasks/{task_id}/roadmap",
-        path_params=("task_id",),
-        query=("limit", "cursor", "sort_by", "sort_order"),
+        path="/v1/milestones",
+        query=("org_id", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
-        parse=_roadmap_task_stops._parse_response,
-        item=TaskRoadmapStop.from_dict,
-        scopes=("projects:read",),
-        summary="The roadmap stops a task is on",
+        parse=_milestones_list_org._parse_response,
+        item=MilestoneOrgOut.from_dict,
+        scopes=("teams:read",),
+        summary="Every milestone you can read in an organization, across its teams",
     ),
     "goals.org": Operation(
         op_id="goals.org",

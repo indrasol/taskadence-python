@@ -1,6 +1,6 @@
 # `tm.milestones`
 
-A team's milestones.
+Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`).
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 
@@ -40,3 +40,13 @@ Delete a milestone.
 - **operationId:** `milestones.delete`
 - **Token scope:** `teams:write`
 - **Returns:** `MilestoneDeleted`
+
+## `tm.milestones.list_org(org_id: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+
+Every milestone you can read in an organization, across its teams.
+
+- **HTTP:** `GET /v1/milestones`
+- **operationId:** `milestones.list_org`
+- **Token scope:** `teams:read`
+- **Returns:** `Page[MilestoneOrgOut]`
+- **List:** returns a `Page`; iterating it follows `next_cursor` through every page.

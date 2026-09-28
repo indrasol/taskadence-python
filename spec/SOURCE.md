@@ -6,12 +6,12 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 
 | | |
 |---|---|
-| Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/phase5/rithin` |
-| Backend commit | `81ea4c3` — "fix(members): 5.5 - GET /v1/organization-members honours search" (task 5.5 fix round 1; the public spec moved at 5.2b `65bc97f` — `client_id_metadata_document_supported`, `client_id` may be a metadata document URL — and 5.5 `3d2d736` — `members:read` gates the org profile, members and designations, the MCP default asks for it — and `81ea4c3` — `search` on the members list) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-09-27 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
+| Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/roadmap-removal/rithin` |
+| Backend commit | `ef1e262` — "feat(db): 5.7 - drop the roadmap tables and team_milestones.stop_id (dev; backup in docs/backups)" (task 5.7; the public spec moved at `81952fd` — `GET /v1/milestones`, `milestones.list_org` — and `87a632d` — the four roadmap reads, their schemas, `MilestoneOut.stop_id` and the ten roadmap webhook events removed) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-09-28 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
-| Size | 107 paths · 168 operations (162 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 206 component schemas · 100 `webhooks` (99 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `46935ccea518957cf658f320509f84ec85087f31ad6810bafdaa3f912e7cdf48` |
+| Size | 104 paths · 165 operations (159 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 201 component schemas · 90 `webhooks` (89 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `f593f0c887eae8105a3d70bd9e0c7afd3eab9d76db4ac9f4f5ae14a9e6b1d93c` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

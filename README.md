@@ -277,6 +277,9 @@ pytest && mypy && ruff check . && ruff format --check .
 TestPyPI only. The first PyPI release waits for TasksMate's stability gate; from 1.0 on, the SDK follows semver and
 `tasksmate.API_VERSION` names the API date it was generated from (sent as `TasksMate-Version`).
 
+0.x: the `roadmap` resource was removed before release (5.7) — TasksMate did not ship the Roadmap. Team milestones
+(`tm.milestones`, with `list_org` for every team at once) are the way to track dated commitments.
+
 ## Security
 
 See [SECURITY.md](SECURITY.md). Report vulnerabilities privately; never paste a live token into an issue.

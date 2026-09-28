@@ -33428,7 +33428,6 @@
                       "created_at": "2026-09-25T12:00:00Z",
                       "updated_at": "2026-09-25T12:00:00Z",
                       "is_active": true,
-                      "stop_id": "string",
                       "task_count": 0,
                       "completed_count": 0
                     }
@@ -33678,7 +33677,6 @@
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "is_active": true,
-                  "stop_id": "string",
                   "task_count": 0,
                   "completed_count": 0
                 }
@@ -33932,7 +33930,6 @@
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "is_active": true,
-                  "stop_id": "string",
                   "task_count": 0,
                   "completed_count": 0
                 }
@@ -34353,14 +34350,14 @@
         ]
       }
     },
-    "/v1/roadmap": {
+    "/v1/milestones": {
       "get": {
         "tags": [
-          "roadmap"
+          "milestones"
         ],
-        "summary": "The organization's roadmap",
-        "description": "The organization's roadmap: every project you can read that has journeys, plus the readable projects that have none.",
-        "operationId": "roadmap.org",
+        "summary": "Every milestone you can read in an organization, across its teams",
+        "description": "Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and its task roll-up, paginated as `{data, next_cursor}`.\n\n- **Who sees what:** a member reads every team's milestones; a guest only those of the teams they are on. 403 when you are not a member of the organization.\n- **Order:** by team name, then each team's open milestones by target date, then its closed ones, latest first.\n- **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).\n- Creating, changing and closing a milestone stay on the team's own milestone operations.",
+        "operationId": "milestones.list_org",
         "parameters": [
           {
             "name": "org_id",
@@ -34368,802 +34365,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Organization scope; the caller must be a member (a guest sees only the projects it can read).",
+              "description": "Organization scope; the caller must be a member (a guest sees only the milestones of teams it is on).",
               "title": "Org Id"
             },
-            "description": "Organization scope; the caller must be a member (a guest sees only the projects it can read)."
-          },
-          {
-            "name": "If-None-Match",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoadmapOut"
-                },
-                "example": {
-                  "projects": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "team_id": "string",
-                      "can_edit": false,
-                      "journeys": [
-                        {
-                          "journey_id": "string",
-                          "project_id": "string",
-                          "name": "string",
-                          "color": "string",
-                          "position": 0,
-                          "stops": [
-                            {
-                              "stop_id": "string",
-                              "project_id": "string",
-                              "title": "string",
-                              "target_date": "2026-09-25",
-                              "description": "string",
-                              "position": 0,
-                              "done": 0,
-                              "total": 0,
-                              "journey_ids": [
-                                "string"
-                              ],
-                              "milestone_ids": [
-                                "string"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "projects_without_roadmap": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "can_edit": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "304": {
-            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "projects:read"
-        ]
-      }
-    },
-    "/v1/projects/{project_id}/roadmap": {
-      "get": {
-        "tags": [
-          "roadmap"
-        ],
-        "summary": "A project's roadmap",
-        "description": "The project's roadmap: the same shape as a team's roadmap, narrowed to this project.",
-        "operationId": "roadmap.project",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoadmapOut"
-                },
-                "example": {
-                  "projects": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "team_id": "string",
-                      "can_edit": false,
-                      "journeys": [
-                        {
-                          "journey_id": "string",
-                          "project_id": "string",
-                          "name": "string",
-                          "color": "string",
-                          "position": 0,
-                          "stops": [
-                            {
-                              "stop_id": "string",
-                              "project_id": "string",
-                              "title": "string",
-                              "target_date": "2026-09-25",
-                              "description": "string",
-                              "position": 0,
-                              "done": 0,
-                              "total": 0,
-                              "journey_ids": [
-                                "string"
-                              ],
-                              "milestone_ids": [
-                                "string"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "projects_without_roadmap": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "can_edit": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "304": {
-            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "project_id"
-            }
-          },
-          {
-            "name": "If-None-Match",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
-          }
-        ],
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "projects:read"
-        ]
-      }
-    },
-    "/v1/teams/{team_id}/roadmap": {
-      "get": {
-        "tags": [
-          "roadmap"
-        ],
-        "summary": "A team's roadmap",
-        "description": "Every readable project of the team with journeys, one band each, and the readable ones without.",
-        "operationId": "roadmap.team",
-        "parameters": [
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          },
-          {
-            "name": "If-None-Match",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoadmapOut"
-                },
-                "example": {
-                  "projects": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "team_id": "string",
-                      "can_edit": false,
-                      "journeys": [
-                        {
-                          "journey_id": "string",
-                          "project_id": "string",
-                          "name": "string",
-                          "color": "string",
-                          "position": 0,
-                          "stops": [
-                            {
-                              "stop_id": "string",
-                              "project_id": "string",
-                              "title": "string",
-                              "target_date": "2026-09-25",
-                              "description": "string",
-                              "position": 0,
-                              "done": 0,
-                              "total": 0,
-                              "journey_ids": [
-                                "string"
-                              ],
-                              "milestone_ids": [
-                                "string"
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ],
-                  "projects_without_roadmap": [
-                    {
-                      "project_id": "string",
-                      "name": "string",
-                      "can_edit": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "304": {
-            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "projects:read"
-        ]
-      }
-    },
-    "/v1/tasks/{task_id}/roadmap": {
-      "get": {
-        "tags": [
-          "roadmap"
-        ],
-        "summary": "The roadmap stops a task is on",
-        "description": "The live roadmap stops this task is on \u2014 directly, or through its milestone's pin \u2014 among the projects you can read, paginated as `{data, next_cursor}`.",
-        "operationId": "roadmap.task_stops",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
+            "description": "Organization scope; the caller must be a member (a guest sees only the milestones of teams it is on)."
           },
           {
             "name": "limit",
@@ -35172,11 +34377,11 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "description": "Page size; default 1000, capped at 1000.",
+              "description": "Page size; default 1000, capped at 1000. Filters: `filter[team]`, `filter[status]` (comma-separated values are OR-ed).",
               "default": 1000,
               "title": "Limit"
             },
-            "description": "Page size; default 1000, capped at 1000."
+            "description": "Page size; default 1000, capped at 1000. Filters: `filter[team]`, `filter[status]` (comma-separated values are OR-ed)."
           },
           {
             "name": "cursor",
@@ -35209,10 +34414,10 @@
                   "type": "null"
                 }
               ],
-              "description": "One of: title. Default: the list's natural order.",
+              "description": "One of: target_date, title, closed_at, created_at, team_name. Default: the list's natural order.",
               "title": "Sort By"
             },
-            "description": "One of: title. Default: the list's natural order."
+            "description": "One of: target_date, title, closed_at, created_at, team_name. Default: the list's natural order."
           },
           {
             "name": "sort_order",
@@ -35242,21 +34447,33 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_TaskRoadmapStop_"
+                  "$ref": "#/components/schemas/MilestoneOrgList"
                 },
                 "example": {
                   "data": [
                     {
-                      "stop_id": "string",
-                      "project_id": "string",
+                      "milestone_id": "string",
+                      "org_id": "string",
+                      "team_id": "string",
                       "title": "string",
-                      "via": "string",
-                      "journeys": [
-                        {}
-                      ]
+                      "target_date": "2026-09-25",
+                      "description": "string",
+                      "owner_user_id": "string",
+                      "status": "open",
+                      "closed_at": "2026-09-25T12:00:00Z",
+                      "closed_by": "string",
+                      "created_by": "string",
+                      "updated_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z",
+                      "updated_at": "2026-09-25T12:00:00Z",
+                      "is_active": true,
+                      "task_count": 0,
+                      "completed_count": 0,
+                      "team_name": "string"
                     }
                   ],
-                  "next_cursor": "string"
+                  "next_cursor": "string",
+                  "total": 0
                 }
               }
             }
@@ -35439,7 +34656,7 @@
         ],
         "x-kind": "list",
         "x-scopes": [
-          "projects:read"
+          "teams:read"
         ]
       }
     },
@@ -46649,7 +45866,40 @@
         "title": "MilestoneList",
         "description": "Every live milestone of the team in ONE response \u2014 open first by target date, then\nclosed by when they were closed (latest first). Not paginated: a team's milestones are\ntens, not thousands."
       },
-      "MilestoneOut": {
+      "MilestoneOrgList": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MilestoneOrgOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "total"
+        ],
+        "title": "MilestoneOrgList",
+        "description": "A page of `GET /v1/milestones`, paginated as `{data, next_cursor}`; `total` counts every matching milestone."
+      },
+      "MilestoneOrgOut": {
         "properties": {
           "milestone_id": {
             "type": "string",
@@ -46773,7 +46023,60 @@
             "title": "Is Active",
             "default": true
           },
-          "stop_id": {
+          "task_count": {
+            "type": "integer",
+            "title": "Task Count",
+            "description": "Tasks filed under this milestone (every status, subtasks excluded).",
+            "default": 0
+          },
+          "completed_count": {
+            "type": "integer",
+            "title": "Completed Count",
+            "description": "How many of them are `completed` \u2014 the roll-up's done against total.",
+            "default": 0
+          },
+          "team_name": {
+            "type": "string",
+            "title": "Team Name",
+            "description": "The name of the milestone's team."
+          }
+        },
+        "type": "object",
+        "required": [
+          "milestone_id",
+          "org_id",
+          "team_id",
+          "title",
+          "target_date",
+          "team_name"
+        ],
+        "title": "MilestoneOrgOut",
+        "description": "A team milestone as the organization-wide list returns it: the milestone plus its team's name."
+      },
+      "MilestoneOut": {
+        "properties": {
+          "milestone_id": {
+            "type": "string",
+            "title": "Milestone Id"
+          },
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "team_id": {
+            "type": "string",
+            "title": "Team Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Target Date"
+          },
+          "description": {
             "anyOf": [
               {
                 "type": "string"
@@ -46782,8 +46085,97 @@
                 "type": "null"
               }
             ],
-            "title": "Stop Id",
-            "description": "The roadmap stop this milestone is pinned to (its tasks count toward that stop's progress); null when not pinned."
+            "title": "Description"
+          },
+          "owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner User Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "open"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "closed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed By"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
           },
           "task_count": {
             "type": "integer",
@@ -49511,35 +48903,6 @@
         ],
         "title": "Page[TaskHistoryInDB]",
         "description": "Returned by `task-history.list`."
-      },
-      "Page_TaskRoadmapStop_": {
-        "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/TaskRoadmapStop"
-            },
-            "type": "array",
-            "title": "Data"
-          },
-          "next_cursor": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Cursor",
-            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
-          }
-        },
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "title": "Page[TaskRoadmapStop]",
-        "description": "Returned by `roadmap.task_stops`."
       },
       "Page_TokenOut_": {
         "properties": {
@@ -52458,223 +51821,6 @@
         ],
         "title": "ReviewToken",
         "description": "Part of `ReviewMember`."
-      },
-      "RoadmapJourneyOut": {
-        "properties": {
-          "journey_id": {
-            "type": "string",
-            "title": "Journey Id"
-          },
-          "project_id": {
-            "type": "string",
-            "title": "Project Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "color": {
-            "type": "string",
-            "title": "Color"
-          },
-          "position": {
-            "type": "integer",
-            "title": "Position"
-          },
-          "stops": {
-            "items": {
-              "$ref": "#/components/schemas/RoadmapStopOut"
-            },
-            "type": "array",
-            "title": "Stops"
-          }
-        },
-        "type": "object",
-        "required": [
-          "journey_id",
-          "project_id",
-          "name",
-          "color",
-          "position",
-          "stops"
-        ],
-        "title": "RoadmapJourneyOut",
-        "description": "Part of `RoadmapProjectOut`."
-      },
-      "RoadmapOut": {
-        "properties": {
-          "projects": {
-            "items": {
-              "$ref": "#/components/schemas/RoadmapProjectOut"
-            },
-            "type": "array",
-            "title": "Projects"
-          },
-          "projects_without_roadmap": {
-            "items": {
-              "$ref": "#/components/schemas/RoadmapProjectRef"
-            },
-            "type": "array",
-            "title": "Projects Without Roadmap"
-          }
-        },
-        "type": "object",
-        "required": [
-          "projects",
-          "projects_without_roadmap"
-        ],
-        "title": "RoadmapOut",
-        "description": "A roadmap. A team's roadmap and a project's roadmap share this shape."
-      },
-      "RoadmapProjectOut": {
-        "properties": {
-          "project_id": {
-            "type": "string",
-            "title": "Project Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "team_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Team Id"
-          },
-          "can_edit": {
-            "type": "boolean",
-            "title": "Can Edit",
-            "description": "The caller may create / rename / reorder / delete journeys and stops here (project owner / editor, org owner / admin).",
-            "default": false
-          },
-          "journeys": {
-            "items": {
-              "$ref": "#/components/schemas/RoadmapJourneyOut"
-            },
-            "type": "array",
-            "title": "Journeys"
-          }
-        },
-        "type": "object",
-        "required": [
-          "project_id",
-          "name",
-          "journeys"
-        ],
-        "title": "RoadmapProjectOut",
-        "description": "Part of `RoadmapOut`."
-      },
-      "RoadmapProjectRef": {
-        "properties": {
-          "project_id": {
-            "type": "string",
-            "title": "Project Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "can_edit": {
-            "type": "boolean",
-            "title": "Can Edit",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "project_id",
-          "name"
-        ],
-        "title": "RoadmapProjectRef",
-        "description": "Part of `RoadmapOut`."
-      },
-      "RoadmapStopOut": {
-        "properties": {
-          "stop_id": {
-            "type": "string",
-            "title": "Stop Id"
-          },
-          "project_id": {
-            "type": "string",
-            "title": "Project Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "target_date": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Target Date"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "position": {
-            "type": "integer",
-            "title": "Position",
-            "description": "Its position on THIS journey (a junction has one per line)."
-          },
-          "done": {
-            "type": "integer",
-            "title": "Done",
-            "description": "Distinct visible tasks that are `completed`."
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Distinct visible tasks \u2014 direct \u222a through pinned milestones, deduped by task_id."
-          },
-          "journey_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Journey Ids",
-            "description": "Every live line this stop is on; two or more = a junction."
-          },
-          "milestone_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Milestone Ids",
-            "description": "Live team milestones pinned to it."
-          }
-        },
-        "type": "object",
-        "required": [
-          "stop_id",
-          "project_id",
-          "title",
-          "position",
-          "done",
-          "total",
-          "journey_ids"
-        ],
-        "title": "RoadmapStopOut",
-        "description": "Part of `RoadmapJourneyOut`."
       },
       "ScopeRef": {
         "properties": {
@@ -55690,45 +54836,6 @@
         ],
         "title": "TaskReviewDecision",
         "description": "The body of a review: accept or reject a task an agent created."
-      },
-      "TaskRoadmapStop": {
-        "properties": {
-          "stop_id": {
-            "type": "string",
-            "title": "Stop Id"
-          },
-          "project_id": {
-            "type": "string",
-            "title": "Project Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "via": {
-            "type": "string",
-            "title": "Via",
-            "description": "`direct` (the task is attached to the stop) or `milestone` (through the task's pinned milestone)."
-          },
-          "journeys": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Journeys"
-          }
-        },
-        "type": "object",
-        "required": [
-          "stop_id",
-          "project_id",
-          "title",
-          "via",
-          "journeys"
-        ],
-        "title": "TaskRoadmapStop",
-        "description": "A roadmap stop a task is on."
       },
       "TaskSectionOut": {
         "properties": {
@@ -58779,7 +57886,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
-        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics and goals. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
@@ -58792,7 +57899,7 @@
             "scopes": {
               "tasks:read": "Read tasks, their comments, attachments, history, sections and saved views.",
               "tasks:write": "Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read).",
-              "projects:read": "Read projects, their members, resources, statistics, goals and roadmaps.",
+              "projects:read": "Read projects, their members, resources, statistics and goals.",
               "projects:write": "Create, update and delete projects, their members, resources and goals (implies projects:read).",
               "teams:read": "Read teams, their members, sprints, milestones and availability.",
               "teams:write": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read).",
@@ -63877,1030 +62984,6 @@
         }
       }
     },
-    "roadmap_journey.created": {
-      "post": {
-        "summary": "roadmap_journey.created",
-        "description": "A roadmap journey was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_journey.created",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_journey.created",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": null,
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_journey",
-                  "resource_id": "RJ12345",
-                  "before": null,
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_journey.deleted": {
-      "post": {
-        "summary": "roadmap_journey.deleted",
-        "description": "A roadmap journey was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_journey.deleted",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_journey.deleted",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": null,
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_journey",
-                  "resource_id": "RJ12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": null
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_journey.updated": {
-      "post": {
-        "summary": "roadmap_journey.updated",
-        "description": "A roadmap journey changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_journey.updated",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_journey.updated",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": null,
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_journey",
-                  "resource_id": "RJ12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.created": {
-      "post": {
-        "summary": "roadmap_stop.created",
-        "description": "A roadmap stop was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.created",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.created",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": null,
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.deleted": {
-      "post": {
-        "summary": "roadmap_stop.deleted",
-        "description": "A roadmap stop was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.deleted",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.deleted",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": null
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.milestone_pinned": {
-      "post": {
-        "summary": "roadmap_stop.milestone_pinned",
-        "description": "A milestone was pinned to a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.milestone_pinned",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.milestone_pinned",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": null,
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.milestone_unpinned": {
-      "post": {
-        "summary": "roadmap_stop.milestone_unpinned",
-        "description": "A milestone was unpinned from a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.milestone_unpinned",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.milestone_unpinned",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": null
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.task_attached": {
-      "post": {
-        "summary": "roadmap_stop.task_attached",
-        "description": "A task was attached to a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.task_attached",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.task_attached",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": null,
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.task_detached": {
-      "post": {
-        "summary": "roadmap_stop.task_detached",
-        "description": "A task was detached from a roadmap stop.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.task_detached",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.task_detached",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": null
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
-    "roadmap_stop.updated": {
-      "post": {
-        "summary": "roadmap_stop.updated",
-        "description": "A roadmap stop changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
-        "operationId": "webhook.roadmap_stop.updated",
-        "tags": [
-          "webhooks"
-        ],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "WD000001",
-            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1790380800",
-            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
-            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
-          },
-          {
-            "name": "X-TasksMate-Event",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "task.updated",
-            "description": "The event type (the body's `type`), for routing before parsing."
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebhookEvent"
-              },
-              "example": {
-                "id": "WD000001",
-                "type": "roadmap_stop.updated",
-                "api_version": "2026-09-25",
-                "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
-                "project_id": "P30104",
-                "actor": {
-                  "kind": "user",
-                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
-                  "username": "ada"
-                },
-                "data": {
-                  "resource_type": "roadmap_stop",
-                  "resource_id": "RS12345",
-                  "before": {
-                    "name": "Before"
-                  },
-                  "after": {
-                    "name": "After"
-                  }
-                },
-                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-              }
-            }
-          }
-        },
-        "responses": {
-          "2XX": {
-            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
-          },
-          "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
-          }
-        }
-      }
-    },
     "service_account.created": {
       "post": {
         "summary": "service_account.created",
@@ -69213,15 +67296,11 @@
     },
     {
       "name": "milestones",
-      "description": "A team's milestones."
+      "description": "Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."
     },
     {
       "name": "availability",
       "description": "Who on a team is unavailable, and when."
-    },
-    {
-      "name": "roadmap",
-      "description": "Roadmaps (read): organization, project, team, and a task's stops."
     },
     {
       "name": "views",
@@ -69380,7 +67459,7 @@
     },
     {
       "scope": "projects:read",
-      "description": "Read projects, their members, resources, statistics, goals and roadmaps."
+      "description": "Read projects, their members, resources, statistics and goals."
     },
     {
       "scope": "projects:write",

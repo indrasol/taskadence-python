@@ -10,15 +10,15 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.page_task_roadmap_stop import PageTaskRoadmapStop
+from ...models.milestone_org_list import MilestoneOrgList
 from ...models.problem import Problem
 from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
-    task_id: str,
     *,
+    org_id: str,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -30,6 +30,8 @@ def _get_kwargs(
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
+
+    params["org_id"] = org_id
 
     params["limit"] = limit
 
@@ -53,9 +55,7 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/tasks/{task_id}/roadmap".format(
-            task_id=quote(str(task_id), safe=""),
-        ),
+        "url": "/v1/milestones",
         "params": params,
     }
 
@@ -65,9 +65,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | PageTaskRoadmapStop | Problem | None:
+) -> Any | MilestoneOrgList | Problem | None:
     if response.status_code == 200:
-        response_200 = PageTaskRoadmapStop.from_dict(response.json())
+        response_200 = MilestoneOrgList.from_dict(response.json())
 
         return response_200
 
@@ -128,7 +128,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | PageTaskRoadmapStop | Problem]:
+) -> Response[Any | MilestoneOrgList | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -138,25 +138,35 @@ def _build_response(
 
 
 def sync_detailed(
-    task_id: str,
     *,
     client: AuthenticatedClient,
+    org_id: str,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | PageTaskRoadmapStop | Problem]:
-    """The roadmap stops a task is on
+) -> Response[Any | MilestoneOrgList | Problem]:
+    """Every milestone you can read in an organization, across its teams
 
-     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
-    projects you can read, paginated as `{data, next_cursor}`.
+     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
+    its task roll-up, paginated as `{data, next_cursor}`.
+
+    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
+    are on. 403 when you are not a member of the organization.
+    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
+    latest first.
+    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
+    - Creating, changing and closing a milestone stay on the team's own milestone operations.
 
     Args:
-        task_id (str):
-        limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only the
+            milestones of teams it is on).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: title. Default: the list's natural order.
+        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
+            team_name. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -165,11 +175,11 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | PageTaskRoadmapStop | Problem]
+        Response[Any | MilestoneOrgList | Problem]
     """
 
     kwargs = _get_kwargs(
-        task_id=task_id,
+        org_id=org_id,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -185,25 +195,35 @@ def sync_detailed(
 
 
 def sync(
-    task_id: str,
     *,
     client: AuthenticatedClient,
+    org_id: str,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | PageTaskRoadmapStop | Problem | None:
-    """The roadmap stops a task is on
+) -> Any | MilestoneOrgList | Problem | None:
+    """Every milestone you can read in an organization, across its teams
 
-     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
-    projects you can read, paginated as `{data, next_cursor}`.
+     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
+    its task roll-up, paginated as `{data, next_cursor}`.
+
+    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
+    are on. 403 when you are not a member of the organization.
+    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
+    latest first.
+    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
+    - Creating, changing and closing a milestone stay on the team's own milestone operations.
 
     Args:
-        task_id (str):
-        limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only the
+            milestones of teams it is on).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: title. Default: the list's natural order.
+        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
+            team_name. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -212,12 +232,12 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | PageTaskRoadmapStop | Problem
+        Any | MilestoneOrgList | Problem
     """
 
     return sync_detailed(
-        task_id=task_id,
         client=client,
+        org_id=org_id,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -227,25 +247,35 @@ def sync(
 
 
 async def asyncio_detailed(
-    task_id: str,
     *,
     client: AuthenticatedClient,
+    org_id: str,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | PageTaskRoadmapStop | Problem]:
-    """The roadmap stops a task is on
+) -> Response[Any | MilestoneOrgList | Problem]:
+    """Every milestone you can read in an organization, across its teams
 
-     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
-    projects you can read, paginated as `{data, next_cursor}`.
+     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
+    its task roll-up, paginated as `{data, next_cursor}`.
+
+    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
+    are on. 403 when you are not a member of the organization.
+    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
+    latest first.
+    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
+    - Creating, changing and closing a milestone stay on the team's own milestone operations.
 
     Args:
-        task_id (str):
-        limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only the
+            milestones of teams it is on).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: title. Default: the list's natural order.
+        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
+            team_name. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -254,11 +284,11 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | PageTaskRoadmapStop | Problem]
+        Response[Any | MilestoneOrgList | Problem]
     """
 
     kwargs = _get_kwargs(
-        task_id=task_id,
+        org_id=org_id,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -272,25 +302,35 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    task_id: str,
     *,
     client: AuthenticatedClient,
+    org_id: str,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | PageTaskRoadmapStop | Problem | None:
-    """The roadmap stops a task is on
+) -> Any | MilestoneOrgList | Problem | None:
+    """Every milestone you can read in an organization, across its teams
 
-     The live roadmap stops this task is on — directly, or through its milestone's pin — among the
-    projects you can read, paginated as `{data, next_cursor}`.
+     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
+    its task roll-up, paginated as `{data, next_cursor}`.
+
+    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
+    are on. 403 when you are not a member of the organization.
+    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
+    latest first.
+    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
+    - Creating, changing and closing a milestone stay on the team's own milestone operations.
 
     Args:
-        task_id (str):
-        limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only the
+            milestones of teams it is on).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: title. Default: the list's natural order.
+        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
+            team_name. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -299,13 +339,13 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | PageTaskRoadmapStop | Problem
+        Any | MilestoneOrgList | Problem
     """
 
     return (
         await asyncio_detailed(
-            task_id=task_id,
             client=client,
+            org_id=org_id,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

@@ -15,6 +15,18 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Removed (5.7 — spec from backend `ef1e262`: the Roadmap removed before release)
+- **0.x: the `roadmap` resource is gone before any release** — the Roadmap was not shipped (it overlapped with
+  milestones). `tm.roadmap.org / project / team / task_stops`, the `Roadmap*` / `TaskRoadmapStop*` models,
+  `MilestoneOut.stop_id` and the ten `roadmap_journey.*` / `roadmap_stop.*` webhook events are removed; the task list
+  never had a `stop` filter in the SDK, and the API now answers `filter[stop]` with a 400.
+- 159 operations (was 162).
+
+### Added (5.7)
+- `milestones.list_org(org_id=…)` — every milestone you can read across the organization's teams (`GET /v1/milestones`),
+  each a `MilestoneOrgOut` (the team milestone plus `team_name`); the API narrows it with `filter[team]` /
+  `filter[status]` and sorts by `target_date`, `title`, `closed_at`, `created_at` or `team_name`.
+
 ### Changed (5.5 — spec from backend `7de395c`: 5.2 registration, 5.4 agent-task review, 5.3 MCP clients)
 - 162 operations (was 160): `tasks.review(task_id, {"decision": "accept" | "reject"})` (accept or reject a task an agent
   created) and `mcp.clients()` (the MCP server's clients table). `tasks.list` takes `filter={"created_via": …,

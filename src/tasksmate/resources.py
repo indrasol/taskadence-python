@@ -2099,7 +2099,7 @@ class AvailabilityResource:
 
 
 class MilestonesResource:
-    """A team's milestones."""
+    """Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -2155,74 +2155,30 @@ class MilestonesResource:
             self._client._call(_OPS["milestones.delete"], path=(team_id, milestone_id), query={"reason": reason}),
         )
 
-
-class RoadmapResource:
-    """Roadmaps (read): organization, project, team, and a task's stops."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    @overload
-    def org(self, *, org_id: str, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    def org(self, *, org_id: str, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    def org(self, *, org_id: str, if_none_match: str | None = None) -> models.RoadmapOut | NotModifiedType:
-        """The organization's roadmap.
-
-        `GET /v1/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            self._client._call(_OPS["roadmap.org"], query={"org_id": org_id}, if_none_match=if_none_match),
-        )
-
-    @overload
-    def project(self, project_id: str, *, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    def project(self, project_id: str, *, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    def project(self, project_id: str, *, if_none_match: str | None = None) -> models.RoadmapOut | NotModifiedType:
-        """A project's roadmap.
-
-        `GET /v1/projects/{project_id}/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            self._client._call(_OPS["roadmap.project"], path=(project_id,), if_none_match=if_none_match),
-        )
-
-    @overload
-    def team(self, team_id: str, *, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    def team(self, team_id: str, *, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    def team(self, team_id: str, *, if_none_match: str | None = None) -> models.RoadmapOut | NotModifiedType:
-        """A team's roadmap.
-
-        `GET /v1/teams/{team_id}/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            self._client._call(_OPS["roadmap.team"], path=(team_id,), if_none_match=if_none_match),
-        )
-
-    def task_stops(
+    def list_org(
         self,
-        task_id: str,
         *,
+        org_id: str,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
-    ) -> Page[models.TaskRoadmapStop]:
-        """The roadmap stops a task is on.
+    ) -> Page[models.MilestoneOrgOut]:
+        """Every milestone you can read in an organization, across its teams.
 
-        `GET /v1/tasks/{task_id}/roadmap` · scope `projects:read` · a `Page` — iterate it for every item
+        `GET /v1/milestones` · scope `teams:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "Page[models.TaskRoadmapStop]",
+            "Page[models.MilestoneOrgOut]",
             self._client._call(
-                _OPS["roadmap.task_stops"],
-                path=(task_id,),
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                _OPS["milestones.list_org"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
             ),
         )
 
@@ -4835,7 +4791,7 @@ class AsyncAvailabilityResource:
 
 
 class AsyncMilestonesResource:
-    """A team's milestones."""
+    """Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -4893,76 +4849,30 @@ class AsyncMilestonesResource:
             await self._client._call(_OPS["milestones.delete"], path=(team_id, milestone_id), query={"reason": reason}),
         )
 
-
-class AsyncRoadmapResource:
-    """Roadmaps (read): organization, project, team, and a task's stops."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    @overload
-    async def org(self, *, org_id: str, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    async def org(self, *, org_id: str, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    async def org(self, *, org_id: str, if_none_match: str | None = None) -> models.RoadmapOut | NotModifiedType:
-        """The organization's roadmap.
-
-        `GET /v1/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            await self._client._call(_OPS["roadmap.org"], query={"org_id": org_id}, if_none_match=if_none_match),
-        )
-
-    @overload
-    async def project(self, project_id: str, *, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    async def project(self, project_id: str, *, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    async def project(
-        self, project_id: str, *, if_none_match: str | None = None
-    ) -> models.RoadmapOut | NotModifiedType:
-        """A project's roadmap.
-
-        `GET /v1/projects/{project_id}/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            await self._client._call(_OPS["roadmap.project"], path=(project_id,), if_none_match=if_none_match),
-        )
-
-    @overload
-    async def team(self, team_id: str, *, if_none_match: None = None) -> models.RoadmapOut: ...
-    @overload
-    async def team(self, team_id: str, *, if_none_match: str) -> models.RoadmapOut | NotModifiedType: ...
-    async def team(self, team_id: str, *, if_none_match: str | None = None) -> models.RoadmapOut | NotModifiedType:
-        """A team's roadmap.
-
-        `GET /v1/teams/{team_id}/roadmap` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.RoadmapOut | NotModifiedType",
-            await self._client._call(_OPS["roadmap.team"], path=(team_id,), if_none_match=if_none_match),
-        )
-
-    async def task_stops(
+    async def list_org(
         self,
-        task_id: str,
         *,
+        org_id: str,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
-    ) -> AsyncPage[models.TaskRoadmapStop]:
-        """The roadmap stops a task is on.
+    ) -> AsyncPage[models.MilestoneOrgOut]:
+        """Every milestone you can read in an organization, across its teams.
 
-        `GET /v1/tasks/{task_id}/roadmap` · scope `projects:read` · a `Page` — iterate it for every item
+        `GET /v1/milestones` · scope `teams:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "AsyncPage[models.TaskRoadmapStop]",
+            "AsyncPage[models.MilestoneOrgOut]",
             await self._client._call(
-                _OPS["roadmap.task_stops"],
-                path=(task_id,),
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                _OPS["milestones.list_org"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
             ),
         )
 
@@ -5477,7 +5387,6 @@ class SyncResources:
     sprints: SprintsResource
     availability: AvailabilityResource
     milestones: MilestonesResource
-    roadmap: RoadmapResource
     goals: GoalsResource
     me: MeResource
     mcp: McpResource
@@ -5510,7 +5419,6 @@ class SyncResources:
         self.sprints = SprintsResource(core)
         self.availability = AvailabilityResource(core)
         self.milestones = MilestonesResource(core)
-        self.roadmap = RoadmapResource(core)
         self.goals = GoalsResource(core)
         self.me = MeResource(core)
         self.mcp = McpResource(core)
@@ -5546,7 +5454,6 @@ class AsyncResources:
     sprints: AsyncSprintsResource
     availability: AsyncAvailabilityResource
     milestones: AsyncMilestonesResource
-    roadmap: AsyncRoadmapResource
     goals: AsyncGoalsResource
     me: AsyncMeResource
     mcp: AsyncMcpResource
@@ -5579,7 +5486,6 @@ class AsyncResources:
         self.sprints = AsyncSprintsResource(core)
         self.availability = AsyncAvailabilityResource(core)
         self.milestones = AsyncMilestonesResource(core)
-        self.roadmap = AsyncRoadmapResource(core)
         self.goals = AsyncGoalsResource(core)
         self.me = AsyncMeResource(core)
         self.mcp = AsyncMcpResource(core)
@@ -5719,10 +5625,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "milestones.create": ("milestones", "create"),
     "milestones.update": ("milestones", "update"),
     "milestones.delete": ("milestones", "delete"),
-    "roadmap.org": ("roadmap", "org"),
-    "roadmap.project": ("roadmap", "project"),
-    "roadmap.team": ("roadmap", "team"),
-    "roadmap.task_stops": ("roadmap", "task_stops"),
+    "milestones.list_org": ("milestones", "list_org"),
     "goals.org": ("goals", "org"),
     "goals.list": ("goals", "list"),
     "goals.create": ("goals", "create"),

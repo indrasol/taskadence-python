@@ -81,6 +81,8 @@ from .mention import Mention
 from .milestone_create import MilestoneCreate
 from .milestone_deleted import MilestoneDeleted
 from .milestone_list import MilestoneList
+from .milestone_org_list import MilestoneOrgList
+from .milestone_org_out import MilestoneOrgOut
 from .milestone_out import MilestoneOut
 from .milestone_update import MilestoneUpdate
 from .o_auth_client_create import OAuthClientCreate
@@ -124,7 +126,6 @@ from .page_service_account_out import PageServiceAccountOut
 from .page_task_attachment_in_db import PageTaskAttachmentInDB
 from .page_task_comment_in_db import PageTaskCommentInDB
 from .page_task_history_in_db import PageTaskHistoryInDB
-from .page_task_roadmap_stop import PageTaskRoadmapStop
 from .page_token_out import PageTokenOut
 from .page_webhook_event_type import PageWebhookEventType
 from .page_webhook_out import PageWebhookOut
@@ -169,11 +170,6 @@ from .release_type import ReleaseType
 from .reply_create import ReplyCreate
 from .review_member import ReviewMember
 from .review_token import ReviewToken
-from .roadmap_journey_out import RoadmapJourneyOut
-from .roadmap_out import RoadmapOut
-from .roadmap_project_out import RoadmapProjectOut
-from .roadmap_project_ref import RoadmapProjectRef
-from .roadmap_stop_out import RoadmapStopOut
 from .scope_ref import ScopeRef
 from .section_create import SectionCreate
 from .section_out import SectionOut
@@ -211,8 +207,6 @@ from .task_milestone_set import TaskMilestoneSet
 from .task_project_set import TaskProjectSet
 from .task_review_decision import TaskReviewDecision
 from .task_review_decision_decision import TaskReviewDecisionDecision
-from .task_roadmap_stop import TaskRoadmapStop
-from .task_roadmap_stop_journeys_item import TaskRoadmapStopJourneysItem
 from .task_section_out import TaskSectionOut
 from .task_section_set import TaskSectionSet
 from .task_sprint_set import TaskSprintSet
@@ -358,6 +352,8 @@ __all__ = (
     "MilestoneCreate",
     "MilestoneDeleted",
     "MilestoneList",
+    "MilestoneOrgList",
+    "MilestoneOrgOut",
     "MilestoneOut",
     "MilestoneUpdate",
     "OAuthClientCreate",
@@ -401,7 +397,6 @@ __all__ = (
     "PageTaskAttachmentInDB",
     "PageTaskCommentInDB",
     "PageTaskHistoryInDB",
-    "PageTaskRoadmapStop",
     "PageTokenOut",
     "PageWebhookEventType",
     "PageWebhookOut",
@@ -446,11 +441,6 @@ __all__ = (
     "ReplyCreate",
     "ReviewMember",
     "ReviewToken",
-    "RoadmapJourneyOut",
-    "RoadmapOut",
-    "RoadmapProjectOut",
-    "RoadmapProjectRef",
-    "RoadmapStopOut",
     "ScopeRef",
     "SectionCreate",
     "SectionOut",
@@ -488,8 +478,6 @@ __all__ = (
     "TaskProjectSet",
     "TaskReviewDecision",
     "TaskReviewDecisionDecision",
-    "TaskRoadmapStop",
-    "TaskRoadmapStopJourneysItem",
     "TaskSectionOut",
     "TaskSectionSet",
     "TaskSprintSet",

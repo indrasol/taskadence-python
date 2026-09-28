@@ -14,23 +14,24 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
-    from ..models.task_roadmap_stop import TaskRoadmapStop
+    from ..models.milestone_org_out import MilestoneOrgOut
 
 
-T = TypeVar("T", bound="PageTaskRoadmapStop")
+T = TypeVar("T", bound="MilestoneOrgList")
 
 
 @_attrs_define
-class PageTaskRoadmapStop:
-    """Returned by `roadmap.task_stops`.
+class MilestoneOrgList:
+    """A page of `GET /v1/milestones`, paginated as `{data, next_cursor}`; `total` counts every matching milestone.
 
     Attributes:
-        data (list[TaskRoadmapStop]):
-        next_cursor (None | str | Unset): Opaque token for the next page (send it back as `cursor`); null on the last
-            page
+        data (list[MilestoneOrgOut]):
+        total (int):
+        next_cursor (None | str | Unset):
     """
 
-    data: list[TaskRoadmapStop]
+    data: list[MilestoneOrgOut]
+    total: int
     next_cursor: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -38,12 +39,14 @@ class PageTaskRoadmapStop:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.task_roadmap_stop import TaskRoadmapStop  # noqa: PLC0415
+        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
 
         data = []
         for data_item_data in self.data:
             data_item = data_item_data.to_dict()
             data.append(data_item)
+
+        total = self.total
 
         next_cursor: None | str | Unset
         if isinstance(self.next_cursor, Unset):
@@ -56,6 +59,7 @@ class PageTaskRoadmapStop:
         field_dict.update(
             {
                 "data": data,
+                "total": total,
             }
         )
         if next_cursor is not UNSET:
@@ -65,15 +69,17 @@ class PageTaskRoadmapStop:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.task_roadmap_stop import TaskRoadmapStop  # noqa: PLC0415
+        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
 
         d = dict(src_dict)
         data = []
         _data = d.pop("data")
         for data_item_data in _data:
-            data_item = TaskRoadmapStop.from_dict(data_item_data)
+            data_item = MilestoneOrgOut.from_dict(data_item_data)
 
             data.append(data_item)
+
+        total = d.pop("total")
 
         def _parse_next_cursor(data: object) -> None | str | Unset:
             if data is None:
@@ -84,13 +90,14 @@ class PageTaskRoadmapStop:
 
         next_cursor = _parse_next_cursor(d.pop("next_cursor", UNSET))
 
-        page_task_roadmap_stop = cls(
+        milestone_org_list = cls(
             data=data,
+            total=total,
             next_cursor=next_cursor,
         )
 
-        page_task_roadmap_stop.additional_properties = d
-        return page_task_roadmap_stop
+        milestone_org_list.additional_properties = d
+        return milestone_org_list
 
     @property
     def additional_keys(self) -> list[str]:

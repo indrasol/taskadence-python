@@ -15,12 +15,12 @@ from typing import cast
 import datetime
 
 
-T = TypeVar("T", bound="MilestoneOut")
+T = TypeVar("T", bound="MilestoneOrgOut")
 
 
 @_attrs_define
-class MilestoneOut:
-    """Returned by `milestones.create` and `milestones.update`.
+class MilestoneOrgOut:
+    """A team milestone as the organization-wide list returns it: the milestone plus its team's name.
 
     Attributes:
         milestone_id (str):
@@ -28,6 +28,7 @@ class MilestoneOut:
         team_id (str):
         title (str):
         target_date (datetime.date):
+        team_name (str): The name of the milestone's team.
         description (None | str | Unset):
         owner_user_id (None | str | Unset):
         status (str | Unset):  Default: 'open'.
@@ -47,6 +48,7 @@ class MilestoneOut:
     team_id: str
     title: str
     target_date: datetime.date
+    team_name: str
     description: None | str | Unset = UNSET
     owner_user_id: None | str | Unset = UNSET
     status: str | Unset = "open"
@@ -74,6 +76,8 @@ class MilestoneOut:
         title = self.title
 
         target_date = self.target_date.isoformat()
+
+        team_name = self.team_name
 
         description: None | str | Unset
         if isinstance(self.description, Unset):
@@ -146,6 +150,7 @@ class MilestoneOut:
                 "team_id": team_id,
                 "title": title,
                 "target_date": target_date,
+                "team_name": team_name,
             }
         )
         if description is not UNSET:
@@ -187,6 +192,8 @@ class MilestoneOut:
         title = d.pop("title")
 
         target_date = datetime.date.fromisoformat(d.pop("target_date"))
+
+        team_name = d.pop("team_name")
 
         def _parse_description(data: object) -> None | str | Unset:
             if data is None:
@@ -292,12 +299,13 @@ class MilestoneOut:
 
         completed_count = d.pop("completed_count", UNSET)
 
-        milestone_out = cls(
+        milestone_org_out = cls(
             milestone_id=milestone_id,
             org_id=org_id,
             team_id=team_id,
             title=title,
             target_date=target_date,
+            team_name=team_name,
             description=description,
             owner_user_id=owner_user_id,
             status=status,
@@ -312,8 +320,8 @@ class MilestoneOut:
             completed_count=completed_count,
         )
 
-        milestone_out.additional_properties = d
-        return milestone_out
+        milestone_org_out.additional_properties = d
+        return milestone_org_out
 
     @property
     def additional_keys(self) -> list[str]:
