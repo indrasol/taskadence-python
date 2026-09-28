@@ -85,6 +85,9 @@ class TaskInDB:
             review with no project; cleared when the task is accepted into it.
         reviewed_at (datetime.datetime | None | Unset): When the review was decided.
         reviewed_by (None | str | Unset): Who decided the review (username).
+        created_by_token_id (None | str | Unset): The access token (personal, service-account or OAuth) that created the
+            task; null for a task created in a signed-in session or before this was recorded. That token cannot review the
+            task. Response only. Example: TK123456.
         restricted_to_user_ids (list[str] | None | Unset): User ids allowed on this task (authoritative when set; null =
             decided by `restricted_to` usernames). Response only.
         has_access (bool | None | Unset): Whether the current user can access this task based on restrictions
@@ -125,6 +128,7 @@ class TaskInDB:
     proposed_project_id: None | str | Unset = UNSET
     reviewed_at: datetime.datetime | None | Unset = UNSET
     reviewed_by: None | str | Unset = UNSET
+    created_by_token_id: None | str | Unset = UNSET
     restricted_to_user_ids: list[str] | None | Unset = UNSET
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
@@ -359,6 +363,12 @@ class TaskInDB:
         else:
             reviewed_by = self.reviewed_by
 
+        created_by_token_id: None | str | Unset
+        if isinstance(self.created_by_token_id, Unset):
+            created_by_token_id = UNSET
+        else:
+            created_by_token_id = self.created_by_token_id
+
         restricted_to_user_ids: list[str] | None | Unset
         if isinstance(self.restricted_to_user_ids, Unset):
             restricted_to_user_ids = UNSET
@@ -448,6 +458,8 @@ class TaskInDB:
             field_dict["reviewed_at"] = reviewed_at
         if reviewed_by is not UNSET:
             field_dict["reviewed_by"] = reviewed_by
+        if created_by_token_id is not UNSET:
+            field_dict["created_by_token_id"] = created_by_token_id
         if restricted_to_user_ids is not UNSET:
             field_dict["restricted_to_user_ids"] = restricted_to_user_ids
         if has_access is not UNSET:
@@ -859,6 +871,15 @@ class TaskInDB:
 
         reviewed_by = _parse_reviewed_by(d.pop("reviewed_by", UNSET))
 
+        def _parse_created_by_token_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        created_by_token_id = _parse_created_by_token_id(d.pop("created_by_token_id", UNSET))
+
         def _parse_restricted_to_user_ids(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -928,6 +949,7 @@ class TaskInDB:
             proposed_project_id=proposed_project_id,
             reviewed_at=reviewed_at,
             reviewed_by=reviewed_by,
+            created_by_token_id=created_by_token_id,
             restricted_to_user_ids=restricted_to_user_ids,
             has_access=has_access,
             has_edit_access=has_edit_access,

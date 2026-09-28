@@ -43,7 +43,10 @@ class OrganizationInDB:
         updated_at (datetime.datetime | None | Unset):
         deleted_at (datetime.datetime | None | Unset):
         delete_reason (None | str | Unset):
-        project_count (int | Unset): Number of projects under the organization Default: 0.
+        project_count (int | Unset): Number of projects under the organization (the same count `GET /v1/organizations`
+            reports) Default: 0.
+        member_count (int | Unset): Number of active members in the organization (the same count `GET /v1/organizations`
+            reports) Default: 0.
         owners (list[str] | Unset): List of usernames of the organization owners
         access_status (None | str | Unset):
     """
@@ -66,6 +69,7 @@ class OrganizationInDB:
     deleted_at: datetime.datetime | None | Unset = UNSET
     delete_reason: None | str | Unset = UNSET
     project_count: int | Unset = 0
+    member_count: int | Unset = 0
     owners: list[str] | Unset = UNSET
     access_status: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -170,6 +174,8 @@ class OrganizationInDB:
 
         project_count = self.project_count
 
+        member_count = self.member_count
+
         owners: list[str] | Unset = UNSET
         if not isinstance(self.owners, Unset):
             owners = self.owners
@@ -220,6 +226,8 @@ class OrganizationInDB:
             field_dict["delete_reason"] = delete_reason
         if project_count is not UNSET:
             field_dict["project_count"] = project_count
+        if member_count is not UNSET:
+            field_dict["member_count"] = member_count
         if owners is not UNSET:
             field_dict["owners"] = owners
         if access_status is not UNSET:
@@ -384,6 +392,8 @@ class OrganizationInDB:
 
         project_count = d.pop("project_count", UNSET)
 
+        member_count = d.pop("member_count", UNSET)
+
         owners = cast(list[str], d.pop("owners", UNSET))
 
         def _parse_access_status(data: object) -> None | str | Unset:
@@ -414,6 +424,7 @@ class OrganizationInDB:
             deleted_at=deleted_at,
             delete_reason=delete_reason,
             project_count=project_count,
+            member_count=member_count,
             owners=owners,
             access_status=access_status,
         )

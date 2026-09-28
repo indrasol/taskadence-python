@@ -562,6 +562,7 @@
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "delete_reason": "string",
                   "project_count": 0,
+                  "member_count": 0,
                   "owners": [
                     "string"
                   ],
@@ -2533,6 +2534,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -3599,6 +3601,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -3923,6 +3926,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -4244,6 +4248,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -4736,6 +4741,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5010,6 +5016,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5284,6 +5291,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -5558,6 +5566,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6063,6 +6072,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6333,6 +6343,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6607,6 +6618,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -6877,6 +6889,7 @@
                   "proposed_project_id": "string",
                   "reviewed_at": "2026-09-25T12:00:00Z",
                   "reviewed_by": "string",
+                  "created_by_token_id": "TK123456",
                   "restricted_to_user_ids": [
                     "string"
                   ],
@@ -48886,7 +48899,13 @@
           "project_count": {
             "type": "integer",
             "title": "Project Count",
-            "description": "Number of projects under the organization",
+            "description": "Number of projects under the organization (the same count `GET /v1/organizations` reports)",
+            "default": 0
+          },
+          "member_count": {
+            "type": "integer",
+            "title": "Member Count",
+            "description": "Number of active members in the organization (the same count `GET /v1/organizations` reports)",
             "default": 0
           },
           "owners": {
@@ -56340,6 +56359,19 @@
             ],
             "title": "Reviewed By",
             "description": "Who decided the review (username)."
+          },
+          "created_by_token_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Token Id",
+            "description": "The access token (personal, service-account or OAuth) that created the task; null for a task created in a signed-in session or before this was recorded. That token cannot review the task. Response only.",
+            "example": "TK123456"
           },
           "restricted_to_user_ids": {
             "anyOf": [
