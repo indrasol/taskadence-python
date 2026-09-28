@@ -10,7 +10,7 @@ Organizations you belong to or are invited to.
 
 - **HTTP:** `GET /v1/organizations`
 - **operationId:** `organizations.list`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `Page[OrgCard]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
 
@@ -20,7 +20,7 @@ Read an organization.
 
 - **HTTP:** `GET /v1/organizations/{org_id}`
 - **operationId:** `organizations.read`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `OrganizationInDB`
 - **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
 

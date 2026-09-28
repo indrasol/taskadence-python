@@ -6,12 +6,12 @@ snapshot of the public contract the TasksMate API serves at `/openapi.public.jso
 
 | | |
 |---|---|
-| Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/main/rithin` |
-| Backend commit | `7de395c` — "feat(mcp): 5.3 - CLIENTS table (one source: app/mcp/clients.py → docs/api/mcp-clients.json, GET /v1/mcp/clients), health names the packages" (task 5.5; the public spec moved at 5.2 `f3cf68e` — `/oauth/register`, 5.4 `89d4d52` — the review step, `created_via` / `review` filters, `agent` type retired, and 5.3 — `GET /v1/mcp/clients`) |
+| Backend repo | `indrasol/Tasks-Mate-Backend`, branch `feature/phase5/rithin` |
+| Backend commit | `81ea4c3` — "fix(members): 5.5 - GET /v1/organization-members honours search" (task 5.5 fix round 1; the public spec moved at 5.2b `65bc97f` — `client_id_metadata_document_supported`, `client_id` may be a metadata document URL — and 5.5 `3d2d736` — `members:read` gates the org profile, members and designations, the MCP default asks for it — and `81ea4c3` — `search` on the members list) |
 | Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-09-27 — the same document `tasksmate-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
 | Size | 107 paths · 168 operations (162 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 206 component schemas · 100 `webhooks` (99 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `6300e915d95126ee6dfd89d76aecf109a7c06cb8c25db97f850ae0ceb7cb18b2` |
+| SHA-256 | `46935ccea518957cf658f320509f84ec85087f31ad6810bafdaa3f912e7cdf48` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

@@ -176,13 +176,15 @@ def sync_detailed(
 ) -> Response[Any | PageOrganizationMemberInDB | Problem]:
     """List an organization's members
 
-     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
-    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
+     The organization's active members, paginated as `{data, next_cursor}`. Each member carries `kind`:
+    `user` or `service_account`.
+    - `search` finds text in the username or email (case-insensitive; `%` and `_` match literally).
+    - `filter[role]` and `filter[designation]` (the display name) narrow it.
+    - `is_active=false` lists the deactivated members instead (owner / admin only).
 
     Args:
         org_id (str):
-        search (None | str | Unset):
+        search (None | str | Unset): Text to find in the username or email (case-insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -235,13 +237,15 @@ def sync(
 ) -> Any | PageOrganizationMemberInDB | Problem | None:
     """List an organization's members
 
-     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
-    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
+     The organization's active members, paginated as `{data, next_cursor}`. Each member carries `kind`:
+    `user` or `service_account`.
+    - `search` finds text in the username or email (case-insensitive; `%` and `_` match literally).
+    - `filter[role]` and `filter[designation]` (the display name) narrow it.
+    - `is_active=false` lists the deactivated members instead (owner / admin only).
 
     Args:
         org_id (str):
-        search (None | str | Unset):
+        search (None | str | Unset): Text to find in the username or email (case-insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -289,13 +293,15 @@ async def asyncio_detailed(
 ) -> Response[Any | PageOrganizationMemberInDB | Problem]:
     """List an organization's members
 
-     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
-    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
+     The organization's active members, paginated as `{data, next_cursor}`. Each member carries `kind`:
+    `user` or `service_account`.
+    - `search` finds text in the username or email (case-insensitive; `%` and `_` match literally).
+    - `filter[role]` and `filter[designation]` (the display name) narrow it.
+    - `is_active=false` lists the deactivated members instead (owner / admin only).
 
     Args:
         org_id (str):
-        search (None | str | Unset):
+        search (None | str | Unset): Text to find in the username or email (case-insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -346,13 +352,15 @@ async def asyncio(
 ) -> Any | PageOrganizationMemberInDB | Problem | None:
     """List an organization's members
 
-     The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and
-    `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members
-    instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.
+     The organization's active members, paginated as `{data, next_cursor}`. Each member carries `kind`:
+    `user` or `service_account`.
+    - `search` finds text in the username or email (case-insensitive; `%` and `_` match literally).
+    - `filter[role]` and `filter[designation]` (the display name) narrow it.
+    - `is_active=false` lists the deactivated members instead (owner / admin only).
 
     Args:
         org_id (str):
-        search (None | str | Unset):
+        search (None | str | Unset): Text to find in the username or email (case-insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,

@@ -56,7 +56,7 @@ class OrganizationsResource:
     ) -> Page[models.OrgCard]:
         """Organizations you belong to or are invited to.
 
-        `GET /v1/organizations` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/organizations` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "Page[models.OrgCard]",
@@ -73,7 +73,7 @@ class OrganizationsResource:
     def read(self, org_id: str, *, if_none_match: str | None = None) -> models.OrganizationInDB | NotModifiedType:
         """Read an organization.
 
-        `GET /v1/organizations/{org_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organizations/{org_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.OrganizationInDB | NotModifiedType",
@@ -420,7 +420,7 @@ class OrganizationMembersResource:
     ) -> Page[models.OrganizationMemberInDB]:
         """List an organization's members.
 
-        `GET /v1/organization-members/{org_id}` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/organization-members/{org_id}` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "Page[models.OrganizationMemberInDB]",
@@ -450,7 +450,7 @@ class OrganizationMembersResource:
     ) -> models.OrganizationMemberInDB | NotModifiedType:
         """Read one member.
 
-        `GET /v1/organization-members/{user_id}/{org_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organization-members/{user_id}/{org_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.OrganizationMemberInDB | NotModifiedType",
@@ -634,7 +634,7 @@ class DesignationsResource:
     ) -> Page[models.Designation] | models.DesignationCatalog:
         """List designations (flat list, or the grouped catalog).
 
-        `GET /v1/designations` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/designations` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "Page[models.Designation] | models.DesignationCatalog",
@@ -674,7 +674,7 @@ class DesignationsResource:
     ) -> models.Designation | NotModifiedType:
         """Read a designation.
 
-        `GET /v1/designations/{designation_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/designations/{designation_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.Designation | NotModifiedType",
@@ -2727,7 +2727,7 @@ class AsyncOrganizationsResource:
     ) -> AsyncPage[models.OrgCard]:
         """Organizations you belong to or are invited to.
 
-        `GET /v1/organizations` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/organizations` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "AsyncPage[models.OrgCard]",
@@ -2744,7 +2744,7 @@ class AsyncOrganizationsResource:
     async def read(self, org_id: str, *, if_none_match: str | None = None) -> models.OrganizationInDB | NotModifiedType:
         """Read an organization.
 
-        `GET /v1/organizations/{org_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organizations/{org_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.OrganizationInDB | NotModifiedType",
@@ -3109,7 +3109,7 @@ class AsyncOrganizationMembersResource:
     ) -> AsyncPage[models.OrganizationMemberInDB]:
         """List an organization's members.
 
-        `GET /v1/organization-members/{org_id}` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/organization-members/{org_id}` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "AsyncPage[models.OrganizationMemberInDB]",
@@ -3139,7 +3139,7 @@ class AsyncOrganizationMembersResource:
     ) -> models.OrganizationMemberInDB | NotModifiedType:
         """Read one member.
 
-        `GET /v1/organization-members/{user_id}/{org_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organization-members/{user_id}/{org_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.OrganizationMemberInDB | NotModifiedType",
@@ -3328,7 +3328,7 @@ class AsyncDesignationsResource:
     ) -> AsyncPage[models.Designation] | models.DesignationCatalog:
         """List designations (flat list, or the grouped catalog).
 
-        `GET /v1/designations` · scope `org:read` · a `Page` — iterate it for every item
+        `GET /v1/designations` · scope `members:read` · a `Page` — iterate it for every item
         """
         return cast(
             "AsyncPage[models.Designation] | models.DesignationCatalog",
@@ -3368,7 +3368,7 @@ class AsyncDesignationsResource:
     ) -> models.Designation | NotModifiedType:
         """Read a designation.
 
-        `GET /v1/designations/{designation_id}` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/designations/{designation_id}` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.Designation | NotModifiedType",

@@ -220,7 +220,7 @@ OPERATIONS: dict[str, Operation] = {
         is_list=True,
         parse=_organizations_list._parse_response,
         item=OrgCard.from_dict,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="Organizations you belong to or are invited to",
     ),
     "organizations.read": Operation(
@@ -230,7 +230,7 @@ OPERATIONS: dict[str, Operation] = {
         path_params=("org_id",),
         if_none_match=True,
         parse=_organizations_read._parse_response,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="Read an organization",
     ),
     "projects.create": Operation(
@@ -484,7 +484,7 @@ OPERATIONS: dict[str, Operation] = {
         is_list=True,
         parse=_organization_members_list._parse_response,
         item=OrganizationMemberInDB.from_dict,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="List an organization's members",
     ),
     "organization-members.read": Operation(
@@ -494,7 +494,7 @@ OPERATIONS: dict[str, Operation] = {
         path_params=("user_id", "org_id"),
         if_none_match=True,
         parse=_organization_members_read._parse_response,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="Read one member",
     ),
     "organization-members.replace": Operation(
@@ -616,7 +616,7 @@ OPERATIONS: dict[str, Operation] = {
         is_list=True,
         parse=_designations_list._parse_response,
         item=Designation.from_dict,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="List designations (flat list, or the grouped catalog)",
     ),
     "designations.create": Operation(
@@ -636,7 +636,7 @@ OPERATIONS: dict[str, Operation] = {
         query=("org_id",),
         if_none_match=True,
         parse=_designations_read._parse_response,
-        scopes=("org:read",),
+        scopes=("members:read",),
         summary="Read a designation",
     ),
     "designations.replace": Operation(

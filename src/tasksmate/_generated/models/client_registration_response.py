@@ -25,7 +25,7 @@ class ClientRegistrationResponse:
     Example:
         {'client_id': 'tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo', 'client_id_issued_at': 1790500000, 'client_name': 'Claude Code',
             'grant_types': ['authorization_code', 'refresh_token'], 'redirect_uris': ['http://localhost:53682/callback'],
-            'response_types': ['code'], 'scope': 'tasks:read tasks:write projects:read teams:read',
+            'response_types': ['code'], 'scope': 'tasks:read tasks:write projects:read teams:read members:read',
             'token_endpoint_auth_method': 'none'}
 
     Attributes:

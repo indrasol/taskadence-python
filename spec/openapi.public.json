@@ -500,7 +500,7 @@
         ],
         "x-kind": "list",
         "x-scopes": [
-          "org:read"
+          "members:read"
         ]
       }
     },
@@ -747,7 +747,7 @@
           }
         ],
         "x-scopes": [
-          "org:read"
+          "members:read"
         ],
         "description": "Read an organization."
       }
@@ -7070,7 +7070,7 @@
           "organization-members"
         ],
         "summary": "List an organization's members",
-        "description": "The organization's active members, paginated as `{data, next_cursor}`. `filter[role]` and `filter[designation]` (the display name) narrow it; `is_active=false` lists the deactivated members instead (owner / admin only). Each member carries `kind`: `user` or `service_account`.",
+        "description": "The organization's active members, paginated as `{data, next_cursor}`. Each member carries `kind`: `user` or `service_account`.\n- `search` finds text in the username or email (case-insensitive; `%` and `_` match literally).\n- `filter[role]` and `filter[designation]` (the display name) narrow it.\n- `is_active=false` lists the deactivated members instead (owner / admin only).",
         "operationId": "organization-members.list",
         "parameters": [
           {
@@ -7095,8 +7095,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Text to find in the username or email (case-insensitive)",
               "title": "Search"
-            }
+            },
+            "description": "Text to find in the username or email (case-insensitive)"
           },
           {
             "name": "role",
@@ -7416,7 +7418,7 @@
         ],
         "x-kind": "list",
         "x-scopes": [
-          "org:read"
+          "members:read"
         ]
       }
     },
@@ -7664,7 +7666,7 @@
           }
         ],
         "x-scopes": [
-          "org:read"
+          "members:read"
         ],
         "description": "Read one member."
       },
@@ -10574,7 +10576,7 @@
         ],
         "x-kind": "list",
         "x-scopes": [
-          "org:read"
+          "members:read"
         ]
       },
       "post": {
@@ -11055,7 +11057,7 @@
           }
         ],
         "x-scopes": [
-          "org:read"
+          "members:read"
         ],
         "description": "Read a designation."
       },
@@ -42704,6 +42706,7 @@
                   "token_endpoint_auth_methods_supported": [
                     "string"
                   ],
+                  "client_id_metadata_document_supported": false,
                   "revocation_endpoint_auth_methods_supported": [
                     "string"
                   ],
@@ -42799,10 +42802,10 @@
                   "type": "null"
                 }
               ],
-              "description": "The app's `tmc_\u2026` id",
+              "description": "The app's `tmc_\u2026` id, or the https URL of the client's metadata document",
               "title": "Client Id"
             },
-            "description": "The app's `tmc_\u2026` id"
+            "description": "The app's `tmc_\u2026` id, or the https URL of the client's metadata document"
           },
           {
             "name": "redirect_uri",
@@ -43149,7 +43152,7 @@
                       }
                     ],
                     "title": "Scope",
-                    "description": "Space-separated, within: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. Omitted \u2192 `tasks:read tasks:write projects:read teams:read`",
+                    "description": "Space-separated, within: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. Omitted \u2192 `tasks:read tasks:write projects:read teams:read members:read`",
                     "examples": [
                       "tasks:read tasks:write"
                     ]
@@ -43228,7 +43231,7 @@
                   "response_types": [
                     "code"
                   ],
-                  "scope": "tasks:read tasks:write projects:read teams:read",
+                  "scope": "tasks:read tasks:write projects:read teams:read members:read",
                   "token_endpoint_auth_method": "none"
                 }
               }
@@ -43675,6 +43678,18 @@
             },
             "type": "array",
             "title": "Token Endpoint Auth Methods Supported"
+          },
+          "client_id_metadata_document_supported": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id Metadata Document Supported",
+            "description": "A `client_id` may be the https URL of the client's metadata document (OAuth Client ID Metadata Documents; no registration call)"
           },
           "revocation_endpoint_auth_methods_supported": {
             "items": {
@@ -44192,7 +44207,7 @@
           "response_types": [
             "code"
           ],
-          "scope": "tasks:read tasks:write projects:read teams:read",
+          "scope": "tasks:read tasks:write projects:read teams:read members:read",
           "token_endpoint_auth_method": "none"
         },
         "description": "Returned by `oauth.register`."
@@ -46911,7 +46926,7 @@
             "type": "array",
             "minItems": 1,
             "title": "Allowed Scopes",
-            "description": "The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.",
+            "description": "The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.",
             "examples": [
               [
                 "tasks:write",
@@ -56736,7 +56751,7 @@
             "type": "array",
             "minItems": 1,
             "title": "Scopes",
-            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.",
+            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.",
             "examples": [
               [
                 "tasks:write",
@@ -58764,7 +58779,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
-        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review. |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and roadmaps. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
@@ -58781,7 +58796,8 @@
               "projects:write": "Create, update and delete projects, their members, resources and goals (implies projects:read).",
               "teams:read": "Read teams, their members, sprints, milestones and availability.",
               "teams:write": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read).",
-              "org:read": "Read the organization, its settings, members, invites, designations, access tokens and access review.",
+              "members:read": "Read the organization's profile, its members (role, designation, active) and the designation catalog.",
+              "org:read": "Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read).",
               "org:write": "Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read).",
               "webhooks:read": "Read the organization's webhooks and their delivery logs (owner / admin, or a service account).",
               "webhooks:write": "Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read).",
@@ -69379,8 +69395,12 @@
       "description": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read)."
     },
     {
+      "scope": "members:read",
+      "description": "Read the organization's profile, its members (role, designation, active) and the designation catalog."
+    },
+    {
       "scope": "org:read",
-      "description": "Read the organization, its settings, members, invites, designations, access tokens and access review."
+      "description": "Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read)."
     },
     {
       "scope": "org:write",

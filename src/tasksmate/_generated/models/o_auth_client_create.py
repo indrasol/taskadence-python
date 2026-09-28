@@ -29,8 +29,8 @@ class OAuthClientCreate:
         redirect_uris (list[str]): Exact-match allow-list: https, or http on a loopback host (localhost, any port). No
             fragment.
         allowed_scopes (list[str]): The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`,
-            `projects:write`, `teams:read`, `teams:write`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`,
-            `admin`.
+            `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`,
+            `webhooks:write`, `admin`.
         client_type (OAuthClientCreateClientType | Unset): `confidential`: a server that keeps a secret. `public`: a
             native or single-page app with no secret (PKCE only). Default: 'confidential'.
         logo_url (None | str | Unset): https URL of a square logo

@@ -10,7 +10,7 @@ List an organization's members.
 
 - **HTTP:** `GET /v1/organization-members/{org_id}`
 - **operationId:** `organization-members.list`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `Page[OrganizationMemberInDB]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
 
@@ -20,7 +20,7 @@ Read one member.
 
 - **HTTP:** `GET /v1/organization-members/{user_id}/{org_id}`
 - **operationId:** `organization-members.read`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `OrganizationMemberInDB`
 - **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
 

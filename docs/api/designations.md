@@ -10,7 +10,7 @@ List designations (flat list, or the grouped catalog).
 
 - **HTTP:** `GET /v1/designations`
 - **operationId:** `designations.list`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `Page[Designation] | DesignationCatalog`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
 
@@ -29,7 +29,7 @@ Read a designation.
 
 - **HTTP:** `GET /v1/designations/{designation_id}`
 - **operationId:** `designations.read`
-- **Token scope:** `org:read`
+- **Token scope:** `members:read`
 - **Returns:** `Designation`
 - **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
 
