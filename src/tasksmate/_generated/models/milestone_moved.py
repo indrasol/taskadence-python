@@ -15,15 +15,15 @@ from typing import cast
 import datetime
 
 if TYPE_CHECKING:
-    from ..models.milestone_org_out_tasks_type_0_item import MilestoneOrgOutTasksType0Item
+    from ..models.milestone_moved_tasks_type_0_item import MilestoneMovedTasksType0Item
 
 
-T = TypeVar("T", bound="MilestoneOrgOut")
+T = TypeVar("T", bound="MilestoneMoved")
 
 
 @_attrs_define
-class MilestoneOrgOut:
-    """A milestone as the organization-wide read returns it: the milestone plus its project's name.
+class MilestoneMoved:
+    """The milestone as it now reads in its new project, plus how many of its tasks moved with it.
 
     Attributes:
         milestone_id (str):
@@ -31,6 +31,7 @@ class MilestoneOrgOut:
         project_id (str):
         title (str):
         target_date (datetime.date):
+        moved_tasks (int): Tasks that moved with the milestone
         description (None | str | Unset):
         owner_user_id (None | str | Unset):
         position (int | Unset):  Default: 0.
@@ -43,9 +44,8 @@ class MilestoneOrgOut:
         updated_at (datetime.datetime | None | Unset):
         tasks_total (int | Unset): Tasks under this milestone the caller can read (subtasks excluded). Default: 0.
         tasks_completed (int | Unset): How many of them are `completed`. Default: 0.
-        tasks (list[MilestoneOrgOutTasksType0Item] | None | Unset): `?include_tasks=true` only: the milestone's task
-            rows (task_card_view shape).
-        project_name (str | Unset): The name of the milestone's project. Default: ''.
+        tasks (list[MilestoneMovedTasksType0Item] | None | Unset): `?include_tasks=true` only: the milestone's task rows
+            (task_card_view shape).
     """
 
     milestone_id: str
@@ -53,6 +53,7 @@ class MilestoneOrgOut:
     project_id: str
     title: str
     target_date: datetime.date
+    moved_tasks: int
     description: None | str | Unset = UNSET
     owner_user_id: None | str | Unset = UNSET
     position: int | Unset = 0
@@ -65,15 +66,14 @@ class MilestoneOrgOut:
     updated_at: datetime.datetime | None | Unset = UNSET
     tasks_total: int | Unset = 0
     tasks_completed: int | Unset = 0
-    tasks: list[MilestoneOrgOutTasksType0Item] | None | Unset = UNSET
-    project_name: str | Unset = ""
+    tasks: list[MilestoneMovedTasksType0Item] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.milestone_org_out_tasks_type_0_item import MilestoneOrgOutTasksType0Item  # noqa: PLC0415
+        from ..models.milestone_moved_tasks_type_0_item import MilestoneMovedTasksType0Item  # noqa: PLC0415
 
         milestone_id = self.milestone_id
 
@@ -84,6 +84,8 @@ class MilestoneOrgOut:
         title = self.title
 
         target_date = self.target_date.isoformat()
+
+        moved_tasks = self.moved_tasks
 
         description: None | str | Unset
         if isinstance(self.description, Unset):
@@ -159,8 +161,6 @@ class MilestoneOrgOut:
         else:
             tasks = self.tasks
 
-        project_name = self.project_name
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -170,6 +170,7 @@ class MilestoneOrgOut:
                 "project_id": project_id,
                 "title": title,
                 "target_date": target_date,
+                "moved_tasks": moved_tasks,
             }
         )
         if description is not UNSET:
@@ -198,14 +199,12 @@ class MilestoneOrgOut:
             field_dict["tasks_completed"] = tasks_completed
         if tasks is not UNSET:
             field_dict["tasks"] = tasks
-        if project_name is not UNSET:
-            field_dict["project_name"] = project_name
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.milestone_org_out_tasks_type_0_item import MilestoneOrgOutTasksType0Item  # noqa: PLC0415
+        from ..models.milestone_moved_tasks_type_0_item import MilestoneMovedTasksType0Item  # noqa: PLC0415
 
         d = dict(src_dict)
         milestone_id = d.pop("milestone_id")
@@ -217,6 +216,8 @@ class MilestoneOrgOut:
         title = d.pop("title")
 
         target_date = datetime.date.fromisoformat(d.pop("target_date"))
+
+        moved_tasks = d.pop("moved_tasks")
 
         def _parse_description(data: object) -> None | str | Unset:
             if data is None:
@@ -322,7 +323,7 @@ class MilestoneOrgOut:
 
         tasks_completed = d.pop("tasks_completed", UNSET)
 
-        def _parse_tasks(data: object) -> list[MilestoneOrgOutTasksType0Item] | None | Unset:
+        def _parse_tasks(data: object) -> list[MilestoneMovedTasksType0Item] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -333,25 +334,24 @@ class MilestoneOrgOut:
                 tasks_type_0 = []
                 _tasks_type_0 = data
                 for tasks_type_0_item_data in _tasks_type_0:
-                    tasks_type_0_item = MilestoneOrgOutTasksType0Item.from_dict(tasks_type_0_item_data)
+                    tasks_type_0_item = MilestoneMovedTasksType0Item.from_dict(tasks_type_0_item_data)
 
                     tasks_type_0.append(tasks_type_0_item)
 
                 return tasks_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
-            return cast(list[MilestoneOrgOutTasksType0Item] | None | Unset, data)
+            return cast(list[MilestoneMovedTasksType0Item] | None | Unset, data)
 
         tasks = _parse_tasks(d.pop("tasks", UNSET))
 
-        project_name = d.pop("project_name", UNSET)
-
-        milestone_org_out = cls(
+        milestone_moved = cls(
             milestone_id=milestone_id,
             org_id=org_id,
             project_id=project_id,
             title=title,
             target_date=target_date,
+            moved_tasks=moved_tasks,
             description=description,
             owner_user_id=owner_user_id,
             position=position,
@@ -365,11 +365,10 @@ class MilestoneOrgOut:
             tasks_total=tasks_total,
             tasks_completed=tasks_completed,
             tasks=tasks,
-            project_name=project_name,
         )
 
-        milestone_org_out.additional_properties = d
-        return milestone_org_out
+        milestone_moved.additional_properties = d
+        return milestone_moved
 
     @property
     def additional_keys(self) -> list[str]:

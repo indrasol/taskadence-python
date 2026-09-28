@@ -29,8 +29,8 @@ Every operation is `tm.<resource>.<method>(…)` on `TasksMate` (and `await` on 
 | [`tm.teams`](teams.md) | 11 | Teams, their members and their task list. |
 | [`tm.sprints`](sprints.md) | 4 | A team's sprints. |
 | [`tm.availability`](availability.md) | 4 | Who on a team is unavailable, and when. |
-| [`tm.milestones`](milestones.md) | 5 | Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`). |
 | [`tm.goals`](goals.md) | 10 | Goals: named containers of a project's tasks. |
+| [`tm.milestones`](milestones.md) | 10 | Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`). |
 | [`tm.me`](me.md) | 1 | Who the caller is: the principal and its organizations / roles. |
 | [`tm.mcp`](mcp.md) | 1 | The MCP server's clients table: how to add `/mcp` to each AI client (remote URL or local package), the tool groups and the scopes each needs. The server itself is `/mcp` (Streamable HTTP), outside this API. |
 | [`tm.audit`](audit.md) | 2 | The organization's audit log (owners and admins). |

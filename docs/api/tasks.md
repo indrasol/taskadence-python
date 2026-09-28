@@ -94,7 +94,7 @@ File a task in a team sprint (or none).
 
 ## `tm.tasks.set_milestone(task_id: str, body: TaskMilestoneSet | Mapping[str, Any])`
 
-Attach a task to a team milestone (or none).
+Attach a task to a milestone of its project (or none).
 
 - **HTTP:** `PUT /v1/tasks/{task_id}/milestone`
 - **operationId:** `tasks.set_milestone`

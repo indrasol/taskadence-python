@@ -15,6 +15,21 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
+### Changed (5.9 — spec from backend `cc02a20`: milestones are project-scoped)
+- **0.x: `milestones` is replaced, not deprecated** (pre-release). A milestone now belongs to a PROJECT (Project →
+  Milestone → Task, like goals): `milestones.list(project_id)`, `create(project_id, {title, target_date, …})`,
+  `update` / `replace(project_id, milestone_id, …)` (the milestone's owner may send `status` alone), `delete`,
+  `reorder(project_id, {milestone_ids})`, `move(project_id, milestone_id, {project_id})` (with its tasks,
+  all-or-nothing), `file_tasks(project_id, milestone_id, {task_ids})`, `unfile_task(…)`. The team routes are gone
+  (`list(team_id)` / `create(team_id, …)` no longer exist).
+- `milestones.list_org(org_id=…)` returns `OrgMilestonesOut` — grouped by project, the shape of `goals.list_org`, each
+  milestone with `project_name` and each group with `milestones_tasks_total` / `_completed` (not a `Page`); narrow it
+  with `filter={"project": …, "status": "open" | "closed"}`, sort with `sort_by` (`project_name` orders the groups).
+- `tasks.set_milestone` takes a milestone of the task's own PROJECT (422 otherwise); moving a task to another project
+  clears it. `milestones.create` sends an `Idempotency-Key` like every create.
+- Webhooks: `milestone.*` payloads carry `project_id` (they carried `team_id`); + `milestone.reordered` / `milestone.moved`.
+- 164 operations (was 159).
+
 ### Removed (5.7 — spec from backend `ef1e262`: the Roadmap removed before release)
 - **0.x: the `roadmap` resource is gone before any release** — the Roadmap was not shipped (it overlapped with
   milestones). `tm.roadmap.org / project / team / task_stops`, the `Roadmap*` / `TaskRoadmapStop*` models,

@@ -5476,8 +5476,8 @@
         "tags": [
           "tasks"
         ],
-        "summary": "Attach a task to a team milestone (or none)",
-        "description": "File the task under a team milestone; `milestone_id: null` takes it out.\n\n- **Who:** anyone who may edit the task \u2014 no right over the milestone itself is needed.\n- **Which milestones:** one of a team the task is reachable from (a project of that team, or filed under the team with no project).\n- **Errors:** 404 for an unknown milestone, 422 when it is unreachable.\n- Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.",
+        "summary": "Attach a task to a milestone of its project (or none)",
+        "description": "File the task under a milestone; `milestone_id: null` takes it out.\n\n- **Who:** anyone who may edit the task \u2014 no right over the milestone itself is needed.\n- **Which milestones:** a live milestone of the task's own project. A task without a project cannot be filed.\n- **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.\n- Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's goal and sprint; moving the task to another project clears it.",
         "operationId": "tasks.set_milestone",
         "parameters": [
           {
@@ -33313,1353 +33313,6 @@
         ]
       }
     },
-    "/v1/teams/{team_id}/milestones": {
-      "get": {
-        "tags": [
-          "milestones"
-        ],
-        "summary": "List a team's milestones",
-        "description": "Every live milestone of the team in ONE response: open first by target date, then\nclosed by `closed_at`, latest first, each with `task_count` / `completed_count`. Not\npaginated \u2014 a team has tens, not thousands.",
-        "operationId": "milestones.list",
-        "parameters": [
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "Page size; default 1000, capped at 1000.",
-              "default": 1000,
-              "title": "Limit"
-            },
-            "description": "Page size; default 1000, capped at 1000."
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "The previous page's `next_cursor`, echoed back verbatim",
-              "title": "Cursor"
-            },
-            "description": "The previous page's `next_cursor`, echoed back verbatim"
-          },
-          {
-            "name": "sort_by",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "One of: target_date, title, closed_at, created_at. Default: the list's natural order.",
-              "title": "Sort By"
-            },
-            "description": "One of: target_date, title, closed_at, created_at. Default: the list's natural order."
-          },
-          {
-            "name": "sort_order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "description": "`asc` or `desc`",
-              "default": "asc",
-              "title": "Sort Order"
-            },
-            "description": "`asc` or `desc`"
-          },
-          {
-            "name": "If-None-Match",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MilestoneList"
-                },
-                "example": {
-                  "data": [
-                    {
-                      "milestone_id": "string",
-                      "org_id": "string",
-                      "team_id": "string",
-                      "title": "string",
-                      "target_date": "2026-09-25",
-                      "description": "string",
-                      "owner_user_id": "string",
-                      "status": "open",
-                      "closed_at": "2026-09-25T12:00:00Z",
-                      "closed_by": "string",
-                      "created_by": "string",
-                      "updated_by": "string",
-                      "created_at": "2026-09-25T12:00:00Z",
-                      "updated_at": "2026-09-25T12:00:00Z",
-                      "is_active": true,
-                      "task_count": 0,
-                      "completed_count": 0
-                    }
-                  ],
-                  "next_cursor": "string",
-                  "total": 0
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "304": {
-            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-kind": "list",
-        "x-scopes": [
-          "teams:read"
-        ]
-      },
-      "post": {
-        "tags": [
-          "milestones"
-        ],
-        "summary": "Create a milestone",
-        "description": "Create an open milestone. `edit` on the team. 409 on a duplicate live title (open or\nclosed), 422 when the owner is not an active member of this team.",
-        "operationId": "milestones.create",
-        "parameters": [
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MilestoneCreate"
-              },
-              "example": {
-                "title": "string",
-                "target_date": "2026-09-25",
-                "description": "string",
-                "owner_user_id": "string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MilestoneOut"
-                },
-                "example": {
-                  "milestone_id": "string",
-                  "org_id": "string",
-                  "team_id": "string",
-                  "title": "string",
-                  "target_date": "2026-09-25",
-                  "description": "string",
-                  "owner_user_id": "string",
-                  "status": "open",
-                  "closed_at": "2026-09-25T12:00:00Z",
-                  "closed_by": "string",
-                  "created_by": "string",
-                  "updated_by": "string",
-                  "created_at": "2026-09-25T12:00:00Z",
-                  "updated_at": "2026-09-25T12:00:00Z",
-                  "is_active": true,
-                  "task_count": 0,
-                  "completed_count": 0
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "teams:write"
-        ]
-      }
-    },
-    "/v1/teams/{team_id}/milestones/{milestone_id}": {
-      "put": {
-        "tags": [
-          "milestones"
-        ],
-        "summary": "Update / close a milestone",
-        "description": "A true partial. `{status: 'closed'}` closes (writes `closed_at` / `closed_by`),\n`{status: 'open'}` re-opens (clears them). The milestone's owner may send `status` alone.",
-        "operationId": "milestones.update",
-        "parameters": [
-          {
-            "name": "milestone_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Milestone Id"
-            }
-          },
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MilestoneUpdate"
-              },
-              "example": {
-                "title": "string",
-                "target_date": "2026-09-25",
-                "description": "string",
-                "owner_user_id": "string",
-                "status": "string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MilestoneOut"
-                },
-                "example": {
-                  "milestone_id": "string",
-                  "org_id": "string",
-                  "team_id": "string",
-                  "title": "string",
-                  "target_date": "2026-09-25",
-                  "description": "string",
-                  "owner_user_id": "string",
-                  "status": "open",
-                  "closed_at": "2026-09-25T12:00:00Z",
-                  "closed_by": "string",
-                  "created_by": "string",
-                  "updated_by": "string",
-                  "created_at": "2026-09-25T12:00:00Z",
-                  "updated_at": "2026-09-25T12:00:00Z",
-                  "is_active": true,
-                  "task_count": 0,
-                  "completed_count": 0
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "teams:write"
-        ]
-      },
-      "delete": {
-        "tags": [
-          "milestones"
-        ],
-        "summary": "Delete a milestone",
-        "description": "SOFT delete; GET stops returning it, and the tasks it held are UNFILED (`milestone_id`\n\u2192 null). No task is deleted; the response says how many were unfiled.",
-        "operationId": "milestones.delete",
-        "parameters": [
-          {
-            "name": "milestone_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Milestone Id"
-            }
-          },
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          },
-          {
-            "name": "reason",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Reason"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MilestoneDeleted"
-                },
-                "example": {
-                  "ok": false,
-                  "milestone_id": "string",
-                  "unfiled_tasks": 0
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-scopes": [
-          "teams:write"
-        ]
-      }
-    },
-    "/v1/milestones": {
-      "get": {
-        "tags": [
-          "milestones"
-        ],
-        "summary": "Every milestone you can read in an organization, across its teams",
-        "description": "Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and its task roll-up, paginated as `{data, next_cursor}`.\n\n- **Who sees what:** a member reads every team's milestones; a guest only those of the teams they are on. 403 when you are not a member of the organization.\n- **Order:** by team name, then each team's open milestones by target date, then its closed ones, latest first.\n- **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).\n- Creating, changing and closing a milestone stay on the team's own milestone operations.",
-        "operationId": "milestones.list_org",
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Organization scope; the caller must be a member (a guest sees only the milestones of teams it is on).",
-              "title": "Org Id"
-            },
-            "description": "Organization scope; the caller must be a member (a guest sees only the milestones of teams it is on)."
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "Page size; default 1000, capped at 1000. Filters: `filter[team]`, `filter[status]` (comma-separated values are OR-ed).",
-              "default": 1000,
-              "title": "Limit"
-            },
-            "description": "Page size; default 1000, capped at 1000. Filters: `filter[team]`, `filter[status]` (comma-separated values are OR-ed)."
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "The previous page's `next_cursor`, echoed back verbatim",
-              "title": "Cursor"
-            },
-            "description": "The previous page's `next_cursor`, echoed back verbatim"
-          },
-          {
-            "name": "sort_by",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "One of: target_date, title, closed_at, created_at, team_name. Default: the list's natural order.",
-              "title": "Sort By"
-            },
-            "description": "One of: target_date, title, closed_at, created_at, team_name. Default: the list's natural order."
-          },
-          {
-            "name": "sort_order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "description": "`asc` or `desc`",
-              "default": "asc",
-              "title": "Sort Order"
-            },
-            "description": "`asc` or `desc`"
-          },
-          {
-            "name": "If-None-Match",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MilestoneOrgList"
-                },
-                "example": {
-                  "data": [
-                    {
-                      "milestone_id": "string",
-                      "org_id": "string",
-                      "team_id": "string",
-                      "title": "string",
-                      "target_date": "2026-09-25",
-                      "description": "string",
-                      "owner_user_id": "string",
-                      "status": "open",
-                      "closed_at": "2026-09-25T12:00:00Z",
-                      "closed_by": "string",
-                      "created_by": "string",
-                      "updated_by": "string",
-                      "created_at": "2026-09-25T12:00:00Z",
-                      "updated_at": "2026-09-25T12:00:00Z",
-                      "is_active": true,
-                      "task_count": 0,
-                      "completed_count": 0,
-                      "team_name": "string"
-                    }
-                  ],
-                  "next_cursor": "string",
-                  "total": 0
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
-                  "status": 422,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Bad request",
-                  "status": 400,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Missing or invalid bearer token",
-                  "status": 401,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated, but not allowed",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Authenticated, but not allowed",
-                  "status": 403,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Not found",
-                  "status": 404,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
-                  "status": 409,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "`If-Match` does not match the current `ETag`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "`If-Match` does not match the current `ETag`",
-                  "status": 412,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
-                  "status": 429,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error \u2014 quote `request_id`",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                },
-                "example": {
-                  "type": "about:blank",
-                  "title": "Unexpected server error",
-                  "status": 500,
-                  "detail": "\u2026",
-                  "instance": "/v1/\u2026",
-                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
-                }
-              }
-            }
-          },
-          "304": {
-            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
-          }
-        },
-        "x-decision": "public",
-        "x-public": true,
-        "security": [
-          {
-            "bearerAuth": []
-          },
-          {
-            "TasksMateToken": []
-          }
-        ],
-        "x-kind": "list",
-        "x-scopes": [
-          "teams:read"
-        ]
-      }
-    },
     "/v1/goals": {
       "get": {
         "tags": [
@@ -37229,6 +35882,2615 @@
                 "example": {
                   "ok": false,
                   "goal_id": "string",
+                  "task_id": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
+    "/v1/milestones": {
+      "get": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Every milestone you can read in an organization, grouped by project",
+        "description": "Every live milestone in the projects you can read, grouped by project \u2014 the shape of `GET /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.\n\n- **Who sees what:** the projects you can read (a guest: only the projects they are a member of). 403 when you are not a member of the organization.\n- **Order:** the organization's project order, then each project's milestones by position.\n- **Filters:** `filter[project]` (project ids) and `filter[status]` (`open` / `closed`); the sums count what is returned.\n- **Sort:** `sort_by=project_name` orders the projects; any other key orders each project's milestones.",
+        "operationId": "milestones.list_org",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Organization scope; the caller must be a member (a guest sees only its projects' milestones).",
+              "title": "Org Id"
+            },
+            "description": "Organization scope; the caller must be a member (a guest sees only its projects' milestones)."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: position, target_date, title, closed_at, created_at, project_name. `project_name` orders the projects; any other key orders each project's milestones. Default: the org's project order, then each project's milestone order.",
+              "title": "Sort By"
+            },
+            "description": "One of: position, target_date, title, closed_at, created_at, project_name. `project_name` orders the projects; any other key orders each project's milestones. Default: the org's project order, then each project's milestone order."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "filter[project]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Project ids, comma-separated or repeated.",
+              "title": "Filter[Project]"
+            },
+            "description": "Project ids, comma-separated or repeated."
+          },
+          {
+            "name": "filter[status]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`open` or `closed`.",
+              "title": "Filter[Status]"
+            },
+            "description": "`open` or `closed`."
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMilestonesOut"
+                },
+                "example": {
+                  "org_id": "string",
+                  "projects": [
+                    {
+                      "project_id": "string",
+                      "project_name": "",
+                      "data": [
+                        {
+                          "milestone_id": "string",
+                          "org_id": "string",
+                          "project_id": "string",
+                          "title": "string",
+                          "target_date": "2026-09-25",
+                          "description": "string",
+                          "owner_user_id": "string",
+                          "position": 0,
+                          "status": "open",
+                          "closed_at": "2026-09-25T12:00:00Z",
+                          "closed_by": "string",
+                          "created_by": "string",
+                          "updated_by": "string",
+                          "created_at": "2026-09-25T12:00:00Z",
+                          "updated_at": "2026-09-25T12:00:00Z",
+                          "tasks_total": 0,
+                          "tasks_completed": 0,
+                          "tasks": [
+                            {}
+                          ],
+                          "project_name": ""
+                        }
+                      ],
+                      "next_cursor": "string",
+                      "milestones_tasks_total": 0,
+                      "milestones_tasks_completed": 0
+                    }
+                  ],
+                  "total": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:read"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/milestones": {
+      "get": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "List a project's milestones",
+        "description": "The project's milestones by position, paginated as `{data, next_cursor}`; the project-level sums are returned beside `data`.",
+        "operationId": "milestones.list",
+        "parameters": [
+          {
+            "name": "include_tasks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Embed each milestone's task rows (the caller's readable ones).",
+              "default": false,
+              "title": "Include Tasks"
+            },
+            "description": "Embed each milestone's task rows (the caller's readable ones)."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 1000, capped at 1000.",
+              "default": 1000,
+              "title": "Limit"
+            },
+            "description": "Page size; default 1000, capped at 1000."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: position, title, target_date, closed_at, created_at. Default: the list's natural order.",
+              "title": "Sort By"
+            },
+            "description": "One of: position, title, target_date, closed_at, created_at. Default: the list's natural order."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMilestonesOut"
+                },
+                "example": {
+                  "project_id": "string",
+                  "data": [
+                    {
+                      "milestone_id": "string",
+                      "org_id": "string",
+                      "project_id": "string",
+                      "title": "string",
+                      "target_date": "2026-09-25",
+                      "description": "string",
+                      "owner_user_id": "string",
+                      "position": 0,
+                      "status": "open",
+                      "closed_at": "2026-09-25T12:00:00Z",
+                      "closed_by": "string",
+                      "created_by": "string",
+                      "updated_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z",
+                      "updated_at": "2026-09-25T12:00:00Z",
+                      "tasks_total": 0,
+                      "tasks_completed": 0,
+                      "tasks": [
+                        {}
+                      ]
+                    }
+                  ],
+                  "next_cursor": "string",
+                  "milestones_tasks_total": 0,
+                  "milestones_tasks_completed": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified \u2014 `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-kind": "list",
+        "x-scopes": [
+          "projects:read"
+        ]
+      },
+      "post": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Create a milestone in a project",
+        "description": "Create an open milestone. 409 on a duplicate live title (open or closed), 422 when the owner cannot read the project.",
+        "operationId": "milestones.create",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneCreate"
+              },
+              "example": {
+                "title": "string",
+                "target_date": "2026-09-25",
+                "description": "string",
+                "owner_user_id": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneOut"
+                },
+                "example": {
+                  "milestone_id": "string",
+                  "org_id": "string",
+                  "project_id": "string",
+                  "title": "string",
+                  "target_date": "2026-09-25",
+                  "description": "string",
+                  "owner_user_id": "string",
+                  "position": 0,
+                  "status": "open",
+                  "closed_at": "2026-09-25T12:00:00Z",
+                  "closed_by": "string",
+                  "created_by": "string",
+                  "updated_by": "string",
+                  "created_at": "2026-09-25T12:00:00Z",
+                  "updated_at": "2026-09-25T12:00:00Z",
+                  "tasks_total": 0,
+                  "tasks_completed": 0,
+                  "tasks": [
+                    {}
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "description": "Replay the first response for 24 h when the same request is retried with this key."
+          }
+        ],
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-kind": "create",
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/milestones/reorder": {
+      "post": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Reorder a project's milestones",
+        "operationId": "milestones.reorder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneOrder"
+              },
+              "example": {
+                "milestone_ids": [
+                  "string"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestonesReordered"
+                },
+                "example": {
+                  "ok": false,
+                  "milestone_ids": [
+                    "string"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ],
+        "description": "Reorder a project's milestones."
+      }
+    },
+    "/v1/projects/{project_id}/milestones/{milestone_id}": {
+      "put": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Update / close a milestone (PUT; partial)",
+        "description": "**Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for older clients.\n\nA partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
+        "operationId": "milestones.replace",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneUpdate"
+              },
+              "example": {
+                "title": "string",
+                "target_date": "2026-09-25",
+                "description": "string",
+                "owner_user_id": "string",
+                "status": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneOut"
+                },
+                "example": {
+                  "milestone_id": "string",
+                  "org_id": "string",
+                  "project_id": "string",
+                  "title": "string",
+                  "target_date": "2026-09-25",
+                  "description": "string",
+                  "owner_user_id": "string",
+                  "position": 0,
+                  "status": "open",
+                  "closed_at": "2026-09-25T12:00:00Z",
+                  "closed_by": "string",
+                  "created_by": "string",
+                  "updated_by": "string",
+                  "created_at": "2026-09-25T12:00:00Z",
+                  "updated_at": "2026-09-25T12:00:00Z",
+                  "tasks_total": 0,
+                  "tasks_completed": 0,
+                  "tasks": [
+                    {}
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ],
+        "deprecated": true
+      },
+      "patch": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Update / close a milestone (JSON merge-patch)",
+        "description": "A partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
+        "operationId": "milestones.update",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneUpdate"
+              },
+              "example": {
+                "title": "string",
+                "target_date": "2026-09-25",
+                "description": "string",
+                "owner_user_id": "string",
+                "status": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneOut"
+                },
+                "example": {
+                  "milestone_id": "string",
+                  "org_id": "string",
+                  "project_id": "string",
+                  "title": "string",
+                  "target_date": "2026-09-25",
+                  "description": "string",
+                  "owner_user_id": "string",
+                  "position": 0,
+                  "status": "open",
+                  "closed_at": "2026-09-25T12:00:00Z",
+                  "closed_by": "string",
+                  "created_by": "string",
+                  "updated_by": "string",
+                  "created_at": "2026-09-25T12:00:00Z",
+                  "updated_at": "2026-09-25T12:00:00Z",
+                  "tasks_total": 0,
+                  "tasks_completed": 0,
+                  "tasks": [
+                    {}
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Delete a milestone (its tasks are unfiled)",
+        "description": "SOFT delete; its tasks are unfiled (they stay in the project) and the response says how many.",
+        "operationId": "milestones.delete",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Reason"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneDeleted"
+                },
+                "example": {
+                  "ok": false,
+                  "milestone_id": "string",
+                  "unfiled_tasks": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/milestones/{milestone_id}/move": {
+      "post": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Move a milestone and its tasks to another project",
+        "description": "The milestone AND its tasks move to `project_id`, all-or-nothing (403 naming the first task that may not move).",
+        "operationId": "milestones.move",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneMove"
+              },
+              "example": {
+                "project_id": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneMoved"
+                },
+                "example": {
+                  "milestone_id": "string",
+                  "org_id": "string",
+                  "project_id": "string",
+                  "title": "string",
+                  "target_date": "2026-09-25",
+                  "description": "string",
+                  "owner_user_id": "string",
+                  "position": 0,
+                  "status": "open",
+                  "closed_at": "2026-09-25T12:00:00Z",
+                  "closed_by": "string",
+                  "created_by": "string",
+                  "updated_by": "string",
+                  "created_at": "2026-09-25T12:00:00Z",
+                  "updated_at": "2026-09-25T12:00:00Z",
+                  "tasks_total": 0,
+                  "tasks_completed": 0,
+                  "tasks": [
+                    {}
+                  ],
+                  "moved_tasks": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/milestones/{milestone_id}/tasks": {
+      "post": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "File tasks under a milestone",
+        "description": "File existing tasks of THIS project under the milestone \u2014 each needs the task's own `edit`; all-or-nothing.",
+        "operationId": "milestones.file_tasks",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneTasksFile"
+              },
+              "example": {
+                "task_ids": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneTasksFiled"
+                },
+                "example": {
+                  "ok": false,
+                  "milestone_id": "string",
+                  "filed": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2014 a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token over its per-minute limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error \u2014 quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TasksMateToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/milestones/{milestone_id}/tasks/{task_id}": {
+      "delete": {
+        "tags": [
+          "milestones"
+        ],
+        "summary": "Take a task out of a milestone",
+        "description": "Take the task out of the milestone (`milestone_id` \u2192 null); it keeps its project and is never deleted.",
+        "operationId": "milestones.unfile_task",
+        "parameters": [
+          {
+            "name": "milestone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Milestone Id"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "project_id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneTaskUnfiled"
+                },
+                "example": {
+                  "ok": false,
+                  "milestone_id": "string",
                   "task_id": "string"
                 }
               }
@@ -45767,13 +47029,13 @@
             "maxLength": 200,
             "minLength": 1,
             "title": "Title",
-            "description": "Unique among the team's live milestones, open or closed (case-insensitive) \u2014 409 otherwise"
+            "description": "Unique among the project's live milestones, open or closed (case-insensitive) \u2014 409 otherwise"
           },
           "target_date": {
             "type": "string",
             "format": "date",
             "title": "Target Date",
-            "description": "The date the team commits to. Passing it changes nothing; the view shows it as overdue."
+            "description": "The date the project commits to. Passing it changes nothing; the view shows it as overdue."
           },
           "description": {
             "anyOf": [
@@ -45797,7 +47059,7 @@
               }
             ],
             "title": "Owner User Id",
-            "description": "The one person accountable \u2014 an active member of THIS team (422 otherwise). They may close / re-open it."
+            "description": "The one person accountable \u2014 someone who can read THIS project (422 otherwise). They may close / re-open it."
           }
         },
         "type": "object",
@@ -45821,7 +47083,7 @@
           "unfiled_tasks": {
             "type": "integer",
             "title": "Unfiled Tasks",
-            "description": "Tasks the milestone held; their `milestone_id` is now null"
+            "description": "Tasks the milestone held; they stay in the project with `milestone_id` null"
           }
         },
         "type": "object",
@@ -45833,49 +47095,44 @@
         "title": "MilestoneDeleted",
         "description": "Returned by `milestones.delete`."
       },
-      "MilestoneList": {
+      "MilestoneMove": {
         "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/MilestoneOut"
-            },
-            "type": "array",
-            "title": "Data"
-          },
-          "next_cursor": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Cursor"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
           }
         },
         "type": "object",
         "required": [
-          "data",
-          "total"
+          "project_id"
         ],
-        "title": "MilestoneList",
-        "description": "Every live milestone of the team in ONE response \u2014 open first by target date, then\nclosed by when they were closed (latest first). Not paginated: a team's milestones are\ntens, not thousands."
+        "title": "MilestoneMove",
+        "description": "`POST \u2026/milestones/{milestone_id}/move` \u2014 the milestone AND its tasks go to `project_id` (same org), all-or-nothing."
       },
-      "MilestoneOrgList": {
+      "MilestoneMoved": {
         "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/MilestoneOrgOut"
-            },
-            "type": "array",
-            "title": "Data"
+          "milestone_id": {
+            "type": "string",
+            "title": "Milestone Id"
           },
-          "next_cursor": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Target Date"
+          },
+          "description": {
             "anyOf": [
               {
                 "type": "string"
@@ -45884,20 +47141,161 @@
                 "type": "null"
               }
             ],
-            "title": "Next Cursor"
+            "title": "Description"
           },
-          "total": {
+          "owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner User Id"
+          },
+          "position": {
             "type": "integer",
-            "title": "Total"
+            "title": "Position",
+            "default": 0
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "open"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "closed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed By"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "tasks_total": {
+            "type": "integer",
+            "title": "Tasks Total",
+            "description": "Tasks under this milestone the caller can read (subtasks excluded).",
+            "default": 0
+          },
+          "tasks_completed": {
+            "type": "integer",
+            "title": "Tasks Completed",
+            "description": "How many of them are `completed`.",
+            "default": 0
+          },
+          "tasks": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasks",
+            "description": "`?include_tasks=true` only: the milestone's task rows (task_card_view shape)."
+          },
+          "moved_tasks": {
+            "type": "integer",
+            "title": "Moved Tasks",
+            "description": "Tasks that moved with the milestone"
           }
         },
         "type": "object",
         "required": [
-          "data",
-          "total"
+          "milestone_id",
+          "org_id",
+          "project_id",
+          "title",
+          "target_date",
+          "moved_tasks"
         ],
-        "title": "MilestoneOrgList",
-        "description": "A page of `GET /v1/milestones`, paginated as `{data, next_cursor}`; `total` counts every matching milestone."
+        "title": "MilestoneMoved",
+        "description": "The milestone as it now reads in its new project, plus how many of its tasks moved with it."
+      },
+      "MilestoneOrder": {
+        "properties": {
+          "milestone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Milestone Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "milestone_ids"
+        ],
+        "title": "MilestoneOrder",
+        "description": "`POST \u2026/milestones/reorder` \u2014 the WHOLE order: every live milestone of the project exactly once."
       },
       "MilestoneOrgOut": {
         "properties": {
@@ -45909,9 +47307,9 @@
             "type": "string",
             "title": "Org Id"
           },
-          "team_id": {
+          "project_id": {
             "type": "string",
-            "title": "Team Id"
+            "title": "Project Id"
           },
           "title": {
             "type": "string",
@@ -45943,6 +47341,11 @@
               }
             ],
             "title": "Owner User Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "default": 0
           },
           "status": {
             "type": "string",
@@ -46018,40 +47421,51 @@
             ],
             "title": "Updated At"
           },
-          "is_active": {
-            "type": "boolean",
-            "title": "Is Active",
-            "default": true
-          },
-          "task_count": {
+          "tasks_total": {
             "type": "integer",
-            "title": "Task Count",
-            "description": "Tasks filed under this milestone (every status, subtasks excluded).",
+            "title": "Tasks Total",
+            "description": "Tasks under this milestone the caller can read (subtasks excluded).",
             "default": 0
           },
-          "completed_count": {
+          "tasks_completed": {
             "type": "integer",
-            "title": "Completed Count",
-            "description": "How many of them are `completed` \u2014 the roll-up's done against total.",
+            "title": "Tasks Completed",
+            "description": "How many of them are `completed`.",
             "default": 0
           },
-          "team_name": {
+          "tasks": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasks",
+            "description": "`?include_tasks=true` only: the milestone's task rows (task_card_view shape)."
+          },
+          "project_name": {
             "type": "string",
-            "title": "Team Name",
-            "description": "The name of the milestone's team."
+            "title": "Project Name",
+            "description": "The name of the milestone's project.",
+            "default": ""
           }
         },
         "type": "object",
         "required": [
           "milestone_id",
           "org_id",
-          "team_id",
+          "project_id",
           "title",
-          "target_date",
-          "team_name"
+          "target_date"
         ],
         "title": "MilestoneOrgOut",
-        "description": "A team milestone as the organization-wide list returns it: the milestone plus its team's name."
+        "description": "A milestone as the organization-wide read returns it: the milestone plus its project's name."
       },
       "MilestoneOut": {
         "properties": {
@@ -46063,9 +47477,9 @@
             "type": "string",
             "title": "Org Id"
           },
-          "team_id": {
+          "project_id": {
             "type": "string",
-            "title": "Team Id"
+            "title": "Project Id"
           },
           "title": {
             "type": "string",
@@ -46097,6 +47511,11 @@
               }
             ],
             "title": "Owner User Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "default": 0
           },
           "status": {
             "type": "string",
@@ -46172,34 +47591,113 @@
             ],
             "title": "Updated At"
           },
-          "is_active": {
-            "type": "boolean",
-            "title": "Is Active",
-            "default": true
-          },
-          "task_count": {
+          "tasks_total": {
             "type": "integer",
-            "title": "Task Count",
-            "description": "Tasks filed under this milestone (every status, subtasks excluded).",
+            "title": "Tasks Total",
+            "description": "Tasks under this milestone the caller can read (subtasks excluded).",
             "default": 0
           },
-          "completed_count": {
+          "tasks_completed": {
             "type": "integer",
-            "title": "Completed Count",
-            "description": "How many of them are `completed` \u2014 the roll-up's done against total.",
+            "title": "Tasks Completed",
+            "description": "How many of them are `completed`.",
             "default": 0
+          },
+          "tasks": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasks",
+            "description": "`?include_tasks=true` only: the milestone's task rows (task_card_view shape)."
           }
         },
         "type": "object",
         "required": [
           "milestone_id",
           "org_id",
-          "team_id",
+          "project_id",
           "title",
           "target_date"
         ],
         "title": "MilestoneOut",
-        "description": "Returned by `milestones.create` and `milestones.update`."
+        "description": "Returned by `milestones.create`, `milestones.replace` and `milestones.update`."
+      },
+      "MilestoneTaskUnfiled": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "milestone_id": {
+            "type": "string",
+            "title": "Milestone Id"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "milestone_id",
+          "task_id"
+        ],
+        "title": "MilestoneTaskUnfiled",
+        "description": "Returned by `milestones.unfile_task`."
+      },
+      "MilestoneTasksFile": {
+        "properties": {
+          "task_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "minItems": 1,
+            "title": "Task Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_ids"
+        ],
+        "title": "MilestoneTasksFile",
+        "description": "`POST \u2026/milestones/{milestone_id}/tasks` \u2014 file existing tasks of THIS project under the milestone (all-or-nothing)."
+      },
+      "MilestoneTasksFiled": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "milestone_id": {
+            "type": "string",
+            "title": "Milestone Id"
+          },
+          "filed": {
+            "type": "integer",
+            "title": "Filed",
+            "description": "Tasks that changed (a task already under the milestone is not counted)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "milestone_id",
+          "filed"
+        ],
+        "title": "MilestoneTasksFiled",
+        "description": "Returned by `milestones.file_tasks`."
       },
       "MilestoneUpdate": {
         "properties": {
@@ -46266,7 +47764,30 @@
         },
         "type": "object",
         "title": "MilestoneUpdate",
-        "description": "A partial update: fields you leave out are unchanged.\n\n- `description` / `owner_user_id` sent as null clear them.\n- `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.\n- The milestone's owner without team `edit` rights may send `status` only \u2014 anything else is a 403."
+        "description": "A partial update: fields you leave out are unchanged.\n\n- `description` / `owner_user_id` sent as null clear them.\n- `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.\n- `target_date` cannot be cleared (422).\n- The milestone's owner without edit rights on the project may send `status` only \u2014 anything else is a 403."
+      },
+      "MilestonesReordered": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "milestone_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Milestone Ids",
+            "description": "The project's milestones in their new order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "milestone_ids"
+        ],
+        "title": "MilestonesReordered",
+        "description": "Returned by `milestones.reorder`."
       },
       "OAuthClientCreate": {
         "properties": {
@@ -47154,6 +48675,34 @@
         ],
         "title": "OrgJoinModeEnum",
         "description": "What a sign-in from one of the organization's verified domains gets: `instant` makes the person a member immediately; `approval` files a join request for an admin to decide."
+      },
+      "OrgMilestonesOut": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMilestonesGroup"
+            },
+            "type": "array",
+            "title": "Projects"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Number of milestones across all groups.",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id",
+          "projects"
+        ],
+        "title": "OrgMilestonesOut",
+        "description": "`GET /v1/milestones?org_id=`: every live milestone in the projects you can read, grouped by project, each group with its milestones' task totals. A readable project with no milestones is absent."
       },
       "OrganizationInDB": {
         "properties": {
@@ -50556,6 +52105,99 @@
         "title": "ProjectMemberUpdate",
         "description": "The body of a project-member update. Every field is optional and omitted fields are left unchanged; `user_id` and `project_id` come from the path and need not be repeated."
       },
+      "ProjectMilestonesGroup": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "project_name": {
+            "type": "string",
+            "title": "Project Name",
+            "description": "The project's name.",
+            "default": ""
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MilestoneOrgOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "milestones_tasks_total": {
+            "type": "integer",
+            "title": "Milestones Tasks Total",
+            "default": 0
+          },
+          "milestones_tasks_completed": {
+            "type": "integer",
+            "title": "Milestones Tasks Completed",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "data"
+        ],
+        "title": "ProjectMilestonesGroup",
+        "description": "One project's group in `GET /v1/milestones`: its milestones and the sums over them."
+      },
+      "ProjectMilestonesOut": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MilestoneOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "The next page's cursor; null on the last page."
+          },
+          "milestones_tasks_total": {
+            "type": "integer",
+            "title": "Milestones Tasks Total",
+            "default": 0
+          },
+          "milestones_tasks_completed": {
+            "type": "integer",
+            "title": "Milestones Tasks Completed",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "data"
+        ],
+        "title": "ProjectMilestonesOut",
+        "description": "`GET /v1/projects/{project_id}/milestones`: the project's live milestones by position, plus project-level sums that count only the tasks filed under its milestones."
+      },
       "ProjectOrder": {
         "properties": {
           "org_id": {
@@ -53228,7 +54870,7 @@
               }
             ],
             "title": "Milestone Id",
-            "description": "The team milestone this task is filed under. One per task, independent of `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none.",
+            "description": "The milestone this task is filed under. One per task, independent of `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.",
             "example": "MS12345"
           },
           "goal_id": {
@@ -54127,7 +55769,7 @@
               }
             ],
             "title": "Milestone Id",
-            "description": "The team milestone this task is filed under. One per task, independent of `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none.",
+            "description": "The milestone this task is filed under. One per task, independent of `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.",
             "example": "MS12345"
           },
           "goal_id": {
@@ -54592,7 +56234,7 @@
               }
             ],
             "title": "Milestone Id",
-            "description": "The team milestone this task is filed under. One per task, independent of `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none.",
+            "description": "The milestone this task is filed under. One per task, independent of `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.",
             "example": "MS12345"
           },
           "goal_id": {
@@ -54790,13 +56432,13 @@
               }
             ],
             "title": "Milestone Id",
-            "description": "The team milestone to file this task under, or null for none.",
+            "description": "The milestone to file this task under (one of its project's), or null for none.",
             "example": "MS12345"
           }
         },
         "type": "object",
         "title": "TaskMilestoneSet",
-        "description": "The body of `PUT /v1/tasks/{task_id}/milestone`: the team milestone to file the task under, or `null` to take it out."
+        "description": "The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone (of the task's own project) to file the task under, or `null` to take it out."
       },
       "TaskProjectSet": {
         "properties": {
@@ -55303,7 +56945,7 @@
               }
             ],
             "title": "Milestone Id",
-            "description": "The team milestone this task is filed under. One per task, independent of `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none.",
+            "description": "The milestone this task is filed under. One per task, independent of `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.",
             "example": "MS12345"
           },
           "goal_id": {
@@ -55858,7 +57500,7 @@
             "type": "array",
             "minItems": 1,
             "title": "Scopes",
-            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.",
+            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.\n\n`admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.",
             "examples": [
               [
                 "tasks:write",
@@ -57886,7 +59528,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
-        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics and goals. |\n| `projects:write` | Create, update and delete projects, their members, resources and goals (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints, milestones and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and milestones. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals and milestones (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
@@ -57899,10 +59541,10 @@
             "scopes": {
               "tasks:read": "Read tasks, their comments, attachments, history, sections and saved views.",
               "tasks:write": "Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read).",
-              "projects:read": "Read projects, their members, resources, statistics and goals.",
-              "projects:write": "Create, update and delete projects, their members, resources and goals (implies projects:read).",
-              "teams:read": "Read teams, their members, sprints, milestones and availability.",
-              "teams:write": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read).",
+              "projects:read": "Read projects, their members, resources, statistics, goals and milestones.",
+              "projects:write": "Create, update and delete projects, their members, resources, goals and milestones (implies projects:read).",
+              "teams:read": "Read teams, their members, sprints and availability.",
+              "teams:write": "Create, update and delete teams, their members, sprints and availability (implies teams:read).",
               "members:read": "Read the organization's profile, its members (role, designation, active) and the designation catalog.",
               "org:read": "Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read).",
               "org:write": "Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read).",
@@ -60509,7 +62151,7 @@
     "milestone.closed": {
       "post": {
         "summary": "milestone.closed",
-        "description": "A team milestone was closed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "A project milestone was closed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.closed",
         "tags": [
           "webhooks"
@@ -60613,7 +62255,7 @@
     "milestone.created": {
       "post": {
         "summary": "milestone.created",
-        "description": "A team milestone was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "A project milestone was created.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.created",
         "tags": [
           "webhooks"
@@ -60715,7 +62357,7 @@
     "milestone.deleted": {
       "post": {
         "summary": "milestone.deleted",
-        "description": "A team milestone was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "A project milestone was deleted.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.deleted",
         "tags": [
           "webhooks"
@@ -60814,10 +62456,114 @@
         }
       }
     },
+    "milestone.moved": {
+      "post": {
+        "summary": "milestone.moved",
+        "description": "A milestone moved to another project.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.milestone.moved",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-TasksMate-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TasksMate-Webhooks/1",
+            "description": "Identifies TasksMate's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "milestone.moved",
+                "api_version": "2026-09-25",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O0020",
+                "project_id": null,
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "milestone",
+                  "resource_id": "MS12345",
+                  "before": {
+                    "name": "Before"
+                  },
+                  "after": {
+                    "name": "After"
+                  }
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+          }
+        }
+      }
+    },
     "milestone.reopened": {
       "post": {
         "summary": "milestone.reopened",
-        "description": "A team milestone was reopened.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "A project milestone was reopened.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.reopened",
         "tags": [
           "webhooks"
@@ -60918,10 +62664,114 @@
         }
       }
     },
+    "milestone.reordered": {
+      "post": {
+        "summary": "milestone.reordered",
+        "description": "A project's milestone order changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.milestone.reordered",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id \u2014 equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-TasksMate-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TasksMate-Webhooks/1",
+            "description": "Identifies TasksMate's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "milestone.reordered",
+                "api_version": "2026-09-25",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O0020",
+                "project_id": null,
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "milestone",
+                  "resource_id": "MS12345",
+                  "before": {
+                    "name": "Before"
+                  },
+                  "after": {
+                    "name": "After"
+                  }
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received \u2014 any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+          }
+        }
+      }
+    },
     "milestone.updated": {
       "post": {
         "summary": "milestone.updated",
-        "description": "A team milestone changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "A project milestone changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it \u2014 the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.milestone.updated",
         "tags": [
           "webhooks"
@@ -67296,7 +69146,7 @@
     },
     {
       "name": "milestones",
-      "description": "Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."
+      "description": "Milestones: titled dates a project commits to, holding its tasks \u2014 one project's, or every project's you can read at once (`GET /v1/milestones`)."
     },
     {
       "name": "availability",
@@ -67459,19 +69309,19 @@
     },
     {
       "scope": "projects:read",
-      "description": "Read projects, their members, resources, statistics and goals."
+      "description": "Read projects, their members, resources, statistics, goals and milestones."
     },
     {
       "scope": "projects:write",
-      "description": "Create, update and delete projects, their members, resources and goals (implies projects:read)."
+      "description": "Create, update and delete projects, their members, resources, goals and milestones (implies projects:read)."
     },
     {
       "scope": "teams:read",
-      "description": "Read teams, their members, sprints, milestones and availability."
+      "description": "Read teams, their members, sprints and availability."
     },
     {
       "scope": "teams:write",
-      "description": "Create, update and delete teams, their members, sprints, milestones and availability (implies teams:read)."
+      "description": "Create, update and delete teams, their members, sprints and availability (implies teams:read)."
     },
     {
       "scope": "members:read",

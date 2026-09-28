@@ -110,20 +110,21 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
 ) -> Response[Problem | TaskInDB]:
-    """Attach a task to a team milestone (or none)
+    """Attach a task to a milestone of its project (or none)
 
-     File the task under a team milestone; `milestone_id: null` takes it out.
+     File the task under a milestone; `milestone_id: null` takes it out.
 
     - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
-    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
-    under the team with no project).
-    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
-    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
+    - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
+    be filed.
+    - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's goal and
+    sprint; moving the task to another project clears it.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
-            milestone to file the task under, or `null` to take it out.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone
+            (of the task's own project) to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -151,20 +152,21 @@ def sync(
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
 ) -> Problem | TaskInDB | None:
-    """Attach a task to a team milestone (or none)
+    """Attach a task to a milestone of its project (or none)
 
-     File the task under a team milestone; `milestone_id: null` takes it out.
+     File the task under a milestone; `milestone_id: null` takes it out.
 
     - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
-    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
-    under the team with no project).
-    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
-    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
+    - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
+    be filed.
+    - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's goal and
+    sprint; moving the task to another project clears it.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
-            milestone to file the task under, or `null` to take it out.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone
+            (of the task's own project) to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -187,20 +189,21 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
 ) -> Response[Problem | TaskInDB]:
-    """Attach a task to a team milestone (or none)
+    """Attach a task to a milestone of its project (or none)
 
-     File the task under a team milestone; `milestone_id: null` takes it out.
+     File the task under a milestone; `milestone_id: null` takes it out.
 
     - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
-    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
-    under the team with no project).
-    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
-    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
+    - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
+    be filed.
+    - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's goal and
+    sprint; moving the task to another project clears it.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
-            milestone to file the task under, or `null` to take it out.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone
+            (of the task's own project) to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -226,20 +229,21 @@ async def asyncio(
     client: AuthenticatedClient,
     body: TaskMilestoneSet,
 ) -> Problem | TaskInDB | None:
-    """Attach a task to a team milestone (or none)
+    """Attach a task to a milestone of its project (or none)
 
-     File the task under a team milestone; `milestone_id: null` takes it out.
+     File the task under a milestone; `milestone_id: null` takes it out.
 
     - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
-    - **Which milestones:** one of a team the task is reachable from (a project of that team, or filed
-    under the team with no project).
-    - **Errors:** 404 for an unknown milestone, 422 when it is unreachable.
-    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's sprint.
+    - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
+    be filed.
+    - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
+    - Taking a task out clears `milestone_id` and deletes nothing. Independent of the task's goal and
+    sprint; moving the task to another project clears it.
 
     Args:
         task_id (str):
-        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the team
-            milestone to file the task under, or `null` to take it out.
+        body (TaskMilestoneSet): The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone
+            (of the task's own project) to file the task under, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

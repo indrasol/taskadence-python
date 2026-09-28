@@ -25,7 +25,7 @@ def _get_kwargs(
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
-        "method": "patch",
+        "method": "put",
         "url": "/v1/projects/{project_id}/milestones/{milestone_id}".format(
             project_id=quote(str(project_id), safe=""),
             milestone_id=quote(str(milestone_id), safe=""),
@@ -115,9 +115,12 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: MilestoneUpdate,
 ) -> Response[MilestoneOut | Problem]:
-    """Update / close a milestone (JSON merge-patch)
+    """Update / close a milestone (PUT; partial)
 
-     A partial update: fields you leave out are unchanged.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
+
+    A partial update: fields you leave out are unchanged.
 
     - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
@@ -166,9 +169,12 @@ def sync(
     client: AuthenticatedClient,
     body: MilestoneUpdate,
 ) -> MilestoneOut | Problem | None:
-    """Update / close a milestone (JSON merge-patch)
+    """Update / close a milestone (PUT; partial)
 
-     A partial update: fields you leave out are unchanged.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
+
+    A partial update: fields you leave out are unchanged.
 
     - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
@@ -212,9 +218,12 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: MilestoneUpdate,
 ) -> Response[MilestoneOut | Problem]:
-    """Update / close a milestone (JSON merge-patch)
+    """Update / close a milestone (PUT; partial)
 
-     A partial update: fields you leave out are unchanged.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
+
+    A partial update: fields you leave out are unchanged.
 
     - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
@@ -261,9 +270,12 @@ async def asyncio(
     client: AuthenticatedClient,
     body: MilestoneUpdate,
 ) -> MilestoneOut | Problem | None:
-    """Update / close a milestone (JSON merge-patch)
+    """Update / close a milestone (PUT; partial)
 
-     A partial update: fields you leave out are unchanged.
+     **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
+    older clients.
+
+    A partial update: fields you leave out are unchanged.
 
     - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).

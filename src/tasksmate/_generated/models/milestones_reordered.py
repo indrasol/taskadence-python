@@ -10,63 +10,58 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
 from typing import cast
 
 
-T = TypeVar("T", bound="TaskMilestoneSet")
+T = TypeVar("T", bound="MilestonesReordered")
 
 
 @_attrs_define
-class TaskMilestoneSet:
-    """The body of `PUT /v1/tasks/{task_id}/milestone`: the milestone (of the task's own project) to file the task under,
-    or `null` to take it out.
+class MilestonesReordered:
+    """Returned by `milestones.reorder`.
 
-        Attributes:
-            milestone_id (None | str | Unset): The milestone to file this task under (one of its project's), or null for
-                none. Example: MS12345.
+    Attributes:
+        ok (bool):
+        milestone_ids (list[str]): The project's milestones in their new order
     """
 
-    milestone_id: None | str | Unset = UNSET
+    ok: bool
+    milestone_ids: list[str]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        milestone_id: None | str | Unset
-        if isinstance(self.milestone_id, Unset):
-            milestone_id = UNSET
-        else:
-            milestone_id = self.milestone_id
+        ok = self.ok
+
+        milestone_ids = self.milestone_ids
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({})
-        if milestone_id is not UNSET:
-            field_dict["milestone_id"] = milestone_id
+        field_dict.update(
+            {
+                "ok": ok,
+                "milestone_ids": milestone_ids,
+            }
+        )
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
+        ok = d.pop("ok")
 
-        def _parse_milestone_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
+        milestone_ids = cast(list[str], d.pop("milestone_ids"))
 
-        milestone_id = _parse_milestone_id(d.pop("milestone_id", UNSET))
-
-        task_milestone_set = cls(
-            milestone_id=milestone_id,
+        milestones_reordered = cls(
+            ok=ok,
+            milestone_ids=milestone_ids,
         )
 
-        task_milestone_set.additional_properties = d
-        return task_milestone_set
+        milestones_reordered.additional_properties = d
+        return milestones_reordered
 
     @property
     def additional_keys(self) -> list[str]:

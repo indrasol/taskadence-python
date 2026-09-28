@@ -350,7 +350,7 @@ class TasksResource:
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.set_sprint"], path=(task_id,), body=body))
 
     def set_milestone(self, task_id: str, body: models.TaskMilestoneSet | Mapping[str, Any]) -> models.TaskInDB:
-        """Attach a task to a team milestone (or none).
+        """Attach a task to a milestone of its project (or none).
 
         `PUT /v1/tasks/{task_id}/milestone` · scope `tasks:write`
         """
@@ -2098,91 +2098,6 @@ class AvailabilityResource:
         )
 
 
-class MilestonesResource:
-    """Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def list(
-        self,
-        team_id: str,
-        *,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.MilestoneOut]:
-        """List a team's milestones.
-
-        `GET /v1/teams/{team_id}/milestones` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.MilestoneOut]",
-            self._client._call(
-                _OPS["milestones.list"],
-                path=(team_id,),
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
-            ),
-        )
-
-    def create(self, team_id: str, body: models.MilestoneCreate | Mapping[str, Any]) -> models.MilestoneOut:
-        """Create a milestone.
-
-        `POST /v1/teams/{team_id}/milestones` · scope `teams:write`
-        """
-        return cast("models.MilestoneOut", self._client._call(_OPS["milestones.create"], path=(team_id,), body=body))
-
-    def update(
-        self, team_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
-    ) -> models.MilestoneOut:
-        """Update / close a milestone.
-
-        `PUT /v1/teams/{team_id}/milestones/{milestone_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.MilestoneOut",
-            self._client._call(_OPS["milestones.update"], path=(team_id, milestone_id), body=body),
-        )
-
-    def delete(self, team_id: str, milestone_id: str, *, reason: str | None = None) -> models.MilestoneDeleted:
-        """Delete a milestone.
-
-        `DELETE /v1/teams/{team_id}/milestones/{milestone_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.MilestoneDeleted",
-            self._client._call(_OPS["milestones.delete"], path=(team_id, milestone_id), query={"reason": reason}),
-        )
-
-    def list_org(
-        self,
-        *,
-        org_id: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.MilestoneOrgOut]:
-        """Every milestone you can read in an organization, across its teams.
-
-        `GET /v1/milestones` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.MilestoneOrgOut]",
-            self._client._call(
-                _OPS["milestones.list_org"],
-                query={
-                    "org_id": org_id,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-
 class GoalsResource:
     """Goals: named containers of a project's tasks."""
 
@@ -2304,6 +2219,180 @@ class GoalsResource:
         """
         return cast(
             "models.GoalTaskUnfiled", self._client._call(_OPS["goals.unfile_task"], path=(project_id, goal_id, task_id))
+        )
+
+
+class MilestonesResource:
+    """Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`)."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: None = None,
+    ) -> models.OrgMilestonesOut: ...
+    @overload
+    def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: str,
+    ) -> models.OrgMilestonesOut | NotModifiedType: ...
+    def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: str | None = None,
+    ) -> models.OrgMilestonesOut | NotModifiedType:
+        """Every milestone you can read in an organization, grouped by project.
+
+        `GET /v1/milestones` · scope `projects:read` · filter keys: project, status · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.OrgMilestonesOut | NotModifiedType",
+            self._client._call(
+                _OPS["milestones.list_org"],
+                query={"org_id": org_id, "sort_by": sort_by, "sort_order": sort_order},
+                filter=filter,
+                if_none_match=if_none_match,
+            ),
+        )
+
+    def list(
+        self,
+        project_id: str,
+        *,
+        include_tasks: bool | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.MilestoneOut]:
+        """List a project's milestones.
+
+        `GET /v1/projects/{project_id}/milestones` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.MilestoneOut]",
+            self._client._call(
+                _OPS["milestones.list"],
+                path=(project_id,),
+                query={
+                    "include_tasks": include_tasks,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    def create(
+        self,
+        project_id: str,
+        body: models.MilestoneCreate | Mapping[str, Any],
+        *,
+        idempotency_key: str | _Auto | None = AUTO,
+    ) -> models.MilestoneOut:
+        """Create a milestone in a project.
+
+        `POST /v1/projects/{project_id}/milestones` · scope `projects:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.MilestoneOut",
+            self._client._call(
+                _OPS["milestones.create"], path=(project_id,), body=body, idempotency_key=idempotency_key
+            ),
+        )
+
+    def reorder(self, project_id: str, body: models.MilestoneOrder | Mapping[str, Any]) -> models.MilestonesReordered:
+        """Reorder a project's milestones.
+
+        `POST /v1/projects/{project_id}/milestones/reorder` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestonesReordered", self._client._call(_OPS["milestones.reorder"], path=(project_id,), body=body)
+        )
+
+    def replace(
+        self, project_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
+    ) -> models.MilestoneOut:
+        """Update / close a milestone (PUT; partial).
+
+        `PUT /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneOut",
+            self._client._call(_OPS["milestones.replace"], path=(project_id, milestone_id), body=body),
+        )
+
+    def update(
+        self, project_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
+    ) -> models.MilestoneOut:
+        """Update / close a milestone (JSON merge-patch).
+
+        `PATCH /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneOut",
+            self._client._call(_OPS["milestones.update"], path=(project_id, milestone_id), body=body),
+        )
+
+    def delete(self, project_id: str, milestone_id: str, *, reason: str | None = None) -> models.MilestoneDeleted:
+        """Delete a milestone (its tasks are unfiled).
+
+        `DELETE /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneDeleted",
+            self._client._call(_OPS["milestones.delete"], path=(project_id, milestone_id), query={"reason": reason}),
+        )
+
+    def move(
+        self, project_id: str, milestone_id: str, body: models.MilestoneMove | Mapping[str, Any]
+    ) -> models.MilestoneMoved:
+        """Move a milestone and its tasks to another project.
+
+        `POST /v1/projects/{project_id}/milestones/{milestone_id}/move` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneMoved",
+            self._client._call(_OPS["milestones.move"], path=(project_id, milestone_id), body=body),
+        )
+
+    def file_tasks(
+        self, project_id: str, milestone_id: str, body: models.MilestoneTasksFile | Mapping[str, Any]
+    ) -> models.MilestoneTasksFiled:
+        """File tasks under a milestone.
+
+        `POST /v1/projects/{project_id}/milestones/{milestone_id}/tasks` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneTasksFiled",
+            self._client._call(_OPS["milestones.file_tasks"], path=(project_id, milestone_id), body=body),
+        )
+
+    def unfile_task(self, project_id: str, milestone_id: str, task_id: str) -> models.MilestoneTaskUnfiled:
+        """Take a task out of a milestone.
+
+        `DELETE /v1/projects/{project_id}/milestones/{milestone_id}/tasks/{task_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneTaskUnfiled",
+            self._client._call(_OPS["milestones.unfile_task"], path=(project_id, milestone_id, task_id)),
         )
 
 
@@ -2987,7 +3076,7 @@ class AsyncTasksResource:
         return cast("models.TaskInDB", await self._client._call(_OPS["tasks.set_sprint"], path=(task_id,), body=body))
 
     async def set_milestone(self, task_id: str, body: models.TaskMilestoneSet | Mapping[str, Any]) -> models.TaskInDB:
-        """Attach a task to a team milestone (or none).
+        """Attach a task to a milestone of its project (or none).
 
         `PUT /v1/tasks/{task_id}/milestone` · scope `tasks:write`
         """
@@ -4790,93 +4879,6 @@ class AsyncAvailabilityResource:
         )
 
 
-class AsyncMilestonesResource:
-    """Team milestones: one team's, or every team's you can read at once (`GET /v1/milestones`)."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def list(
-        self,
-        team_id: str,
-        *,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.MilestoneOut]:
-        """List a team's milestones.
-
-        `GET /v1/teams/{team_id}/milestones` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.MilestoneOut]",
-            await self._client._call(
-                _OPS["milestones.list"],
-                path=(team_id,),
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
-            ),
-        )
-
-    async def create(self, team_id: str, body: models.MilestoneCreate | Mapping[str, Any]) -> models.MilestoneOut:
-        """Create a milestone.
-
-        `POST /v1/teams/{team_id}/milestones` · scope `teams:write`
-        """
-        return cast(
-            "models.MilestoneOut", await self._client._call(_OPS["milestones.create"], path=(team_id,), body=body)
-        )
-
-    async def update(
-        self, team_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
-    ) -> models.MilestoneOut:
-        """Update / close a milestone.
-
-        `PUT /v1/teams/{team_id}/milestones/{milestone_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.MilestoneOut",
-            await self._client._call(_OPS["milestones.update"], path=(team_id, milestone_id), body=body),
-        )
-
-    async def delete(self, team_id: str, milestone_id: str, *, reason: str | None = None) -> models.MilestoneDeleted:
-        """Delete a milestone.
-
-        `DELETE /v1/teams/{team_id}/milestones/{milestone_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.MilestoneDeleted",
-            await self._client._call(_OPS["milestones.delete"], path=(team_id, milestone_id), query={"reason": reason}),
-        )
-
-    async def list_org(
-        self,
-        *,
-        org_id: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.MilestoneOrgOut]:
-        """Every milestone you can read in an organization, across its teams.
-
-        `GET /v1/milestones` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.MilestoneOrgOut]",
-            await self._client._call(
-                _OPS["milestones.list_org"],
-                query={
-                    "org_id": org_id,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-
 class AsyncGoalsResource:
     """Goals: named containers of a project's tasks."""
 
@@ -5014,6 +5016,185 @@ class AsyncGoalsResource:
         return cast(
             "models.GoalTaskUnfiled",
             await self._client._call(_OPS["goals.unfile_task"], path=(project_id, goal_id, task_id)),
+        )
+
+
+class AsyncMilestonesResource:
+    """Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`)."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: None = None,
+    ) -> models.OrgMilestonesOut: ...
+    @overload
+    async def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: str,
+    ) -> models.OrgMilestonesOut | NotModifiedType: ...
+    async def list_org(
+        self,
+        *,
+        org_id: str,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        filter: Mapping[str, Any] | None = None,
+        if_none_match: str | None = None,
+    ) -> models.OrgMilestonesOut | NotModifiedType:
+        """Every milestone you can read in an organization, grouped by project.
+
+        `GET /v1/milestones` · scope `projects:read` · filter keys: project, status · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.OrgMilestonesOut | NotModifiedType",
+            await self._client._call(
+                _OPS["milestones.list_org"],
+                query={"org_id": org_id, "sort_by": sort_by, "sort_order": sort_order},
+                filter=filter,
+                if_none_match=if_none_match,
+            ),
+        )
+
+    async def list(
+        self,
+        project_id: str,
+        *,
+        include_tasks: bool | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.MilestoneOut]:
+        """List a project's milestones.
+
+        `GET /v1/projects/{project_id}/milestones` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.MilestoneOut]",
+            await self._client._call(
+                _OPS["milestones.list"],
+                path=(project_id,),
+                query={
+                    "include_tasks": include_tasks,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    async def create(
+        self,
+        project_id: str,
+        body: models.MilestoneCreate | Mapping[str, Any],
+        *,
+        idempotency_key: str | _Auto | None = AUTO,
+    ) -> models.MilestoneOut:
+        """Create a milestone in a project.
+
+        `POST /v1/projects/{project_id}/milestones` · scope `projects:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.MilestoneOut",
+            await self._client._call(
+                _OPS["milestones.create"], path=(project_id,), body=body, idempotency_key=idempotency_key
+            ),
+        )
+
+    async def reorder(
+        self, project_id: str, body: models.MilestoneOrder | Mapping[str, Any]
+    ) -> models.MilestonesReordered:
+        """Reorder a project's milestones.
+
+        `POST /v1/projects/{project_id}/milestones/reorder` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestonesReordered",
+            await self._client._call(_OPS["milestones.reorder"], path=(project_id,), body=body),
+        )
+
+    async def replace(
+        self, project_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
+    ) -> models.MilestoneOut:
+        """Update / close a milestone (PUT; partial).
+
+        `PUT /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneOut",
+            await self._client._call(_OPS["milestones.replace"], path=(project_id, milestone_id), body=body),
+        )
+
+    async def update(
+        self, project_id: str, milestone_id: str, body: models.MilestoneUpdate | Mapping[str, Any]
+    ) -> models.MilestoneOut:
+        """Update / close a milestone (JSON merge-patch).
+
+        `PATCH /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneOut",
+            await self._client._call(_OPS["milestones.update"], path=(project_id, milestone_id), body=body),
+        )
+
+    async def delete(self, project_id: str, milestone_id: str, *, reason: str | None = None) -> models.MilestoneDeleted:
+        """Delete a milestone (its tasks are unfiled).
+
+        `DELETE /v1/projects/{project_id}/milestones/{milestone_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneDeleted",
+            await self._client._call(
+                _OPS["milestones.delete"], path=(project_id, milestone_id), query={"reason": reason}
+            ),
+        )
+
+    async def move(
+        self, project_id: str, milestone_id: str, body: models.MilestoneMove | Mapping[str, Any]
+    ) -> models.MilestoneMoved:
+        """Move a milestone and its tasks to another project.
+
+        `POST /v1/projects/{project_id}/milestones/{milestone_id}/move` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneMoved",
+            await self._client._call(_OPS["milestones.move"], path=(project_id, milestone_id), body=body),
+        )
+
+    async def file_tasks(
+        self, project_id: str, milestone_id: str, body: models.MilestoneTasksFile | Mapping[str, Any]
+    ) -> models.MilestoneTasksFiled:
+        """File tasks under a milestone.
+
+        `POST /v1/projects/{project_id}/milestones/{milestone_id}/tasks` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneTasksFiled",
+            await self._client._call(_OPS["milestones.file_tasks"], path=(project_id, milestone_id), body=body),
+        )
+
+    async def unfile_task(self, project_id: str, milestone_id: str, task_id: str) -> models.MilestoneTaskUnfiled:
+        """Take a task out of a milestone.
+
+        `DELETE /v1/projects/{project_id}/milestones/{milestone_id}/tasks/{task_id}` · scope `projects:write`
+        """
+        return cast(
+            "models.MilestoneTaskUnfiled",
+            await self._client._call(_OPS["milestones.unfile_task"], path=(project_id, milestone_id, task_id)),
         )
 
 
@@ -5386,8 +5567,8 @@ class SyncResources:
     teams: TeamsResource
     sprints: SprintsResource
     availability: AvailabilityResource
-    milestones: MilestonesResource
     goals: GoalsResource
+    milestones: MilestonesResource
     me: MeResource
     mcp: McpResource
     audit: AuditResource
@@ -5418,8 +5599,8 @@ class SyncResources:
         self.teams = TeamsResource(core)
         self.sprints = SprintsResource(core)
         self.availability = AvailabilityResource(core)
-        self.milestones = MilestonesResource(core)
         self.goals = GoalsResource(core)
+        self.milestones = MilestonesResource(core)
         self.me = MeResource(core)
         self.mcp = McpResource(core)
         self.audit = AuditResource(core)
@@ -5453,8 +5634,8 @@ class AsyncResources:
     teams: AsyncTeamsResource
     sprints: AsyncSprintsResource
     availability: AsyncAvailabilityResource
-    milestones: AsyncMilestonesResource
     goals: AsyncGoalsResource
+    milestones: AsyncMilestonesResource
     me: AsyncMeResource
     mcp: AsyncMcpResource
     audit: AsyncAuditResource
@@ -5485,8 +5666,8 @@ class AsyncResources:
         self.teams = AsyncTeamsResource(core)
         self.sprints = AsyncSprintsResource(core)
         self.availability = AsyncAvailabilityResource(core)
-        self.milestones = AsyncMilestonesResource(core)
         self.goals = AsyncGoalsResource(core)
+        self.milestones = AsyncMilestonesResource(core)
         self.me = AsyncMeResource(core)
         self.mcp = AsyncMcpResource(core)
         self.audit = AsyncAuditResource(core)
@@ -5621,11 +5802,6 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "availability.create": ("availability", "create"),
     "availability.update": ("availability", "update"),
     "availability.delete": ("availability", "delete"),
-    "milestones.list": ("milestones", "list"),
-    "milestones.create": ("milestones", "create"),
-    "milestones.update": ("milestones", "update"),
-    "milestones.delete": ("milestones", "delete"),
-    "milestones.list_org": ("milestones", "list_org"),
     "goals.org": ("goals", "org"),
     "goals.list": ("goals", "list"),
     "goals.create": ("goals", "create"),
@@ -5637,6 +5813,16 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "goals.move": ("goals", "move"),
     "goals.file_tasks": ("goals", "file_tasks"),
     "goals.unfile_task": ("goals", "unfile_task"),
+    "milestones.list_org": ("milestones", "list_org"),
+    "milestones.list": ("milestones", "list"),
+    "milestones.create": ("milestones", "create"),
+    "milestones.reorder": ("milestones", "reorder"),
+    "milestones.replace": ("milestones", "replace"),
+    "milestones.update": ("milestones", "update"),
+    "milestones.delete": ("milestones", "delete"),
+    "milestones.move": ("milestones", "move"),
+    "milestones.file_tasks": ("milestones", "file_tasks"),
+    "milestones.unfile_task": ("milestones", "unfile_task"),
     "me.read": ("me", "read"),
     "mcp.clients": ("mcp", "clients"),
     "audit.list": ("audit", "list"),

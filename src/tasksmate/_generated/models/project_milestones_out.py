@@ -14,39 +14,44 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
-    from ..models.milestone_org_out import MilestoneOrgOut
+    from ..models.milestone_out import MilestoneOut
 
 
-T = TypeVar("T", bound="MilestoneOrgList")
+T = TypeVar("T", bound="ProjectMilestonesOut")
 
 
 @_attrs_define
-class MilestoneOrgList:
-    """A page of `GET /v1/milestones`, paginated as `{data, next_cursor}`; `total` counts every matching milestone.
+class ProjectMilestonesOut:
+    """`GET /v1/projects/{project_id}/milestones`: the project's live milestones by position, plus project-level sums that
+    count only the tasks filed under its milestones.
 
-    Attributes:
-        data (list[MilestoneOrgOut]):
-        total (int):
-        next_cursor (None | str | Unset):
+        Attributes:
+            project_id (str):
+            data (list[MilestoneOut]):
+            next_cursor (None | str | Unset): The next page's cursor; null on the last page.
+            milestones_tasks_total (int | Unset):  Default: 0.
+            milestones_tasks_completed (int | Unset):  Default: 0.
     """
 
-    data: list[MilestoneOrgOut]
-    total: int
+    project_id: str
+    data: list[MilestoneOut]
     next_cursor: None | str | Unset = UNSET
+    milestones_tasks_total: int | Unset = 0
+    milestones_tasks_completed: int | Unset = 0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
+        from ..models.milestone_out import MilestoneOut  # noqa: PLC0415
+
+        project_id = self.project_id
 
         data = []
         for data_item_data in self.data:
             data_item = data_item_data.to_dict()
             data.append(data_item)
-
-        total = self.total
 
         next_cursor: None | str | Unset
         if isinstance(self.next_cursor, Unset):
@@ -54,32 +59,40 @@ class MilestoneOrgList:
         else:
             next_cursor = self.next_cursor
 
+        milestones_tasks_total = self.milestones_tasks_total
+
+        milestones_tasks_completed = self.milestones_tasks_completed
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "project_id": project_id,
                 "data": data,
-                "total": total,
             }
         )
         if next_cursor is not UNSET:
             field_dict["next_cursor"] = next_cursor
+        if milestones_tasks_total is not UNSET:
+            field_dict["milestones_tasks_total"] = milestones_tasks_total
+        if milestones_tasks_completed is not UNSET:
+            field_dict["milestones_tasks_completed"] = milestones_tasks_completed
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
+        from ..models.milestone_out import MilestoneOut  # noqa: PLC0415
 
         d = dict(src_dict)
+        project_id = d.pop("project_id")
+
         data = []
         _data = d.pop("data")
         for data_item_data in _data:
-            data_item = MilestoneOrgOut.from_dict(data_item_data)
+            data_item = MilestoneOut.from_dict(data_item_data)
 
             data.append(data_item)
-
-        total = d.pop("total")
 
         def _parse_next_cursor(data: object) -> None | str | Unset:
             if data is None:
@@ -90,14 +103,20 @@ class MilestoneOrgList:
 
         next_cursor = _parse_next_cursor(d.pop("next_cursor", UNSET))
 
-        milestone_org_list = cls(
+        milestones_tasks_total = d.pop("milestones_tasks_total", UNSET)
+
+        milestones_tasks_completed = d.pop("milestones_tasks_completed", UNSET)
+
+        project_milestones_out = cls(
+            project_id=project_id,
             data=data,
-            total=total,
             next_cursor=next_cursor,
+            milestones_tasks_total=milestones_tasks_total,
+            milestones_tasks_completed=milestones_tasks_completed,
         )
 
-        milestone_org_list.additional_properties = d
-        return milestone_org_list
+        project_milestones_out.additional_properties = d
+        return project_milestones_out
 
     @property
     def additional_keys(self) -> list[str]:

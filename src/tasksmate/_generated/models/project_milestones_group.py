@@ -14,41 +14,47 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
-    from ..models.milestone_out import MilestoneOut
+    from ..models.milestone_org_out import MilestoneOrgOut
 
 
-T = TypeVar("T", bound="MilestoneList")
+T = TypeVar("T", bound="ProjectMilestonesGroup")
 
 
 @_attrs_define
-class MilestoneList:
-    """Every live milestone of the team in ONE response — open first by target date, then
-    closed by when they were closed (latest first). Not paginated: a team's milestones are
-    tens, not thousands.
+class ProjectMilestonesGroup:
+    """One project's group in `GET /v1/milestones`: its milestones and the sums over them.
 
-        Attributes:
-            data (list[MilestoneOut]):
-            total (int):
-            next_cursor (None | str | Unset):
+    Attributes:
+        project_id (str):
+        data (list[MilestoneOrgOut]):
+        project_name (str | Unset): The project's name. Default: ''.
+        next_cursor (None | str | Unset):
+        milestones_tasks_total (int | Unset):  Default: 0.
+        milestones_tasks_completed (int | Unset):  Default: 0.
     """
 
-    data: list[MilestoneOut]
-    total: int
+    project_id: str
+    data: list[MilestoneOrgOut]
+    project_name: str | Unset = ""
     next_cursor: None | str | Unset = UNSET
+    milestones_tasks_total: int | Unset = 0
+    milestones_tasks_completed: int | Unset = 0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.milestone_out import MilestoneOut  # noqa: PLC0415
+        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
+
+        project_id = self.project_id
 
         data = []
         for data_item_data in self.data:
             data_item = data_item_data.to_dict()
             data.append(data_item)
 
-        total = self.total
+        project_name = self.project_name
 
         next_cursor: None | str | Unset
         if isinstance(self.next_cursor, Unset):
@@ -56,32 +62,44 @@ class MilestoneList:
         else:
             next_cursor = self.next_cursor
 
+        milestones_tasks_total = self.milestones_tasks_total
+
+        milestones_tasks_completed = self.milestones_tasks_completed
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "project_id": project_id,
                 "data": data,
-                "total": total,
             }
         )
+        if project_name is not UNSET:
+            field_dict["project_name"] = project_name
         if next_cursor is not UNSET:
             field_dict["next_cursor"] = next_cursor
+        if milestones_tasks_total is not UNSET:
+            field_dict["milestones_tasks_total"] = milestones_tasks_total
+        if milestones_tasks_completed is not UNSET:
+            field_dict["milestones_tasks_completed"] = milestones_tasks_completed
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.milestone_out import MilestoneOut  # noqa: PLC0415
+        from ..models.milestone_org_out import MilestoneOrgOut  # noqa: PLC0415
 
         d = dict(src_dict)
+        project_id = d.pop("project_id")
+
         data = []
         _data = d.pop("data")
         for data_item_data in _data:
-            data_item = MilestoneOut.from_dict(data_item_data)
+            data_item = MilestoneOrgOut.from_dict(data_item_data)
 
             data.append(data_item)
 
-        total = d.pop("total")
+        project_name = d.pop("project_name", UNSET)
 
         def _parse_next_cursor(data: object) -> None | str | Unset:
             if data is None:
@@ -92,14 +110,21 @@ class MilestoneList:
 
         next_cursor = _parse_next_cursor(d.pop("next_cursor", UNSET))
 
-        milestone_list = cls(
+        milestones_tasks_total = d.pop("milestones_tasks_total", UNSET)
+
+        milestones_tasks_completed = d.pop("milestones_tasks_completed", UNSET)
+
+        project_milestones_group = cls(
+            project_id=project_id,
             data=data,
-            total=total,
+            project_name=project_name,
             next_cursor=next_cursor,
+            milestones_tasks_total=milestones_tasks_total,
+            milestones_tasks_completed=milestones_tasks_completed,
         )
 
-        milestone_list.additional_properties = d
-        return milestone_list
+        project_milestones_group.additional_properties = d
+        return project_milestones_group
 
     @property
     def additional_keys(self) -> list[str]:

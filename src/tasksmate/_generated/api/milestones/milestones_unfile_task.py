@@ -10,37 +10,24 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.milestone_deleted import MilestoneDeleted
+from ...models.milestone_task_unfiled import MilestoneTaskUnfiled
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
     project_id: str,
     milestone_id: str,
-    *,
-    reason: None | str | Unset = UNSET,
+    task_id: str,
 ) -> dict[str, Any]:
-
-    params: dict[str, Any] = {}
-
-    json_reason: None | str | Unset
-    if isinstance(reason, Unset):
-        json_reason = UNSET
-    else:
-        json_reason = reason
-    params["reason"] = json_reason
-
-    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
-        "url": "/v1/projects/{project_id}/milestones/{milestone_id}".format(
+        "url": "/v1/projects/{project_id}/milestones/{milestone_id}/tasks/{task_id}".format(
             project_id=quote(str(project_id), safe=""),
             milestone_id=quote(str(milestone_id), safe=""),
+            task_id=quote(str(task_id), safe=""),
         ),
-        "params": params,
     }
 
     return _kwargs
@@ -48,9 +35,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> MilestoneDeleted | Problem | None:
+) -> MilestoneTaskUnfiled | Problem | None:
     if response.status_code == 200:
-        response_200 = MilestoneDeleted.from_dict(response.json())
+        response_200 = MilestoneTaskUnfiled.from_dict(response.json())
 
         return response_200
 
@@ -107,7 +94,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[MilestoneDeleted | Problem]:
+) -> Response[MilestoneTaskUnfiled | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -119,31 +106,32 @@ def _build_response(
 def sync_detailed(
     project_id: str,
     milestone_id: str,
+    task_id: str,
     *,
     client: AuthenticatedClient,
-    reason: None | str | Unset = UNSET,
-) -> Response[MilestoneDeleted | Problem]:
-    """Delete a milestone (its tasks are unfiled)
+) -> Response[MilestoneTaskUnfiled | Problem]:
+    """Take a task out of a milestone
 
-     SOFT delete; its tasks are unfiled (they stay in the project) and the response says how many.
+     Take the task out of the milestone (`milestone_id` → null); it keeps its project and is never
+    deleted.
 
     Args:
         project_id (str):
         milestone_id (str):
-        reason (None | str | Unset):
+        task_id (str):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[MilestoneDeleted | Problem]
+        Response[MilestoneTaskUnfiled | Problem]
     """
 
     kwargs = _get_kwargs(
         project_id=project_id,
         milestone_id=milestone_id,
-        reason=reason,
+        task_id=task_id,
     )
 
     response = client.get_httpx_client().request(
@@ -156,63 +144,65 @@ def sync_detailed(
 def sync(
     project_id: str,
     milestone_id: str,
+    task_id: str,
     *,
     client: AuthenticatedClient,
-    reason: None | str | Unset = UNSET,
-) -> MilestoneDeleted | Problem | None:
-    """Delete a milestone (its tasks are unfiled)
+) -> MilestoneTaskUnfiled | Problem | None:
+    """Take a task out of a milestone
 
-     SOFT delete; its tasks are unfiled (they stay in the project) and the response says how many.
+     Take the task out of the milestone (`milestone_id` → null); it keeps its project and is never
+    deleted.
 
     Args:
         project_id (str):
         milestone_id (str):
-        reason (None | str | Unset):
+        task_id (str):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        MilestoneDeleted | Problem
+        MilestoneTaskUnfiled | Problem
     """
 
     return sync_detailed(
         project_id=project_id,
         milestone_id=milestone_id,
+        task_id=task_id,
         client=client,
-        reason=reason,
     ).parsed
 
 
 async def asyncio_detailed(
     project_id: str,
     milestone_id: str,
+    task_id: str,
     *,
     client: AuthenticatedClient,
-    reason: None | str | Unset = UNSET,
-) -> Response[MilestoneDeleted | Problem]:
-    """Delete a milestone (its tasks are unfiled)
+) -> Response[MilestoneTaskUnfiled | Problem]:
+    """Take a task out of a milestone
 
-     SOFT delete; its tasks are unfiled (they stay in the project) and the response says how many.
+     Take the task out of the milestone (`milestone_id` → null); it keeps its project and is never
+    deleted.
 
     Args:
         project_id (str):
         milestone_id (str):
-        reason (None | str | Unset):
+        task_id (str):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[MilestoneDeleted | Problem]
+        Response[MilestoneTaskUnfiled | Problem]
     """
 
     kwargs = _get_kwargs(
         project_id=project_id,
         milestone_id=milestone_id,
-        reason=reason,
+        task_id=task_id,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -223,32 +213,33 @@ async def asyncio_detailed(
 async def asyncio(
     project_id: str,
     milestone_id: str,
+    task_id: str,
     *,
     client: AuthenticatedClient,
-    reason: None | str | Unset = UNSET,
-) -> MilestoneDeleted | Problem | None:
-    """Delete a milestone (its tasks are unfiled)
+) -> MilestoneTaskUnfiled | Problem | None:
+    """Take a task out of a milestone
 
-     SOFT delete; its tasks are unfiled (they stay in the project) and the response says how many.
+     Take the task out of the milestone (`milestone_id` → null); it keeps its project and is never
+    deleted.
 
     Args:
         project_id (str):
         milestone_id (str):
-        reason (None | str | Unset):
+        task_id (str):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        MilestoneDeleted | Problem
+        MilestoneTaskUnfiled | Problem
     """
 
     return (
         await asyncio_detailed(
             project_id=project_id,
             milestone_id=milestone_id,
+            task_id=task_id,
             client=client,
-            reason=reason,
         )
     ).parsed

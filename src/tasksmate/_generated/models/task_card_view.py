@@ -72,9 +72,9 @@ class TaskCardView:
             team's intake. null = none.
         sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
             task is reachable from the sprint's team. null = none. Example: SP12345.
-        milestone_id (None | str | Unset): The team milestone this task is filed under. One per task, independent of
-            `sprint_id`; refused (422) unless the task is reachable from the milestone's team. null = none. Example:
-            MS12345.
+        milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
+            `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
+            Example: MS12345.
         goal_id (None | str | Unset): The project goal this task is filed under. One per task; refused (422) unless it
             is a live goal of the task's own project. Moving the task to another project clears it. null = none. Example:
             G12345.

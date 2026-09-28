@@ -80,11 +80,19 @@ from .me_principal_type import MePrincipalType
 from .mention import Mention
 from .milestone_create import MilestoneCreate
 from .milestone_deleted import MilestoneDeleted
-from .milestone_list import MilestoneList
-from .milestone_org_list import MilestoneOrgList
+from .milestone_move import MilestoneMove
+from .milestone_moved import MilestoneMoved
+from .milestone_moved_tasks_type_0_item import MilestoneMovedTasksType0Item
+from .milestone_order import MilestoneOrder
 from .milestone_org_out import MilestoneOrgOut
+from .milestone_org_out_tasks_type_0_item import MilestoneOrgOutTasksType0Item
 from .milestone_out import MilestoneOut
+from .milestone_out_tasks_type_0_item import MilestoneOutTasksType0Item
+from .milestone_task_unfiled import MilestoneTaskUnfiled
+from .milestone_tasks_file import MilestoneTasksFile
+from .milestone_tasks_filed import MilestoneTasksFiled
 from .milestone_update import MilestoneUpdate
+from .milestones_reordered import MilestonesReordered
 from .o_auth_client_create import OAuthClientCreate
 from .o_auth_client_create_client_type import OAuthClientCreateClientType
 from .o_auth_client_created import OAuthClientCreated
@@ -102,6 +110,7 @@ from .o_auth_error_body import OAuthErrorBody
 from .org_card import OrgCard
 from .org_goals_out import OrgGoalsOut
 from .org_join_mode_enum import OrgJoinModeEnum
+from .org_milestones_out import OrgMilestonesOut
 from .organization_in_db import OrganizationInDB
 from .organization_in_db_metadata_type_0 import OrganizationInDBMetadataType0
 from .organization_invite_create import OrganizationInviteCreate
@@ -149,6 +158,8 @@ from .project_lead_out import ProjectLeadOut
 from .project_member_create import ProjectMemberCreate
 from .project_member_in_db import ProjectMemberInDB
 from .project_member_update import ProjectMemberUpdate
+from .project_milestones_group import ProjectMilestonesGroup
+from .project_milestones_out import ProjectMilestonesOut
 from .project_order import ProjectOrder
 from .project_resource_create import ProjectResourceCreate
 from .project_resource_in_db import ProjectResourceInDB
@@ -351,10 +362,18 @@ __all__ = (
     "MePrincipalType",
     "MilestoneCreate",
     "MilestoneDeleted",
-    "MilestoneList",
-    "MilestoneOrgList",
+    "MilestoneMove",
+    "MilestoneMoved",
+    "MilestoneMovedTasksType0Item",
+    "MilestoneOrder",
     "MilestoneOrgOut",
+    "MilestoneOrgOutTasksType0Item",
     "MilestoneOut",
+    "MilestoneOutTasksType0Item",
+    "MilestonesReordered",
+    "MilestoneTasksFile",
+    "MilestoneTasksFiled",
+    "MilestoneTaskUnfiled",
     "MilestoneUpdate",
     "OAuthClientCreate",
     "OAuthClientCreateClientType",
@@ -382,6 +401,7 @@ __all__ = (
     "OrgCard",
     "OrgGoalsOut",
     "OrgJoinModeEnum",
+    "OrgMilestonesOut",
     "PageConnectedApp",
     "PageDeliveryOut",
     "PageDesignation",
@@ -420,6 +440,8 @@ __all__ = (
     "ProjectMemberCreate",
     "ProjectMemberInDB",
     "ProjectMemberUpdate",
+    "ProjectMilestonesGroup",
+    "ProjectMilestonesOut",
     "ProjectOrder",
     "ProjectResourceCreate",
     "ProjectResourceInDB",

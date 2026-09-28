@@ -24,7 +24,8 @@ class MilestoneUpdate:
 
     - `description` / `owner_user_id` sent as null clear them.
     - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`, re-opening clears them.
-    - The milestone's owner without team `edit` rights may send `status` only — anything else is a 403.
+    - `target_date` cannot be cleared (422).
+    - The milestone's owner without edit rights on the project may send `status` only — anything else is a 403.
 
         Attributes:
             title (None | str | Unset):

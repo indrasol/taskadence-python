@@ -13,20 +13,24 @@ from ... import errors
 from ...models.milestone_create import MilestoneCreate
 from ...models.milestone_out import MilestoneOut
 from ...models.problem import Problem
+from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    project_id: str,
     *,
     body: MilestoneCreate,
+    idempotency_key: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
+    if not isinstance(idempotency_key, Unset):
+        headers["Idempotency-Key"] = idempotency_key
 
     _kwargs: dict[str, Any] = {
         "method": "post",
-        "url": "/v1/teams/{team_id}/milestones".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/projects/{project_id}/milestones".format(
+            project_id=quote(str(project_id), safe=""),
         ),
     }
 
@@ -107,18 +111,20 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
+    idempotency_key: str | Unset = UNSET,
 ) -> Response[MilestoneOut | Problem]:
-    """Create a milestone
+    """Create a milestone in a project
 
-     Create an open milestone. `edit` on the team. 409 on a duplicate live title (open or
-    closed), 422 when the owner is not an active member of this team.
+     Create an open milestone. 409 on a duplicate live title (open or closed), 422 when the owner cannot
+    read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
+        idempotency_key (str | Unset):
         body (MilestoneCreate): The request body of `milestones.create`.
 
     Raises:
@@ -130,8 +136,9 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         body=body,
+        idempotency_key=idempotency_key,
     )
 
     response = client.get_httpx_client().request(
@@ -142,18 +149,20 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
+    idempotency_key: str | Unset = UNSET,
 ) -> MilestoneOut | Problem | None:
-    """Create a milestone
+    """Create a milestone in a project
 
-     Create an open milestone. `edit` on the team. 409 on a duplicate live title (open or
-    closed), 422 when the owner is not an active member of this team.
+     Create an open milestone. 409 on a duplicate live title (open or closed), 422 when the owner cannot
+    read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
+        idempotency_key (str | Unset):
         body (MilestoneCreate): The request body of `milestones.create`.
 
     Raises:
@@ -165,25 +174,28 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        project_id=project_id,
         client=client,
         body=body,
+        idempotency_key=idempotency_key,
     ).parsed
 
 
 async def asyncio_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
+    idempotency_key: str | Unset = UNSET,
 ) -> Response[MilestoneOut | Problem]:
-    """Create a milestone
+    """Create a milestone in a project
 
-     Create an open milestone. `edit` on the team. 409 on a duplicate live title (open or
-    closed), 422 when the owner is not an active member of this team.
+     Create an open milestone. 409 on a duplicate live title (open or closed), 422 when the owner cannot
+    read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
+        idempotency_key (str | Unset):
         body (MilestoneCreate): The request body of `milestones.create`.
 
     Raises:
@@ -195,8 +207,9 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         body=body,
+        idempotency_key=idempotency_key,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -205,18 +218,20 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: MilestoneCreate,
+    idempotency_key: str | Unset = UNSET,
 ) -> MilestoneOut | Problem | None:
-    """Create a milestone
+    """Create a milestone in a project
 
-     Create an open milestone. `edit` on the team. 409 on a duplicate live title (open or
-    closed), 422 when the owner is not an active member of this team.
+     Create an open milestone. 409 on a duplicate live title (open or closed), 422 when the owner cannot
+    read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
+        idempotency_key (str | Unset):
         body (MilestoneCreate): The request body of `milestones.create`.
 
     Raises:
@@ -229,8 +244,9 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            project_id=project_id,
             client=client,
             body=body,
+            idempotency_key=idempotency_key,
         )
     ).parsed

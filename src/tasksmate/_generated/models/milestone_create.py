@@ -23,12 +23,12 @@ class MilestoneCreate:
     """The request body of `milestones.create`.
 
     Attributes:
-        title (str): Unique among the team's live milestones, open or closed (case-insensitive) — 409 otherwise
-        target_date (datetime.date): The date the team commits to. Passing it changes nothing; the view shows it as
+        title (str): Unique among the project's live milestones, open or closed (case-insensitive) — 409 otherwise
+        target_date (datetime.date): The date the project commits to. Passing it changes nothing; the view shows it as
             overdue.
         description (None | str | Unset):
-        owner_user_id (None | str | Unset): The one person accountable — an active member of THIS team (422 otherwise).
-            They may close / re-open it.
+        owner_user_id (None | str | Unset): The one person accountable — someone who can read THIS project (422
+            otherwise). They may close / re-open it.
     """
 
     title: str

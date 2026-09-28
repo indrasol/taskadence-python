@@ -14,22 +14,26 @@ from ..types import UNSET, Unset
 from typing import cast
 import datetime
 
+if TYPE_CHECKING:
+    from ..models.milestone_out_tasks_type_0_item import MilestoneOutTasksType0Item
+
 
 T = TypeVar("T", bound="MilestoneOut")
 
 
 @_attrs_define
 class MilestoneOut:
-    """Returned by `milestones.create` and `milestones.update`.
+    """Returned by `milestones.create`, `milestones.replace` and `milestones.update`.
 
     Attributes:
         milestone_id (str):
         org_id (str):
-        team_id (str):
+        project_id (str):
         title (str):
         target_date (datetime.date):
         description (None | str | Unset):
         owner_user_id (None | str | Unset):
+        position (int | Unset):  Default: 0.
         status (str | Unset):  Default: 'open'.
         closed_at (datetime.datetime | None | Unset):
         closed_by (None | str | Unset):
@@ -37,18 +41,20 @@ class MilestoneOut:
         updated_by (None | str | Unset):
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
-        is_active (bool | Unset):  Default: True.
-        task_count (int | Unset): Tasks filed under this milestone (every status, subtasks excluded). Default: 0.
-        completed_count (int | Unset): How many of them are `completed` — the roll-up's done against total. Default: 0.
+        tasks_total (int | Unset): Tasks under this milestone the caller can read (subtasks excluded). Default: 0.
+        tasks_completed (int | Unset): How many of them are `completed`. Default: 0.
+        tasks (list[MilestoneOutTasksType0Item] | None | Unset): `?include_tasks=true` only: the milestone's task rows
+            (task_card_view shape).
     """
 
     milestone_id: str
     org_id: str
-    team_id: str
+    project_id: str
     title: str
     target_date: datetime.date
     description: None | str | Unset = UNSET
     owner_user_id: None | str | Unset = UNSET
+    position: int | Unset = 0
     status: str | Unset = "open"
     closed_at: datetime.datetime | None | Unset = UNSET
     closed_by: None | str | Unset = UNSET
@@ -56,20 +62,22 @@ class MilestoneOut:
     updated_by: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
-    is_active: bool | Unset = True
-    task_count: int | Unset = 0
-    completed_count: int | Unset = 0
+    tasks_total: int | Unset = 0
+    tasks_completed: int | Unset = 0
+    tasks: list[MilestoneOutTasksType0Item] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.milestone_out_tasks_type_0_item import MilestoneOutTasksType0Item  # noqa: PLC0415
+
         milestone_id = self.milestone_id
 
         org_id = self.org_id
 
-        team_id = self.team_id
+        project_id = self.project_id
 
         title = self.title
 
@@ -86,6 +94,8 @@ class MilestoneOut:
             owner_user_id = UNSET
         else:
             owner_user_id = self.owner_user_id
+
+        position = self.position
 
         status = self.status
 
@@ -131,11 +141,21 @@ class MilestoneOut:
         else:
             updated_at = self.updated_at
 
-        is_active = self.is_active
+        tasks_total = self.tasks_total
 
-        task_count = self.task_count
+        tasks_completed = self.tasks_completed
 
-        completed_count = self.completed_count
+        tasks: list[dict[str, Any]] | None | Unset
+        if isinstance(self.tasks, Unset):
+            tasks = UNSET
+        elif isinstance(self.tasks, list):
+            tasks = []
+            for tasks_type_0_item_data in self.tasks:
+                tasks_type_0_item = tasks_type_0_item_data.to_dict()
+                tasks.append(tasks_type_0_item)
+
+        else:
+            tasks = self.tasks
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -143,7 +163,7 @@ class MilestoneOut:
             {
                 "milestone_id": milestone_id,
                 "org_id": org_id,
-                "team_id": team_id,
+                "project_id": project_id,
                 "title": title,
                 "target_date": target_date,
             }
@@ -152,6 +172,8 @@ class MilestoneOut:
             field_dict["description"] = description
         if owner_user_id is not UNSET:
             field_dict["owner_user_id"] = owner_user_id
+        if position is not UNSET:
+            field_dict["position"] = position
         if status is not UNSET:
             field_dict["status"] = status
         if closed_at is not UNSET:
@@ -166,23 +188,25 @@ class MilestoneOut:
             field_dict["created_at"] = created_at
         if updated_at is not UNSET:
             field_dict["updated_at"] = updated_at
-        if is_active is not UNSET:
-            field_dict["is_active"] = is_active
-        if task_count is not UNSET:
-            field_dict["task_count"] = task_count
-        if completed_count is not UNSET:
-            field_dict["completed_count"] = completed_count
+        if tasks_total is not UNSET:
+            field_dict["tasks_total"] = tasks_total
+        if tasks_completed is not UNSET:
+            field_dict["tasks_completed"] = tasks_completed
+        if tasks is not UNSET:
+            field_dict["tasks"] = tasks
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.milestone_out_tasks_type_0_item import MilestoneOutTasksType0Item  # noqa: PLC0415
+
         d = dict(src_dict)
         milestone_id = d.pop("milestone_id")
 
         org_id = d.pop("org_id")
 
-        team_id = d.pop("team_id")
+        project_id = d.pop("project_id")
 
         title = d.pop("title")
 
@@ -205,6 +229,8 @@ class MilestoneOut:
             return cast(None | str | Unset, data)
 
         owner_user_id = _parse_owner_user_id(d.pop("owner_user_id", UNSET))
+
+        position = d.pop("position", UNSET)
 
         status = d.pop("status", UNSET)
 
@@ -286,20 +312,41 @@ class MilestoneOut:
 
         updated_at = _parse_updated_at(d.pop("updated_at", UNSET))
 
-        is_active = d.pop("is_active", UNSET)
+        tasks_total = d.pop("tasks_total", UNSET)
 
-        task_count = d.pop("task_count", UNSET)
+        tasks_completed = d.pop("tasks_completed", UNSET)
 
-        completed_count = d.pop("completed_count", UNSET)
+        def _parse_tasks(data: object) -> list[MilestoneOutTasksType0Item] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                tasks_type_0 = []
+                _tasks_type_0 = data
+                for tasks_type_0_item_data in _tasks_type_0:
+                    tasks_type_0_item = MilestoneOutTasksType0Item.from_dict(tasks_type_0_item_data)
+
+                    tasks_type_0.append(tasks_type_0_item)
+
+                return tasks_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[MilestoneOutTasksType0Item] | None | Unset, data)
+
+        tasks = _parse_tasks(d.pop("tasks", UNSET))
 
         milestone_out = cls(
             milestone_id=milestone_id,
             org_id=org_id,
-            team_id=team_id,
+            project_id=project_id,
             title=title,
             target_date=target_date,
             description=description,
             owner_user_id=owner_user_id,
+            position=position,
             status=status,
             closed_at=closed_at,
             closed_by=closed_by,
@@ -307,9 +354,9 @@ class MilestoneOut:
             updated_by=updated_by,
             created_at=created_at,
             updated_at=updated_at,
-            is_active=is_active,
-            task_count=task_count,
-            completed_count=completed_count,
+            tasks_total=tasks_total,
+            tasks_completed=tasks_completed,
+            tasks=tasks,
         )
 
         milestone_out.additional_properties = d

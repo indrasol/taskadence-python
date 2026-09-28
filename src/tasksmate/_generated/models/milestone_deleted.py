@@ -21,7 +21,7 @@ class MilestoneDeleted:
     Attributes:
         ok (bool):
         milestone_id (str):
-        unfiled_tasks (int): Tasks the milestone held; their `milestone_id` is now null
+        unfiled_tasks (int): Tasks the milestone held; they stay in the project with `milestone_id` null
     """
 
     ok: bool

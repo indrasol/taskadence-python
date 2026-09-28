@@ -10,7 +10,7 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.milestone_org_list import MilestoneOrgList
+from ...models.org_milestones_out import OrgMilestonesOut
 from ...models.problem import Problem
 from ...types import UNSET, Unset
 from typing import cast
@@ -19,10 +19,10 @@ from typing import cast
 def _get_kwargs(
     *,
     org_id: str,
-    limit: int | Unset = 1000,
-    cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
+    filterproject: list[str] | None | Unset = UNSET,
+    filterstatus: list[str] | None | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
@@ -33,15 +33,6 @@ def _get_kwargs(
 
     params["org_id"] = org_id
 
-    params["limit"] = limit
-
-    json_cursor: None | str | Unset
-    if isinstance(cursor, Unset):
-        json_cursor = UNSET
-    else:
-        json_cursor = cursor
-    params["cursor"] = json_cursor
-
     json_sort_by: None | str | Unset
     if isinstance(sort_by, Unset):
         json_sort_by = UNSET
@@ -50,6 +41,26 @@ def _get_kwargs(
     params["sort_by"] = json_sort_by
 
     params["sort_order"] = sort_order
+
+    json_filterproject: list[str] | None | Unset
+    if isinstance(filterproject, Unset):
+        json_filterproject = UNSET
+    elif isinstance(filterproject, list):
+        json_filterproject = filterproject
+
+    else:
+        json_filterproject = filterproject
+    params["filter[project]"] = json_filterproject
+
+    json_filterstatus: list[str] | None | Unset
+    if isinstance(filterstatus, Unset):
+        json_filterstatus = UNSET
+    elif isinstance(filterstatus, list):
+        json_filterstatus = filterstatus
+
+    else:
+        json_filterstatus = filterstatus
+    params["filter[status]"] = json_filterstatus
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -65,9 +76,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | MilestoneOrgList | Problem | None:
+) -> Any | OrgMilestonesOut | Problem | None:
     if response.status_code == 200:
-        response_200 = MilestoneOrgList.from_dict(response.json())
+        response_200 = OrgMilestonesOut.from_dict(response.json())
 
         return response_200
 
@@ -128,7 +139,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | MilestoneOrgList | Problem]:
+) -> Response[Any | OrgMilestonesOut | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -141,33 +152,35 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    limit: int | Unset = 1000,
-    cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
+    filterproject: list[str] | None | Unset = UNSET,
+    filterstatus: list[str] | None | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | MilestoneOrgList | Problem]:
-    """Every milestone you can read in an organization, across its teams
+) -> Response[Any | OrgMilestonesOut | Problem]:
+    """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
-    its task roll-up, paginated as `{data, next_cursor}`.
+     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+    /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
+    `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
-    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
-    are on. 403 when you are not a member of the organization.
-    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
-    latest first.
-    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
-    - Creating, changing and closing a milestone stay on the team's own milestone operations.
+    - **Who sees what:** the projects you can read (a guest: only the projects they are a member of).
+    403 when you are not a member of the organization.
+    - **Order:** the organization's project order, then each project's milestones by position.
+    - **Filters:** `filter[project]` (project ids) and `filter[status]` (`open` / `closed`); the sums
+    count what is returned.
+    - **Sort:** `sort_by=project_name` orders the projects; any other key orders each project's
+    milestones.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the
-            milestones of teams it is on).
-        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
-            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
-        cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
-            team_name. Default: the list's natural order.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' milestones).
+        sort_by (None | str | Unset): One of: position, target_date, title, closed_at, created_at,
+            project_name. `project_name` orders the projects; any other key orders each project's
+            milestones. Default: the org's project order, then each project's milestone order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
+        filterproject (list[str] | None | Unset): Project ids, comma-separated or repeated.
+        filterstatus (list[str] | None | Unset): `open` or `closed`.
         if_none_match (str | Unset):
 
     Raises:
@@ -175,15 +188,15 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | MilestoneOrgList | Problem]
+        Response[Any | OrgMilestonesOut | Problem]
     """
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        limit=limit,
-        cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
+        filterproject=filterproject,
+        filterstatus=filterstatus,
         if_none_match=if_none_match,
     )
 
@@ -198,33 +211,35 @@ def sync(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    limit: int | Unset = 1000,
-    cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
+    filterproject: list[str] | None | Unset = UNSET,
+    filterstatus: list[str] | None | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
-) -> Any | MilestoneOrgList | Problem | None:
-    """Every milestone you can read in an organization, across its teams
+) -> Any | OrgMilestonesOut | Problem | None:
+    """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
-    its task roll-up, paginated as `{data, next_cursor}`.
+     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+    /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
+    `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
-    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
-    are on. 403 when you are not a member of the organization.
-    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
-    latest first.
-    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
-    - Creating, changing and closing a milestone stay on the team's own milestone operations.
+    - **Who sees what:** the projects you can read (a guest: only the projects they are a member of).
+    403 when you are not a member of the organization.
+    - **Order:** the organization's project order, then each project's milestones by position.
+    - **Filters:** `filter[project]` (project ids) and `filter[status]` (`open` / `closed`); the sums
+    count what is returned.
+    - **Sort:** `sort_by=project_name` orders the projects; any other key orders each project's
+    milestones.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the
-            milestones of teams it is on).
-        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
-            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
-        cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
-            team_name. Default: the list's natural order.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' milestones).
+        sort_by (None | str | Unset): One of: position, target_date, title, closed_at, created_at,
+            project_name. `project_name` orders the projects; any other key orders each project's
+            milestones. Default: the org's project order, then each project's milestone order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
+        filterproject (list[str] | None | Unset): Project ids, comma-separated or repeated.
+        filterstatus (list[str] | None | Unset): `open` or `closed`.
         if_none_match (str | Unset):
 
     Raises:
@@ -232,16 +247,16 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | MilestoneOrgList | Problem
+        Any | OrgMilestonesOut | Problem
     """
 
     return sync_detailed(
         client=client,
         org_id=org_id,
-        limit=limit,
-        cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
+        filterproject=filterproject,
+        filterstatus=filterstatus,
         if_none_match=if_none_match,
     ).parsed
 
@@ -250,33 +265,35 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    limit: int | Unset = 1000,
-    cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
+    filterproject: list[str] | None | Unset = UNSET,
+    filterstatus: list[str] | None | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | MilestoneOrgList | Problem]:
-    """Every milestone you can read in an organization, across its teams
+) -> Response[Any | OrgMilestonesOut | Problem]:
+    """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
-    its task roll-up, paginated as `{data, next_cursor}`.
+     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+    /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
+    `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
-    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
-    are on. 403 when you are not a member of the organization.
-    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
-    latest first.
-    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
-    - Creating, changing and closing a milestone stay on the team's own milestone operations.
+    - **Who sees what:** the projects you can read (a guest: only the projects they are a member of).
+    403 when you are not a member of the organization.
+    - **Order:** the organization's project order, then each project's milestones by position.
+    - **Filters:** `filter[project]` (project ids) and `filter[status]` (`open` / `closed`); the sums
+    count what is returned.
+    - **Sort:** `sort_by=project_name` orders the projects; any other key orders each project's
+    milestones.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the
-            milestones of teams it is on).
-        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
-            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
-        cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
-            team_name. Default: the list's natural order.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' milestones).
+        sort_by (None | str | Unset): One of: position, target_date, title, closed_at, created_at,
+            project_name. `project_name` orders the projects; any other key orders each project's
+            milestones. Default: the org's project order, then each project's milestone order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
+        filterproject (list[str] | None | Unset): Project ids, comma-separated or repeated.
+        filterstatus (list[str] | None | Unset): `open` or `closed`.
         if_none_match (str | Unset):
 
     Raises:
@@ -284,15 +301,15 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | MilestoneOrgList | Problem]
+        Response[Any | OrgMilestonesOut | Problem]
     """
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        limit=limit,
-        cursor=cursor,
         sort_by=sort_by,
         sort_order=sort_order,
+        filterproject=filterproject,
+        filterstatus=filterstatus,
         if_none_match=if_none_match,
     )
 
@@ -305,33 +322,35 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    limit: int | Unset = 1000,
-    cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
+    filterproject: list[str] | None | Unset = UNSET,
+    filterstatus: list[str] | None | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
-) -> Any | MilestoneOrgList | Problem | None:
-    """Every milestone you can read in an organization, across its teams
+) -> Any | OrgMilestonesOut | Problem | None:
+    """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone of the organization's teams you can read, each with `team_id` / `team_name` and
-    its task roll-up, paginated as `{data, next_cursor}`.
+     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+    /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
+    `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
-    - **Who sees what:** a member reads every team's milestones; a guest only those of the teams they
-    are on. 403 when you are not a member of the organization.
-    - **Order:** by team name, then each team's open milestones by target date, then its closed ones,
-    latest first.
-    - **Filters:** `filter[team]` (team ids) and `filter[status]` (`open` / `closed`).
-    - Creating, changing and closing a milestone stay on the team's own milestone operations.
+    - **Who sees what:** the projects you can read (a guest: only the projects they are a member of).
+    403 when you are not a member of the organization.
+    - **Order:** the organization's project order, then each project's milestones by position.
+    - **Filters:** `filter[project]` (project ids) and `filter[status]` (`open` / `closed`); the sums
+    count what is returned.
+    - **Sort:** `sort_by=project_name` orders the projects; any other key orders each project's
+    milestones.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the
-            milestones of teams it is on).
-        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[team]`,
-            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
-        cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at,
-            team_name. Default: the list's natural order.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' milestones).
+        sort_by (None | str | Unset): One of: position, target_date, title, closed_at, created_at,
+            project_name. `project_name` orders the projects; any other key orders each project's
+            milestones. Default: the org's project order, then each project's milestone order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
+        filterproject (list[str] | None | Unset): Project ids, comma-separated or repeated.
+        filterstatus (list[str] | None | Unset): `open` or `closed`.
         if_none_match (str | Unset):
 
     Raises:
@@ -339,17 +358,17 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | MilestoneOrgList | Problem
+        Any | OrgMilestonesOut | Problem
     """
 
     return (
         await asyncio_detailed(
             client=client,
             org_id=org_id,
-            limit=limit,
-            cursor=cursor,
             sort_by=sort_by,
             sort_order=sort_order,
+            filterproject=filterproject,
+            filterstatus=filterstatus,
             if_none_match=if_none_match,
         )
     ).parsed

@@ -10,15 +10,16 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.milestone_list import MilestoneList
 from ...models.problem import Problem
+from ...models.project_milestones_out import ProjectMilestonesOut
 from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    project_id: str,
     *,
+    include_tasks: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -30,6 +31,8 @@ def _get_kwargs(
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
+
+    params["include_tasks"] = include_tasks
 
     params["limit"] = limit
 
@@ -53,8 +56,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/teams/{team_id}/milestones".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/projects/{project_id}/milestones".format(
+            project_id=quote(str(project_id), safe=""),
         ),
         "params": params,
     }
@@ -65,9 +68,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | MilestoneList | Problem | None:
+) -> Any | Problem | ProjectMilestonesOut | None:
     if response.status_code == 200:
-        response_200 = MilestoneList.from_dict(response.json())
+        response_200 = ProjectMilestonesOut.from_dict(response.json())
 
         return response_200
 
@@ -128,7 +131,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | MilestoneList | Problem]:
+) -> Response[Any | Problem | ProjectMilestonesOut]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -138,27 +141,29 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
+    include_tasks: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | MilestoneList | Problem]:
-    """List a team's milestones
+) -> Response[Any | Problem | ProjectMilestonesOut]:
+    """List a project's milestones
 
-     Every live milestone of the team in ONE response: open first by target date, then
-    closed by `closed_at`, latest first, each with `task_count` / `completed_count`. Not
-    paginated — a team has tens, not thousands.
+     The project's milestones by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
-        team_id (str):
+        project_id (str):
+        include_tasks (bool | Unset): Embed each milestone's task rows (the caller's readable
+            ones). Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at. Default:
-            the list's natural order.
+        sort_by (None | str | Unset): One of: position, title, target_date, closed_at, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -167,11 +172,12 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | MilestoneList | Problem]
+        Response[Any | Problem | ProjectMilestonesOut]
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
+        include_tasks=include_tasks,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -187,27 +193,29 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
+    include_tasks: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | MilestoneList | Problem | None:
-    """List a team's milestones
+) -> Any | Problem | ProjectMilestonesOut | None:
+    """List a project's milestones
 
-     Every live milestone of the team in ONE response: open first by target date, then
-    closed by `closed_at`, latest first, each with `task_count` / `completed_count`. Not
-    paginated — a team has tens, not thousands.
+     The project's milestones by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
-        team_id (str):
+        project_id (str):
+        include_tasks (bool | Unset): Embed each milestone's task rows (the caller's readable
+            ones). Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at. Default:
-            the list's natural order.
+        sort_by (None | str | Unset): One of: position, title, target_date, closed_at, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -216,12 +224,13 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | MilestoneList | Problem
+        Any | Problem | ProjectMilestonesOut
     """
 
     return sync_detailed(
-        team_id=team_id,
+        project_id=project_id,
         client=client,
+        include_tasks=include_tasks,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -231,27 +240,29 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
+    include_tasks: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | MilestoneList | Problem]:
-    """List a team's milestones
+) -> Response[Any | Problem | ProjectMilestonesOut]:
+    """List a project's milestones
 
-     Every live milestone of the team in ONE response: open first by target date, then
-    closed by `closed_at`, latest first, each with `task_count` / `completed_count`. Not
-    paginated — a team has tens, not thousands.
+     The project's milestones by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
-        team_id (str):
+        project_id (str):
+        include_tasks (bool | Unset): Embed each milestone's task rows (the caller's readable
+            ones). Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at. Default:
-            the list's natural order.
+        sort_by (None | str | Unset): One of: position, title, target_date, closed_at, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -260,11 +271,12 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | MilestoneList | Problem]
+        Response[Any | Problem | ProjectMilestonesOut]
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
+        include_tasks=include_tasks,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -278,27 +290,29 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
+    include_tasks: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | MilestoneList | Problem | None:
-    """List a team's milestones
+) -> Any | Problem | ProjectMilestonesOut | None:
+    """List a project's milestones
 
-     Every live milestone of the team in ONE response: open first by target date, then
-    closed by `closed_at`, latest first, each with `task_count` / `completed_count`. Not
-    paginated — a team has tens, not thousands.
+     The project's milestones by position, paginated as `{data, next_cursor}`; the project-level sums are
+    returned beside `data`.
 
     Args:
-        team_id (str):
+        project_id (str):
+        include_tasks (bool | Unset): Embed each milestone's task rows (the caller's readable
+            ones). Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: target_date, title, closed_at, created_at. Default:
-            the list's natural order.
+        sort_by (None | str | Unset): One of: position, title, target_date, closed_at, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -307,13 +321,14 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | MilestoneList | Problem
+        Any | Problem | ProjectMilestonesOut
     """
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            project_id=project_id,
             client=client,
+            include_tasks=include_tasks,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

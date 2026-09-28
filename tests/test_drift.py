@@ -77,7 +77,15 @@ def test_every_list_is_a_page_and_every_create_is_idempotent() -> None:
     lists = {k for k, op in OPERATIONS.items() if op.is_list}
     creates = {k for k, op in OPERATIONS.items() if op.is_create}
     assert {"tasks.list", "views.rows", "projects.list", "webhooks.deliveries", "audit.list"} <= lists
-    assert creates == {"tasks.create", "projects.create", "goals.create", "task-comments.create", "task-comments.reply"}
+    # 5.9: + milestones.create (a project's milestones, goals' create)
+    assert creates == {
+        "tasks.create",
+        "projects.create",
+        "goals.create",
+        "milestones.create",
+        "task-comments.create",
+        "task-comments.reply",
+    }
     for op_id in lists:
         assert OPERATIONS[op_id].item is not None, op_id
 
