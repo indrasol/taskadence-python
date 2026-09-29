@@ -1,0 +1,7 @@
+# Local hooks (task S.1). Opt-in: run `pre-commit install` once per clone (see SECURITY.md).
+# gitleaks scans the staged diff with .gitleaks.toml; CI runs the same version (the `secrets` job in ci.yml).
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks

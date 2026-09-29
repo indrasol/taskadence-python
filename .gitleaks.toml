@@ -1,0 +1,15 @@
+# gitleaks config (task S.1). Default rules + narrowly scoped allowlists for the
+# false positives triaged in docs/security/SECRETS_SCAN_2026-09-29.md (umbrella repo).
+# Every entry is path AND value-shape; never add a blanket path ignore here.
+# A real finding is never allowlisted: rotate the credential (see SECURITY.md).
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Response examples in the vendored public OpenAPI spec and the models generated from it: made-up tm_live_/tmr_/tmcs_/whsec_ values copied from the backend schemas (hashed and checked against dev: no match)"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^(spec/openapi\.public\.json|src/tasksmate/_generated/models/[a-z_]+\.py)$''']
+regexTarget = "secret"
+regexes = ['''^(tm_live_|tmr_|tmcs_|whsec_)[A-Za-z0-9_=-]+$''']

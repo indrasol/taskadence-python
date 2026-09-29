@@ -189,3 +189,44 @@ jobs:
         run: pip install -e ".[dev]"
       - if: env.TASKSMATE_TOKEN != ''
         run: pytest -m integration -o addopts="" -v
+
+  secrets:
+    name: secrets
+    # S.1: gitleaks, a pinned and checksum-verified binary (gitleaks-action needs a paid licence on org repos).
+    # Pull request: only the commits the PR adds. Push: the full history of every ref in the clone.
+    # Fails on any finding not allowlisted in .gitleaks.toml; the redacted SARIF is uploaded either way.
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks (pinned, checksum-verified)
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" version
+
+      - name: Scan (PR commits, or full history on push)
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then range="${BASE_SHA}..${HEAD_SHA}"; else range="--all"; fi
+          "$RUNNER_TEMP/gitleaks" git . --log-opts="$range" --config .gitleaks.toml --redact --no-banner \
+            --exit-code 1 --report-format sarif --report-path gitleaks.sarif
+
+      - name: Upload redacted SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-sarif
+          path: gitleaks.sarif
+          if-no-files-found: ignore
+          retention-days: 30

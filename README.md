@@ -285,6 +285,9 @@ every project at once) — the team-scoped milestone methods were replaced befor
 
 See [SECURITY.md](SECURITY.md). Report vulnerabilities privately; never paste a live token into an issue.
 
+Contributors: `pre-commit install` (after `pip install pre-commit`) enables the gitleaks check from
+`.pre-commit-config.yaml` on each commit. CI runs the same scan (the `secrets` job). Nothing installs the hook for you.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The licence grants no right to use the TasksMate or Indrasol names or marks (§6).

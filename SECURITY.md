@@ -33,3 +33,12 @@ The SDK never logs the access token (a test asserts it), never writes it anywher
 (`tm auth login`: the OS keyring, else `~/.config/tasksmate/config.toml` with mode `600`), and sends it only in the
 `Authorization` header to the base URL you configured. Webhook secrets are yours: `tasksmate.webhooks.verify` reads
 the one you pass and never stores it.
+
+## Secrets in this repository
+
+The SDK repository holds no credentials. The examples in `spec/openapi.public.json` and the generated models are
+made-up values copied from the API's OpenAPI document. The `secrets` job in `.github/workflows/ci.yml` runs gitleaks
+on every pull request and over the full history on pushes to `main`. Locally, `pre-commit install` enables the same
+check on each commit (opt-in). `.gitleaks.toml` allowlists only those spec examples, by path and value shape. How
+TasksMate handles its own secrets, and how they are rotated, is in the API's security policy
+(`Tasks-Mate-Backend/SECURITY.md`).
