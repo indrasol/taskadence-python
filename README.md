@@ -288,6 +288,8 @@ See [SECURITY.md](SECURITY.md). Report vulnerabilities privately; never paste a 
 Contributors: `pre-commit install` (after `pip install pre-commit`) enables the gitleaks check from
 `.pre-commit-config.yaml` on each commit. CI runs the same scan (the `secrets` job). Nothing installs the hook for you.
 
+CI/CD controls (S.19: branch rules, environments, secrets, workflow permissions, pinned actions, zizmor, signed commits) are recorded in one place: `taskadence-api/docs/CICD_CONTROLS.md`. The `workflows` job here runs actionlint and zizmor on `.github/`.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The licence grants no right to use the TasksMate or Indrasol names or marks (§6).
