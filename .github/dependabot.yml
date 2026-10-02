@@ -1,0 +1,22 @@
+# Dependabot (S.19, SOC 2): keeps the SHA-pinned GitHub Actions current. Weekly, grouped, a 7-day cooldown before a
+# version update (security updates skip it). This repo has no `dev` branch, so updates target `main` (the default).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    labels: [dependencies]
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      actions-minor-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+      actions-security:
+        applies-to: security-updates
+        patterns: ["*"]

@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "anyio>=4", "starlette>=0.40", "ruff==0.16.9", "mypy>=1.11", "build>=1.2", "twine>=5", "pip-audit>=2.7"]
+dev = ["pytest>=8", "anyio>=4", "starlette>=0.40", "ruff==0.16.9", "mypy>=1.11,<2.4", "build>=1.2", "twine>=5", "pip-audit>=2.7"]
 
 [project.scripts]
 tasksmate-mcp = "tasksmate_mcp.cli:main"
