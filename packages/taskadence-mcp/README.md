@@ -1,16 +1,16 @@
-# @taskadence/mcp — Taskadence's MCP server over stdio
+# taskadence-mcp — Taskadence's MCP server over stdio
 
-For MCP clients that **start a local process** instead of calling a URL. `npx -y @taskadence/mcp` speaks the Model
-Context Protocol over stdio to your client and forwards every message to Taskadence's **remote** MCP server
+For MCP clients that **start a local process** instead of calling a URL. `uvx taskadence-mcp` speaks the Model Context
+Protocol over stdio to your client and forwards every message to Taskadence's **remote** MCP server
 (`<api>/mcp`, Streamable HTTP) with your access token. It is a proxy, not a second server: the tools, the read-only and
 tool-group enforcement, and the audit trail are the remote server's — the same tools, by construction.
 
-> **`0.x` is a pre-release**, and **not on npm yet** (Taskadence's stability gate). Until then, from a checkout:
-> `npm ci && npm run build` in `packages/mcp-node`, then run `node packages/mcp-node/dist/cli.js`.
+> **`0.x` is a pre-release**, and **not on PyPI yet** (Taskadence's stability gate). Until then, install from a checkout:
+> `pip install -e packages/taskadence-mcp`, then run `taskadence-mcp`.
 
 If your client can add a remote server by URL (Claude, Claude Code, Cursor, VS Code, …), use the URL instead — it signs
-in with OAuth and needs no token: [Connect](https://docs.taskadence.com/mcp/connect/). The Python twin is
-`uvx taskadence-mcp` (same variables, same flags).
+in with OAuth and needs no token: [Connect](https://docs.taskadence.com/mcp/connect/). The npm twin is
+`npx -y @taskadence/mcp` (same variables, same flags).
 
 ## Configure
 
@@ -31,15 +31,15 @@ server's own convention, not this one's.
 {
   "mcpServers": {
     "taskadence": {
-      "command": "npx",
-      "args": ["-y", "@taskadence/mcp"],
+      "command": "uvx",
+      "args": ["taskadence-mcp"],
       "env": { "TASKADENCE_TOKEN": "tkd_live_…", "TASKADENCE_MCP_READONLY": "1" }
     }
   }
 }
 ```
 
-Claude Code: `claude mcp add --env TASKADENCE_TOKEN=tkd_live_… --transport stdio taskadence -- npx -y @taskadence/mcp`.
+Claude Code: `claude mcp add --env TASKADENCE_TOKEN=tkd_live_… --transport stdio taskadence -- uvx taskadence-mcp`.
 Taskadence's **Developers → MCP** tab writes this for your client, with a token scoped to your choice.
 
 ## What it does, exactly
@@ -51,4 +51,4 @@ Taskadence's **Developers → MCP** tab writes this for your client, with a toke
   `-32003`; each also writes one line to stderr.
 - It holds no tool of its own and reaches nothing but `<api>/mcp`.
 
-Node ≥ 20, ESM. Depends on `@modelcontextprotocol/sdk` (the official SDK). Apache-2.0.
+Python ≥ 3.10. Depends on `mcp` (the official SDK, `<2`) and `httpx`. Apache-2.0.

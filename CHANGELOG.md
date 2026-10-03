@@ -1,17 +1,27 @@
 # Changelog
 
-All notable changes to `tasksmate` (the Python SDK). The format follows [Keep a Changelog](https://keepachangelog.com/);
+All notable changes to `taskadence` (the Python SDK). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions follow semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0 (task S.23).
 
 ## [Unreleased] — 0.1.0.dev0
 
+### Changed (5.8 — the product is Taskadence; nothing was published under the old names, so there is no shim)
+- (5.8) Distributions `taskadence` / `taskadence-mcp` (PyPI) and `@taskadence/mcp` (npm); was `tasksmate` / `tasksmate-mcp` / `@tasksmate/mcp`.
+- (5.8) Import `taskadence` (`Taskadence`, `AsyncTaskadence`, `TaskadenceError`); was `tasksmate` (`TasksMate`, …). No `tasksmate` import shim.
+- (5.8) CLI: `tm` stays, plus a `taskadence` entry point; MCP binary `taskadence-mcp`. Default API `https://api.taskadence.com`.
+- (5.8) Environment `TASKADENCE_*`; a `TASKSMATE_*` variable still works when the new one is unset, with a DeprecationWarning.
+- (5.8) Problem types `urn:taskadence:problem:*`; `urn:tasksmate:problem:*` maps to the same exceptions.
+- (5.8) Tokens are minted as `tkd_live_` / `tkd_test_`; `tm_live_` / `tm_test_` tokens keep working (CLI login, redaction).
+- (5.8) The CLI still reads a token stored under keyring service `tasksmate` or in `~/.config/tasksmate/`; logout clears both.
+- (5.8) Request header `Taskadence-Version` (was `TasksMate-Version`; informational, the API ignores it).
+
 ### Added
-- `TasksMate` / `AsyncTasksMate`: `tm.<resource>.<verb>(…)` for all 152 public operations of API `2026-09-25`,
+- `Taskadence` / `AsyncTaskadence`: `tm.<resource>.<verb>(…)` for all 152 public operations of API `2026-09-25`,
   generated from `spec/openapi.public.json` (openapi-python-client 0.29.1 + a generated facade).
 - Auto-paging lists (`Page` / `AsyncPage`), typed problem+json exceptions with `request_id`, retries with backoff and
   `Retry-After`, automatic `Idempotency-Key` on creates, `ETag` / `If-Match` / `If-None-Match`, deprecation warnings.
 - `to_dataframe()` on pages (the `pandas` extra).
-- `tasksmate.webhooks.verify` / `parse` (Standard Webhooks signatures, rotation aware).
+- `taskadence.webhooks.verify` / `parse` (Standard Webhooks signatures, rotation aware).
 - The `tm` CLI (the `cli` extra): `auth`, `me`, `tasks`, `projects`, `views`, `webhooks`, `tokens`.
 - `examples/streamlit_dashboard`.
 
@@ -51,9 +61,9 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - `POST /oauth/register` (RFC 7591, `x-kind: oauth`) is protocol, not a method — like the other `/oauth/*` routes.
 
 ### Added (5.3 — the stdio MCP packages, `packages/`)
-- `tasksmate-mcp` (Python, `uvx tasksmate-mcp`) and `@tasksmate/mcp` (Node, `npx -y @tasksmate/mcp`): stdio ↔
-  Streamable HTTP proxies to TasksMate's remote MCP server — no tool code of their own. `TASKSMATE_TOKEN` (required),
-  `TASKSMATE_API_URL`, `TASKSMATE_MCP_READONLY`, `TASKSMATE_MCP_GROUPS` (or `--api-url`, `--readonly`, `--groups`). A
+- `taskadence-mcp` (Python, `uvx taskadence-mcp`) and `@taskadence/mcp` (Node, `npx -y @taskadence/mcp`): stdio ↔
+  Streamable HTTP proxies to Taskadence's remote MCP server — no tool code of their own. `TASKADENCE_TOKEN` (required),
+  `TASKADENCE_API_URL`, `TASKADENCE_MCP_READONLY`, `TASKADENCE_MCP_GROUPS` (or `--api-url`, `--readonly`, `--groups`). A
   refused token / an HTTP refusal / an unreachable server is a JSON-RPC error (`-32001` / `-32002` / `-32003`) and one
   stderr line, never the token.
 - CI tests both (Python 3.10–3.13, Node 20 / 22); `release.yml` builds, checks and SBOMs all three artefacts from one
@@ -63,7 +73,7 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - 160 operations (was 152): `oauth_clients.*` (list, create, read, update, delete, rotate_secret) and
   `connected_apps.list` / `connected_apps.delete`. The five OAuth 2.1 protocol operations (`x-kind: oauth` —
   `/oauth/authorize`, `/oauth/token`, `/oauth/revoke`, the two `/.well-known/*` documents) are **not** methods: the
-  generator drops them; an app's access token is used as `TasksMate(token=…)` like any other.
+  generator drops them; an app's access token is used as `Taskadence(token=…)` like any other.
 - `views.create` / `views.update` / `views.list` know `resource` (`ViewResourceEnum`: `task` | `project`).
 
 ### Changed (4.1b — licence)

@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TasksMate API",
-    "description": "The TasksMate public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasksMate access token (`TasksMateToken` \u2014 one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write \u2014 a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:tasksmate:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:tasksmate:problem:invalid-parameter` | A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:tasksmate:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry. |\n| `urn:tasksmate:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:tasksmate:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:tasksmate:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:tasksmate:problem:rate-limit` | Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:tasksmate:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:tasksmate:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:tasksmate:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:tasksmate:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:tasksmate:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:tasksmate:problem:test-token-read-only` | A `tm_test_` token can authenticate and read, never write. |\n| `urn:tasksmate:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:tasksmate:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |",
+    "title": "Taskadence API",
+    "description": "The Taskadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a Taskadence access token (`TaskadenceToken` \u2014 one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write \u2014 a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |",
     "version": "2026-09-25"
   },
   "paths": {
@@ -495,7 +495,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -744,7 +744,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -1018,7 +1018,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -1365,7 +1365,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -1620,7 +1620,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -1908,7 +1908,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -2195,7 +2195,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -2413,7 +2413,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -2714,7 +2714,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -3510,7 +3510,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -3784,7 +3784,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -4106,7 +4106,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -4428,7 +4428,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -4646,7 +4646,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -4921,7 +4921,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -5196,7 +5196,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -5471,7 +5471,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -5746,7 +5746,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -5977,7 +5977,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -6252,7 +6252,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -6523,7 +6523,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -6798,7 +6798,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -7069,7 +7069,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -7426,7 +7426,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -7675,7 +7675,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -7943,7 +7943,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -8212,7 +8212,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -8439,7 +8439,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -8681,7 +8681,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -9021,7 +9021,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -9318,7 +9318,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -9569,7 +9569,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -9778,7 +9778,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -10006,7 +10006,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -10217,7 +10217,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -10584,7 +10584,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -10815,7 +10815,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -11066,7 +11066,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -11326,7 +11326,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -11587,7 +11587,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -11816,7 +11816,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -12055,7 +12055,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -12294,7 +12294,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -12635,7 +12635,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -12880,7 +12880,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -13146,7 +13146,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -13413,7 +13413,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -13640,7 +13640,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -13886,7 +13886,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -14220,7 +14220,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -14465,7 +14465,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -14726,7 +14726,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -14953,7 +14953,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -15188,7 +15188,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -15407,7 +15407,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -15703,7 +15703,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -15953,7 +15953,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -16219,7 +16219,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -16445,7 +16445,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -16691,7 +16691,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -17028,7 +17028,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -17260,7 +17260,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -17531,7 +17531,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -17804,7 +17804,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -18040,7 +18040,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -18362,7 +18362,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -18617,7 +18617,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -18848,7 +18848,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -19084,7 +19084,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -19334,7 +19334,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -19386,7 +19386,7 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.tasksmate.invalid",
+                  "email": "ci-bot@service.o0020.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
@@ -19568,7 +19568,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -19676,7 +19676,7 @@
                     {
                       "active_tokens": 1,
                       "created_at": "2026-09-25T12:00:00Z",
-                      "email": "ci-bot@service.o0020.tasksmate.invalid",
+                      "email": "ci-bot@service.o0020.taskadence.invalid",
                       "is_active": true,
                       "kind": "service_account",
                       "name": "CI bot",
@@ -19864,7 +19864,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -19925,7 +19925,7 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.tasksmate.invalid",
+                  "email": "ci-bot@service.o0020.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
@@ -20107,7 +20107,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -20152,7 +20152,7 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.tasksmate.invalid",
+                  "email": "ci-bot@service.o0020.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
@@ -20334,7 +20334,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -20610,7 +20610,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -20672,9 +20672,9 @@
                     "tasks:write"
                   ],
                   "status": "active",
-                  "token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "token": "tkd_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
                   "token_id": "TK123456",
-                  "token_prefix": "tm_live_Ab3x",
+                  "token_prefix": "tkd_live_Ab3x",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "use_count": 0
                 }
@@ -20851,7 +20851,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -20973,7 +20973,7 @@
                       ],
                       "status": "active",
                       "token_id": "TK123456",
-                      "token_prefix": "tm_live_Ab3x",
+                      "token_prefix": "tkd_live_Ab3x",
                       "updated_at": "2026-09-25T12:00:00Z",
                       "use_count": 0
                     }
@@ -21156,7 +21156,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -21215,7 +21215,7 @@
                   ],
                   "status": "active",
                   "token_id": "TK123456",
-                  "token_prefix": "tm_live_Ab3x",
+                  "token_prefix": "tkd_live_Ab3x",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "use_count": 0
                 }
@@ -21395,7 +21395,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -21457,7 +21457,7 @@
                   ],
                   "status": "active",
                   "token_id": "TK123456",
-                  "token_prefix": "tm_live_Ab3x",
+                  "token_prefix": "tkd_live_Ab3x",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "use_count": 0
                 }
@@ -21634,7 +21634,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -21682,7 +21682,7 @@
                   ],
                   "status": "active",
                   "token_id": "TK123456",
-                  "token_prefix": "tm_live_Ab3x",
+                  "token_prefix": "tkd_live_Ab3x",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "use_count": 0
                 }
@@ -21859,7 +21859,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -21908,9 +21908,9 @@
                     "tasks:write"
                   ],
                   "status": "active",
-                  "token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "token": "tkd_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
                   "token_id": "TK123456",
-                  "token_prefix": "tm_live_Ab3x",
+                  "token_prefix": "tkd_live_Ab3x",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "use_count": 0
                 }
@@ -22087,7 +22087,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -22370,7 +22370,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -22395,7 +22395,7 @@
               "example": {
                 "org_id": "string",
                 "name": "Deploy notifier",
-                "url": "https://hooks.example.com/tasksmate",
+                "url": "https://hooks.example.com/taskadence",
                 "events": [
                   "task.*",
                   "project.created"
@@ -22431,7 +22431,7 @@
                   "status": "active",
                   "subscription_id": "WH123456",
                   "updated_at": "2026-09-25T12:00:00Z",
-                  "url": "https://hooks.example.com/tasksmate"
+                  "url": "https://hooks.example.com/taskadence"
                 }
               }
             }
@@ -22606,7 +22606,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -22728,7 +22728,7 @@
                       "status": "active",
                       "subscription_id": "WH123456",
                       "updated_at": "2026-09-25T12:00:00Z",
-                      "url": "https://hooks.example.com/tasksmate"
+                      "url": "https://hooks.example.com/taskadence"
                     }
                   ],
                   "next_cursor": "string"
@@ -22909,7 +22909,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -22968,7 +22968,7 @@
                   "status": "active",
                   "subscription_id": "WH123456",
                   "updated_at": "2026-09-25T12:00:00Z",
-                  "url": "https://hooks.example.com/tasksmate"
+                  "url": "https://hooks.example.com/taskadence"
                 }
               }
             }
@@ -23146,7 +23146,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -23225,7 +23225,7 @@
                   "status": "active",
                   "subscription_id": "WH123456",
                   "updated_at": "2026-09-25T12:00:00Z",
-                  "url": "https://hooks.example.com/tasksmate"
+                  "url": "https://hooks.example.com/taskadence"
                 }
               }
             }
@@ -23400,7 +23400,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -23457,7 +23457,7 @@
                   "status": "active",
                   "subscription_id": "WH123456",
                   "updated_at": "2026-09-25T12:00:00Z",
-                  "url": "https://hooks.example.com/tasksmate"
+                  "url": "https://hooks.example.com/taskadence"
                 }
               }
             }
@@ -23632,7 +23632,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -23683,7 +23683,7 @@
                   "status": "active",
                   "subscription_id": "WH123456",
                   "updated_at": "2026-09-25T12:00:00Z",
-                  "url": "https://hooks.example.com/tasksmate"
+                  "url": "https://hooks.example.com/taskadence"
                 }
               }
             }
@@ -23858,7 +23858,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -24090,7 +24090,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -24394,7 +24394,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -24648,7 +24648,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -24883,7 +24883,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -24997,7 +24997,7 @@
                         "tasks:write",
                         "projects:read"
                       ],
-                      "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                      "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                       "client_type": "confidential",
                       "created_at": "2026-09-26T12:00:00Z",
                       "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -25194,7 +25194,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -25247,8 +25247,8 @@
                     "tasks:write",
                     "projects:read"
                   ],
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
-                  "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_secret": "tkdcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
                   "client_type": "confidential",
                   "created_at": "2026-09-26T12:00:00Z",
                   "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -25439,7 +25439,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -25488,7 +25488,7 @@
                     "tasks:write",
                     "projects:read"
                   ],
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                   "client_type": "confidential",
                   "created_at": "2026-09-26T12:00:00Z",
                   "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -25682,7 +25682,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -25742,7 +25742,7 @@
                     "tasks:write",
                     "projects:read"
                   ],
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                   "client_type": "confidential",
                   "created_at": "2026-09-26T12:00:00Z",
                   "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -25933,7 +25933,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -25971,7 +25971,7 @@
                     "tasks:write",
                     "projects:read"
                   ],
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                   "client_type": "confidential",
                   "created_at": "2026-09-26T12:00:00Z",
                   "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -26162,7 +26162,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -26202,8 +26202,8 @@
                     "tasks:write",
                     "projects:read"
                   ],
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
-                  "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_secret": "tkdcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
                   "client_type": "confidential",
                   "created_at": "2026-09-26T12:00:00Z",
                   "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -26394,7 +26394,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -26493,7 +26493,7 @@
                 "example": {
                   "data": [
                     {
-                      "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                      "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                       "client_name": "Acme HR",
                       "created_at": "2026-09-26T12:00:00Z",
                       "grant_id": "tmg_Xy12Ab34Cd56",
@@ -26684,7 +26684,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -26896,7 +26896,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -27530,7 +27530,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -27756,7 +27756,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -27989,7 +27989,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -28224,7 +28224,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -28433,7 +28433,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -28673,7 +28673,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -28993,7 +28993,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -29239,7 +29239,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -29493,7 +29493,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -29748,7 +29748,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -29997,7 +29997,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -30228,7 +30228,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -30467,7 +30467,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -30705,7 +30705,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -30923,7 +30923,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -31287,7 +31287,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -31597,7 +31597,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -31844,7 +31844,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -32102,7 +32102,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -32338,7 +32338,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -32620,7 +32620,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -32854,7 +32854,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -33099,7 +33099,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -33318,7 +33318,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -33576,7 +33576,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -33899,7 +33899,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -34153,7 +34153,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -34375,7 +34375,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -34603,7 +34603,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -34858,7 +34858,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -35112,7 +35112,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -35349,7 +35349,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -35602,7 +35602,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -35839,7 +35839,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -36070,7 +36070,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -36402,7 +36402,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -36725,7 +36725,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -36981,7 +36981,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "create",
@@ -37210,7 +37210,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -37467,7 +37467,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -37722,7 +37722,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -37958,7 +37958,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -38211,7 +38211,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -38448,7 +38448,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -38679,7 +38679,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -38896,7 +38896,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [],
@@ -38919,7 +38919,7 @@
           "mcp"
         ],
         "summary": "How to add the MCP server to each client: the clients table, tool groups and scopes",
-        "description": "How to add the TasksMate MCP server to each client: a remote (URL) and a local (stdio package) artefact per\nclient, with the server URL for this API, the tool groups (`default`, `requires_scope`) and the scopes each\ngroup's read and write tools need.",
+        "description": "How to add the Taskadence MCP server to each client: a remote (URL) and a local (stdio package) artefact per\nclient, with the server URL for this API, the tool groups (`default`, `requires_scope`) and the scopes each\ngroup's read and write tools need.",
         "operationId": "mcp.clients",
         "responses": {
           "200": {
@@ -39150,7 +39150,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [],
@@ -39545,7 +39545,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -39909,7 +39909,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -40250,7 +40250,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -40482,7 +40482,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -40718,7 +40718,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -40967,7 +40967,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -41186,7 +41186,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -41426,7 +41426,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -41758,7 +41758,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -41977,7 +41977,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -42186,7 +42186,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -42482,7 +42482,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-kind": "list",
@@ -42710,7 +42710,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -42918,7 +42918,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -43150,7 +43150,7 @@
             "bearerAuth": []
           },
           {
-            "TasksMateToken": []
+            "TaskadenceToken": []
           }
         ],
         "x-scopes": [
@@ -43260,7 +43260,7 @@
           "oauth"
         ],
         "summary": "Start an authorization: sign-in and consent, then back to the app",
-        "description": "Start an authorization: the person signs in to TasksMate, picks the organization and approves the scopes; the\nbrowser then returns to `redirect_uri` with `code` and `state` (or `error` and `state`).",
+        "description": "Start an authorization: the person signs in to Taskadence, picks the organization and approves the scopes; the\nbrowser then returns to `redirect_uri` with `code` and `state` (or `error` and `state`).",
         "operationId": "oauth.authorize",
         "parameters": [
           {
@@ -43294,10 +43294,10 @@
                   "type": "null"
                 }
               ],
-              "description": "The app's `tmc_\u2026` id, or the https URL of the client's metadata document",
+              "description": "The app's `tkdc_\u2026` id, or the https URL of the client's metadata document",
               "title": "Client Id"
             },
-            "description": "The app's `tmc_\u2026` id, or the https URL of the client's metadata document"
+            "description": "The app's `tkdc_\u2026` id, or the https URL of the client's metadata document"
           },
           {
             "name": "redirect_uri",
@@ -43501,9 +43501,9 @@
                   "$ref": "#/components/schemas/TokenResponse"
                 },
                 "example": {
-                  "access_token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+                  "access_token": "tkd_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
                   "expires_in": 3600,
-                  "refresh_token": "tmr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
+                  "refresh_token": "tkdr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
                   "scope": "tasks:write projects:read",
                   "token_type": "Bearer"
                 }
@@ -43710,7 +43710,7 @@
                   "$ref": "#/components/schemas/ClientRegistrationResponse"
                 },
                 "example": {
-                  "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+                  "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
                   "client_id_issued_at": 1790500000,
                   "client_name": "Claude Code",
                   "grant_types": [
@@ -43753,23 +43753,23 @@
                       "type": "string",
                       "enum": [
                         "about:blank",
-                        "urn:tasksmate:problem:validation",
-                        "urn:tasksmate:problem:invalid-parameter",
-                        "urn:tasksmate:problem:precondition-failed",
-                        "urn:tasksmate:problem:idempotency-key-reused",
-                        "urn:tasksmate:problem:idempotency-key-in-flight",
-                        "urn:tasksmate:problem:idempotency-key-invalid",
-                        "urn:tasksmate:problem:rate-limit",
-                        "urn:tasksmate:problem:internal",
-                        "urn:tasksmate:problem:token-invalid",
-                        "urn:tasksmate:problem:token-expired",
-                        "urn:tasksmate:problem:token-revoked",
-                        "urn:tasksmate:problem:insufficient-scope",
-                        "urn:tasksmate:problem:test-token-read-only",
-                        "urn:tasksmate:problem:token-policy",
-                        "urn:tasksmate:problem:url-refused"
+                        "urn:taskadence:problem:validation",
+                        "urn:taskadence:problem:invalid-parameter",
+                        "urn:taskadence:problem:precondition-failed",
+                        "urn:taskadence:problem:idempotency-key-reused",
+                        "urn:taskadence:problem:idempotency-key-in-flight",
+                        "urn:taskadence:problem:idempotency-key-invalid",
+                        "urn:taskadence:problem:rate-limit",
+                        "urn:taskadence:problem:internal",
+                        "urn:taskadence:problem:token-invalid",
+                        "urn:taskadence:problem:token-expired",
+                        "urn:taskadence:problem:token-revoked",
+                        "urn:taskadence:problem:insufficient-scope",
+                        "urn:taskadence:problem:test-token-read-only",
+                        "urn:taskadence:problem:token-policy",
+                        "urn:taskadence:problem:url-refused"
                       ],
-                      "description": "`about:blank` or a `urn:tasksmate:problem:*` identifier"
+                      "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
                     "title": {
                       "type": "string",
@@ -43835,23 +43835,23 @@
                       "type": "string",
                       "enum": [
                         "about:blank",
-                        "urn:tasksmate:problem:validation",
-                        "urn:tasksmate:problem:invalid-parameter",
-                        "urn:tasksmate:problem:precondition-failed",
-                        "urn:tasksmate:problem:idempotency-key-reused",
-                        "urn:tasksmate:problem:idempotency-key-in-flight",
-                        "urn:tasksmate:problem:idempotency-key-invalid",
-                        "urn:tasksmate:problem:rate-limit",
-                        "urn:tasksmate:problem:internal",
-                        "urn:tasksmate:problem:token-invalid",
-                        "urn:tasksmate:problem:token-expired",
-                        "urn:tasksmate:problem:token-revoked",
-                        "urn:tasksmate:problem:insufficient-scope",
-                        "urn:tasksmate:problem:test-token-read-only",
-                        "urn:tasksmate:problem:token-policy",
-                        "urn:tasksmate:problem:url-refused"
+                        "urn:taskadence:problem:validation",
+                        "urn:taskadence:problem:invalid-parameter",
+                        "urn:taskadence:problem:precondition-failed",
+                        "urn:taskadence:problem:idempotency-key-reused",
+                        "urn:taskadence:problem:idempotency-key-in-flight",
+                        "urn:taskadence:problem:idempotency-key-invalid",
+                        "urn:taskadence:problem:rate-limit",
+                        "urn:taskadence:problem:internal",
+                        "urn:taskadence:problem:token-invalid",
+                        "urn:taskadence:problem:token-expired",
+                        "urn:taskadence:problem:token-revoked",
+                        "urn:taskadence:problem:insufficient-scope",
+                        "urn:taskadence:problem:test-token-read-only",
+                        "urn:taskadence:problem:token-policy",
+                        "urn:taskadence:problem:url-refused"
                       ],
-                      "description": "`about:blank` or a `urn:tasksmate:problem:*` identifier"
+                      "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
                     "title": {
                       "type": "string",
@@ -43929,7 +43929,7 @@
                 "properties": {
                   "token": {
                     "type": "string",
-                    "description": "A refresh token (`tmr_\u2026`) or an access token (`tm_live_\u2026`)"
+                    "description": "A refresh token (`tkdr_\u2026`) or an access token (`tkd_live_\u2026`)"
                   },
                   "token_type_hint": {
                     "type": "string",
@@ -44597,7 +44597,7 @@
           "client_id": {
             "type": "string",
             "title": "Client Id",
-            "description": "Public identifier (`tmc_\u2026`). There is no client secret."
+            "description": "Public identifier (`tkdc_\u2026`). There is no client secret."
           },
           "client_id_issued_at": {
             "type": "integer",
@@ -44686,7 +44686,7 @@
         ],
         "title": "ClientRegistrationResponse",
         "example": {
-          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
           "client_id_issued_at": 1790500000,
           "client_name": "Claude Code",
           "grant_types": [
@@ -44823,7 +44823,7 @@
         ],
         "title": "ConnectedApp",
         "example": {
-          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
           "client_name": "Acme HR",
           "created_at": "2026-09-26T12:00:00Z",
           "grant_id": "tmg_Xy12Ab34Cd56",
@@ -46730,7 +46730,7 @@
           "default_api_url": {
             "type": "string",
             "title": "Default Api Url",
-            "description": "The API the packages call when `TASKSMATE_API_URL` is unset"
+            "description": "The API the packages call when `TASKADENCE_API_URL` is unset"
           },
           "env": {
             "additionalProperties": {
@@ -47915,7 +47915,7 @@
           "client_id": {
             "type": "string",
             "title": "Client Id",
-            "description": "Public identifier (`tmc_\u2026`)"
+            "description": "Public identifier (`tkdc_\u2026`)"
           },
           "org_id": {
             "type": "string",
@@ -48124,7 +48124,7 @@
               }
             ],
             "title": "Client Secret",
-            "description": "THE SECRET (`tmcs_\u2026`) of a confidential app \u2014 shown once, never stored (only its SHA-256 is). null for a public app."
+            "description": "THE SECRET (`tkdcs_\u2026`) of a confidential app \u2014 shown once, never stored (only its SHA-256 is). null for a public app."
           }
         },
         "type": "object",
@@ -48143,8 +48143,8 @@
             "tasks:write",
             "projects:read"
           ],
-          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
-          "client_secret": "tmcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+          "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_secret": "tkdcs_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
           "client_type": "confidential",
           "created_at": "2026-09-26T12:00:00Z",
           "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -48169,7 +48169,7 @@
           "client_id": {
             "type": "string",
             "title": "Client Id",
-            "description": "Public identifier (`tmc_\u2026`)"
+            "description": "Public identifier (`tkdc_\u2026`)"
           },
           "org_id": {
             "type": "string",
@@ -48385,7 +48385,7 @@
             "tasks:write",
             "projects:read"
           ],
-          "client_id": "tmc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
+          "client_id": "tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo",
           "client_type": "confidential",
           "created_at": "2026-09-26T12:00:00Z",
           "created_by": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
@@ -53803,7 +53803,7 @@
           "email": {
             "type": "string",
             "title": "Email",
-            "description": "`<slug>@service.<org_id>.tasksmate.invalid` \u2014 syntactically valid, never deliverable"
+            "description": "`<slug>@service.<org_id>.taskadence.invalid` \u2014 syntactically valid, never deliverable"
           },
           "kind": {
             "type": "string",
@@ -53864,7 +53864,7 @@
         "example": {
           "active_tokens": 1,
           "created_at": "2026-09-25T12:00:00Z",
-          "email": "ci-bot@service.o0020.tasksmate.invalid",
+          "email": "ci-bot@service.o0020.taskadence.invalid",
           "is_active": true,
           "kind": "service_account",
           "name": "CI bot",
@@ -57522,7 +57522,7 @@
               "test"
             ],
             "title": "Kind",
-            "description": "`live` (tm_live_\u2026) or `test` (tm_test_\u2026: authenticates and reads, never writes)",
+            "description": "`live` (tkd_live_\u2026) or `test` (tkd_test_\u2026: authenticates and reads, never writes)",
             "default": "live"
           },
           "scopes": {
@@ -57630,7 +57630,7 @@
           "token_prefix": {
             "type": "string",
             "title": "Token Prefix",
-            "description": "The first 12 characters (`tm_live_ab12`) \u2014 the token itself is never shown again"
+            "description": "The first 12 characters (`tkd_live_ab12`) \u2014 the token itself is never shown again"
           },
           "kind": {
             "type": "string",
@@ -57826,9 +57826,9 @@
             "tasks:write"
           ],
           "status": "active",
-          "token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+          "token": "tkd_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
           "token_id": "TK123456",
-          "token_prefix": "tm_live_Ab3x",
+          "token_prefix": "tkd_live_Ab3x",
           "updated_at": "2026-09-25T12:00:00Z",
           "use_count": 0
         },
@@ -57872,7 +57872,7 @@
           "token_prefix": {
             "type": "string",
             "title": "Token Prefix",
-            "description": "The first 12 characters (`tm_live_ab12`) \u2014 the token itself is never shown again"
+            "description": "The first 12 characters (`tkd_live_ab12`) \u2014 the token itself is never shown again"
           },
           "kind": {
             "type": "string",
@@ -58063,7 +58063,7 @@
           ],
           "status": "active",
           "token_id": "TK123456",
-          "token_prefix": "tm_live_Ab3x",
+          "token_prefix": "tkd_live_Ab3x",
           "updated_at": "2026-09-25T12:00:00Z",
           "use_count": 0
         },
@@ -58074,7 +58074,7 @@
           "access_token": {
             "type": "string",
             "title": "Access Token",
-            "description": "A TasksMate access token (`tm_live_\u2026`), 1 hour"
+            "description": "A Taskadence access token (`tkd_live_\u2026`), 1 hour"
           },
           "token_type": {
             "type": "string",
@@ -58090,7 +58090,7 @@
           "refresh_token": {
             "type": "string",
             "title": "Refresh Token",
-            "description": "`tmr_\u2026` \u2014 single use: each refresh returns a new one"
+            "description": "`tkdr_\u2026` \u2014 single use: each refresh returns a new one"
           },
           "scope": {
             "type": "string",
@@ -58107,9 +58107,9 @@
         ],
         "title": "TokenResponse",
         "example": {
-          "access_token": "tm_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
+          "access_token": "tkd_live_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0R",
           "expires_in": 3600,
-          "refresh_token": "tmr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
+          "refresh_token": "tkdr_Zk5n8WcHt1YpUo4MiGs7Fj6Da-_Bq0RAb3xQ9eLr0v2",
           "scope": "tasks:write projects:read",
           "token_type": "Bearer"
         },
@@ -58659,7 +58659,7 @@
             "title": "Url",
             "description": "An https:// endpoint (http://localhost is accepted outside production)",
             "examples": [
-              "https://hooks.example.com/tasksmate"
+              "https://hooks.example.com/taskadence"
             ]
           },
           "events": {
@@ -58914,7 +58914,7 @@
           "status": "active",
           "subscription_id": "WH123456",
           "updated_at": "2026-09-25T12:00:00Z",
-          "url": "https://hooks.example.com/tasksmate"
+          "url": "https://hooks.example.com/taskadence"
         },
         "description": "Returned by `webhooks.create` and `webhooks.rotate_secret`."
       },
@@ -59151,7 +59151,7 @@
           "status": "active",
           "subscription_id": "WH123456",
           "updated_at": "2026-09-25T12:00:00Z",
-          "url": "https://hooks.example.com/tasksmate"
+          "url": "https://hooks.example.com/taskadence"
         },
         "description": "Returned by `webhooks.delete`, `webhooks.read` and `webhooks.update`."
       },
@@ -59280,24 +59280,24 @@
         "properties": {
           "type": {
             "type": "string",
-            "description": "`about:blank` or a `urn:tasksmate:problem:*` identifier",
+            "description": "`about:blank` or a `urn:taskadence:problem:*` identifier",
             "enum": [
               "about:blank",
-              "urn:tasksmate:problem:validation",
-              "urn:tasksmate:problem:invalid-parameter",
-              "urn:tasksmate:problem:precondition-failed",
-              "urn:tasksmate:problem:idempotency-key-reused",
-              "urn:tasksmate:problem:idempotency-key-in-flight",
-              "urn:tasksmate:problem:idempotency-key-invalid",
-              "urn:tasksmate:problem:rate-limit",
-              "urn:tasksmate:problem:internal",
-              "urn:tasksmate:problem:token-invalid",
-              "urn:tasksmate:problem:token-expired",
-              "urn:tasksmate:problem:token-revoked",
-              "urn:tasksmate:problem:insufficient-scope",
-              "urn:tasksmate:problem:test-token-read-only",
-              "urn:tasksmate:problem:token-policy",
-              "urn:tasksmate:problem:url-refused"
+              "urn:taskadence:problem:validation",
+              "urn:taskadence:problem:invalid-parameter",
+              "urn:taskadence:problem:precondition-failed",
+              "urn:taskadence:problem:idempotency-key-reused",
+              "urn:taskadence:problem:idempotency-key-in-flight",
+              "urn:taskadence:problem:idempotency-key-invalid",
+              "urn:taskadence:problem:rate-limit",
+              "urn:taskadence:problem:internal",
+              "urn:taskadence:problem:token-invalid",
+              "urn:taskadence:problem:token-expired",
+              "urn:taskadence:problem:token-revoked",
+              "urn:taskadence:problem:insufficient-scope",
+              "urn:taskadence:problem:test-token-read-only",
+              "urn:taskadence:problem:token-policy",
+              "urn:taskadence:problem:url-refused"
             ]
           },
           "title": {
@@ -59554,17 +59554,17 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "A Supabase session token (`Authorization: Bearer <jwt>`) \u2014 what the TasksMate app sends. It holds every scope."
+        "description": "A Supabase session token (`Authorization: Bearer <jwt>`) \u2014 what the Taskadence app sends. It holds every scope."
       },
-      "TasksMateToken": {
+      "TaskadenceToken": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "tm_live_\u2026 / tm_test_\u2026",
-        "description": "A TasksMate access token: `Authorization: Bearer tm_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tm_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and milestones. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals and milestones (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "bearerFormat": "tkd_live_\u2026 / tkd_test_\u2026",
+        "description": "A Taskadence access token: `Authorization: Bearer tkd_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tkd_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and milestones. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals and milestones (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
-        "description": "For third-party apps acting for a TasksMate user: the authorization-code flow with PKCE (S256, required). The access token it returns is a `tm_live_\u2026` token for one organization, valid 1 hour; refresh tokens rotate on every use.",
+        "description": "For third-party apps acting for a Taskadence user: the authorization-code flow with PKCE (S256, required). The access token it returns is a `tkd_live_\u2026` token for one organization, valid 1 hour; refresh tokens rotate on every use.",
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "/oauth/authorize",
@@ -59591,8 +59591,8 @@
   },
   "servers": [
     {
-      "url": "https://tasksmate-fdfsarhnf5gacfb7.eastus-01.azurewebsites.net",
-      "description": "The deployed TasksMate API (production)"
+      "url": "https://api.taskadence.com",
+      "description": "The deployed Taskadence API (production)"
     }
   ],
   "webhooks": {
@@ -59636,7 +59636,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -59652,8 +59652,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -59693,7 +59693,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -59738,7 +59738,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -59754,8 +59754,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -59795,7 +59795,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -59840,7 +59840,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -59856,8 +59856,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -59899,7 +59899,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -59944,7 +59944,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -59960,8 +59960,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60001,7 +60001,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60046,7 +60046,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60062,8 +60062,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60105,7 +60105,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60150,7 +60150,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60166,8 +60166,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60209,7 +60209,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60254,7 +60254,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60270,8 +60270,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60313,7 +60313,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60358,7 +60358,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60374,8 +60374,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60417,7 +60417,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60462,7 +60462,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60478,8 +60478,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60519,7 +60519,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60564,7 +60564,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60580,8 +60580,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60621,7 +60621,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60666,7 +60666,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60682,8 +60682,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60725,7 +60725,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60770,7 +60770,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60786,8 +60786,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60829,7 +60829,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60874,7 +60874,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60890,8 +60890,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -60933,7 +60933,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -60978,7 +60978,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -60994,8 +60994,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61037,7 +61037,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61082,7 +61082,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61098,8 +61098,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61141,7 +61141,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61186,7 +61186,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61202,8 +61202,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61243,7 +61243,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61288,7 +61288,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61304,8 +61304,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61347,7 +61347,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61392,7 +61392,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61408,8 +61408,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61451,7 +61451,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61496,7 +61496,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61512,8 +61512,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61555,7 +61555,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61600,7 +61600,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61616,8 +61616,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61659,7 +61659,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61704,7 +61704,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61720,8 +61720,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61761,7 +61761,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61806,7 +61806,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61822,8 +61822,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61865,7 +61865,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -61910,7 +61910,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -61926,8 +61926,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -61969,7 +61969,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62014,7 +62014,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62030,8 +62030,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62071,7 +62071,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62116,7 +62116,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62132,8 +62132,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62175,7 +62175,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62220,7 +62220,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62236,8 +62236,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62279,7 +62279,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62324,7 +62324,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62340,8 +62340,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62381,7 +62381,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62426,7 +62426,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62442,8 +62442,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62483,7 +62483,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62528,7 +62528,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62544,8 +62544,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62587,7 +62587,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62632,7 +62632,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62648,8 +62648,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62691,7 +62691,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62736,7 +62736,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62752,8 +62752,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62795,7 +62795,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62840,7 +62840,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62856,8 +62856,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -62899,7 +62899,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -62944,7 +62944,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -62960,8 +62960,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63001,7 +63001,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63046,7 +63046,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63062,8 +63062,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63103,7 +63103,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63148,7 +63148,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63164,8 +63164,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63205,7 +63205,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63250,7 +63250,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63266,8 +63266,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63309,7 +63309,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63354,7 +63354,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63370,8 +63370,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63413,7 +63413,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63458,7 +63458,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63474,8 +63474,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63517,7 +63517,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63562,7 +63562,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63578,8 +63578,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63621,7 +63621,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63666,7 +63666,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63682,8 +63682,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63723,7 +63723,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63768,7 +63768,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63784,8 +63784,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63827,7 +63827,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63872,7 +63872,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63888,8 +63888,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -63929,7 +63929,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -63974,7 +63974,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -63990,8 +63990,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64033,7 +64033,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64078,7 +64078,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64094,8 +64094,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64135,7 +64135,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64180,7 +64180,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64196,8 +64196,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64237,7 +64237,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64282,7 +64282,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64298,8 +64298,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64341,7 +64341,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64386,7 +64386,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64402,8 +64402,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64445,7 +64445,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64490,7 +64490,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64506,8 +64506,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64549,7 +64549,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64594,7 +64594,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64610,8 +64610,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64653,7 +64653,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64698,7 +64698,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64714,8 +64714,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64757,7 +64757,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64802,7 +64802,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64818,8 +64818,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64861,7 +64861,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -64906,7 +64906,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -64922,8 +64922,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -64963,7 +64963,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65008,7 +65008,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65024,8 +65024,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65067,7 +65067,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65112,7 +65112,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65128,8 +65128,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65171,7 +65171,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65216,7 +65216,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65232,8 +65232,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65273,7 +65273,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65318,7 +65318,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65334,8 +65334,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65375,7 +65375,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65420,7 +65420,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65436,8 +65436,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65479,7 +65479,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65524,7 +65524,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65540,8 +65540,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65581,7 +65581,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65626,7 +65626,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65642,8 +65642,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65683,7 +65683,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65728,7 +65728,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65744,8 +65744,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65785,7 +65785,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65830,7 +65830,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65846,8 +65846,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65887,7 +65887,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -65932,7 +65932,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -65948,8 +65948,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -65991,7 +65991,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66036,7 +66036,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66052,8 +66052,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66093,7 +66093,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66138,7 +66138,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66154,8 +66154,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66195,7 +66195,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66240,7 +66240,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66256,8 +66256,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66297,7 +66297,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66342,7 +66342,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66358,8 +66358,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66399,7 +66399,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66444,7 +66444,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66460,8 +66460,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66503,7 +66503,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66548,7 +66548,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66564,8 +66564,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66607,7 +66607,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66652,7 +66652,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66668,8 +66668,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66711,7 +66711,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66756,7 +66756,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66772,8 +66772,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66813,7 +66813,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66858,7 +66858,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66874,8 +66874,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -66915,7 +66915,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -66960,7 +66960,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -66976,8 +66976,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67019,7 +67019,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67064,7 +67064,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67080,8 +67080,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67121,7 +67121,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67166,7 +67166,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67182,8 +67182,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67223,7 +67223,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67268,7 +67268,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67284,8 +67284,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67325,7 +67325,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67370,7 +67370,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67386,8 +67386,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67427,7 +67427,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67472,7 +67472,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67488,8 +67488,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67531,7 +67531,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67576,7 +67576,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67592,8 +67592,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67635,7 +67635,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67680,7 +67680,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67696,8 +67696,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67739,7 +67739,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67784,7 +67784,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67800,8 +67800,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67841,7 +67841,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67886,7 +67886,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -67902,8 +67902,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -67945,7 +67945,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -67990,7 +67990,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68006,8 +68006,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68049,7 +68049,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68094,7 +68094,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68110,8 +68110,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68153,7 +68153,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68198,7 +68198,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68214,8 +68214,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68255,7 +68255,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68300,7 +68300,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68316,8 +68316,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68357,7 +68357,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68402,7 +68402,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68418,8 +68418,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68461,7 +68461,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68506,7 +68506,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68522,8 +68522,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68565,7 +68565,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68610,7 +68610,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68626,8 +68626,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68669,7 +68669,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68714,7 +68714,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68730,8 +68730,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68773,7 +68773,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68818,7 +68818,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68834,8 +68834,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68877,7 +68877,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -68922,7 +68922,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -68938,8 +68938,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -68981,7 +68981,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -69026,7 +69026,7 @@
             "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
           },
           {
-            "name": "X-TasksMate-Event",
+            "name": "X-Taskadence-Event",
             "in": "header",
             "required": true,
             "schema": {
@@ -69042,8 +69042,8 @@
             "schema": {
               "type": "string"
             },
-            "example": "TasksMate-Webhooks/1",
-            "description": "Identifies TasksMate's sender."
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies Taskadence's sender."
           }
         ],
         "requestBody": {
@@ -69085,7 +69085,7 @@
             "description": "Received \u2014 any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone \u2014 TasksMate disables the webhook and stops sending"
+            "description": "Gone \u2014 Taskadence disables the webhook and stops sending"
           }
         }
       }
@@ -69118,7 +69118,7 @@
     },
     {
       "name": "tokens",
-      "description": "TasksMate access tokens (`tm_live_\u2026` / `tm_test_\u2026`): mint, list, rename, revoke, rotate."
+      "description": "Taskadence access tokens (`tkd_live_\u2026` / `tkd_test_\u2026`): mint, list, rename, revoke, rotate."
     },
     {
       "name": "webhooks",
@@ -69198,7 +69198,7 @@
     },
     {
       "name": "releases",
-      "description": "What's new in TasksMate."
+      "description": "What's new in Taskadence."
     },
     {
       "name": "mcp",
@@ -69210,7 +69210,7 @@
     },
     {
       "name": "connected-apps",
-      "description": "The OAuth apps you have connected to TasksMate, and disconnecting them."
+      "description": "The OAuth apps you have connected to Taskadence, and disconnecting them."
     },
     {
       "name": "oauth",
@@ -69224,98 +69224,98 @@
       "description": "A plain HTTP error; the status and `detail` say everything."
     },
     {
-      "type": "urn:tasksmate:problem:validation",
+      "type": "urn:taskadence:problem:validation",
       "statuses": [
         422
       ],
       "description": "The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`)."
     },
     {
-      "type": "urn:tasksmate:problem:invalid-parameter",
+      "type": "urn:taskadence:problem:invalid-parameter",
       "statuses": [
         400
       ],
       "description": "A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values."
     },
     {
-      "type": "urn:tasksmate:problem:precondition-failed",
+      "type": "urn:taskadence:problem:precondition-failed",
       "statuses": [
         412
       ],
       "description": "`If-Match` did not match the resource's current `ETag` \u2014 re-read it and retry."
     },
     {
-      "type": "urn:tasksmate:problem:idempotency-key-reused",
+      "type": "urn:taskadence:problem:idempotency-key-reused",
       "statuses": [
         422
       ],
       "description": "This `Idempotency-Key` was first used for a different request (method, path or body)."
     },
     {
-      "type": "urn:tasksmate:problem:idempotency-key-in-flight",
+      "type": "urn:taskadence:problem:idempotency-key-in-flight",
       "statuses": [
         409
       ],
       "description": "The first request with this `Idempotency-Key` has not finished; retry shortly."
     },
     {
-      "type": "urn:tasksmate:problem:idempotency-key-invalid",
+      "type": "urn:taskadence:problem:idempotency-key-invalid",
       "statuses": [
         400
       ],
       "description": "`Idempotency-Key` must be 1\u2013255 printable ASCII characters."
     },
     {
-      "type": "urn:tasksmate:problem:rate-limit",
+      "type": "urn:taskadence:problem:rate-limit",
       "statuses": [
         429
       ],
       "description": "Too many requests with this access token; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand)."
     },
     {
-      "type": "urn:tasksmate:problem:internal",
+      "type": "urn:taskadence:problem:internal",
       "statuses": [
         500
       ],
       "description": "An unexpected server error. Quote `request_id` to support."
     },
     {
-      "type": "urn:tasksmate:problem:token-invalid",
+      "type": "urn:taskadence:problem:token-invalid",
       "statuses": [
         401
       ],
       "description": "The access token is unknown or malformed (or its principal no longer exists)."
     },
     {
-      "type": "urn:tasksmate:problem:token-expired",
+      "type": "urn:taskadence:problem:token-expired",
       "statuses": [
         401
       ],
       "description": "The access token is past its `expires_at`; mint a new one."
     },
     {
-      "type": "urn:tasksmate:problem:token-revoked",
+      "type": "urn:taskadence:problem:token-revoked",
       "statuses": [
         401
       ],
       "description": "The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation)."
     },
     {
-      "type": "urn:tasksmate:problem:insufficient-scope",
+      "type": "urn:taskadence:problem:insufficient-scope",
       "statuses": [
         403
       ],
       "description": "The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens)."
     },
     {
-      "type": "urn:tasksmate:problem:test-token-read-only",
+      "type": "urn:taskadence:problem:test-token-read-only",
       "statuses": [
         403
       ],
-      "description": "A `tm_test_` token can authenticate and read, never write."
+      "description": "A `tkd_test_` token can authenticate and read, never write."
     },
     {
-      "type": "urn:tasksmate:problem:token-policy",
+      "type": "urn:taskadence:problem:token-policy",
       "statuses": [
         403,
         422
@@ -69323,7 +69323,7 @@
       "description": "The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime)."
     },
     {
-      "type": "urn:tasksmate:problem:url-refused",
+      "type": "urn:taskadence:problem:url-refused",
       "statuses": [
         422
       ],

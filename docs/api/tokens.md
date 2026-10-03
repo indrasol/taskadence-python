@@ -1,6 +1,6 @@
 # `tm.tokens`
 
-TasksMate access tokens (`tm_live_…` / `tm_test_…`): mint, list, rename, revoke, rotate.
+Taskadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

@@ -1,6 +1,6 @@
 # `tm.releases`
 
-What's new in TasksMate.
+What's new in Taskadence.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

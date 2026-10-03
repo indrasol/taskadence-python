@@ -1,6 +1,6 @@
 # `tm.connected_apps`
 
-The OAuth apps you have connected to TasksMate, and disconnecting them.
+The OAuth apps you have connected to Taskadence, and disconnecting them.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

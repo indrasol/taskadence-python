@@ -1,7 +1,7 @@
-"""TasksMate dashboard — a Streamlit example of the `tasksmate` SDK.
+"""Taskadence dashboard — a Streamlit example of the `taskadence` SDK.
 
-    export TASKSMATE_TOKEN=tm_live_…                 # an access token with tasks:read + projects:read
-    export TASKSMATE_API_URL=http://localhost:8000   # optional; default: the SDK's server
+    export TASKADENCE_TOKEN=tkd_live_…                 # an access token with tasks:read + projects:read
+    export TASKADENCE_API_URL=http://localhost:8000   # optional; default: the SDK's server
     streamlit run examples/streamlit_dashboard/app.py
 
 No other configuration: the organizations come from `tm.me()`, everything else from the API.
@@ -16,26 +16,26 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from tasksmate import APIError, TasksMate, TasksMateError
+from taskadence import APIError, Taskadence, TaskadenceError
 
-st.set_page_config(page_title="TasksMate dashboard", page_icon="✅", layout="wide")
+st.set_page_config(page_title="Taskadence dashboard", page_icon="✅", layout="wide")
 
 DONE = {"completed", "archived"}
 STATUS_ORDER = ["backlog", "not_started", "in_progress", "blocked", "on_hold", "completed", "archived"]
 PRIORITY_ORDER = ["critical", "high", "medium", "low", "none"]
 
 
-if not os.environ.get("TASKSMATE_TOKEN"):
+if not os.environ.get("TASKADENCE_TOKEN"):
     st.error(
-        "Set **TASKSMATE_TOKEN** to a TasksMate access token (`tm_live_…`) and restart: "
-        "`TASKSMATE_TOKEN=tm_live_… streamlit run app.py`. Mint one in TasksMate → Developers → Tokens."
+        "Set **TASKADENCE_TOKEN** to a Taskadence access token (`tkd_live_…`) and restart: "
+        "`TASKADENCE_TOKEN=tkd_live_… streamlit run app.py`. Mint one in Taskadence → Developers → Tokens."
     )
     st.stop()
 
 
 @st.cache_resource
-def client() -> TasksMate:
-    return TasksMate()  # token from TASKSMATE_TOKEN, base URL from TASKSMATE_API_URL or the SDK default
+def client() -> Taskadence:
+    return Taskadence()  # token from TASKADENCE_TOKEN, base URL from TASKADENCE_API_URL or the SDK default
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -98,12 +98,12 @@ def show(frame: pd.DataFrame) -> None:
 
 try:
     username, orgs = whoami()
-except (TasksMateError, APIError) as exc:
-    st.error(f"The TasksMate API refused the request: {exc}")
+except (TaskadenceError, APIError) as exc:
+    st.error(f"The Taskadence API refused the request: {exc}")
     st.stop()
 
 with st.sidebar:
-    st.title("TasksMate")
+    st.title("Taskadence")
     st.caption(f"Signed in as **{username or 'a service account'}** · {client().base_url}")
     if not orgs:
         st.warning("This token belongs to no organization.")
@@ -116,7 +116,7 @@ with st.sidebar:
 try:
     tasks = tasks_frame(org_id)
     projects = projects_frame(org_id)
-except (TasksMateError, APIError) as exc:
+except (TaskadenceError, APIError) as exc:
     st.error(f"{exc}")
     st.stop()
 
