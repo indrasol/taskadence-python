@@ -1,6 +1,6 @@
-# tasksmate-python CI (task 4.5 Part E). Every job runs offline except `integration`, which runs only when the
-# TASKSMATE_TOKEN secret exists. Nothing here publishes anything (that is release.yml, and PyPI is gated on S.23).
-# 5.3: + the two stdio MCP proxies in packages/ — `tasksmate-mcp` (Python, `uvx`) and `@tasksmate/mcp` (Node, `npx`).
+# taskadence-python CI (task 4.5 Part E). Every job runs offline except `integration`, which runs only when the
+# TASKADENCE_TOKEN secret exists. Nothing here publishes anything (that is release.yml, and PyPI is gated on S.23).
+# 5.3: + the two stdio MCP proxies in packages/ — `taskadence-mcp` (Python, `uvx`) and `@taskadence/mcp` (Node, `npx`).
 name: ci
 
 on:
@@ -30,7 +30,7 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check src tests scripts examples
       - run: ruff format --check src tests scripts examples
-      # src/tasksmate/_generated is excluded (pyproject [tool.mypy]): generated code is its generator's to type-check;
+      # src/taskadence/_generated is excluded (pyproject [tool.mypy]): generated code is its generator's to type-check;
       # every call into it is typed at the facade's boundary.
       - run: mypy
 
@@ -72,7 +72,7 @@ jobs:
           test -z "$(git status --porcelain)"
 
   mcp-python:
-    name: tasksmate-mcp — ruff, mypy, pytest (${{ matrix.python }})
+    name: taskadence-mcp — ruff, mypy, pytest (${{ matrix.python }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -80,7 +80,7 @@ jobs:
         python: ["3.10", "3.11", "3.12", "3.13"]
     defaults:
       run:
-        working-directory: packages/tasksmate-mcp
+        working-directory: packages/taskadence-mcp
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -96,7 +96,7 @@ jobs:
       - run: pytest   # a stdio client → the proxy → a fake Streamable HTTP server, in memory; plus the real process
 
   mcp-node:
-    name: "@tasksmate/mcp — typecheck, vitest, npm pack (node ${{ matrix.node }})"
+    name: "@taskadence/mcp — typecheck, vitest, npm pack (node ${{ matrix.node }})"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -132,19 +132,19 @@ jobs:
           python -m venv /tmp/audit
           /tmp/audit/bin/pip install --upgrade pip pip-audit
           /tmp/audit/bin/pip install ".[cli,pandas]"
-          # tasksmate itself is not on PyPI (yet): audit everything it pulls in, pinned as installed
-          /tmp/audit/bin/pip freeze --exclude tasksmate --exclude pip-audit > /tmp/audit-requirements.txt
+          # taskadence itself is not on PyPI (yet): audit everything it pulls in, pinned as installed
+          /tmp/audit/bin/pip freeze --exclude taskadence --exclude pip-audit > /tmp/audit-requirements.txt
           /tmp/audit/bin/pip-audit --strict --desc=off -r /tmp/audit-requirements.txt
-      - name: tasksmate-mcp's dependencies (mcp, httpx and what they pull in)
+      - name: taskadence-mcp's dependencies (mcp, httpx and what they pull in)
         run: |
           python -m venv /tmp/audit-mcp
           /tmp/audit-mcp/bin/pip install --upgrade pip pip-audit
-          /tmp/audit-mcp/bin/pip install ./packages/tasksmate-mcp
-          /tmp/audit-mcp/bin/pip freeze --exclude tasksmate-mcp --exclude pip-audit > /tmp/audit-mcp-requirements.txt
+          /tmp/audit-mcp/bin/pip install ./packages/taskadence-mcp
+          /tmp/audit-mcp/bin/pip freeze --exclude taskadence-mcp --exclude pip-audit > /tmp/audit-mcp-requirements.txt
           /tmp/audit-mcp/bin/pip-audit --strict --desc=off -r /tmp/audit-mcp-requirements.txt
 
   build:
-    name: build + twine check + SBOM (tasksmate, tasksmate-mcp, @tasksmate/mcp)
+    name: build + twine check + SBOM (taskadence, taskadence-mcp, @taskadence/mcp)
     runs-on: ubuntu-latest
     needs: [lint, test, regen, mcp-python, mcp-node]
     steps:
@@ -159,17 +159,17 @@ jobs:
           node-version: "22"
       - run: pip install build twine cyclonedx-bom
       - run: python -m build
-      - run: python -m build packages/tasksmate-mcp --outdir dist/
+      - run: python -m build packages/taskadence-mcp --outdir dist/
       - run: twine check --strict dist/*
       - name: CycloneDX SBOM of each installed wheel (S.2)
         run: |
           python -m venv /tmp/sbom
-          /tmp/sbom/bin/pip install dist/tasksmate-*.whl   # tasksmate's wheel; tasksmate-mcp's is tasksmate_mcp-*.whl
+          /tmp/sbom/bin/pip install dist/taskadence-*.whl   # taskadence's wheel; taskadence-mcp's is taskadence_mcp-*.whl
           cyclonedx-py environment /tmp/sbom/bin/python --of JSON -o dist/sbom.cdx.json
           python -m venv /tmp/sbom-mcp
-          /tmp/sbom-mcp/bin/pip install dist/tasksmate_mcp-*.whl
-          cyclonedx-py environment /tmp/sbom-mcp/bin/python --of JSON -o dist/sbom-tasksmate-mcp.cdx.json
-      - name: npm pack + SBOM (@tasksmate/mcp; nothing is published)
+          /tmp/sbom-mcp/bin/pip install dist/taskadence_mcp-*.whl
+          cyclonedx-py environment /tmp/sbom-mcp/bin/python --of JSON -o dist/sbom-taskadence-mcp.cdx.json
+      - name: npm pack + SBOM (@taskadence/mcp; nothing is published)
         working-directory: packages/mcp-node
         run: |
           npm ci
@@ -186,24 +186,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      TASKSMATE_TOKEN: ${{ secrets.TASKSMATE_TOKEN }}
-      TASKSMATE_API_URL: ${{ vars.TASKSMATE_API_URL }}
-      TASKSMATE_ORG: ${{ vars.TASKSMATE_ORG }}
+      TASKADENCE_TOKEN: ${{ secrets.TASKADENCE_TOKEN }}
+      TASKADENCE_API_URL: ${{ vars.TASKADENCE_API_URL }}
+      TASKADENCE_ORG: ${{ vars.TASKADENCE_ORG }}
     steps:
       - name: Skip when no token is configured
-        if: env.TASKSMATE_TOKEN == ''
-        run: echo "TASKSMATE_TOKEN is not set for this repository — the integration job is skipped."
+        if: env.TASKADENCE_TOKEN == ''
+        run: echo "TASKADENCE_TOKEN is not set for this repository — the integration job is skipped."
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-        if: env.TASKSMATE_TOKEN != ''
+        if: env.TASKADENCE_TOKEN != ''
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        if: env.TASKSMATE_TOKEN != ''
+        if: env.TASKADENCE_TOKEN != ''
         with:
           python-version: "3.12"
-      - if: env.TASKSMATE_TOKEN != ''
+      - if: env.TASKADENCE_TOKEN != ''
         run: pip install -e ".[dev]"
-      - if: env.TASKSMATE_TOKEN != ''
+      - if: env.TASKADENCE_TOKEN != ''
         run: pytest -m integration -o addopts="" -v
 
   workflows:

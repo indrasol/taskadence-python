@@ -1,5 +1,5 @@
-{#- tasksmate: a copy of openapi-python-client 0.29.1's templates/model.py.jinja with ONE addition, marked
-    "tasksmate:" below (the `etag` field). Re-copy it when the generator version in pyproject.toml changes. -#}
+{#- taskadence: a copy of openapi-python-client 0.29.1's templates/model.py.jinja with ONE addition, marked
+    "taskadence:" below (the `etag` field). Re-copy it when the generator version in pyproject.toml changes. -#}
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -86,7 +86,7 @@ class {{ class_name }}:
     {% if model.additional_properties %}
     additional_properties: dict[str, {{ additional_property_type }}] = _attrs_field(init=False, factory=dict)
     {% endif %}
-    # tasksmate: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
+    # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
