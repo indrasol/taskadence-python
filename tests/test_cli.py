@@ -13,8 +13,8 @@ import pytest
 import respx
 from typer.testing import CliRunner
 
-import tasksmate
-from tasksmate.cli import _config, app
+import taskadence
+from taskadence.cli import _config, app
 
 from .conftest import BASE, TOKEN, card, example, problem, task
 
@@ -39,9 +39,9 @@ class FakeKeyring:
 def home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
     monkeypatch.setenv("COLUMNS", "220")
-    monkeypatch.delenv("TASKSMATE_TOKEN", raising=False)
-    monkeypatch.delenv("TASKSMATE_ORG", raising=False)
-    monkeypatch.setenv("TASKSMATE_API_URL", BASE)
+    monkeypatch.delenv("TASKADENCE_TOKEN", raising=False)
+    monkeypatch.delenv("TASKADENCE_ORG", raising=False)
+    monkeypatch.setenv("TASKADENCE_API_URL", BASE)
     return tmp_path
 
 
@@ -59,7 +59,7 @@ def no_ring(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture
 def signed_in(home: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("TASKSMATE_TOKEN", TOKEN)
+    monkeypatch.setenv("TASKADENCE_TOKEN", TOKEN)
 
 
 def invoke(*args: str, **kwargs: Any) -> Any:
@@ -78,7 +78,7 @@ def no_token_in(result: Any) -> None:
 
 def test_version_and_usage_exit_codes(home: Path) -> None:
     result = invoke("--version")
-    assert result.exit_code == 0 and tasksmate.__version__ in result.output
+    assert result.exit_code == 0 and taskadence.__version__ in result.output
     assert invoke("tasks", "list", "--limit", "0").exit_code == 2  # usage error
     assert invoke("tasks", "frobnicate").exit_code == 2
 
@@ -94,8 +94,8 @@ def test_login_verifies_then_stores_in_the_keyring_never_echoing(
     api.get("/v1/me").respond(json=example("me.read"))
     result = invoke("auth", "login", "--token", TOKEN)
     assert result.exit_code == 0, result.output
-    assert ring.store[("tasksmate", "default")] == TOKEN
-    assert "Saved tm_live_xxxx… to the OS keyring" in result.output
+    assert ring.store[("taskadence", "default")] == TOKEN
+    assert "Saved tkd_live_xxx… to the OS keyring" in result.output
     no_token_in(result)
     assert "token" not in _config.read_config()  # not in the file when a keyring exists
     status = invoke("auth", "status")
@@ -106,7 +106,7 @@ def test_login_verifies_then_stores_in_the_keyring_never_echoing(
 def test_login_prompts_hidden_when_no_token_is_given(home: Path, ring: FakeKeyring, api: respx.MockRouter) -> None:
     api.get("/v1/me").respond(json=example("me.read"))
     result = runner.invoke(app, ["auth", "login"], input=TOKEN + "\n")
-    assert result.exit_code == 0 and ring.store[("tasksmate", "default")] == TOKEN
+    assert result.exit_code == 0 and ring.store[("taskadence", "default")] == TOKEN
     no_token_in(result)
 
 
@@ -123,7 +123,7 @@ def test_without_a_keyring_the_token_goes_to_a_600_file(home: Path, no_ring: Non
 
 
 def test_a_refused_token_is_not_stored(home: Path, ring: FakeKeyring, api: respx.MockRouter) -> None:
-    api.get("/v1/me").respond(401, json=problem(401, "urn:tasksmate:problem:token-revoked", "revoked"))
+    api.get("/v1/me").respond(401, json=problem(401, "urn:taskadence:problem:token-revoked", "revoked"))
     result = invoke("auth", "login", "--token", TOKEN)
     assert result.exit_code == 1 and ring.store == {}
     assert invoke("auth", "login", "--token", "not-a-token").exit_code == 2
@@ -132,8 +132,8 @@ def test_a_refused_token_is_not_stored(home: Path, ring: FakeKeyring, api: respx
 def test_the_environment_wins_over_the_stored_token(
     home: Path, ring: FakeKeyring, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    ring.store[("tasksmate", "default")] = "tm_live_" + "k" * 43
-    monkeypatch.setenv("TASKSMATE_TOKEN", TOKEN)
+    ring.store[("taskadence", "default")] = "tkd_live_" + "k" * 43
+    monkeypatch.setenv("TASKADENCE_TOKEN", TOKEN)
     assert _config.load().source == "env"
 
 
@@ -264,7 +264,7 @@ def test_tokens_list_shows_prefixes_only(signed_in: None, api: respx.MockRouter)
 
 
 def test_timestamps_print_to_the_minute_in_utc() -> None:
-    from tasksmate.cli import _cell
+    from taskadence.cli import _cell
 
     assert _cell("2026-09-28T04:10:59.221500+00:00") == "2026-09-28 04:10Z"
     assert _cell("2026-09-28T04:10:59Z") == "2026-09-28 04:10Z"

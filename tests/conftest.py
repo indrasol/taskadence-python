@@ -12,10 +12,10 @@ from typing import Any
 import pytest
 import respx
 
-from tasksmate import AsyncTasksMate, TasksMate
+from taskadence import AsyncTaskadence, Taskadence
 
-BASE = "https://api.tasksmate.test"
-TOKEN = "tm_live_" + "x" * 43  # a well-formed, fake access token
+BASE = "https://api.taskadence.test"
+TOKEN = "tkd_live_" + "x" * 43  # a well-formed, fake access token
 FULL_SPEC: dict[str, Any] = json.loads(
     (Path(__file__).resolve().parent.parent / "spec" / "openapi.public.json").read_text()
 )
@@ -69,6 +69,17 @@ def problem(status: int, type_: str = "about:blank", detail: Any = "nope", **ext
     }
 
 
+@pytest.fixture(autouse=True)
+def _no_legacy_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A developer's own pre-rename variables (`_brand.LEGACY_ENV_PREFIX`) must not leak into any test."""
+    import os
+
+    from taskadence._brand import LEGACY_ENV_PREFIX
+
+    for name in [n for n in os.environ if n.startswith(LEGACY_ENV_PREFIX)]:
+        monkeypatch.delenv(name)
+
+
 @pytest.fixture
 def api() -> Iterator[respx.MockRouter]:
     with respx.mock(base_url=BASE, assert_all_called=False) as router:
@@ -81,8 +92,8 @@ def slept() -> list[float]:
 
 
 @pytest.fixture
-def tm(api: respx.MockRouter, slept: list[float]) -> Iterator[TasksMate]:
-    client = TasksMate(token=TOKEN, base_url=BASE)
+def tm(api: respx.MockRouter, slept: list[float]) -> Iterator[Taskadence]:
+    client = Taskadence(token=TOKEN, base_url=BASE)
     client._core._sleep = slept.append  # no real waiting; the delays are asserted
     yield client
     client.close()
@@ -90,7 +101,7 @@ def tm(api: respx.MockRouter, slept: list[float]) -> Iterator[TasksMate]:
 
 @pytest.fixture
 async def atm(api: respx.MockRouter, slept: list[float]) -> Any:
-    client = AsyncTasksMate(token=TOKEN, base_url=BASE)
+    client = AsyncTaskadence(token=TOKEN, base_url=BASE)
 
     async def asleep(seconds: float) -> None:
         slept.append(seconds)

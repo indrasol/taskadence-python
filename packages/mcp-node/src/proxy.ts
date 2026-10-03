@@ -6,14 +6,14 @@
  * own transports do the protocol work (`StdioServerTransport`, `StreamableHTTPClientTransport`).
  *
  * One thing is added: an HTTP refusal becomes a JSON-RPC error. `problemFetch` (the transport's `fetch`) answers a
- * refused or failed POST of a request itself with a JSON-RPC error for THAT id: a 401 names `TASKSMATE_TOKEN` (never
+ * refused or failed POST of a request itself with a JSON-RPC error for THAT id: a 401 names `TASKADENCE_TOKEN` (never
  * its value), a 400 carries the server's problem detail (an unknown group), anything else the status and detail; an
  * unreachable server says so. Each also writes one line to stderr. stdout carries JSON-RPC only.
  */
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import { isJSONRPCErrorResponse, isJSONRPCRequest, isJSONRPCResultResponse, type JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
-import { mcpUrl, redact, TOKEN_ENV, type Config } from './config.js';
+import { BRAND_NAME, mcpUrl, redact, SLUG, TOKEN_ENV, type Config } from './config.js';
 import { VERSION } from './version.js';
 
 export const UNAUTHORIZED = -32001; // JSON-RPC implementation-defined server errors: -32000 … -32099
@@ -22,7 +22,7 @@ export const UNREACHABLE = -32003;
 export const DRAIN_MS = 30_000; // after stdin closes: how long answers still in flight are waited for
 
 export type Log = (line: string) => void;
-export const stderrLog: Log = (line) => process.stderr.write(`tasksmate-mcp: ${redact(line)}\n`);
+export const stderrLog: Log = (line) => process.stderr.write(`${SLUG}-mcp: ${redact(line)}\n`);
 
 type Fetch = typeof fetch;
 
@@ -57,8 +57,8 @@ export function problemFetch(inner: Fetch, log: Log = stderrLog): Fetch {
       // no answer to make: not a JSON-RPC POST, or the transport itself aborted it (closing) — that is not "unreachable"
       if (!rpc || init?.signal?.aborted) throw err;
       const url = new URL(input instanceof Request ? input.url : String(input));
-      log(`cannot reach ${url.origin} (${(err as Error)?.name ?? 'Error'}) — check TASKSMATE_API_URL and the network`);
-      return answer(rpc, UNREACHABLE, `TasksMate MCP server unreachable at ${url.origin}`, { url: url.origin });
+      log(`cannot reach ${url.origin} (${(err as Error)?.name ?? 'Error'}) — check TASKADENCE_API_URL and the network`);
+      return answer(rpc, UNREACHABLE, `${BRAND_NAME} MCP server unreachable at ${url.origin}`, { url: url.origin });
     }
     if (!rpc || response.status < 400) return response;
     let problem: Record<string, unknown> = {};
@@ -73,17 +73,17 @@ export function problemFetch(inner: Fetch, log: Log = stderrLog): Fetch {
     for (const k of ['type', 'title', 'detail', 'errors', 'request_id']) if (k in problem) data[k] = problem[k];
     if (response.status === 401) {
       log(`the server refused ${TOKEN_ENV} (401): ${detail}`);
-      return answer(rpc, UNAUTHORIZED, `TasksMate refused the access token in ${TOKEN_ENV} (401): ${detail}. Create one in Developers → Tokens.`, data);
+      return answer(rpc, UNAUTHORIZED, `${BRAND_NAME} refused the access token in ${TOKEN_ENV} (401): ${detail}. Create one in Developers → Tokens.`, data);
     }
     log(`the server answered ${response.status}: ${detail}`);
-    return answer(rpc, HTTP_ERROR, `TasksMate MCP server: ${response.status} ${detail}`, data);
+    return answer(rpc, HTTP_ERROR, `${BRAND_NAME} MCP server: ${response.status} ${detail}`, data);
   };
 }
 
 export function remoteTransport(config: Config, options: { fetch?: Fetch; log?: Log } = {}): StreamableHTTPClientTransport {
   return new StreamableHTTPClientTransport(new URL(mcpUrl(config)), {
     fetch: problemFetch(options.fetch ?? fetch, options.log),
-    requestInit: { headers: { Authorization: `Bearer ${config.token}`, 'User-Agent': `tasksmate-mcp/${VERSION} (node)` } },
+    requestInit: { headers: { Authorization: `Bearer ${config.token}`, 'User-Agent': `${SLUG}-mcp/${VERSION} (node)` } },
   });
 }
 

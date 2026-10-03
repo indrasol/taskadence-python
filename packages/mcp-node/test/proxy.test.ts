@@ -1,5 +1,5 @@
 /**
- * @tasksmate/mcp (task 5.3): the stdio ↔ Streamable HTTP proxy.
+ * @taskadence/mcp (task 5.3): the stdio ↔ Streamable HTTP proxy.
  *
  * An MCP client (the SDK's `Client` over an in-memory pair — what stdio carries) → `bridge` → a fake remote server
  * (the SDK's low-level `Server` behind a stateless, JSON-response `StreamableHTTPServerTransport` on a local port). The
@@ -19,12 +19,14 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { afterEach, describe, expect, it } from 'vitest';
-import { loadConfig, mcpUrl, type Config } from '../src/config.js';
+import { loadConfig, mcpUrl, redact, type Config } from '../src/config.js';
 import { bridge, HTTP_ERROR, remoteTransport, UNAUTHORIZED, UNREACHABLE } from '../src/proxy.js';
 import { VERSION } from '../src/version.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const TOKEN = `tm_live_${'S3cret'.repeat(7)}x`;
+const TOKEN = `tkd_live_${'S3cret'.repeat(7)}x`;
+/** Minted before the 5.8 rename: still a valid token. */
+const LEGACY_TOKEN = `tm_live_${'L3gacy'.repeat(7)}x`;
 const TOOLS: Record<string, [group: string, readOnly: boolean]> = {
   whoami: ['me', true],
   list_my_tasks: ['tasks', true],
@@ -54,11 +56,11 @@ async function fakeRemote(): Promise<{ url: string; seen: Seen[]; close: () => P
     }
     const groups = url.searchParams.get('groups');
     if (groups && !groups.split(',').every((g) => ['tasks', 'projects', 'me', 'admin'].includes(g))) {
-      problem(res, 400, { type: 'urn:tasksmate:problem:invalid-parameter', title: 'Bad Request', detail: `groups must be a comma-separated list of: tasks, projects; got ${groups}` });
+      problem(res, 400, { type: 'urn:taskadence:problem:invalid-parameter', title: 'Bad Request', detail: `groups must be a comma-separated list of: tasks, projects; got ${groups}` });
       return;
     }
     const names = enabled(url.searchParams);
-    const server = new Server({ name: 'tasksmate', version: '0' }, { capabilities: { tools: {} } });
+    const server = new Server({ name: 'taskadence', version: '0' }, { capabilities: { tools: {} } });
     server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: Object.keys(TOOLS).filter((n) => names.has(n)).map((name) => ({ name, inputSchema: { type: 'object' as const } })),
     }));
@@ -105,13 +107,13 @@ describe('forwarding', () => {
     cleanups.push(remote.close);
     const { client, clientSide } = await throughProxy(cfg(remote.url));
     await client.connect(clientSide);
-    expect(client.getServerVersion()?.name).toBe('tasksmate');
+    expect(client.getServerVersion()?.name).toBe('taskadence');
     expect((await client.listTools()).tools.map((t) => t.name)).toEqual(['whoami', 'list_my_tasks', 'create_task', 'list_projects']);
     const called = await client.callTool({ name: 'create_task', arguments: { title: 'x' } });
     expect(called.isError).toBeFalsy();
     const posts = remote.seen.filter((s) => s.method === 'POST');
     expect(posts.length).toBeGreaterThan(0);
-    expect(posts.every((s) => s.auth === `Bearer ${TOKEN}` && s.query === '' && s.ua?.startsWith('tasksmate-mcp/'))).toBe(true);
+    expect(posts.every((s) => s.auth === `Bearer ${TOKEN}` && s.query === '' && s.ua?.startsWith('taskadence-mcp/'))).toBe(true);
   });
 
   it('readonly and groups are forwarded as the query, and the SERVER refuses the write', async () => {
@@ -128,16 +130,16 @@ describe('forwarding', () => {
   it('a refused token is a JSON-RPC error naming the variable, never the value', async () => {
     const remote = await fakeRemote();
     cleanups.push(remote.close);
-    const wrong = `tm_live_${'W'.repeat(43)}`;
+    const wrong = `tkd_live_${'W'.repeat(43)}`;
     const logs: string[] = [];
     const { client, clientSide } = await throughProxy({ ...cfg(remote.url), token: wrong }, { logs });
     const error = await client.connect(clientSide).then(() => null, (e: unknown) => e);
     expect(error).toBeInstanceOf(McpError);
     expect((error as McpError).code).toBe(UNAUTHORIZED);
-    expect((error as McpError).message).toContain('TASKSMATE_TOKEN');
+    expect((error as McpError).message).toContain('TASKADENCE_TOKEN');
     expect((error as McpError).message).toContain('not valid');
     expect(((error as McpError).data as { request_id: string }).request_id).toBe('r-1');
-    expect(logs).toContain('the server refused TASKSMATE_TOKEN (401): The access token is not valid');
+    expect(logs).toContain('the server refused TASKADENCE_TOKEN (401): The access token is not valid');
     expect(JSON.stringify([String(error), (error as McpError).data, logs])).not.toContain(wrong);
   });
 
@@ -148,7 +150,7 @@ describe('forwarding', () => {
     const error = (await client.connect(clientSide).then(() => null, (e: unknown) => e)) as McpError;
     expect(error.code).toBe(HTTP_ERROR);
     expect(error.message).toContain('got nope');
-    expect((error.data as { type: string }).type).toBe('urn:tasksmate:problem:invalid-parameter');
+    expect((error.data as { type: string }).type).toBe('urn:taskadence:problem:invalid-parameter');
   });
 
   it('an unreachable server is a JSON-RPC error, not a hang', async () => {
@@ -177,21 +179,38 @@ describe('shutdown', () => {
 
 describe('configuration', () => {
   it('flags win over the environment, and the URL is the server\'s contract', () => {
-    const env = { TASKSMATE_TOKEN: TOKEN, TASKSMATE_API_URL: 'https://dev.example/v1/', TASKSMATE_MCP_READONLY: 'true', TASKSMATE_MCP_GROUPS: 'Tasks, projects' };
+    const env = { TASKADENCE_TOKEN: TOKEN, TASKADENCE_API_URL: 'https://dev.example/v1/', TASKADENCE_MCP_READONLY: 'true', TASKADENCE_MCP_GROUPS: 'Tasks, projects' };
     const c = loadConfig({}, env);
     expect([c.apiUrl, c.readonly, c.groups]).toEqual(['https://dev.example', true, ['tasks', 'projects']]);
     expect(mcpUrl(c)).toBe('https://dev.example/mcp?readonly=1&groups=tasks,projects');
     expect(mcpUrl(loadConfig({ apiUrl: 'http://localhost:8000/mcp', readonly: false, groups: 'views' }, env))).toBe('http://localhost:8000/mcp?groups=views');
-    expect(mcpUrl(loadConfig({}, { TASKSMATE_TOKEN: TOKEN }))).toBe('https://tasksmate-fdfsarhnf5gacfb7.eastus-01.azurewebsites.net/mcp');
-    expect(loadConfig({}, { TASKSMATE_TOKEN: TOKEN, TASKSMATE_MCP_GROUPS: '' }).groups).toBeNull();
+    expect(mcpUrl(loadConfig({}, { TASKADENCE_TOKEN: TOKEN }))).toBe('https://api.taskadence.com/mcp');
+    expect(loadConfig({}, { TASKADENCE_TOKEN: TOKEN, TASKADENCE_MCP_GROUPS: '' }).groups).toBeNull();
   });
 
   it.each([
-    [{}, 'TASKSMATE_TOKEN is not set'],
-    [{ TASKSMATE_TOKEN: TOKEN, TASKSMATE_MCP_READONLY: 'maybe' }, 'TASKSMATE_MCP_READONLY must be 1 or 0'],
-    [{ TASKSMATE_TOKEN: TOKEN, TASKSMATE_API_URL: 'ftp://x' }, 'must start with http'],
+    [{}, 'TASKADENCE_TOKEN is not set'],
+    [{ TASKADENCE_TOKEN: TOKEN, TASKADENCE_MCP_READONLY: 'maybe' }, 'TASKADENCE_MCP_READONLY must be 1 or 0'],
+    [{ TASKADENCE_TOKEN: TOKEN, TASKADENCE_API_URL: 'ftp://x' }, 'must start with http'],
   ])('a bad configuration is refused, naming no token (%j)', (env, message) => {
     expect(() => loadConfig({}, env)).toThrow(message);
+  });
+
+  it('reads a legacy TASKSMATE_* variable with one deprecation notice each; the new name wins silently', () => {
+    const legacy = { TASKSMATE_TOKEN: LEGACY_TOKEN, TASKSMATE_API_URL: 'https://dev.example', TASKSMATE_MCP_READONLY: '1', TASKSMATE_MCP_GROUPS: 'tasks' };
+    const notices: string[] = [];
+    const c = loadConfig({}, legacy, (l) => notices.push(l));
+    expect([c.token, mcpUrl(c)]).toEqual([LEGACY_TOKEN, 'https://dev.example/mcp?readonly=1&groups=tasks']);
+    expect(notices.map((n) => n.split(' ')[0]).sort()).toEqual(Object.keys(legacy).sort());
+    expect(notices[0]).toContain('is deprecated: taskadence-mcp reads TASKADENCE_');
+    const quiet: string[] = [];
+    const env = { ...legacy, TASKADENCE_TOKEN: TOKEN, TASKADENCE_API_URL: 'http://x', TASKADENCE_MCP_READONLY: '0', TASKADENCE_MCP_GROUPS: 'views' };
+    expect(loadConfig({}, env, (l) => quiet.push(l)).token).toBe(TOKEN);
+    expect(quiet).toEqual([]);
+  });
+
+  it('redacts both the new and the legacy token prefixes', () => {
+    expect(redact(`a ${TOKEN} b ${LEGACY_TOKEN} c tkd_test_abc`)).toBe('a tkd_… b tkd_… c tkd_…');
   });
 
   it('the version is package.json\'s', () => {
@@ -201,7 +220,7 @@ describe('configuration', () => {
 
 describe('the process', () => {
   const run = (args: string[], input: string, env: Record<string, string>) => {
-    const base = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('TASKSMATE_')));
+    const base = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('TASKADENCE_') && !k.startsWith('TASKSMATE_')));
     return spawnSync(process.execPath, [join(ROOT, 'dist', 'cli.js'), ...args], { input, env: { ...base, ...env }, encoding: 'utf8', timeout: 30_000 });
   };
 
@@ -211,7 +230,7 @@ describe('the process', () => {
     const { port } = probe.address() as AddressInfo;
     await new Promise((r) => probe.close(r));
     const init = { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 't', version: '0' } } };
-    const done = run(['--api-url', `http://127.0.0.1:${port}`, '--readonly'], `${JSON.stringify(init)}\n`, { TASKSMATE_TOKEN: TOKEN });
+    const done = run(['--api-url', `http://127.0.0.1:${port}`, '--readonly'], `${JSON.stringify(init)}\n`, { TASKADENCE_TOKEN: TOKEN });
     const lines = done.stdout.split('\n').filter((l) => l.trim());
     expect(lines.length, done.stderr).toBeGreaterThan(0);
     const messages = lines.map((l) => JSON.parse(l) as { jsonrpc: string; id: number; error: { code: number } });
@@ -224,11 +243,18 @@ describe('the process', () => {
     expect(done.status).toBe(0);
   });
 
+  it('reads a legacy TASKSMATE_TOKEN, with a one-line deprecation notice on stderr', () => {
+    const done = run(['--api-url', 'http://127.0.0.1:9'], '', { TASKSMATE_TOKEN: LEGACY_TOKEN });
+    expect(done.stderr).toContain('taskadence-mcp: warning: TASKSMATE_TOKEN is deprecated');
+    expect(done.stderr).not.toContain('is not set');
+    expect(done.stdout + done.stderr).not.toContain(LEGACY_TOKEN);
+  });
+
   it('without a token exits 2, saying so on stderr', () => {
     const done = run([], '', {});
     expect(done.status).toBe(2);
     expect(done.stdout).toBe('');
-    expect(done.stderr).toContain('TASKSMATE_TOKEN is not set');
+    expect(done.stderr).toContain('TASKADENCE_TOKEN is not set');
   });
 });
 

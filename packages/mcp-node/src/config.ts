@@ -1,27 +1,36 @@
 /**
  * Where the proxy connects, as whom, and with which options — flags first, then the environment. The same names as
- * the Python twin (`uvx tasksmate-mcp`):
+ * the Python twin (`uvx taskadence-mcp`):
  *
- *   TASKSMATE_TOKEN         required — a `tm_live_…` / `tm_test_…` access token (Developers → Tokens)
- *   TASKSMATE_API_URL       the API's origin (default: production); `/mcp` is added here
- *   TASKSMATE_MCP_READONLY  `1` / `true` → `?readonly=1`: the SERVER lists and allows only read tools
- *   TASKSMATE_MCP_GROUPS    `tasks,projects` → `?groups=…`: the SERVER enables only those groups (`me` is always on)
+ *   TASKADENCE_TOKEN         required — a `tkd_live_…` / `tkd_test_…` access token (Developers → Tokens; a pre-rename
+ *                            `tm_live_…` / `tm_test_…` token works too)
+ *   TASKADENCE_API_URL       the API's origin (default: production); `/mcp` is added here
+ *   TASKADENCE_MCP_READONLY  `1` / `true` → `?readonly=1`: the SERVER lists and allows only read tools
+ *   TASKADENCE_MCP_GROUPS    `tasks,projects` → `?groups=…`: the SERVER enables only those groups (`me` is always on)
  *
- * `TASKSMATE_*` on purpose — the packages' (and the `tm` CLI's) environment; `…_TM` is the API server's own convention,
- * not this one's. Flags `--api-url`, `--readonly` / `--no-readonly`, `--groups` win. No `--token`: argv is public.
+ * `TASKADENCE_*` on purpose — the packages' (and the `tm` CLI's) environment; `…_TM` is the API server's own
+ * convention, not this one's. The pre-rename `TASKSMATE_*` names are still read when the new one is unset, with a
+ * one-line deprecation notice on stderr. Flags `--api-url`, `--readonly` / `--no-readonly`, `--groups` win. No
+ * `--token`: argv is public.
  */
-export const TOKEN_ENV = 'TASKSMATE_TOKEN';
-export const URL_ENV = 'TASKSMATE_API_URL';
-export const READONLY_ENV = 'TASKSMATE_MCP_READONLY';
-export const GROUPS_ENV = 'TASKSMATE_MCP_GROUPS';
+export const BRAND_NAME = 'Taskadence';
+export const SLUG = 'taskadence';
+export const ENV_PREFIX = 'TASKADENCE_';
+/** Pre-rename prefix: read (with a stderr deprecation notice) when the `TASKADENCE_*` variable is unset. */
+export const LEGACY_ENV_PREFIX = 'TASKSMATE_';
+export const TOKEN_ENV = `${ENV_PREFIX}TOKEN`;
+export const URL_ENV = `${ENV_PREFIX}API_URL`;
+export const READONLY_ENV = `${ENV_PREFIX}MCP_READONLY`;
+export const GROUPS_ENV = `${ENV_PREFIX}MCP_GROUPS`;
 
 /** The production API — the Python SDK's DEFAULT_BASE_URL (the backend's clients table names the same one). */
-export const DEFAULT_API_URL = 'https://tasksmate-fdfsarhnf5gacfb7.eastus-01.azurewebsites.net';
+export const DEFAULT_API_URL = 'https://api.taskadence.com';
 export const MCP_PATH = '/mcp';
 
 const TRUE = new Set(['1', 'true', 'yes', 'on']);
 const FALSE = new Set(['0', 'false', 'no', 'off', '']);
-const TOKEN_SHAPED = /tm_(?:live|test)_[A-Za-z0-9_-]*/g;
+// `tkd_live_` / `tkd_test_`, and the pre-rename `tm_live_` / `tm_test_` (those tokens keep working).
+const TOKEN_SHAPED = /(?:tkd|tm)_(?:live|test)_[A-Za-z0-9_-]*/g;
 
 export class ConfigError extends Error {}
 
@@ -38,8 +47,20 @@ export interface Flags {
   groups?: string;
 }
 
-/** Anything token-shaped becomes `tm_…` — a belt for every line this package writes. */
-export const redact = (text: string): string => text.replace(TOKEN_SHAPED, 'tm_…');
+/** Anything token-shaped becomes `tkd_…` — a belt for every line this package writes. */
+export const redact = (text: string): string => text.replace(TOKEN_SHAPED, 'tkd_…');
+
+export type Warn = (line: string) => void;
+const stderrWarn: Warn = (line) => process.stderr.write(`${SLUG}-mcp: warning: ${line}\n`);
+
+/** `name` (a `TASKADENCE_*` variable), else its deprecated `TASKSMATE_*` twin — with one notice through `warn`. */
+function envOf(env: Record<string, string | undefined>, name: string, warn: Warn): string | undefined {
+  if (env[name] !== undefined) return env[name];
+  const legacy = LEGACY_ENV_PREFIX + name.slice(ENV_PREFIX.length);
+  if (env[legacy] === undefined) return undefined;
+  warn(`${legacy} is deprecated: ${SLUG}-mcp reads ${name}. Rename it in the client's MCP config.`);
+  return env[legacy];
+}
 
 /** `<api>/mcp[?readonly=1][&groups=a,b]` — the remote server's own URL contract (5.1). */
 export function mcpUrl(config: Pick<Config, 'apiUrl' | 'readonly' | 'groups'>): string {
@@ -70,13 +91,17 @@ function apiUrlOf(value: string): string {
   return url;
 }
 
-export function loadConfig(flags: Flags = {}, env: Record<string, string | undefined> = process.env): Config {
-  const token = (env[TOKEN_ENV] ?? '').trim();
+export function loadConfig(
+  flags: Flags = {},
+  env: Record<string, string | undefined> = process.env,
+  warn: Warn = stderrWarn,
+): Config {
+  const token = (envOf(env, TOKEN_ENV, warn) ?? '').trim();
   if (!token) {
-    throw new ConfigError(`${TOKEN_ENV} is not set: create an access token in TasksMate (Developers → Tokens) and put it in the client's MCP config as ${TOKEN_ENV}`);
+    throw new ConfigError(`${TOKEN_ENV} is not set: create an access token in ${BRAND_NAME} (Developers → Tokens) and put it in the client's MCP config as ${TOKEN_ENV}`);
   }
-  const apiUrl = apiUrlOf(flags.apiUrl ?? (env[URL_ENV] || DEFAULT_API_URL));
-  const readonly = flags.readonly ?? bool(READONLY_ENV, env[READONLY_ENV] ?? '');
-  const rawGroups = flags.groups ?? (env[GROUPS_ENV] || undefined);   // an empty variable = unset
+  const apiUrl = apiUrlOf(flags.apiUrl ?? (envOf(env, URL_ENV, warn) || DEFAULT_API_URL));
+  const readonly = flags.readonly ?? bool(READONLY_ENV, envOf(env, READONLY_ENV, warn) ?? '');
+  const rawGroups = flags.groups ?? (envOf(env, GROUPS_ENV, warn) || undefined);   // an empty variable = unset
   return { token, apiUrl, readonly, groups: rawGroups === undefined ? null : groupsOf(rawGroups) };
 }
