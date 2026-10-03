@@ -140,7 +140,7 @@ def sync_detailed(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | WhatsNewResponse]:
-    """What's new — recent release notes
+    """What's new - recent release notes
 
      Get 'What's New' information for the specified time period.
 
@@ -181,7 +181,7 @@ def sync(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | WhatsNewResponse | None:
-    """What's new — recent release notes
+    """What's new - recent release notes
 
      Get 'What's New' information for the specified time period.
 
@@ -217,7 +217,7 @@ async def asyncio_detailed(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | WhatsNewResponse]:
-    """What's new — recent release notes
+    """What's new - recent release notes
 
      Get 'What's New' information for the specified time period.
 
@@ -256,7 +256,7 @@ async def asyncio(
     repository: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | WhatsNewResponse | None:
-    """What's new — recent release notes
+    """What's new - recent release notes
 
      Get 'What's New' information for the specified time period.
 

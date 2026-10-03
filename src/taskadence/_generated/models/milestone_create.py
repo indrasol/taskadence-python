@@ -23,11 +23,11 @@ class MilestoneCreate:
     """The request body of `milestones.create`.
 
     Attributes:
-        title (str): Unique among the project's live milestones, open or closed (case-insensitive) — 409 otherwise
+        title (str): Unique among the project's live milestones, open or closed (case-insensitive) - 409 otherwise
         target_date (datetime.date): The date the project commits to. Passing it changes nothing; the view shows it as
             overdue.
         description (None | str | Unset):
-        owner_user_id (None | str | Unset): The one person accountable — someone who can read THIS project (422
+        owner_user_id (None | str | Unset): The one person accountable - someone who can read THIS project (422
             otherwise). They may close / re-open it.
     """
 
@@ -35,7 +35,6 @@ class MilestoneCreate:
     target_date: datetime.date
     description: None | str | Unset = UNSET
     owner_user_id: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -58,7 +57,7 @@ class MilestoneCreate:
             owner_user_id = self.owner_user_id
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "title": title,
@@ -104,21 +103,4 @@ class MilestoneCreate:
             owner_user_id=owner_user_id,
         )
 
-        milestone_create.additional_properties = d
         return milestone_create
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

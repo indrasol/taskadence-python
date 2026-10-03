@@ -13,6 +13,7 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - (5.8) Problem types `urn:taskadence:problem:*`; `urn:tasksmate:problem:*` maps to the same exceptions.
 - (5.8) Tokens are minted as `tkd_live_` / `tkd_test_`; `tm_live_` / `tm_test_` tokens keep working (CLI login, redaction).
 - (5.8) The CLI still reads a token stored under keyring service `tasksmate` or in `~/.config/tasksmate/`; logout clears both.
+- Spec from backend `b34364d`: + `audit.export_json` (`GET /v1/audit.json`, `AuditExportRow`), MFA / upload problem types (mapped by status), access-review MFA and projects; 165 operations (was 164).
 - (5.8) Request header `Taskadence-Version` (was `TasksMate-Version`; informational, the API ignores it).
 
 ### Added

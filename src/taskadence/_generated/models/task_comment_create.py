@@ -15,7 +15,7 @@ from typing import cast
 import datetime
 
 if TYPE_CHECKING:
-    from ..models.mention import Mention
+    from ..models.mention_in import MentionIn
 
 
 T = TypeVar("T", bound="TaskCommentCreate")
@@ -34,7 +34,7 @@ class TaskCommentCreate:
         parent_comment_id (None | str | Unset): ID of the parent comment if this is a reply
         created_at (datetime.datetime | None | Unset): When the comment was created
         updated_at (datetime.datetime | None | Unset): When the comment was last updated
-        mentions (list[Mention] | None | Unset): List of mentioned users details in the comment
+        mentions (list[MentionIn] | None | Unset): List of mentioned users details in the comment
         org_id (None | str | Unset): Organization ID (UUID)
     """
 
@@ -46,15 +46,14 @@ class TaskCommentCreate:
     parent_comment_id: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
-    mentions: list[Mention] | None | Unset = UNSET
+    mentions: list[MentionIn] | None | Unset = UNSET
     org_id: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.mention import Mention  # noqa: PLC0415
+        from ..models.mention_in import MentionIn  # noqa: PLC0415
 
         task_id = self.task_id
 
@@ -123,7 +122,7 @@ class TaskCommentCreate:
             org_id = self.org_id
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "task_id": task_id,
@@ -152,7 +151,7 @@ class TaskCommentCreate:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.mention import Mention  # noqa: PLC0415
+        from ..models.mention_in import MentionIn  # noqa: PLC0415
 
         d = dict(src_dict)
         task_id = d.pop("task_id")
@@ -236,7 +235,7 @@ class TaskCommentCreate:
 
         updated_at = _parse_updated_at(d.pop("updated_at", UNSET))
 
-        def _parse_mentions(data: object) -> list[Mention] | None | Unset:
+        def _parse_mentions(data: object) -> list[MentionIn] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -247,14 +246,14 @@ class TaskCommentCreate:
                 mentions_type_0 = []
                 _mentions_type_0 = data
                 for mentions_type_0_item_data in _mentions_type_0:
-                    mentions_type_0_item = Mention.from_dict(mentions_type_0_item_data)
+                    mentions_type_0_item = MentionIn.from_dict(mentions_type_0_item_data)
 
                     mentions_type_0.append(mentions_type_0_item)
 
                 return mentions_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
-            return cast(list[Mention] | None | Unset, data)
+            return cast(list[MentionIn] | None | Unset, data)
 
         mentions = _parse_mentions(d.pop("mentions", UNSET))
 
@@ -280,21 +279,4 @@ class TaskCommentCreate:
             org_id=org_id,
         )
 
-        task_comment_create.additional_properties = d
         return task_comment_create
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

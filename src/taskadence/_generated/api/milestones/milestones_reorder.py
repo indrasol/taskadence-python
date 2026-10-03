@@ -120,7 +120,7 @@ def sync_detailed(
 
     Args:
         project_id (str):
-        body (MilestoneOrder): `POST …/milestones/reorder` — the WHOLE order: every live milestone
+        body (MilestoneOrder): `POST …/milestones/reorder` - the WHOLE order: every live milestone
             of the project exactly once.
 
     Raises:
@@ -155,7 +155,7 @@ def sync(
 
     Args:
         project_id (str):
-        body (MilestoneOrder): `POST …/milestones/reorder` — the WHOLE order: every live milestone
+        body (MilestoneOrder): `POST …/milestones/reorder` - the WHOLE order: every live milestone
             of the project exactly once.
 
     Raises:
@@ -185,7 +185,7 @@ async def asyncio_detailed(
 
     Args:
         project_id (str):
-        body (MilestoneOrder): `POST …/milestones/reorder` — the WHOLE order: every live milestone
+        body (MilestoneOrder): `POST …/milestones/reorder` - the WHOLE order: every live milestone
             of the project exactly once.
 
     Raises:
@@ -218,7 +218,7 @@ async def asyncio(
 
     Args:
         project_id (str):
-        body (MilestoneOrder): `POST …/milestones/reorder` — the WHOLE order: every live milestone
+        body (MilestoneOrder): `POST …/milestones/reorder` - the WHOLE order: every live milestone
             of the project exactly once.
 
     Raises:

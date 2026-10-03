@@ -16,14 +16,13 @@ T = TypeVar("T", bound="GoalMove")
 
 @_attrs_define
 class GoalMove:
-    """`POST …/goals/{goal_id}/move` — the goal AND its tasks go to `project_id` (same org), all-or-nothing.
+    """`POST …/goals/{goal_id}/move` - the goal AND its tasks go to `project_id` (same org), all-or-nothing.
 
     Attributes:
         project_id (str):
     """
 
     project_id: str
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -32,7 +31,7 @@ class GoalMove:
         project_id = self.project_id
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "project_id": project_id,
@@ -50,21 +49,4 @@ class GoalMove:
             project_id=project_id,
         )
 
-        goal_move.additional_properties = d
         return goal_move
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

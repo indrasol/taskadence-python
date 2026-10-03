@@ -111,7 +111,7 @@ def sync_detailed(
 
      Deactivate: the membership goes inactive and every token it holds is revoked
     (`service_account_deactivated`).
-    Never a hard delete — its audit history and the tasks that name it stay intact.
+    Never a hard delete - its audit history and the tasks that name it stay intact.
 
     Args:
         org_id (str):
@@ -147,7 +147,7 @@ def sync(
 
      Deactivate: the membership goes inactive and every token it holds is revoked
     (`service_account_deactivated`).
-    Never a hard delete — its audit history and the tasks that name it stay intact.
+    Never a hard delete - its audit history and the tasks that name it stay intact.
 
     Args:
         org_id (str):
@@ -178,7 +178,7 @@ async def asyncio_detailed(
 
      Deactivate: the membership goes inactive and every token it holds is revoked
     (`service_account_deactivated`).
-    Never a hard delete — its audit history and the tasks that name it stay intact.
+    Never a hard delete - its audit history and the tasks that name it stay intact.
 
     Args:
         org_id (str):
@@ -212,7 +212,7 @@ async def asyncio(
 
      Deactivate: the membership goes inactive and every token it holds is revoked
     (`service_account_deactivated`).
-    Never a hard delete — its audit history and the tasks that name it stay intact.
+    Never a hard delete - its audit history and the tasks that name it stay intact.
 
     Args:
         org_id (str):

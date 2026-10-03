@@ -20,7 +20,7 @@ T = TypeVar("T", bound="ScopeRef")
 
 @_attrs_define
 class ScopeRef:
-    """One (scope_type, scope_id) pair — a multi-scope read answers for a list of these.
+    """One (scope_type, scope_id) pair - a multi-scope read answers for a list of these.
 
     Attributes:
         scope_type (SectionScopeEnum): One of `project`, `team`, `user`. Used by `ScopeRef` and 5 more.

@@ -63,7 +63,7 @@ class OAuthClientCreated:
         updated_at (datetime.datetime | None | Unset):
         revoked_at (datetime.datetime | None | Unset):
         revoked_by (None | str | Unset):
-        client_secret (None | str | Unset): THE SECRET (`tkdcs_…`) of a confidential app — shown once, never stored
+        client_secret (None | str | Unset): THE SECRET (`tkdcs_…`) of a confidential app - shown once, never stored
             (only its SHA-256 is). null for a public app.
     """
 

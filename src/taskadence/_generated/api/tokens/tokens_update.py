@@ -112,7 +112,7 @@ def sync_detailed(
 ) -> Response[Problem | TokenOut]:
     """Rename an access token
 
-     Rename. Nothing else about a token changes — rotate it or revoke it.
+     Rename. Nothing else about a token changes - rotate it or revoke it.
 
     Args:
         token_id (str):
@@ -146,7 +146,7 @@ def sync(
 ) -> Problem | TokenOut | None:
     """Rename an access token
 
-     Rename. Nothing else about a token changes — rotate it or revoke it.
+     Rename. Nothing else about a token changes - rotate it or revoke it.
 
     Args:
         token_id (str):
@@ -175,7 +175,7 @@ async def asyncio_detailed(
 ) -> Response[Problem | TokenOut]:
     """Rename an access token
 
-     Rename. Nothing else about a token changes — rotate it or revoke it.
+     Rename. Nothing else about a token changes - rotate it or revoke it.
 
     Args:
         token_id (str):
@@ -207,7 +207,7 @@ async def asyncio(
 ) -> Problem | TokenOut | None:
     """Rename an access token
 
-     Rename. Nothing else about a token changes — rotate it or revoke it.
+     Rename. Nothing else about a token changes - rotate it or revoke it.
 
     Args:
         token_id (str):

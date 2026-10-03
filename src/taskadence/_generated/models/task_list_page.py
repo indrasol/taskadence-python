@@ -23,7 +23,7 @@ T = TypeVar("T", bound="TaskListPage")
 @_attrs_define
 class TaskListPage:
     """A page of `GET /v1/tasks`. `next_cursor` is opaque: send it back as `cursor`; null means the last page. `data` may
-    be empty while `next_cursor` is set (every task on that page was restricted) — keep following the cursor.
+    be empty while `next_cursor` is set (every task on that page was restricted) - keep following the cursor.
 
         Attributes:
             data (list[TaskCardView]):

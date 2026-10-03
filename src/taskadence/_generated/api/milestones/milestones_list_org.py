@@ -160,7 +160,7 @@ def sync_detailed(
 ) -> Response[Any | OrgMilestonesOut | Problem]:
     """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+     Every live milestone in the projects you can read, grouped by project - the shape of `GET
     /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
     `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
@@ -219,7 +219,7 @@ def sync(
 ) -> Any | OrgMilestonesOut | Problem | None:
     """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+     Every live milestone in the projects you can read, grouped by project - the shape of `GET
     /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
     `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
@@ -273,7 +273,7 @@ async def asyncio_detailed(
 ) -> Response[Any | OrgMilestonesOut | Problem]:
     """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+     Every live milestone in the projects you can read, grouped by project - the shape of `GET
     /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
     `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 
@@ -330,7 +330,7 @@ async def asyncio(
 ) -> Any | OrgMilestonesOut | Problem | None:
     """Every milestone you can read in an organization, grouped by project
 
-     Every live milestone in the projects you can read, grouped by project — the shape of `GET
+     Every live milestone in the projects you can read, grouped by project - the shape of `GET
     /v1/goals`. Each milestone carries its task roll-up and `project_name`; each group
     `milestones_tasks_total` / `milestones_tasks_completed`. Not paginated.
 

@@ -116,7 +116,8 @@ def sync_detailed(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Response[AccessReview | Any | Problem]:
-    """Access review: every member and the tokens they hold (owner / admin; JSON or CSV)
+    """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or
+    CSV)
 
      Who can reach this organization, and with which tokens. Owner / admin. `Accept: text/csv` for a
     spreadsheet.
@@ -151,7 +152,8 @@ def sync(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> AccessReview | Any | Problem | None:
-    """Access review: every member and the tokens they hold (owner / admin; JSON or CSV)
+    """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or
+    CSV)
 
      Who can reach this organization, and with which tokens. Owner / admin. `Accept: text/csv` for a
     spreadsheet.
@@ -181,7 +183,8 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> Response[AccessReview | Any | Problem]:
-    """Access review: every member and the tokens they hold (owner / admin; JSON or CSV)
+    """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or
+    CSV)
 
      Who can reach this organization, and with which tokens. Owner / admin. `Accept: text/csv` for a
     spreadsheet.
@@ -214,7 +217,8 @@ async def asyncio(
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
 ) -> AccessReview | Any | Problem | None:
-    """Access review: every member and the tokens they hold (owner / admin; JSON or CSV)
+    """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or
+    CSV)
 
      Who can reach this organization, and with which tokens. Owner / admin. `Accept: text/csv` for a
     spreadsheet.

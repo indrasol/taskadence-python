@@ -113,7 +113,7 @@ def sync_detailed(
     """Create a webhook (the signing secret is shown once)
 
      Register an HTTPS endpoint for a set of events. The response's `secret` is the only time it is ever
-    shown —
+    shown -
     store it now. Deliveries are signed Standard-Webhooks style (`webhook-id`, `webhook-timestamp`,
     `webhook-signature`). Events of private projects are included.
 
@@ -147,7 +147,7 @@ def sync(
     """Create a webhook (the signing secret is shown once)
 
      Register an HTTPS endpoint for a set of events. The response's `secret` is the only time it is ever
-    shown —
+    shown -
     store it now. Deliveries are signed Standard-Webhooks style (`webhook-id`, `webhook-timestamp`,
     `webhook-signature`). Events of private projects are included.
 
@@ -176,7 +176,7 @@ async def asyncio_detailed(
     """Create a webhook (the signing secret is shown once)
 
      Register an HTTPS endpoint for a set of events. The response's `secret` is the only time it is ever
-    shown —
+    shown -
     store it now. Deliveries are signed Standard-Webhooks style (`webhook-id`, `webhook-timestamp`,
     `webhook-signature`). Events of private projects are included.
 
@@ -208,7 +208,7 @@ async def asyncio(
     """Create a webhook (the signing secret is shown once)
 
      Register an HTTPS endpoint for a set of events. The response's `secret` is the only time it is ever
-    shown —
+    shown -
     store it now. Deliveries are signed Standard-Webhooks style (`webhook-id`, `webhook-timestamp`,
     `webhook-signature`). Events of private projects are included.
 

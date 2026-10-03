@@ -73,6 +73,16 @@ def _parse_response(
 
         return response_412
 
+    if response.status_code == 413:
+        response_413 = Problem.from_dict(response.json())
+
+        return response_413
+
+    if response.status_code == 415:
+        response_415 = Problem.from_dict(response.json())
+
+        return response_415
+
     if response.status_code == 422:
         response_422 = Problem.from_dict(response.json())
 
@@ -87,6 +97,11 @@ def _parse_response(
         response_500 = Problem.from_dict(response.json())
 
         return response_500
+
+    if response.status_code == 503:
+        response_503 = Problem.from_dict(response.json())
+
+        return response_503
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -113,7 +128,15 @@ def sync_detailed(
     """Upload an attachment to a task (multipart)
 
      Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+    Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
+    name cleaned);
+    a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
+    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
+    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
+    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
+    type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -146,7 +169,15 @@ def sync(
     """Upload an attachment to a task (multipart)
 
      Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+    Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
+    name cleaned);
+    a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
+    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
+    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
+    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
+    type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -174,7 +205,15 @@ async def asyncio_detailed(
     """Upload an attachment to a task (multipart)
 
      Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+    Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
+    name cleaned);
+    a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
+    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
+    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
+    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
+    type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -205,7 +244,15 @@ async def asyncio(
     """Upload an attachment to a task (multipart)
 
      Upload a file to storage and create an attachment row.
-    Enforces per-task limit.
+    Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
+    name cleaned);
+    a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
+    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
+    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
+    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
+    type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-

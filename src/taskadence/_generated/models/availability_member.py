@@ -19,7 +19,7 @@ T = TypeVar("T", bound="AvailabilityMember")
 
 @_attrs_define
 class AvailabilityMember:
-    """A team member in an availability response — who the entries belong to.
+    """A team member in an availability response - who the entries belong to.
 
     Attributes:
         user_id (str):

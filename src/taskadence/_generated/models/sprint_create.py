@@ -23,7 +23,7 @@ class SprintCreate:
     """The request body of `sprints.create`.
 
     Attributes:
-        name (str): Unique among the team's active sprints (case-insensitive) — 409 otherwise
+        name (str): Unique among the team's active sprints (case-insensitive) - 409 otherwise
         start_date (datetime.date): First day of the time box
         description (None | str | Unset):
         goal (None | str | Unset): What the sprint is for, in the team's words. Free text; nothing is derived from it.
@@ -39,7 +39,6 @@ class SprintCreate:
     goal: None | str | Unset = UNSET
     end_date: datetime.date | None | Unset = UNSET
     duration_weeks: int | None | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -76,7 +75,7 @@ class SprintCreate:
             duration_weeks = self.duration_weeks
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "name": name,
@@ -154,21 +153,4 @@ class SprintCreate:
             duration_weeks=duration_weeks,
         )
 
-        sprint_create.additional_properties = d
         return sprint_create
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

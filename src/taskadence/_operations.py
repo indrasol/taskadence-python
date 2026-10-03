@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from ._core import Operation
 from ._generated.api.audit import audit_export as _audit_export
+from ._generated.api.audit import audit_export_json as _audit_export_json
 from ._generated.api.audit import audit_list as _audit_list
 from ._generated.api.availability import availability_create as _availability_create
 from ._generated.api.availability import availability_delete as _availability_delete
@@ -828,7 +829,7 @@ OPERATIONS: dict[str, Operation] = {
         op_id="task-attachments.list",
         method="GET",
         path="/v1/task-attachments",
-        query=("task_id", "limit", "cursor", "sort_by", "sort_order"),
+        query=("task_id", "inline", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_task_attachments_list._parse_response,
         item=TaskAttachmentInDB.from_dict,
@@ -1030,7 +1031,7 @@ OPERATIONS: dict[str, Operation] = {
         if_none_match=True,
         parse=_organizations_access_review._parse_response,
         scopes=("org:read",),
-        summary="Access review: every member and the tokens they hold (owner / admin; JSON or CSV)",
+        summary="Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or CSV)",
     ),
     "tokens.create": Operation(
         op_id="tokens.create",
@@ -1284,7 +1285,7 @@ OPERATIONS: dict[str, Operation] = {
         query=("environment", "since_days", "repository"),
         if_none_match=True,
         parse=_releases_whats_new._parse_response,
-        summary="What's new — recent release notes",
+        summary="What's new - recent release notes",
     ),
     "sections.list": Operation(
         op_id="sections.list",
@@ -1792,6 +1793,16 @@ OPERATIONS: dict[str, Operation] = {
         parse=_audit_export._parse_response,
         scopes=("admin",),
         summary="Export the audit log as CSV (owner / admin)",
+    ),
+    "audit.export_json": Operation(
+        op_id="audit.export_json",
+        method="GET",
+        path="/v1/audit.json",
+        query=("org_id", "resource_type", "resource_id", "project_id", "action", "actor", "from", "to", "limit"),
+        if_none_match=True,
+        parse=_audit_export_json._parse_response,
+        scopes=("admin",),
+        summary="Export the audit log as a JSON array (owner / admin; S.8)",
     ),
     "views.list": Operation(
         op_id="views.list",

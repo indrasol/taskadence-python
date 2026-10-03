@@ -24,7 +24,7 @@ T = TypeVar("T", bound="Designation")
 
 @_attrs_define
 class Designation:
-    """A designation — global (`org_id` null, `is_system`) or the organization's own. The list adds the org's
+    """A designation - global (`org_id` null, `is_system`) or the organization's own. The list adds the org's
     `pinned` / `hidden` and `legacy_value` (and `usage` with `with_usage=true`); a single read / write returns the
     stored row (`slug`, `metadata`, the audit columns).
 

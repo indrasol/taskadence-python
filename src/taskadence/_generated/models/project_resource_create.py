@@ -27,7 +27,6 @@ class ProjectResourceCreate:
         resource_name (str): Resource name Example: API Docs.
         resource_url (None | str | Unset): Resource URL Example: https://example.com/api-docs.pdf.
         resource_type (None | str | Unset): Type of resource Example: pdf.
-        storage_path (None | str | Unset): Original File Storage Path
         is_active (bool | None | Unset): Is the resource active? Default: True. Example: True.
         created_by (None | str | Unset): Who created the resource
         updated_by (None | str | Unset): Who last updated the resource
@@ -39,12 +38,10 @@ class ProjectResourceCreate:
     resource_name: str
     resource_url: None | str | Unset = UNSET
     resource_type: None | str | Unset = UNSET
-    storage_path: None | str | Unset = UNSET
     is_active: bool | None | Unset = True
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     delete_reason: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -67,12 +64,6 @@ class ProjectResourceCreate:
             resource_type = UNSET
         else:
             resource_type = self.resource_type
-
-        storage_path: None | str | Unset
-        if isinstance(self.storage_path, Unset):
-            storage_path = UNSET
-        else:
-            storage_path = self.storage_path
 
         is_active: bool | None | Unset
         if isinstance(self.is_active, Unset):
@@ -99,7 +90,7 @@ class ProjectResourceCreate:
             delete_reason = self.delete_reason
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "project_id": project_id,
@@ -111,8 +102,6 @@ class ProjectResourceCreate:
             field_dict["resource_url"] = resource_url
         if resource_type is not UNSET:
             field_dict["resource_type"] = resource_type
-        if storage_path is not UNSET:
-            field_dict["storage_path"] = storage_path
         if is_active is not UNSET:
             field_dict["is_active"] = is_active
         if created_by is not UNSET:
@@ -150,15 +139,6 @@ class ProjectResourceCreate:
             return cast(None | str | Unset, data)
 
         resource_type = _parse_resource_type(d.pop("resource_type", UNSET))
-
-        def _parse_storage_path(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        storage_path = _parse_storage_path(d.pop("storage_path", UNSET))
 
         def _parse_is_active(data: object) -> bool | None | Unset:
             if data is None:
@@ -202,28 +182,10 @@ class ProjectResourceCreate:
             resource_name=resource_name,
             resource_url=resource_url,
             resource_type=resource_type,
-            storage_path=storage_path,
             is_active=is_active,
             created_by=created_by,
             updated_by=updated_by,
             delete_reason=delete_reason,
         )
 
-        project_resource_create.additional_properties = d
         return project_resource_create
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

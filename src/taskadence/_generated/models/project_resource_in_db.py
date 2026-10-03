@@ -38,6 +38,8 @@ class ProjectResourceInDB:
             created_by (None | str | Unset): Who created the resource
             updated_by (None | str | Unset): Who last updated the resource
             delete_reason (None | str | Unset): Reason for deletion
+            url_expires_at (datetime.datetime | None | Unset): When `resource_url` stops working (null for a link resource)
+            content_type (None | str | Unset): A stored file's detected type
     """
 
     project_id: str
@@ -54,6 +56,8 @@ class ProjectResourceInDB:
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     delete_reason: None | str | Unset = UNSET
+    url_expires_at: datetime.datetime | None | Unset = UNSET
+    content_type: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -128,6 +132,20 @@ class ProjectResourceInDB:
         else:
             delete_reason = self.delete_reason
 
+        url_expires_at: None | str | Unset
+        if isinstance(self.url_expires_at, Unset):
+            url_expires_at = UNSET
+        elif isinstance(self.url_expires_at, datetime.datetime):
+            url_expires_at = self.url_expires_at.isoformat()
+        else:
+            url_expires_at = self.url_expires_at
+
+        content_type: None | str | Unset
+        if isinstance(self.content_type, Unset):
+            content_type = UNSET
+        else:
+            content_type = self.content_type
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -155,6 +173,10 @@ class ProjectResourceInDB:
             field_dict["updated_by"] = updated_by
         if delete_reason is not UNSET:
             field_dict["delete_reason"] = delete_reason
+        if url_expires_at is not UNSET:
+            field_dict["url_expires_at"] = url_expires_at
+        if content_type is not UNSET:
+            field_dict["content_type"] = content_type
 
         return field_dict
 
@@ -277,6 +299,32 @@ class ProjectResourceInDB:
 
         delete_reason = _parse_delete_reason(d.pop("delete_reason", UNSET))
 
+        def _parse_url_expires_at(data: object) -> datetime.datetime | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                url_expires_at_type_0 = datetime.datetime.fromisoformat(data)
+
+                return url_expires_at_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(datetime.datetime | None | Unset, data)
+
+        url_expires_at = _parse_url_expires_at(d.pop("url_expires_at", UNSET))
+
+        def _parse_content_type(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        content_type = _parse_content_type(d.pop("content_type", UNSET))
+
         project_resource_in_db = cls(
             project_id=project_id,
             project_name=project_name,
@@ -292,6 +340,8 @@ class ProjectResourceInDB:
             created_by=created_by,
             updated_by=updated_by,
             delete_reason=delete_reason,
+            url_expires_at=url_expires_at,
+            content_type=content_type,
         )
 
         project_resource_in_db.additional_properties = d

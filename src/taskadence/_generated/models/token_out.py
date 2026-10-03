@@ -41,7 +41,8 @@ class TokenOut:
         principal_user_id (str): Who the token acts as
         created_by (str):
         name (str):
-        token_prefix (str): The first 12 characters (`tkd_live_ab12`) — the token itself is never shown again
+        token_prefix (str): The prefix and the next 4 characters (`tkd_live_ab12`) - the token itself is never shown
+            again
         kind (TokenOutKind):
         grant_type (TokenOutGrantType):
         scopes (list[str]):

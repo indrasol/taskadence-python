@@ -110,11 +110,15 @@ def sync_detailed(
 ) -> Response[Problem | TokenCreated]:
     """Mint an access token (the token is shown once)
 
-     Mint a token. The response's `token` is the only time it is ever shown — store it now. Yourself by
+     Mint a token. The response's `token` is the only time it is ever shown - store it now. Yourself by
     default;
     `principal_user_id` = a service account of the org (owner / admin). The org's policy applies
     (personal tokens
     allowed? expiry required? maximum lifetime?).
+
+    In an organization that requires two-step sign-in for you, a signed-in session must have completed
+    it (403
+    `mfa-required`); a token is not asked again once it exists.
 
     Args:
         body (TokenCreate): The request body of `tokens.create`.
@@ -145,11 +149,15 @@ def sync(
 ) -> Problem | TokenCreated | None:
     """Mint an access token (the token is shown once)
 
-     Mint a token. The response's `token` is the only time it is ever shown — store it now. Yourself by
+     Mint a token. The response's `token` is the only time it is ever shown - store it now. Yourself by
     default;
     `principal_user_id` = a service account of the org (owner / admin). The org's policy applies
     (personal tokens
     allowed? expiry required? maximum lifetime?).
+
+    In an organization that requires two-step sign-in for you, a signed-in session must have completed
+    it (403
+    `mfa-required`); a token is not asked again once it exists.
 
     Args:
         body (TokenCreate): The request body of `tokens.create`.
@@ -175,11 +183,15 @@ async def asyncio_detailed(
 ) -> Response[Problem | TokenCreated]:
     """Mint an access token (the token is shown once)
 
-     Mint a token. The response's `token` is the only time it is ever shown — store it now. Yourself by
+     Mint a token. The response's `token` is the only time it is ever shown - store it now. Yourself by
     default;
     `principal_user_id` = a service account of the org (owner / admin). The org's policy applies
     (personal tokens
     allowed? expiry required? maximum lifetime?).
+
+    In an organization that requires two-step sign-in for you, a signed-in session must have completed
+    it (403
+    `mfa-required`); a token is not asked again once it exists.
 
     Args:
         body (TokenCreate): The request body of `tokens.create`.
@@ -208,11 +220,15 @@ async def asyncio(
 ) -> Problem | TokenCreated | None:
     """Mint an access token (the token is shown once)
 
-     Mint a token. The response's `token` is the only time it is ever shown — store it now. Yourself by
+     Mint a token. The response's `token` is the only time it is ever shown - store it now. Yourself by
     default;
     `principal_user_id` = a service account of the org (owner / admin). The org's policy applies
     (personal tokens
     allowed? expiry required? maximum lifetime?).
+
+    In an organization that requires two-step sign-in for you, a signed-in session must have completed
+    it (403
+    `mfa-required`); a token is not asked again once it exists.
 
     Args:
         body (TokenCreate): The request body of `tokens.create`.

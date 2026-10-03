@@ -21,7 +21,7 @@ class DesignationDeleted:
     Attributes:
         ok (bool):
         designation_id (str):
-        is_active (bool): false: DELETE is a deactivate — existing assignments keep the row
+        is_active (bool): false: DELETE is a deactivate - existing assignments keep the row
     """
 
     ok: bool

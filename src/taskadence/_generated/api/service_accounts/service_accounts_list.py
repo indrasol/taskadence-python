@@ -149,7 +149,7 @@ def sync_detailed(
 ) -> Response[Any | PageServiceAccountOut | Problem]:
     """List an organization's service accounts (owner / admin)
 
-     The organization's service accounts — active and deactivated — with how many tokens each holds right
+     The organization's service accounts - active and deactivated - with how many tokens each holds right
     now.
 
     Args:
@@ -197,7 +197,7 @@ def sync(
 ) -> Any | PageServiceAccountOut | Problem | None:
     """List an organization's service accounts (owner / admin)
 
-     The organization's service accounts — active and deactivated — with how many tokens each holds right
+     The organization's service accounts - active and deactivated - with how many tokens each holds right
     now.
 
     Args:
@@ -240,7 +240,7 @@ async def asyncio_detailed(
 ) -> Response[Any | PageServiceAccountOut | Problem]:
     """List an organization's service accounts (owner / admin)
 
-     The organization's service accounts — active and deactivated — with how many tokens each holds right
+     The organization's service accounts - active and deactivated - with how many tokens each holds right
     now.
 
     Args:
@@ -286,7 +286,7 @@ async def asyncio(
 ) -> Any | PageServiceAccountOut | Problem | None:
     """List an organization's service accounts (owner / admin)
 
-     The organization's service accounts — active and deactivated — with how many tokens each holds right
+     The organization's service accounts - active and deactivated - with how many tokens each holds right
     now.
 
     Args:

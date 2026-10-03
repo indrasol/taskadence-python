@@ -24,7 +24,7 @@ class ConnectedApp:
 
     Example:
         {'client_id': 'tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo', 'client_name': 'Acme HR', 'created_at': '2026-09-26T12:00:00Z',
-            'grant_id': 'tmg_Xy12Ab34Cd56', 'homepage_url': 'https://hr.example.com', 'last_used_at':
+            'grant_id': 'tkdg_Xy12Ab34Cd56', 'homepage_url': 'https://hr.example.com', 'last_used_at':
             '2026-09-26T13:00:00Z', 'org_id': 'O0020', 'org_name': 'Indrasol', 'scopes': ['tasks:write']}
 
     Attributes:

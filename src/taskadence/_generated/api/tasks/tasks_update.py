@@ -117,7 +117,7 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Update a task (JSON merge-patch)
 
-     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -158,7 +158,7 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Update a task (JSON merge-patch)
 
-     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -194,7 +194,7 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Update a task (JSON merge-patch)
 
-     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -233,7 +233,7 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Update a task (JSON merge-patch)
 
-     Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+     Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 

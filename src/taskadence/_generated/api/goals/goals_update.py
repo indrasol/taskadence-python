@@ -120,7 +120,7 @@ def sync_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
+        body (GoalUpdate): A true partial - an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
             touches the tasks.
@@ -160,7 +160,7 @@ def sync(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
+        body (GoalUpdate): A true partial - an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
             touches the tasks.
@@ -195,7 +195,7 @@ async def asyncio_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
+        body (GoalUpdate): A true partial - an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
             touches the tasks.
@@ -233,7 +233,7 @@ async def asyncio(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalUpdate): A true partial — an absent field is left alone; `target_date` /
+        body (GoalUpdate): A true partial - an absent field is left alone; `target_date` /
             `description` sent as null clear.
             `status` closes (`closed_at` / `closed_by` written) or re-opens (both cleared); neither
             touches the tasks.

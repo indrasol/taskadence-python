@@ -126,7 +126,7 @@ def sync_detailed(
         team_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
-            is a 422 — moving a day
+            is a 422 - moving a day
             off between people is a delete plus a create, with two events.
 
     Raises:
@@ -166,7 +166,7 @@ def sync(
         team_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
-            is a 422 — moving a day
+            is a 422 - moving a day
             off between people is a delete plus a create, with two events.
 
     Raises:
@@ -201,7 +201,7 @@ async def asyncio_detailed(
         team_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
-            is a 422 — moving a day
+            is a 422 - moving a day
             off between people is a delete plus a create, with two events.
 
     Raises:
@@ -239,7 +239,7 @@ async def asyncio(
         team_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
-            is a 422 — moving a day
+            is a 422 - moving a day
             off between people is a delete plus a create, with two events.
 
     Raises:

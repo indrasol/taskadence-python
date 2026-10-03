@@ -17,6 +17,7 @@ from typing import cast
 
 if TYPE_CHECKING:
     from ..models.problem_errors_item import ProblemErrorsItem
+    from ..models.problem_mfa import ProblemMfa
 
 
 T = TypeVar("T", bound="Problem")
@@ -24,7 +25,7 @@ T = TypeVar("T", bound="Problem")
 
 @_attrs_define
 class Problem:
-    """An RFC 9457 problem details object — the body of every error response. `detail` is the human-readable explanation;
+    """An RFC 9457 problem details object - the body of every error response. `detail` is the human-readable explanation;
     `request_id` identifies the request for support.
 
         Attributes:
@@ -37,6 +38,9 @@ class Problem:
             request_id (str):  Example: 9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11.
             errors (list[ProblemErrorsItem] | Unset): Structured failures: validation errors, or `{loc, msg, allowed}` for a
                 bad parameter
+            mfa (ProblemMfa | Unset): On an `mfa-required` problem only: `enrolled` (does the person have an authenticator
+                app set up), `required_for` (`all` or `admins`) and `reason` (`org_policy`: the organization's requirement;
+                `step_up`: this action needs a second step)
     """
 
     type_: ProblemType
@@ -46,6 +50,7 @@ class Problem:
     instance: str
     request_id: str
     errors: list[ProblemErrorsItem] | Unset = UNSET
+    mfa: ProblemMfa | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -53,6 +58,7 @@ class Problem:
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.problem_errors_item import ProblemErrorsItem  # noqa: PLC0415
+        from ..models.problem_mfa import ProblemMfa  # noqa: PLC0415
 
         type_: str = self.type_
 
@@ -73,6 +79,10 @@ class Problem:
                 errors_item = errors_item_data.to_dict()
                 errors.append(errors_item)
 
+        mfa: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.mfa, Unset):
+            mfa = self.mfa.to_dict()
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -87,12 +97,15 @@ class Problem:
         )
         if errors is not UNSET:
             field_dict["errors"] = errors
+        if mfa is not UNSET:
+            field_dict["mfa"] = mfa
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.problem_errors_item import ProblemErrorsItem  # noqa: PLC0415
+        from ..models.problem_mfa import ProblemMfa  # noqa: PLC0415
 
         d = dict(src_dict)
         type_ = check_problem_type(d.pop("type"))
@@ -116,6 +129,13 @@ class Problem:
 
                 errors.append(errors_item)
 
+        _mfa = d.pop("mfa", UNSET)
+        mfa: ProblemMfa | Unset
+        if isinstance(_mfa, Unset):
+            mfa = UNSET
+        else:
+            mfa = ProblemMfa.from_dict(_mfa)
+
         problem = cls(
             type_=type_,
             title=title,
@@ -124,6 +144,7 @@ class Problem:
             instance=instance,
             request_id=request_id,
             errors=errors,
+            mfa=mfa,
         )
 
         problem.additional_properties = d

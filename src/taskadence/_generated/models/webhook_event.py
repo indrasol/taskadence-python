@@ -27,7 +27,7 @@ class WebhookEvent:
     docs' Webhooks guide has the recipe); delivery is at-least-once, so deduplicate on `id`.
 
         Attributes:
-            id (str): The delivery id — the same as the `webhook-id` header (a replay keeps the original's)
+            id (str): The delivery id - the same as the `webhook-id` header (a replay keeps the original's)
             type_ (str): The event: one of the `webhooks` keys of this document (`task.updated`, …), or `webhook.test` for a
                 test send
             api_version (str): The subscription's API version (the date the body's shape is pinned to)
@@ -35,7 +35,7 @@ class WebhookEvent:
             org_id (str):
             project_id (None | str): The project the event belongs to, if any
             actor (WebhookActor): Who caused the event.
-            data (WebhookEventData): What changed: the audit row's scrubbed diff — never a whole resource, never a secret.
+            data (WebhookEventData): What changed: the audit row's scrubbed diff - never a whole resource, never a secret.
             request_id (None | str): The API request that caused it (quote it to support)
     """
 

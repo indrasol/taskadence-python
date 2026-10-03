@@ -46,7 +46,6 @@ class OAuthClientCreate:
     logo_url: None | str | Unset = UNSET
     homepage_url: None | str | Unset = UNSET
     privacy_url: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -83,7 +82,7 @@ class OAuthClientCreate:
             privacy_url = self.privacy_url
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update(
             {
                 "org_id": org_id,
@@ -159,21 +158,4 @@ class OAuthClientCreate:
             privacy_url=privacy_url,
         )
 
-        o_auth_client_create.additional_properties = d
         return o_auth_client_create
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

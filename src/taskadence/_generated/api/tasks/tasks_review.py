@@ -114,7 +114,7 @@ def sync_detailed(
 
      Accept or reject a task an agent created while it waits for review (`review_state: pending`).
 
-    - **Who:** a person who may edit the task — signed in, or with their own access token. A service
+    - **Who:** a person who may edit the task - signed in, or with their own access token. A service
     account's token, or a call made through the MCP server, is a 403: agents do not review their own
     work.
     - **accept:** the task counts as ordinary work. A task held back from a private project
@@ -158,7 +158,7 @@ def sync(
 
      Accept or reject a task an agent created while it waits for review (`review_state: pending`).
 
-    - **Who:** a person who may edit the task — signed in, or with their own access token. A service
+    - **Who:** a person who may edit the task - signed in, or with their own access token. A service
     account's token, or a call made through the MCP server, is a 403: agents do not review their own
     work.
     - **accept:** the task counts as ordinary work. A task held back from a private project
@@ -197,7 +197,7 @@ async def asyncio_detailed(
 
      Accept or reject a task an agent created while it waits for review (`review_state: pending`).
 
-    - **Who:** a person who may edit the task — signed in, or with their own access token. A service
+    - **Who:** a person who may edit the task - signed in, or with their own access token. A service
     account's token, or a call made through the MCP server, is a 403: agents do not review their own
     work.
     - **accept:** the task counts as ordinary work. A task held back from a private project
@@ -239,7 +239,7 @@ async def asyncio(
 
      Accept or reject a task an agent created while it waits for review (`review_state: pending`).
 
-    - **Who:** a person who may edit the task — signed in, or with their own access token. A service
+    - **Who:** a person who may edit the task - signed in, or with their own access token. A service
     account's token, or a call made through the MCP server, is a 403: agents do not review their own
     work.
     - **accept:** the task counts as ordinary work. A task held back from a private project

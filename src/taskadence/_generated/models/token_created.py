@@ -41,12 +41,13 @@ class TokenCreated:
         principal_user_id (str): Who the token acts as
         created_by (str):
         name (str):
-        token_prefix (str): The first 12 characters (`tkd_live_ab12`) — the token itself is never shown again
+        token_prefix (str): The prefix and the next 4 characters (`tkd_live_ab12`) - the token itself is never shown
+            again
         kind (TokenCreatedKind):
         grant_type (TokenCreatedGrantType):
         scopes (list[str]):
         status (TokenCreatedStatus):
-        token (str): THE TOKEN — shown once, never stored (only its SHA-256 is). Send it as `Authorization: Bearer
+        token (str): THE TOKEN - shown once, never stored (only its SHA-256 is). Send it as `Authorization: Bearer
             <token>`.
         principal_display (None | str | Unset): The principal's name: a service account's display name, otherwise the
             username (or the email when there is none); null when the principal is no longer in the organization.

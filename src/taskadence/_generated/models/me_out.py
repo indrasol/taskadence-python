@@ -35,11 +35,15 @@ class MeOut:
         principal (MePrincipal): Part of `MeOut`.
         organizations (list[MeOrganization] | Unset): Active memberships, by name (a token: only its own organization)
         auth (MeAuth | None | Unset): The access token behind this request; absent for a session token.
+        idle_timeout_minutes (int | None | Unset): S.6: a signed-in session only - the STRICTEST idle sign-out (minutes)
+            across the person's organizations; the web app signs out after it. 60 when none sets one. Absent for an access
+            token
     """
 
     principal: MePrincipal
     organizations: list[MeOrganization] | Unset = UNSET
     auth: MeAuth | None | Unset = UNSET
+    idle_timeout_minutes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -67,6 +71,12 @@ class MeOut:
         else:
             auth = self.auth
 
+        idle_timeout_minutes: int | None | Unset
+        if isinstance(self.idle_timeout_minutes, Unset):
+            idle_timeout_minutes = UNSET
+        else:
+            idle_timeout_minutes = self.idle_timeout_minutes
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -78,6 +88,8 @@ class MeOut:
             field_dict["organizations"] = organizations
         if auth is not UNSET:
             field_dict["auth"] = auth
+        if idle_timeout_minutes is not UNSET:
+            field_dict["idle_timeout_minutes"] = idle_timeout_minutes
 
         return field_dict
 
@@ -116,10 +128,20 @@ class MeOut:
 
         auth = _parse_auth(d.pop("auth", UNSET))
 
+        def _parse_idle_timeout_minutes(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        idle_timeout_minutes = _parse_idle_timeout_minutes(d.pop("idle_timeout_minutes", UNSET))
+
         me_out = cls(
             principal=principal,
             organizations=organizations,
             auth=auth,
+            idle_timeout_minutes=idle_timeout_minutes,
         )
 
         me_out.additional_properties = d

@@ -112,7 +112,7 @@ def sync_detailed(
 ) -> Response[OAuthClientCreated | Problem]:
     """Register an OAuth app (a confidential app's secret is shown once)
 
-     Register an app (owner / admin). A confidential app's `client_secret` is in this response only —
+     Register an app (owner / admin). A confidential app's `client_secret` is in this response only -
     store it now.
 
     Args:
@@ -144,7 +144,7 @@ def sync(
 ) -> OAuthClientCreated | Problem | None:
     """Register an OAuth app (a confidential app's secret is shown once)
 
-     Register an app (owner / admin). A confidential app's `client_secret` is in this response only —
+     Register an app (owner / admin). A confidential app's `client_secret` is in this response only -
     store it now.
 
     Args:
@@ -171,7 +171,7 @@ async def asyncio_detailed(
 ) -> Response[OAuthClientCreated | Problem]:
     """Register an OAuth app (a confidential app's secret is shown once)
 
-     Register an app (owner / admin). A confidential app's `client_secret` is in this response only —
+     Register an app (owner / admin). A confidential app's `client_secret` is in this response only -
     store it now.
 
     Args:
@@ -201,7 +201,7 @@ async def asyncio(
 ) -> OAuthClientCreated | Problem | None:
     """Register an OAuth app (a confidential app's secret is shown once)
 
-     Register an app (owner / admin). A confidential app's `client_secret` is in this response only —
+     Register an app (owner / admin). A confidential app's `client_secret` is in this response only -
     store it now.
 
     Args:

@@ -12,6 +12,8 @@ from ..types import UNSET, Unset
 
 from ..models.agent_task_review_enum import AgentTaskReviewEnum
 from ..models.agent_task_review_enum import check_agent_task_review_enum
+from ..models.mfa_requirement_enum import check_mfa_requirement_enum
+from ..models.mfa_requirement_enum import MfaRequirementEnum
 from ..models.org_join_mode_enum import check_org_join_mode_enum
 from ..models.org_join_mode_enum import OrgJoinModeEnum
 from ..models.project_visibility_enum import check_project_visibility_enum
@@ -19,6 +21,9 @@ from ..models.project_visibility_enum import ProjectVisibilityEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+
+if TYPE_CHECKING:
+    from ..models.mfa_enrolment_counts import MfaEnrolmentCounts
 
 
 T = TypeVar("T", bound="OrganizationSettingsOut")
@@ -30,8 +35,8 @@ class OrganizationSettingsOut:
 
     Attributes:
         org_id (str):
-        default_visibility (ProjectVisibilityEnum | Unset): Who can see a project: `public` — every member of the
-            organization; `private` — the project's members and org admins. Also the organization's default for new
+        default_visibility (ProjectVisibilityEnum | Unset): Who can see a project: `public` - every member of the
+            organization; `private` - the project's members and org admins. Also the organization's default for new
             projects.
         domain_join_mode (OrgJoinModeEnum | Unset): What a sign-in from one of the organization's verified domains gets:
             `instant` makes the person a member immediately; `approval` files a join request for an admin to decide.
@@ -46,6 +51,22 @@ class OrganizationSettingsOut:
             project kept as `proposed_project_id`, until a person accepts it.
             - `always`: every agent task, where it was asked to go.
             - `never`: none (agent tasks stay marked by `created_via`).
+        require_mfa (MfaRequirementEnum | Unset): Who must sign in with two-step sign-in (an authenticator app) to reach
+            the organization's data.
+
+            - `off` (default): nobody is required to.
+            - `admins`: owners and admins.
+            - `all`: every member, guests included.
+        idle_timeout_minutes (int | Unset): S.6: the web app signs people out after this many idle minutes (15, 30, 60,
+            240 or 480) Default: 60.
+        restrict_to_verified_domains (bool | Unset): S.7: only people with an email at a verified domain get in by
+            themselves (invites to other domains need an owner) Default: False.
+        deleted_item_retention_days (int | Unset): S.13: days a deleted task, project, goal, milestone, sprint, team or
+            test run stays restorable before it is purged Default: 30.
+        attachment_retention_days (int | Unset): S.13: days a deleted attachment's file is kept in storage before it is
+            removed Default: 30.
+        mfa_not_enrolled (MfaEnrolmentCounts | None | Unset): For owners and admins: how many members each policy value
+            would stop until they set up two-step sign-in. null for anyone else.
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         updated_by (None | str | Unset):
@@ -60,6 +81,12 @@ class OrganizationSettingsOut:
     max_token_ttl_days: int | None | Unset = UNSET
     require_token_expiry: bool | Unset = False
     agent_task_review: AgentTaskReviewEnum | Unset = UNSET
+    require_mfa: MfaRequirementEnum | Unset = UNSET
+    idle_timeout_minutes: int | Unset = 60
+    restrict_to_verified_domains: bool | Unset = False
+    deleted_item_retention_days: int | Unset = 30
+    attachment_retention_days: int | Unset = 30
+    mfa_not_enrolled: MfaEnrolmentCounts | None | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
     updated_by: None | str | Unset = UNSET
@@ -70,6 +97,8 @@ class OrganizationSettingsOut:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.mfa_enrolment_counts import MfaEnrolmentCounts  # noqa: PLC0415
+
         org_id = self.org_id
 
         default_visibility: str | Unset = UNSET
@@ -99,6 +128,26 @@ class OrganizationSettingsOut:
         agent_task_review: str | Unset = UNSET
         if not isinstance(self.agent_task_review, Unset):
             agent_task_review = self.agent_task_review
+
+        require_mfa: str | Unset = UNSET
+        if not isinstance(self.require_mfa, Unset):
+            require_mfa = self.require_mfa
+
+        idle_timeout_minutes = self.idle_timeout_minutes
+
+        restrict_to_verified_domains = self.restrict_to_verified_domains
+
+        deleted_item_retention_days = self.deleted_item_retention_days
+
+        attachment_retention_days = self.attachment_retention_days
+
+        mfa_not_enrolled: dict[str, Any] | None | Unset
+        if isinstance(self.mfa_not_enrolled, Unset):
+            mfa_not_enrolled = UNSET
+        elif isinstance(self.mfa_not_enrolled, MfaEnrolmentCounts):
+            mfa_not_enrolled = self.mfa_not_enrolled.to_dict()
+        else:
+            mfa_not_enrolled = self.mfa_not_enrolled
 
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
@@ -145,6 +194,18 @@ class OrganizationSettingsOut:
             field_dict["require_token_expiry"] = require_token_expiry
         if agent_task_review is not UNSET:
             field_dict["agent_task_review"] = agent_task_review
+        if require_mfa is not UNSET:
+            field_dict["require_mfa"] = require_mfa
+        if idle_timeout_minutes is not UNSET:
+            field_dict["idle_timeout_minutes"] = idle_timeout_minutes
+        if restrict_to_verified_domains is not UNSET:
+            field_dict["restrict_to_verified_domains"] = restrict_to_verified_domains
+        if deleted_item_retention_days is not UNSET:
+            field_dict["deleted_item_retention_days"] = deleted_item_retention_days
+        if attachment_retention_days is not UNSET:
+            field_dict["attachment_retention_days"] = attachment_retention_days
+        if mfa_not_enrolled is not UNSET:
+            field_dict["mfa_not_enrolled"] = mfa_not_enrolled
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
         if updated_at is not UNSET:
@@ -158,6 +219,8 @@ class OrganizationSettingsOut:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.mfa_enrolment_counts import MfaEnrolmentCounts  # noqa: PLC0415
+
         d = dict(src_dict)
         org_id = d.pop("org_id")
 
@@ -203,6 +266,38 @@ class OrganizationSettingsOut:
             agent_task_review = UNSET
         else:
             agent_task_review = check_agent_task_review_enum(_agent_task_review)
+
+        _require_mfa = d.pop("require_mfa", UNSET)
+        require_mfa: MfaRequirementEnum | Unset
+        if isinstance(_require_mfa, Unset):
+            require_mfa = UNSET
+        else:
+            require_mfa = check_mfa_requirement_enum(_require_mfa)
+
+        idle_timeout_minutes = d.pop("idle_timeout_minutes", UNSET)
+
+        restrict_to_verified_domains = d.pop("restrict_to_verified_domains", UNSET)
+
+        deleted_item_retention_days = d.pop("deleted_item_retention_days", UNSET)
+
+        attachment_retention_days = d.pop("attachment_retention_days", UNSET)
+
+        def _parse_mfa_not_enrolled(data: object) -> MfaEnrolmentCounts | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                mfa_not_enrolled_type_0 = MfaEnrolmentCounts.from_dict(data)
+
+                return mfa_not_enrolled_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(MfaEnrolmentCounts | None | Unset, data)
+
+        mfa_not_enrolled = _parse_mfa_not_enrolled(d.pop("mfa_not_enrolled", UNSET))
 
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
@@ -258,6 +353,12 @@ class OrganizationSettingsOut:
             max_token_ttl_days=max_token_ttl_days,
             require_token_expiry=require_token_expiry,
             agent_task_review=agent_task_review,
+            require_mfa=require_mfa,
+            idle_timeout_minutes=idle_timeout_minutes,
+            restrict_to_verified_domains=restrict_to_verified_domains,
+            deleted_item_retention_days=deleted_item_retention_days,
+            attachment_retention_days=attachment_retention_days,
+            mfa_not_enrolled=mfa_not_enrolled,
             created_at=created_at,
             updated_at=updated_at,
             updated_by=updated_by,

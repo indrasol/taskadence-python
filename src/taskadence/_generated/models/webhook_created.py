@@ -37,10 +37,10 @@ class WebhookCreated:
         name (str):
         url (str): As registered (an admin's own configuration)
         events (list[str]):
-        secret_prefix (str): `whsec_` + 6 characters — the secret itself is never shown again
+        secret_prefix (str): `whsec_` + 6 characters - the secret itself is never shown again
         status (WebhookCreatedStatus):
         api_version (str):
-        secret (str): THE SIGNING SECRET — shown once, stored only encrypted. Verify `webhook-signature` with the
+        secret (str): THE SIGNING SECRET - shown once, stored only encrypted. Verify `webhook-signature` with the
             base64-decoded part after `whsec_`.
         created_by (None | str | Unset):
         project_ids (list[str] | None | Unset):

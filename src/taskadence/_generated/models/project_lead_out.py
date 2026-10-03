@@ -20,7 +20,7 @@ T = TypeVar("T", bound="ProjectLeadOut")
 
 @_attrs_define
 class ProjectLeadOut:
-    """One lead of a project: who, who set them, and when. A lead is distinct from the owner — the owner administers the
+    """One lead of a project: who, who set them, and when. A lead is distinct from the owner - the owner administers the
     project, a lead is accountable for delivering it.
 
         Attributes:

@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
+    from ..models.review_project import ReviewProject
     from ..models.review_token import ReviewToken
 
 
@@ -33,6 +34,12 @@ class ReviewMember:
         designation (None | str | Unset):
         last_active_at (None | str | Unset):
         tokens (list[ReviewToken] | Unset): Tokens that authenticate right now
+        mfa (str | Unset): `enrolled`, `not_enrolled`, `unknown` (the auth service could not say) or `n/a` (a service
+            account) Default: 'unknown'.
+        mfa_required (bool | Unset): The organization's two-step sign-in policy covers this member's role Default:
+            False.
+        last_sign_in_at (None | str | Unset):
+        projects (list[ReviewProject] | Unset): Projects of this organization the member belongs to, with their role
     """
 
     user_id: str
@@ -43,12 +50,17 @@ class ReviewMember:
     designation: None | str | Unset = UNSET
     last_active_at: None | str | Unset = UNSET
     tokens: list[ReviewToken] | Unset = UNSET
+    mfa: str | Unset = "unknown"
+    mfa_required: bool | Unset = False
+    last_sign_in_at: None | str | Unset = UNSET
+    projects: list[ReviewProject] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.review_project import ReviewProject  # noqa: PLC0415
         from ..models.review_token import ReviewToken  # noqa: PLC0415
 
         user_id = self.user_id
@@ -88,6 +100,23 @@ class ReviewMember:
                 tokens_item = tokens_item_data.to_dict()
                 tokens.append(tokens_item)
 
+        mfa = self.mfa
+
+        mfa_required = self.mfa_required
+
+        last_sign_in_at: None | str | Unset
+        if isinstance(self.last_sign_in_at, Unset):
+            last_sign_in_at = UNSET
+        else:
+            last_sign_in_at = self.last_sign_in_at
+
+        projects: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.projects, Unset):
+            projects = []
+            for projects_item_data in self.projects:
+                projects_item = projects_item_data.to_dict()
+                projects.append(projects_item)
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -107,11 +136,20 @@ class ReviewMember:
             field_dict["last_active_at"] = last_active_at
         if tokens is not UNSET:
             field_dict["tokens"] = tokens
+        if mfa is not UNSET:
+            field_dict["mfa"] = mfa
+        if mfa_required is not UNSET:
+            field_dict["mfa_required"] = mfa_required
+        if last_sign_in_at is not UNSET:
+            field_dict["last_sign_in_at"] = last_sign_in_at
+        if projects is not UNSET:
+            field_dict["projects"] = projects
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.review_project import ReviewProject  # noqa: PLC0415
         from ..models.review_token import ReviewToken  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -166,6 +204,28 @@ class ReviewMember:
 
                 tokens.append(tokens_item)
 
+        mfa = d.pop("mfa", UNSET)
+
+        mfa_required = d.pop("mfa_required", UNSET)
+
+        def _parse_last_sign_in_at(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        last_sign_in_at = _parse_last_sign_in_at(d.pop("last_sign_in_at", UNSET))
+
+        _projects = d.pop("projects", UNSET)
+        projects: list[ReviewProject] | Unset = UNSET
+        if _projects is not UNSET:
+            projects = []
+            for projects_item_data in _projects:
+                projects_item = ReviewProject.from_dict(projects_item_data)
+
+                projects.append(projects_item)
+
         review_member = cls(
             user_id=user_id,
             kind=kind,
@@ -175,6 +235,10 @@ class ReviewMember:
             designation=designation,
             last_active_at=last_active_at,
             tokens=tokens,
+            mfa=mfa,
+            mfa_required=mfa_required,
+            last_sign_in_at=last_sign_in_at,
+            projects=projects,
         )
 
         review_member.additional_properties = d

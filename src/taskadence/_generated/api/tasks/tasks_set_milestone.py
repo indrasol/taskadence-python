@@ -114,7 +114,7 @@ def sync_detailed(
 
      File the task under a milestone; `milestone_id: null` takes it out.
 
-    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Who:** anyone who may edit the task - no right over the milestone itself is needed.
     - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
     be filed.
     - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
@@ -156,7 +156,7 @@ def sync(
 
      File the task under a milestone; `milestone_id: null` takes it out.
 
-    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Who:** anyone who may edit the task - no right over the milestone itself is needed.
     - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
     be filed.
     - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
@@ -193,7 +193,7 @@ async def asyncio_detailed(
 
      File the task under a milestone; `milestone_id: null` takes it out.
 
-    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Who:** anyone who may edit the task - no right over the milestone itself is needed.
     - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
     be filed.
     - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.
@@ -233,7 +233,7 @@ async def asyncio(
 
      File the task under a milestone; `milestone_id: null` takes it out.
 
-    - **Who:** anyone who may edit the task — no right over the milestone itself is needed.
+    - **Who:** anyone who may edit the task - no right over the milestone itself is needed.
     - **Which milestones:** a live milestone of the task's own project. A task without a project cannot
     be filed.
     - **Errors:** 404 for an unknown milestone, 422 when it belongs to another project.

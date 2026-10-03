@@ -125,7 +125,7 @@ def sync_detailed(
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` — the milestone AND its
+        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` - the milestone AND its
             tasks go to `project_id` (same org), all-or-nothing.
 
     Raises:
@@ -164,7 +164,7 @@ def sync(
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` — the milestone AND its
+        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` - the milestone AND its
             tasks go to `project_id` (same org), all-or-nothing.
 
     Raises:
@@ -198,7 +198,7 @@ async def asyncio_detailed(
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` — the milestone AND its
+        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` - the milestone AND its
             tasks go to `project_id` (same org), all-or-nothing.
 
     Raises:
@@ -235,7 +235,7 @@ async def asyncio(
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` — the milestone AND its
+        body (MilestoneMove): `POST …/milestones/{milestone_id}/move` - the milestone AND its
             tasks go to `project_id` (same org), all-or-nothing.
 
     Raises:

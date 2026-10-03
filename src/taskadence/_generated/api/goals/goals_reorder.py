@@ -120,7 +120,7 @@ def sync_detailed(
 
     Args:
         project_id (str):
-        body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
+        body (GoalOrder): `POST …/goals/reorder` - the WHOLE order: every live goal of the project
             exactly once.
 
     Raises:
@@ -155,7 +155,7 @@ def sync(
 
     Args:
         project_id (str):
-        body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
+        body (GoalOrder): `POST …/goals/reorder` - the WHOLE order: every live goal of the project
             exactly once.
 
     Raises:
@@ -185,7 +185,7 @@ async def asyncio_detailed(
 
     Args:
         project_id (str):
-        body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
+        body (GoalOrder): `POST …/goals/reorder` - the WHOLE order: every live goal of the project
             exactly once.
 
     Raises:
@@ -218,7 +218,7 @@ async def asyncio(
 
     Args:
         project_id (str):
-        body (GoalOrder): `POST …/goals/reorder` — the WHOLE order: every live goal of the project
+        body (GoalOrder): `POST …/goals/reorder` - the WHOLE order: every live goal of the project
             exactly once.
 
     Raises:

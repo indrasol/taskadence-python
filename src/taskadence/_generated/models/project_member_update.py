@@ -14,7 +14,6 @@ from ..models.project_role_enum import check_project_role_enum
 from ..models.project_role_enum import ProjectRoleEnum
 from ..types import UNSET, Unset
 from typing import cast
-import datetime
 
 
 T = TypeVar("T", bound="ProjectMemberUpdate")
@@ -26,10 +25,6 @@ class ProjectMemberUpdate:
     `project_id` come from the path and need not be repeated.
 
         Attributes:
-            project_id (None | str | Unset): Project ID (text) — the path's; optional in the body Example: project-1234.
-            user_id (None | str | Unset): User ID (UUID) — the path's; optional in the body Example:
-                b3c1e2d4-1234-5678-9abc-def012345678.
-            username (None | str | Unset): Username of the member Example: john_doe.
             designation (None | str | Unset): Designation name Example: developer.
             designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
                 this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
@@ -37,53 +32,19 @@ class ProjectMemberUpdate:
                 omitted. Prefer `project_role`. Example: owner.
             project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
                 omitted. Example: editor.
-            created_by (None | str | Unset): Who created the membership (username)
-            updated_by (None | str | Unset): Who last updated the membership (username)
             is_active (bool | None | Unset): Whether the member is active. Omit to leave it unchanged. Example: True.
-            created_at (datetime.datetime | None | Unset): Creation timestamp
-            updated_at (datetime.datetime | None | Unset): Last update timestamp
-            deleted_at (datetime.datetime | None | Unset): When the member was deleted
-            delete_reason (None | str | Unset): Reason for deletion
     """
 
-    project_id: None | str | Unset = UNSET
-    user_id: None | str | Unset = UNSET
-    username: None | str | Unset = UNSET
     designation: None | str | Unset = UNSET
     designation_id: None | str | Unset = UNSET
     role: None | str | Unset = UNSET
     project_role: None | ProjectRoleEnum | Unset = UNSET
-    created_by: None | str | Unset = UNSET
-    updated_by: None | str | Unset = UNSET
     is_active: bool | None | Unset = UNSET
-    created_at: datetime.datetime | None | Unset = UNSET
-    updated_at: datetime.datetime | None | Unset = UNSET
-    deleted_at: datetime.datetime | None | Unset = UNSET
-    delete_reason: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        project_id: None | str | Unset
-        if isinstance(self.project_id, Unset):
-            project_id = UNSET
-        else:
-            project_id = self.project_id
-
-        user_id: None | str | Unset
-        if isinstance(self.user_id, Unset):
-            user_id = UNSET
-        else:
-            user_id = self.user_id
-
-        username: None | str | Unset
-        if isinstance(self.username, Unset):
-            username = UNSET
-        else:
-            username = self.username
-
         designation: None | str | Unset
         if isinstance(self.designation, Unset):
             designation = UNSET
@@ -110,63 +71,15 @@ class ProjectMemberUpdate:
         else:
             project_role = self.project_role
 
-        created_by: None | str | Unset
-        if isinstance(self.created_by, Unset):
-            created_by = UNSET
-        else:
-            created_by = self.created_by
-
-        updated_by: None | str | Unset
-        if isinstance(self.updated_by, Unset):
-            updated_by = UNSET
-        else:
-            updated_by = self.updated_by
-
         is_active: bool | None | Unset
         if isinstance(self.is_active, Unset):
             is_active = UNSET
         else:
             is_active = self.is_active
 
-        created_at: None | str | Unset
-        if isinstance(self.created_at, Unset):
-            created_at = UNSET
-        elif isinstance(self.created_at, datetime.datetime):
-            created_at = self.created_at.isoformat()
-        else:
-            created_at = self.created_at
-
-        updated_at: None | str | Unset
-        if isinstance(self.updated_at, Unset):
-            updated_at = UNSET
-        elif isinstance(self.updated_at, datetime.datetime):
-            updated_at = self.updated_at.isoformat()
-        else:
-            updated_at = self.updated_at
-
-        deleted_at: None | str | Unset
-        if isinstance(self.deleted_at, Unset):
-            deleted_at = UNSET
-        elif isinstance(self.deleted_at, datetime.datetime):
-            deleted_at = self.deleted_at.isoformat()
-        else:
-            deleted_at = self.deleted_at
-
-        delete_reason: None | str | Unset
-        if isinstance(self.delete_reason, Unset):
-            delete_reason = UNSET
-        else:
-            delete_reason = self.delete_reason
-
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
-        if project_id is not UNSET:
-            field_dict["project_id"] = project_id
-        if user_id is not UNSET:
-            field_dict["user_id"] = user_id
-        if username is not UNSET:
-            field_dict["username"] = username
         if designation is not UNSET:
             field_dict["designation"] = designation
         if designation_id is not UNSET:
@@ -175,53 +88,14 @@ class ProjectMemberUpdate:
             field_dict["role"] = role
         if project_role is not UNSET:
             field_dict["project_role"] = project_role
-        if created_by is not UNSET:
-            field_dict["created_by"] = created_by
-        if updated_by is not UNSET:
-            field_dict["updated_by"] = updated_by
         if is_active is not UNSET:
             field_dict["is_active"] = is_active
-        if created_at is not UNSET:
-            field_dict["created_at"] = created_at
-        if updated_at is not UNSET:
-            field_dict["updated_at"] = updated_at
-        if deleted_at is not UNSET:
-            field_dict["deleted_at"] = deleted_at
-        if delete_reason is not UNSET:
-            field_dict["delete_reason"] = delete_reason
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-
-        def _parse_project_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        project_id = _parse_project_id(d.pop("project_id", UNSET))
-
-        def _parse_user_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        user_id = _parse_user_id(d.pop("user_id", UNSET))
-
-        def _parse_username(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        username = _parse_username(d.pop("username", UNSET))
 
         def _parse_designation(data: object) -> None | str | Unset:
             if data is None:
@@ -267,24 +141,6 @@ class ProjectMemberUpdate:
 
         project_role = _parse_project_role(d.pop("project_role", UNSET))
 
-        def _parse_created_by(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        created_by = _parse_created_by(d.pop("created_by", UNSET))
-
-        def _parse_updated_by(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        updated_by = _parse_updated_by(d.pop("updated_by", UNSET))
-
         def _parse_is_active(data: object) -> bool | None | Unset:
             if data is None:
                 return data
@@ -294,98 +150,12 @@ class ProjectMemberUpdate:
 
         is_active = _parse_is_active(d.pop("is_active", UNSET))
 
-        def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
-
-                return created_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        created_at = _parse_created_at(d.pop("created_at", UNSET))
-
-        def _parse_updated_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
-
-                return updated_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        updated_at = _parse_updated_at(d.pop("updated_at", UNSET))
-
-        def _parse_deleted_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                deleted_at_type_0 = datetime.datetime.fromisoformat(data)
-
-                return deleted_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        deleted_at = _parse_deleted_at(d.pop("deleted_at", UNSET))
-
-        def _parse_delete_reason(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        delete_reason = _parse_delete_reason(d.pop("delete_reason", UNSET))
-
         project_member_update = cls(
-            project_id=project_id,
-            user_id=user_id,
-            username=username,
             designation=designation,
             designation_id=designation_id,
             role=role,
             project_role=project_role,
-            created_by=created_by,
-            updated_by=updated_by,
             is_active=is_active,
-            created_at=created_at,
-            updated_at=updated_at,
-            deleted_at=deleted_at,
-            delete_reason=delete_reason,
         )
 
-        project_member_update.additional_properties = d
         return project_member_update
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

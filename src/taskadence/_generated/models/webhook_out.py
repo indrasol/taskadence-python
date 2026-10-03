@@ -36,7 +36,7 @@ class WebhookOut:
         name (str):
         url (str): As registered (an admin's own configuration)
         events (list[str]):
-        secret_prefix (str): `whsec_` + 6 characters — the secret itself is never shown again
+        secret_prefix (str): `whsec_` + 6 characters - the secret itself is never shown again
         status (WebhookOutStatus):
         api_version (str):
         created_by (None | str | Unset):

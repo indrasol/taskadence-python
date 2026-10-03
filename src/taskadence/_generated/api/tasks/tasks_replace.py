@@ -120,7 +120,7 @@ def sync_detailed(
      **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
     older clients.
 
-    Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -164,7 +164,7 @@ def sync(
      **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
     older clients.
 
-    Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -203,7 +203,7 @@ async def asyncio_detailed(
      **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
     older clients.
 
-    Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 
@@ -245,7 +245,7 @@ async def asyncio(
      **Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for
     older clients.
 
-    Requires edit access to the task: a project owner or editor, an org admin, or the assignee — on a
+    Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a
     restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires
     permission to restrict the task.
 

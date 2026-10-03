@@ -116,7 +116,7 @@ def sync_detailed(
     slots.
 
     Args:
-        body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
+        body (ProjectOrder): `POST /v1/projects/reorder` - `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
             its subset).
@@ -151,7 +151,7 @@ def sync(
     slots.
 
     Args:
-        body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
+        body (ProjectOrder): `POST /v1/projects/reorder` - `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
             its subset).
@@ -181,7 +181,7 @@ async def asyncio_detailed(
     slots.
 
     Args:
-        body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
+        body (ProjectOrder): `POST /v1/projects/reorder` - `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
             its subset).
@@ -214,7 +214,7 @@ async def asyncio(
     slots.
 
     Args:
-        body (ProjectOrder): `POST /v1/projects/reorder` — `project_ids` in their new order. They
+        body (ProjectOrder): `POST /v1/projects/reorder` - `project_ids` in their new order. They
             are re-ordered among the slots they
             already hold in the org's order; projects not listed keep theirs (a filtered view reorders
             its subset).

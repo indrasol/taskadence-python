@@ -33,7 +33,6 @@ class ProjectUpdate:
     """The request body of `projects.replace` and `projects.update`.
 
     Attributes:
-        org_id (None | str | Unset):
         name (None | str | Unset):
         description (None | str | Unset):
         metadata (None | ProjectUpdateMetadataType0 | Unset):
@@ -42,7 +41,6 @@ class ProjectUpdate:
         start_date (datetime.date | None | Unset):
         end_date (datetime.date | None | Unset):
         is_active (bool | None | Unset):
-        delete_reason (None | str | Unset):
         owner (None | str | Unset):
         team_members (list[str] | None | Unset):
         visibility (None | ProjectVisibilityEnum | Unset):
@@ -52,7 +50,6 @@ class ProjectUpdate:
         team_member_designations (list[TeamMemberDesignation] | None | Unset):
     """
 
-    org_id: None | str | Unset = UNSET
     name: None | str | Unset = UNSET
     description: None | str | Unset = UNSET
     metadata: None | ProjectUpdateMetadataType0 | Unset = UNSET
@@ -61,7 +58,6 @@ class ProjectUpdate:
     start_date: datetime.date | None | Unset = UNSET
     end_date: datetime.date | None | Unset = UNSET
     is_active: bool | None | Unset = UNSET
-    delete_reason: None | str | Unset = UNSET
     owner: None | str | Unset = UNSET
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
@@ -69,7 +65,6 @@ class ProjectUpdate:
     team_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -77,12 +72,6 @@ class ProjectUpdate:
     def to_dict(self) -> dict[str, Any]:
         from ..models.project_update_metadata_type_0 import ProjectUpdateMetadataType0  # noqa: PLC0415
         from ..models.team_member_designation import TeamMemberDesignation  # noqa: PLC0415
-
-        org_id: None | str | Unset
-        if isinstance(self.org_id, Unset):
-            org_id = UNSET
-        else:
-            org_id = self.org_id
 
         name: None | str | Unset
         if isinstance(self.name, Unset):
@@ -142,12 +131,6 @@ class ProjectUpdate:
         else:
             is_active = self.is_active
 
-        delete_reason: None | str | Unset
-        if isinstance(self.delete_reason, Unset):
-            delete_reason = UNSET
-        else:
-            delete_reason = self.delete_reason
-
         owner: None | str | Unset
         if isinstance(self.owner, Unset):
             owner = UNSET
@@ -202,10 +185,8 @@ class ProjectUpdate:
             team_member_designations = self.team_member_designations
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
-        if org_id is not UNSET:
-            field_dict["org_id"] = org_id
         if name is not UNSET:
             field_dict["name"] = name
         if description is not UNSET:
@@ -222,8 +203,6 @@ class ProjectUpdate:
             field_dict["end_date"] = end_date
         if is_active is not UNSET:
             field_dict["is_active"] = is_active
-        if delete_reason is not UNSET:
-            field_dict["delete_reason"] = delete_reason
         if owner is not UNSET:
             field_dict["owner"] = owner
         if team_members is not UNSET:
@@ -247,15 +226,6 @@ class ProjectUpdate:
         from ..models.team_member_designation import TeamMemberDesignation  # noqa: PLC0415
 
         d = dict(src_dict)
-
-        def _parse_org_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        org_id = _parse_org_id(d.pop("org_id", UNSET))
 
         def _parse_name(data: object) -> None | str | Unset:
             if data is None:
@@ -369,15 +339,6 @@ class ProjectUpdate:
 
         is_active = _parse_is_active(d.pop("is_active", UNSET))
 
-        def _parse_delete_reason(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        delete_reason = _parse_delete_reason(d.pop("delete_reason", UNSET))
-
         def _parse_owner(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -473,7 +434,6 @@ class ProjectUpdate:
         team_member_designations = _parse_team_member_designations(d.pop("team_member_designations", UNSET))
 
         project_update = cls(
-            org_id=org_id,
             name=name,
             description=description,
             metadata=metadata,
@@ -482,7 +442,6 @@ class ProjectUpdate:
             start_date=start_date,
             end_date=end_date,
             is_active=is_active,
-            delete_reason=delete_reason,
             owner=owner,
             team_members=team_members,
             visibility=visibility,
@@ -492,21 +451,4 @@ class ProjectUpdate:
             team_member_designations=team_member_designations,
         )
 
-        project_update.additional_properties = d
         return project_update
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

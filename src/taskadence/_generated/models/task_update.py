@@ -35,7 +35,6 @@ class TaskUpdate:
 
         Attributes:
             project_id (None | str | Unset): Project ID (text) Example: project-1234.
-            org_id (None | str | Unset): Organization ID (text) Example: org-1234.
             sub_tasks (list[str] | None | Unset): List of sub-task IDs Example: ['task-5678'].
             dependencies (list[str] | None | Unset): List of dependency task IDs Example: ['task-4321'].
             title (None | str | Unset): Task title. Omit to leave it; an explicit blank is refused (422). Example: Implement
@@ -58,12 +57,6 @@ class TaskUpdate:
                 the key).
             metadata (list[TaskUpdateMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
                 'new': 'in_progress', 'old': 'not_started'}].
-            created_by (None | str | Unset): Who created the task
-            updated_by (None | str | Unset): Who last updated the task
-            is_subtask (bool | None | Unset): Is Sub Task
-            bug_id (None | str | Unset): Bug ID (text) Example: B1234.
-            tracker_id (None | str | Unset): On create, for a bug only: the test tracker to file it under. Refused (422) for
-                a task that is not a bug or a tracker of another project. Example: TR1234.
             restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
                 Setting it needs `restrict` on the task.
             team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
@@ -79,7 +72,6 @@ class TaskUpdate:
     """
 
     project_id: None | str | Unset = UNSET
-    org_id: None | str | Unset = UNSET
     sub_tasks: list[str] | None | Unset = UNSET
     dependencies: list[str] | None | Unset = UNSET
     title: None | str | Unset = UNSET
@@ -93,17 +85,11 @@ class TaskUpdate:
     tags: list[str] | None | Unset = UNSET
     type_data: None | TaskUpdateTypeDataType0 | Unset = UNSET
     metadata: list[TaskUpdateMetadataType0Item] | None | Unset = UNSET
-    created_by: None | str | Unset = UNSET
-    updated_by: None | str | Unset = UNSET
-    is_subtask: bool | None | Unset = UNSET
-    bug_id: None | str | Unset = UNSET
-    tracker_id: None | str | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
     team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -117,12 +103,6 @@ class TaskUpdate:
             project_id = UNSET
         else:
             project_id = self.project_id
-
-        org_id: None | str | Unset
-        if isinstance(self.org_id, Unset):
-            org_id = UNSET
-        else:
-            org_id = self.org_id
 
         sub_tasks: list[str] | None | Unset
         if isinstance(self.sub_tasks, Unset):
@@ -229,36 +209,6 @@ class TaskUpdate:
         else:
             metadata = self.metadata
 
-        created_by: None | str | Unset
-        if isinstance(self.created_by, Unset):
-            created_by = UNSET
-        else:
-            created_by = self.created_by
-
-        updated_by: None | str | Unset
-        if isinstance(self.updated_by, Unset):
-            updated_by = UNSET
-        else:
-            updated_by = self.updated_by
-
-        is_subtask: bool | None | Unset
-        if isinstance(self.is_subtask, Unset):
-            is_subtask = UNSET
-        else:
-            is_subtask = self.is_subtask
-
-        bug_id: None | str | Unset
-        if isinstance(self.bug_id, Unset):
-            bug_id = UNSET
-        else:
-            bug_id = self.bug_id
-
-        tracker_id: None | str | Unset
-        if isinstance(self.tracker_id, Unset):
-            tracker_id = UNSET
-        else:
-            tracker_id = self.tracker_id
-
         restricted_to: list[str] | None | Unset
         if isinstance(self.restricted_to, Unset):
             restricted_to = UNSET
@@ -293,12 +243,10 @@ class TaskUpdate:
             goal_id = self.goal_id
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
         if project_id is not UNSET:
             field_dict["project_id"] = project_id
-        if org_id is not UNSET:
-            field_dict["org_id"] = org_id
         if sub_tasks is not UNSET:
             field_dict["sub_tasks"] = sub_tasks
         if dependencies is not UNSET:
@@ -325,16 +273,6 @@ class TaskUpdate:
             field_dict["type_data"] = type_data
         if metadata is not UNSET:
             field_dict["metadata"] = metadata
-        if created_by is not UNSET:
-            field_dict["created_by"] = created_by
-        if updated_by is not UNSET:
-            field_dict["updated_by"] = updated_by
-        if is_subtask is not UNSET:
-            field_dict["is_subtask"] = is_subtask
-        if bug_id is not UNSET:
-            field_dict["bug_id"] = bug_id
-        if tracker_id is not UNSET:
-            field_dict["tracker_id"] = tracker_id
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
         if team_id is not UNSET:
@@ -363,15 +301,6 @@ class TaskUpdate:
             return cast(None | str | Unset, data)
 
         project_id = _parse_project_id(d.pop("project_id", UNSET))
-
-        def _parse_org_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        org_id = _parse_org_id(d.pop("org_id", UNSET))
 
         def _parse_sub_tasks(data: object) -> list[str] | None | Unset:
             if data is None:
@@ -575,51 +504,6 @@ class TaskUpdate:
 
         metadata = _parse_metadata(d.pop("metadata", UNSET))
 
-        def _parse_created_by(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        created_by = _parse_created_by(d.pop("created_by", UNSET))
-
-        def _parse_updated_by(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        updated_by = _parse_updated_by(d.pop("updated_by", UNSET))
-
-        def _parse_is_subtask(data: object) -> bool | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(bool | None | Unset, data)
-
-        is_subtask = _parse_is_subtask(d.pop("is_subtask", UNSET))
-
-        def _parse_bug_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        bug_id = _parse_bug_id(d.pop("bug_id", UNSET))
-
-        def _parse_tracker_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        tracker_id = _parse_tracker_id(d.pop("tracker_id", UNSET))
-
         def _parse_restricted_to(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -675,7 +559,6 @@ class TaskUpdate:
 
         task_update = cls(
             project_id=project_id,
-            org_id=org_id,
             sub_tasks=sub_tasks,
             dependencies=dependencies,
             title=title,
@@ -689,11 +572,6 @@ class TaskUpdate:
             tags=tags,
             type_data=type_data,
             metadata=metadata,
-            created_by=created_by,
-            updated_by=updated_by,
-            is_subtask=is_subtask,
-            bug_id=bug_id,
-            tracker_id=tracker_id,
             restricted_to=restricted_to,
             team_id=team_id,
             sprint_id=sprint_id,
@@ -701,21 +579,4 @@ class TaskUpdate:
             goal_id=goal_id,
         )
 
-        task_update.additional_properties = d
         return task_update
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

@@ -378,7 +378,7 @@ def sync_detailed(
     **Pagination**
     - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
     back as `cursor` for the next page. `null` means the end.
-    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) - keep
     following the cursor until it is null.
     - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
     query is a 400.
@@ -389,7 +389,7 @@ def sync_detailed(
     - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
     plus tasks filed in no project.
     - Private projects you are not a member of never appear.
-    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    - Restricted tasks you may not open are left out - or returned with `has_access: false` when
     `include_inaccessible=true`.
 
     **Filters**
@@ -557,7 +557,7 @@ def sync(
     **Pagination**
     - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
     back as `cursor` for the next page. `null` means the end.
-    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) - keep
     following the cursor until it is null.
     - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
     query is a 400.
@@ -568,7 +568,7 @@ def sync(
     - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
     plus tasks filed in no project.
     - Private projects you are not a member of never appear.
-    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    - Restricted tasks you may not open are left out - or returned with `has_access: false` when
     `include_inaccessible=true`.
 
     **Filters**
@@ -731,7 +731,7 @@ async def asyncio_detailed(
     **Pagination**
     - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
     back as `cursor` for the next page. `null` means the end.
-    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) - keep
     following the cursor until it is null.
     - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
     query is a 400.
@@ -742,7 +742,7 @@ async def asyncio_detailed(
     - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
     plus tasks filed in no project.
     - Private projects you are not a member of never appear.
-    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    - Restricted tasks you may not open are left out - or returned with `has_access: false` when
     `include_inaccessible=true`.
 
     **Filters**
@@ -908,7 +908,7 @@ async def asyncio(
     **Pagination**
     - The response is `{"data": [TaskCardView…], "next_cursor": "<opaque>" | null}`; pass `next_cursor`
     back as `cursor` for the next page. `null` means the end.
-    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) — keep
+    - A page can be `data: []` with a non-null `next_cursor` (every task on it was restricted) - keep
     following the cursor until it is null.
     - A cursor is bound to the filters, sort and scope it was issued for; reusing it with a different
     query is a 400.
@@ -919,7 +919,7 @@ async def asyncio(
     - `org_id`: you must be a member of the organization; tasks come from the projects you can read,
     plus tasks filed in no project.
     - Private projects you are not a member of never appear.
-    - Restricted tasks you may not open are left out — or returned with `has_access: false` when
+    - Restricted tasks you may not open are left out - or returned with `has_access: false` when
     `include_inaccessible=true`.
 
     **Filters**

@@ -119,13 +119,13 @@ def sync_detailed(
 ) -> Response[GoalTasksFiled | Problem]:
     """File tasks under a goal
 
-     File existing tasks of THIS project under the goal — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the goal - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` — file existing tasks of THIS project
+        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` - file existing tasks of THIS project
             under the goal (all-or-nothing).
 
     Raises:
@@ -158,13 +158,13 @@ def sync(
 ) -> GoalTasksFiled | Problem | None:
     """File tasks under a goal
 
-     File existing tasks of THIS project under the goal — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the goal - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` — file existing tasks of THIS project
+        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` - file existing tasks of THIS project
             under the goal (all-or-nothing).
 
     Raises:
@@ -192,13 +192,13 @@ async def asyncio_detailed(
 ) -> Response[GoalTasksFiled | Problem]:
     """File tasks under a goal
 
-     File existing tasks of THIS project under the goal — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the goal - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` — file existing tasks of THIS project
+        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` - file existing tasks of THIS project
             under the goal (all-or-nothing).
 
     Raises:
@@ -229,13 +229,13 @@ async def asyncio(
 ) -> GoalTasksFiled | Problem | None:
     """File tasks under a goal
 
-     File existing tasks of THIS project under the goal — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the goal - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` — file existing tasks of THIS project
+        body (GoalTasksFile): `POST …/goals/{goal_id}/tasks` - file existing tasks of THIS project
             under the goal (all-or-nothing).
 
     Raises:

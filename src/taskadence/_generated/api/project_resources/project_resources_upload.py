@@ -83,6 +83,16 @@ def _parse_response(
 
         return response_412
 
+    if response.status_code == 413:
+        response_413 = Problem.from_dict(response.json())
+
+        return response_413
+
+    if response.status_code == 415:
+        response_415 = Problem.from_dict(response.json())
+
+        return response_415
+
     if response.status_code == 422:
         response_422 = Problem.from_dict(response.json())
 
@@ -97,6 +107,11 @@ def _parse_response(
         response_500 = Problem.from_dict(response.json())
 
         return response_500
+
+    if response.status_code == 503:
+        response_503 = Problem.from_dict(response.json())
+
+        return response_503
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -125,7 +140,7 @@ def sync_detailed(
 
      Upload a file and add it to the project as a resource. The project is the `project_id` query
     parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
-    ignored — the query value is used.
+    ignored - the query value is used.
 
     Args:
         project_id (str):
@@ -162,7 +177,7 @@ def sync(
 
      Upload a file and add it to the project as a resource. The project is the `project_id` query
     parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
-    ignored — the query value is used.
+    ignored - the query value is used.
 
     Args:
         project_id (str):
@@ -194,7 +209,7 @@ async def asyncio_detailed(
 
      Upload a file and add it to the project as a resource. The project is the `project_id` query
     parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
-    ignored — the query value is used.
+    ignored - the query value is used.
 
     Args:
         project_id (str):
@@ -229,7 +244,7 @@ async def asyncio(
 
      Upload a file and add it to the project as a resource. The project is the `project_id` query
     parameter. **Deprecated:** a `project_id` form field is still accepted from older clients and
-    ignored — the query value is used.
+    ignored - the query value is used.
 
     Args:
         project_id (str):

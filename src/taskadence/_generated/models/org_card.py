@@ -25,7 +25,7 @@ class OrgCard:
     Attributes:
         org_id (str): Organization ID Example: O123456.
         name (str): Organization name Example: Acme Corp.
-        description (str | Unset): Description of the organization Example: A global tech company..
+        description (None | str | Unset): Description of the organization (optional) Example: A global tech company..
         role (str | Unset): Role of the current user in the organization Default: 'owner'. Example: owner.
         designation (None | str | Unset): User's designation in the organization
         project_count (int | Unset): Number of projects under the organization Default: 0.
@@ -35,11 +35,14 @@ class OrgCard:
         owners (list[str] | None | Unset): List of usernames of the organization owners
         is_invite (bool | None | Unset): Is Organization Invite
         invitation_id (None | str | Unset): Invitation ID Example: O123456.
+        pending_deletion (bool | Unset): The organization was deleted and can still be restored by an owner until
+            `purge_after`; listed to owners only, and unreachable until restored Default: False.
+        purge_after (datetime.datetime | None | Unset): When a deleted organization is purged for good (owners only)
     """
 
     org_id: str
     name: str
-    description: str | Unset = UNSET
+    description: None | str | Unset = UNSET
     role: str | Unset = "owner"
     designation: None | str | Unset = UNSET
     project_count: int | Unset = 0
@@ -49,6 +52,8 @@ class OrgCard:
     owners: list[str] | None | Unset = UNSET
     is_invite: bool | None | Unset = UNSET
     invitation_id: None | str | Unset = UNSET
+    pending_deletion: bool | Unset = False
+    purge_after: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -59,7 +64,11 @@ class OrgCard:
 
         name = self.name
 
-        description = self.description
+        description: None | str | Unset
+        if isinstance(self.description, Unset):
+            description = UNSET
+        else:
+            description = self.description
 
         role = self.role
 
@@ -108,6 +117,16 @@ class OrgCard:
         else:
             invitation_id = self.invitation_id
 
+        pending_deletion = self.pending_deletion
+
+        purge_after: None | str | Unset
+        if isinstance(self.purge_after, Unset):
+            purge_after = UNSET
+        elif isinstance(self.purge_after, datetime.datetime):
+            purge_after = self.purge_after.isoformat()
+        else:
+            purge_after = self.purge_after
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -136,6 +155,10 @@ class OrgCard:
             field_dict["is_invite"] = is_invite
         if invitation_id is not UNSET:
             field_dict["invitation_id"] = invitation_id
+        if pending_deletion is not UNSET:
+            field_dict["pending_deletion"] = pending_deletion
+        if purge_after is not UNSET:
+            field_dict["purge_after"] = purge_after
 
         return field_dict
 
@@ -146,7 +169,14 @@ class OrgCard:
 
         name = d.pop("name")
 
-        description = d.pop("description", UNSET)
+        def _parse_description(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        description = _parse_description(d.pop("description", UNSET))
 
         role = d.pop("role", UNSET)
 
@@ -224,6 +254,25 @@ class OrgCard:
 
         invitation_id = _parse_invitation_id(d.pop("invitation_id", UNSET))
 
+        pending_deletion = d.pop("pending_deletion", UNSET)
+
+        def _parse_purge_after(data: object) -> datetime.datetime | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                purge_after_type_0 = datetime.datetime.fromisoformat(data)
+
+                return purge_after_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(datetime.datetime | None | Unset, data)
+
+        purge_after = _parse_purge_after(d.pop("purge_after", UNSET))
+
         org_card = cls(
             org_id=org_id,
             name=name,
@@ -237,6 +286,8 @@ class OrgCard:
             owners=owners,
             is_invite=is_invite,
             invitation_id=invitation_id,
+            pending_deletion=pending_deletion,
+            purge_after=purge_after,
         )
 
         org_card.additional_properties = d

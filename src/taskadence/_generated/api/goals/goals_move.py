@@ -121,7 +121,7 @@ def sync_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalMove): `POST …/goals/{goal_id}/move` — the goal AND its tasks go to `project_id`
+        body (GoalMove): `POST …/goals/{goal_id}/move` - the goal AND its tasks go to `project_id`
             (same org), all-or-nothing.
 
     Raises:
@@ -160,7 +160,7 @@ def sync(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalMove): `POST …/goals/{goal_id}/move` — the goal AND its tasks go to `project_id`
+        body (GoalMove): `POST …/goals/{goal_id}/move` - the goal AND its tasks go to `project_id`
             (same org), all-or-nothing.
 
     Raises:
@@ -194,7 +194,7 @@ async def asyncio_detailed(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalMove): `POST …/goals/{goal_id}/move` — the goal AND its tasks go to `project_id`
+        body (GoalMove): `POST …/goals/{goal_id}/move` - the goal AND its tasks go to `project_id`
             (same org), all-or-nothing.
 
     Raises:
@@ -231,7 +231,7 @@ async def asyncio(
     Args:
         project_id (str):
         goal_id (str):
-        body (GoalMove): `POST …/goals/{goal_id}/move` — the goal AND its tasks go to `project_id`
+        body (GoalMove): `POST …/goals/{goal_id}/move` - the goal AND its tasks go to `project_id`
             (same org), all-or-nothing.
 
     Raises:

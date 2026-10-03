@@ -92,6 +92,9 @@ class TaskCardView:
             True.
         has_edit_access (bool | None | Unset): True for task creator, project owner, or organization owner Default:
             False.
+        can_delete (bool | Unset): Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}`
+            decides): the caller may edit it and is an org owner or admin, a project owner or editor, its creator, its
+            assignee, or the person behind the access token that created it. Response only. Default: False.
         section_id (None | str | Unset): Section the task sits in for the requested `section_scope`, if any
         section_position (float | None | Unset): Position inside that section
     """
@@ -133,6 +136,7 @@ class TaskCardView:
     restricted_to_user_ids: list[str] | None | Unset = UNSET
     has_access: bool | None | Unset = True
     has_edit_access: bool | None | Unset = False
+    can_delete: bool | Unset = False
     section_id: None | str | Unset = UNSET
     section_position: float | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -390,6 +394,8 @@ class TaskCardView:
         else:
             has_edit_access = self.has_edit_access
 
+        can_delete = self.can_delete
+
         section_id: None | str | Unset
         if isinstance(self.section_id, Unset):
             section_id = UNSET
@@ -477,6 +483,8 @@ class TaskCardView:
             field_dict["has_access"] = has_access
         if has_edit_access is not UNSET:
             field_dict["has_edit_access"] = has_edit_access
+        if can_delete is not UNSET:
+            field_dict["can_delete"] = can_delete
         if section_id is not UNSET:
             field_dict["section_id"] = section_id
         if section_position is not UNSET:
@@ -928,6 +936,8 @@ class TaskCardView:
 
         has_edit_access = _parse_has_edit_access(d.pop("has_edit_access", UNSET))
 
+        can_delete = d.pop("can_delete", UNSET)
+
         def _parse_section_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -984,6 +994,7 @@ class TaskCardView:
             restricted_to_user_ids=restricted_to_user_ids,
             has_access=has_access,
             has_edit_access=has_edit_access,
+            can_delete=can_delete,
             section_id=section_id,
             section_position=section_position,
         )

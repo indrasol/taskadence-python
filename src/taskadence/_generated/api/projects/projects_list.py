@@ -156,13 +156,13 @@ def sync_detailed(
      The organization's projects, paginated as `{data, next_cursor}`.
 
     - `show_all=true` returns every project you can read: public projects, the projects you are a member
-    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
     - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
     ids) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
-    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
 
     Args:
@@ -220,13 +220,13 @@ def sync(
      The organization's projects, paginated as `{data, next_cursor}`.
 
     - `show_all=true` returns every project you can read: public projects, the projects you are a member
-    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
     - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
     ids) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
-    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
 
     Args:
@@ -279,13 +279,13 @@ async def asyncio_detailed(
      The organization's projects, paginated as `{data, next_cursor}`.
 
     - `show_all=true` returns every project you can read: public projects, the projects you are a member
-    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
     - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
     ids) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
-    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
 
     Args:
@@ -341,13 +341,13 @@ async def asyncio(
      The organization's projects, paginated as `{data, next_cursor}`.
 
     - `show_all=true` returns every project you can read: public projects, the projects you are a member
-    of, and — for org owners and admins — all of them. Private projects you are not a member of never
+    of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
     - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
     ids) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
-    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date —
+    - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
 
     Args:

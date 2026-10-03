@@ -121,7 +121,9 @@ def sync_detailed(
 ) -> Response[OrganizationSettingsOut | Problem]:
     """Update an organization's settings
 
-     Upsert the org's settings. Owners and admins only.
+     Upsert the org's settings. Owners and admins only; `require_mfa` owners only, and turning it on
+    needs your
+    session signed in with two steps.
 
     Args:
         org_id (str): Organization ID
@@ -159,7 +161,9 @@ def sync(
 ) -> OrganizationSettingsOut | Problem | None:
     """Update an organization's settings
 
-     Upsert the org's settings. Owners and admins only.
+     Upsert the org's settings. Owners and admins only; `require_mfa` owners only, and turning it on
+    needs your
+    session signed in with two steps.
 
     Args:
         org_id (str): Organization ID
@@ -192,7 +196,9 @@ async def asyncio_detailed(
 ) -> Response[OrganizationSettingsOut | Problem]:
     """Update an organization's settings
 
-     Upsert the org's settings. Owners and admins only.
+     Upsert the org's settings. Owners and admins only; `require_mfa` owners only, and turning it on
+    needs your
+    session signed in with two steps.
 
     Args:
         org_id (str): Organization ID
@@ -228,7 +234,9 @@ async def asyncio(
 ) -> OrganizationSettingsOut | Problem | None:
     """Update an organization's settings
 
-     Upsert the org's settings. Owners and admins only.
+     Upsert the org's settings. Owners and admins only; `require_mfa` owners only, and turning it on
+    needs your
+    session signed in with two steps.
 
     Args:
         org_id (str): Organization ID

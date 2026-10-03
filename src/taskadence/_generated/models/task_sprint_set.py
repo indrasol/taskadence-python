@@ -26,7 +26,6 @@ class TaskSprintSet:
     """
 
     sprint_id: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -39,7 +38,7 @@ class TaskSprintSet:
             sprint_id = self.sprint_id
 
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
@@ -63,21 +62,4 @@ class TaskSprintSet:
             sprint_id=sprint_id,
         )
 
-        task_sprint_set.additional_properties = d
         return task_sprint_set
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

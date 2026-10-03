@@ -6,13 +6,12 @@ snapshot of the public contract the Taskadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `feature/roadmap-removal/rithin` |
-| Backend commit | `b8385de` — "fix(mcp,tasks): 5.5 fix round 2 part A - creating token cannot review; reviewed actor; org counts; scope challenge follows groups" (task 5.5 fix round 2: `TaskInDB.created_by_token_id` — the access token that created a task, which cannot review it; `OrganizationInDB.member_count`, and `GET /v1/organizations/{org_id}` reports the list's counts) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-09-28 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
-| Rename (5.8) | The product rename applied to this snapshot by hand (`urn:taskadence:problem:…`, `TaskadenceToken`, `X-Taskadence-Event`, `tkd_live_…` examples, `servers` = `https://api.taskadence.com`) until it is re-pinned from the renamed backend |
+| Backend repo | `indrasol/taskadence-api`, branch `feature/rename-taskadence` |
+| Backend commit | `b34364d` — the 5.8 rename (`urn:taskadence:problem:*`, `TaskadenceToken`, `X-Taskadence-Event`, `tkd*_` token / secret prefixes, `servers` = `https://api.taskadence.com`), plus the drift since `b8385de` (`GET /v1/audit.json` → `audit.export_json`, `AuditExportRow`, MFA / upload problem types, access-review MFA and projects) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-03 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
-| Size | 108 paths · 170 operations (164 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 209 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `ae35af0ef9771ce469126dffae030fd10982019d00a8e9750679d5c84253dfbf` (after the 5.8 rename; pre-rename `1ac7750a…`) |
+| Size | 109 paths · 171 operations (165 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 216 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `aad0ef460622179c8ca0866889010232be476415349fd0a9022995b2b65ce2eb` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

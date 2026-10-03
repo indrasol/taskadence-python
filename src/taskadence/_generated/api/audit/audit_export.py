@@ -189,7 +189,7 @@ def sync_detailed(
 ) -> Response[Any | Problem | str]:
     """Export the audit log as CSV (owner / admin)
 
-     The same filtered rows as CSV, streamed. 422 above 50 000 rows — narrow `from` / `to`.
+     The same filtered rows as CSV, streamed. 422 above 50 000 rows - narrow `from` / `to`.
 
     Args:
         org_id (str): The organization whose log to read (owner / admin only)
@@ -250,7 +250,7 @@ def sync(
 ) -> Any | Problem | str | None:
     """Export the audit log as CSV (owner / admin)
 
-     The same filtered rows as CSV, streamed. 422 above 50 000 rows — narrow `from` / `to`.
+     The same filtered rows as CSV, streamed. 422 above 50 000 rows - narrow `from` / `to`.
 
     Args:
         org_id (str): The organization whose log to read (owner / admin only)
@@ -306,7 +306,7 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | str]:
     """Export the audit log as CSV (owner / admin)
 
-     The same filtered rows as CSV, streamed. 422 above 50 000 rows — narrow `from` / `to`.
+     The same filtered rows as CSV, streamed. 422 above 50 000 rows - narrow `from` / `to`.
 
     Args:
         org_id (str): The organization whose log to read (owner / admin only)
@@ -365,7 +365,7 @@ async def asyncio(
 ) -> Any | Problem | str | None:
     """Export the audit log as CSV (owner / admin)
 
-     The same filtered rows as CSV, streamed. 422 above 50 000 rows — narrow `from` / `to`.
+     The same filtered rows as CSV, streamed. 422 above 50 000 rows - narrow `from` / `to`.
 
     Args:
         org_id (str): The organization whose log to read (owner / admin only)

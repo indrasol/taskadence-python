@@ -93,6 +93,9 @@ class TaskInDB:
         has_access (bool | None | Unset): Whether the current user can access this task based on restrictions
         has_edit_access (bool | None | Unset): True unless the task is restricted and the caller is neither listed
             creator/assignee nor an org admin
+        can_delete (bool | None | Unset): Whether the caller may delete this task (exactly what `DELETE
+            /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor,
+            its creator, its assignee, or the person behind the access token that created it. Response only.
     """
 
     title: str
@@ -132,6 +135,7 @@ class TaskInDB:
     restricted_to_user_ids: list[str] | None | Unset = UNSET
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
+    can_delete: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -390,6 +394,12 @@ class TaskInDB:
         else:
             has_edit_access = self.has_edit_access
 
+        can_delete: bool | None | Unset
+        if isinstance(self.can_delete, Unset):
+            can_delete = UNSET
+        else:
+            can_delete = self.can_delete
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -466,6 +476,8 @@ class TaskInDB:
             field_dict["has_access"] = has_access
         if has_edit_access is not UNSET:
             field_dict["has_edit_access"] = has_edit_access
+        if can_delete is not UNSET:
+            field_dict["can_delete"] = can_delete
 
         return field_dict
 
@@ -915,6 +927,15 @@ class TaskInDB:
 
         has_edit_access = _parse_has_edit_access(d.pop("has_edit_access", UNSET))
 
+        def _parse_can_delete(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        can_delete = _parse_can_delete(d.pop("can_delete", UNSET))
+
         task_in_db = cls(
             title=title,
             task_id=task_id,
@@ -953,6 +974,7 @@ class TaskInDB:
             restricted_to_user_ids=restricted_to_user_ids,
             has_access=has_access,
             has_edit_access=has_edit_access,
+            can_delete=can_delete,
         )
 
         task_in_db.additional_properties = d

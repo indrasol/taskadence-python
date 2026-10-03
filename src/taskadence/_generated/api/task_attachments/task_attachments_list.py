@@ -19,6 +19,7 @@ from typing import cast
 def _get_kwargs(
     *,
     task_id: str,
+    inline: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -32,6 +33,8 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["task_id"] = task_id
+
+    params["inline"] = inline
 
     params["limit"] = limit
 
@@ -141,6 +144,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     task_id: str,
+    inline: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -153,6 +157,8 @@ def sync_detailed(
 
     Args:
         task_id (str):
+        inline (bool | Unset): S.21: true lists the images inside the task's description instead
+            (the web app resolves its `tm-attachment:{id}` references from them) Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: uploaded_at, name, title. Default: the list's
@@ -170,6 +176,7 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         task_id=task_id,
+        inline=inline,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -188,6 +195,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     task_id: str,
+    inline: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -200,6 +208,8 @@ def sync(
 
     Args:
         task_id (str):
+        inline (bool | Unset): S.21: true lists the images inside the task's description instead
+            (the web app resolves its `tm-attachment:{id}` references from them) Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: uploaded_at, name, title. Default: the list's
@@ -218,6 +228,7 @@ def sync(
     return sync_detailed(
         client=client,
         task_id=task_id,
+        inline=inline,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -230,6 +241,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     task_id: str,
+    inline: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -242,6 +254,8 @@ async def asyncio_detailed(
 
     Args:
         task_id (str):
+        inline (bool | Unset): S.21: true lists the images inside the task's description instead
+            (the web app resolves its `tm-attachment:{id}` references from them) Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: uploaded_at, name, title. Default: the list's
@@ -259,6 +273,7 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         task_id=task_id,
+        inline=inline,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -275,6 +290,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     task_id: str,
+    inline: bool | Unset = False,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -287,6 +303,8 @@ async def asyncio(
 
     Args:
         task_id (str):
+        inline (bool | Unset): S.21: true lists the images inside the task's description instead
+            (the web app resolves its `tm-attachment:{id}` references from them) Default: False.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: uploaded_at, name, title. Default: the list's
@@ -306,6 +324,7 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             task_id=task_id,
+            inline=inline,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

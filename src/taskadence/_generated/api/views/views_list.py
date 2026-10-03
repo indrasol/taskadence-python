@@ -173,7 +173,7 @@ def sync_detailed(
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -229,7 +229,7 @@ def sync(
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -280,7 +280,7 @@ async def asyncio_detailed(
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -334,7 +334,7 @@ async def asyncio(
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` — only that scope's views.
+        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.

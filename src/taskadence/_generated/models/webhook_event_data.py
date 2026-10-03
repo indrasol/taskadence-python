@@ -22,11 +22,11 @@ T = TypeVar("T", bound="WebhookEventData")
 
 @_attrs_define
 class WebhookEventData:
-    """What changed: the audit row's scrubbed diff — never a whole resource, never a secret.
+    """What changed: the audit row's scrubbed diff - never a whole resource, never a secret.
 
     Attributes:
         resource_type (str): `task`, `project`, `member`, `invite`, `organization`, `team`, `webhook`, …
-        resource_id (str): The resource's id — read it with the API for the full object
+        resource_id (str): The resource's id - read it with the API for the full object
         before (None | WebhookEventDataBeforeType0): The changed fields before (null on a create)
         after (None | WebhookEventDataAfterType0): The changed fields after (null on a delete)
     """

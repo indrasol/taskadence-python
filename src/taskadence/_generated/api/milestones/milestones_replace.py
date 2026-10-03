@@ -138,7 +138,7 @@ def sync_detailed(
             - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
             re-opening clears them.
             - `target_date` cannot be cleared (422).
-            - The milestone's owner without edit rights on the project may send `status` only —
+            - The milestone's owner without edit rights on the project may send `status` only -
             anything else is a 403.
 
     Raises:
@@ -192,7 +192,7 @@ def sync(
             - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
             re-opening clears them.
             - `target_date` cannot be cleared (422).
-            - The milestone's owner without edit rights on the project may send `status` only —
+            - The milestone's owner without edit rights on the project may send `status` only -
             anything else is a 403.
 
     Raises:
@@ -241,7 +241,7 @@ async def asyncio_detailed(
             - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
             re-opening clears them.
             - `target_date` cannot be cleared (422).
-            - The milestone's owner without edit rights on the project may send `status` only —
+            - The milestone's owner without edit rights on the project may send `status` only -
             anything else is a 403.
 
     Raises:
@@ -293,7 +293,7 @@ async def asyncio(
             - `status` closes or re-opens the milestone: closing records `closed_at` / `closed_by`,
             re-opening clears them.
             - `target_date` cannot be cleared (422).
-            - The milestone's owner without edit rights on the project may send `status` only —
+            - The milestone's owner without edit rights on the project may send `status` only -
             anything else is a 403.
 
     Raises:

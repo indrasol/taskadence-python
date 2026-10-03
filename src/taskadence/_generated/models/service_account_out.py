@@ -31,7 +31,7 @@ class ServiceAccountOut:
         user_id (str): The service account's principal id (its user id).
         org_id (str):
         username (str): `sa-<slug>`: fixed at creation (tasks reference it)
-        email (str): `<slug>@service.<org_id>.taskadence.invalid` — syntactically valid, never deliverable
+        email (str): `<slug>@service.<org_id>.taskadence.invalid` - syntactically valid, never deliverable
         name (None | str | Unset): Its display name
         kind (str | Unset): Always `service_account` Default: 'service_account'.
         role (str | Unset): Always `member`: a service account is never owner / admin Default: 'member'.

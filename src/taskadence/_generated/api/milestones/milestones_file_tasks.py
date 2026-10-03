@@ -119,13 +119,13 @@ def sync_detailed(
 ) -> Response[MilestoneTasksFiled | Problem]:
     """File tasks under a milestone
 
-     File existing tasks of THIS project under the milestone — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the milestone - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` — file existing tasks
+        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` - file existing tasks
             of THIS project under the milestone (all-or-nothing).
 
     Raises:
@@ -158,13 +158,13 @@ def sync(
 ) -> MilestoneTasksFiled | Problem | None:
     """File tasks under a milestone
 
-     File existing tasks of THIS project under the milestone — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the milestone - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` — file existing tasks
+        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` - file existing tasks
             of THIS project under the milestone (all-or-nothing).
 
     Raises:
@@ -192,13 +192,13 @@ async def asyncio_detailed(
 ) -> Response[MilestoneTasksFiled | Problem]:
     """File tasks under a milestone
 
-     File existing tasks of THIS project under the milestone — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the milestone - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` — file existing tasks
+        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` - file existing tasks
             of THIS project under the milestone (all-or-nothing).
 
     Raises:
@@ -229,13 +229,13 @@ async def asyncio(
 ) -> MilestoneTasksFiled | Problem | None:
     """File tasks under a milestone
 
-     File existing tasks of THIS project under the milestone — each needs the task's own `edit`; all-or-
+     File existing tasks of THIS project under the milestone - each needs the task's own `edit`; all-or-
     nothing.
 
     Args:
         project_id (str):
         milestone_id (str):
-        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` — file existing tasks
+        body (MilestoneTasksFile): `POST …/milestones/{milestone_id}/tasks` - file existing tasks
             of THIS project under the milestone (all-or-nothing).
 
     Raises:

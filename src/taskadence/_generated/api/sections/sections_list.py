@@ -201,7 +201,7 @@ def sync_detailed(
     - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
     the team can read it.
 
-    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) - scopes of one `scope_type`,
     answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
@@ -215,7 +215,7 @@ def sync_detailed(
             more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read -
             repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
             `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -274,7 +274,7 @@ def sync(
     - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
     the team can read it.
 
-    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) - scopes of one `scope_type`,
     answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
@@ -288,7 +288,7 @@ def sync(
             more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read -
             repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
             `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -342,7 +342,7 @@ async def asyncio_detailed(
     - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
     the team can read it.
 
-    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) - scopes of one `scope_type`,
     answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
@@ -356,7 +356,7 @@ async def asyncio_detailed(
             more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read -
             repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
             `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -413,7 +413,7 @@ async def asyncio(
     - **A team scope** starts empty. The team owner or an org admin manages it; everyone who can read
     the team can read it.
 
-    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) — scopes of one `scope_type`,
+    **Several scopes at once:** pass `scope_ids` (instead of `scope_id`) - scopes of one `scope_type`,
     answered as `{"data": [...], "scopes": [...]}`, each row carrying its own `scope_type` / `scope_id`.
 
     - `scope_type=user` is refused (400): personal scopes are private to their owner.
@@ -427,7 +427,7 @@ async def asyncio(
             more.
         scope_id (None | str | Unset): project_id for `project`; your own username for `user`
             (anyone else's → 403); team_id for `team`. Exactly one of `scope_id` / `scope_ids`.
-        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read —
+        scope_ids (list[str] | None | Unset): Several scopes of `scope_type` in one read -
             repeatable and/or comma-separated (`scope_ids=P1&scope_ids=P2,P3`). Only for `project` and
             `team`; `user` is a 400.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.

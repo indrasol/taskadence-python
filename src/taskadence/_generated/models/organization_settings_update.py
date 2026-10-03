@@ -12,8 +12,16 @@ from ..types import UNSET, Unset
 
 from ..models.agent_task_review_enum import AgentTaskReviewEnum
 from ..models.agent_task_review_enum import check_agent_task_review_enum
+from ..models.mfa_requirement_enum import check_mfa_requirement_enum
+from ..models.mfa_requirement_enum import MfaRequirementEnum
 from ..models.org_join_mode_enum import check_org_join_mode_enum
 from ..models.org_join_mode_enum import OrgJoinModeEnum
+from ..models.organization_settings_update_idle_timeout_minutes_type_0 import (
+    check_organization_settings_update_idle_timeout_minutes_type_0,
+)
+from ..models.organization_settings_update_idle_timeout_minutes_type_0 import (
+    OrganizationSettingsUpdateIdleTimeoutMinutesType0,
+)
 from ..models.project_visibility_enum import check_project_visibility_enum
 from ..models.project_visibility_enum import ProjectVisibilityEnum
 from ..types import UNSET, Unset
@@ -33,7 +41,7 @@ class OrganizationSettingsUpdate:
         domain_join_mode (None | OrgJoinModeEnum | Unset): instant: a verified-domain sign-in becomes a member;
             approval: it files a join request (default)
         audit_retention_days (int | None | Unset): Audit log retention in days; send null to keep events forever (the
-            default)
+            default). Owners only (S.13)
         allow_personal_tokens (bool | None | Unset): Whether members may mint personal access tokens (default true;
             service-account tokens are unaffected).
         max_token_ttl_days (int | None | Unset): The longest lifetime a new token may have, in days; send null for no
@@ -41,6 +49,18 @@ class OrganizationSettingsUpdate:
         require_token_expiry (bool | None | Unset): Whether every new token must carry an `expires_at` (default false).
         agent_task_review (AgentTaskReviewEnum | None | Unset): Which tasks created by an agent wait for a person's
             review: `private_projects` (default), `always` or `never`.
+        require_mfa (MfaRequirementEnum | None | Unset): Who must sign in with two-step sign-in: `off` (default),
+            `admins` (owners and admins) or `all`. Owners only. Turning it on needs your own session signed in with two
+            steps (409 `mfa-required` otherwise).
+        idle_timeout_minutes (None | OrganizationSettingsUpdateIdleTimeoutMinutesType0 | Unset): S.6: sign people out of
+            the web app after this many minutes without activity - 15, 30, 60 (default), 240 or 480
+        restrict_to_verified_domains (bool | None | Unset): S.7: only people with an email at one of the org's verified
+            domains get in by themselves; an invite to another domain needs an owner, a join request from one is refused.
+            Owners only (default false)
+        deleted_item_retention_days (int | None | Unset): S.13: days a deleted task, project, goal, milestone, sprint,
+            team or test run stays restorable before it is purged (default 30). Owners only
+        attachment_retention_days (int | None | Unset): S.13: days a deleted attachment's file is kept before it is
+            removed from storage (default 30; 0 = at the next purge run). Owners only
     """
 
     default_visibility: None | ProjectVisibilityEnum | Unset = UNSET
@@ -50,7 +70,11 @@ class OrganizationSettingsUpdate:
     max_token_ttl_days: int | None | Unset = UNSET
     require_token_expiry: bool | None | Unset = UNSET
     agent_task_review: AgentTaskReviewEnum | None | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+    require_mfa: MfaRequirementEnum | None | Unset = UNSET
+    idle_timeout_minutes: None | OrganizationSettingsUpdateIdleTimeoutMinutesType0 | Unset = UNSET
+    restrict_to_verified_domains: bool | None | Unset = UNSET
+    deleted_item_retention_days: int | None | Unset = UNSET
+    attachment_retention_days: int | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -104,8 +128,42 @@ class OrganizationSettingsUpdate:
         else:
             agent_task_review = self.agent_task_review
 
+        require_mfa: None | str | Unset
+        if isinstance(self.require_mfa, Unset):
+            require_mfa = UNSET
+        elif isinstance(self.require_mfa, str):
+            require_mfa = self.require_mfa
+        else:
+            require_mfa = self.require_mfa
+
+        idle_timeout_minutes: int | None | Unset
+        if isinstance(self.idle_timeout_minutes, Unset):
+            idle_timeout_minutes = UNSET
+        elif isinstance(self.idle_timeout_minutes, int):
+            idle_timeout_minutes = self.idle_timeout_minutes
+        else:
+            idle_timeout_minutes = self.idle_timeout_minutes
+
+        restrict_to_verified_domains: bool | None | Unset
+        if isinstance(self.restrict_to_verified_domains, Unset):
+            restrict_to_verified_domains = UNSET
+        else:
+            restrict_to_verified_domains = self.restrict_to_verified_domains
+
+        deleted_item_retention_days: int | None | Unset
+        if isinstance(self.deleted_item_retention_days, Unset):
+            deleted_item_retention_days = UNSET
+        else:
+            deleted_item_retention_days = self.deleted_item_retention_days
+
+        attachment_retention_days: int | None | Unset
+        if isinstance(self.attachment_retention_days, Unset):
+            attachment_retention_days = UNSET
+        else:
+            attachment_retention_days = self.attachment_retention_days
+
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
         if default_visibility is not UNSET:
             field_dict["default_visibility"] = default_visibility
@@ -121,6 +179,16 @@ class OrganizationSettingsUpdate:
             field_dict["require_token_expiry"] = require_token_expiry
         if agent_task_review is not UNSET:
             field_dict["agent_task_review"] = agent_task_review
+        if require_mfa is not UNSET:
+            field_dict["require_mfa"] = require_mfa
+        if idle_timeout_minutes is not UNSET:
+            field_dict["idle_timeout_minutes"] = idle_timeout_minutes
+        if restrict_to_verified_domains is not UNSET:
+            field_dict["restrict_to_verified_domains"] = restrict_to_verified_domains
+        if deleted_item_retention_days is not UNSET:
+            field_dict["deleted_item_retention_days"] = deleted_item_retention_days
+        if attachment_retention_days is not UNSET:
+            field_dict["attachment_retention_days"] = attachment_retention_days
 
         return field_dict
 
@@ -215,6 +283,69 @@ class OrganizationSettingsUpdate:
 
         agent_task_review = _parse_agent_task_review(d.pop("agent_task_review", UNSET))
 
+        def _parse_require_mfa(data: object) -> MfaRequirementEnum | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                require_mfa_type_0 = check_mfa_requirement_enum(data)
+
+                return require_mfa_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(MfaRequirementEnum | None | Unset, data)
+
+        require_mfa = _parse_require_mfa(d.pop("require_mfa", UNSET))
+
+        def _parse_idle_timeout_minutes(
+            data: object,
+        ) -> None | OrganizationSettingsUpdateIdleTimeoutMinutesType0 | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, int):
+                    raise TypeError()
+                idle_timeout_minutes_type_0 = check_organization_settings_update_idle_timeout_minutes_type_0(data)
+
+                return idle_timeout_minutes_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | OrganizationSettingsUpdateIdleTimeoutMinutesType0 | Unset, data)
+
+        idle_timeout_minutes = _parse_idle_timeout_minutes(d.pop("idle_timeout_minutes", UNSET))
+
+        def _parse_restrict_to_verified_domains(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        restrict_to_verified_domains = _parse_restrict_to_verified_domains(d.pop("restrict_to_verified_domains", UNSET))
+
+        def _parse_deleted_item_retention_days(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        deleted_item_retention_days = _parse_deleted_item_retention_days(d.pop("deleted_item_retention_days", UNSET))
+
+        def _parse_attachment_retention_days(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        attachment_retention_days = _parse_attachment_retention_days(d.pop("attachment_retention_days", UNSET))
+
         organization_settings_update = cls(
             default_visibility=default_visibility,
             domain_join_mode=domain_join_mode,
@@ -223,23 +354,11 @@ class OrganizationSettingsUpdate:
             max_token_ttl_days=max_token_ttl_days,
             require_token_expiry=require_token_expiry,
             agent_task_review=agent_task_review,
+            require_mfa=require_mfa,
+            idle_timeout_minutes=idle_timeout_minutes,
+            restrict_to_verified_domains=restrict_to_verified_domains,
+            deleted_item_retention_days=deleted_item_retention_days,
+            attachment_retention_days=attachment_retention_days,
         )
 
-        organization_settings_update.additional_properties = d
         return organization_settings_update
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

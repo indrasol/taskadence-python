@@ -148,7 +148,7 @@ def sync_detailed(
     Args:
         team_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
-        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD — at most 93 days
+        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
         if_none_match (str | Unset):
 
@@ -191,7 +191,7 @@ def sync(
     Args:
         team_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
-        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD — at most 93 days
+        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
         if_none_match (str | Unset):
 
@@ -229,7 +229,7 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
-        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD — at most 93 days
+        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
         if_none_match (str | Unset):
 
@@ -270,7 +270,7 @@ async def asyncio(
     Args:
         team_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
-        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD — at most 93 days
+        to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
         if_none_match (str | Unset):
 

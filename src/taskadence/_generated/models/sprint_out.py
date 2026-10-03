@@ -43,7 +43,7 @@ class SprintOut:
             range is not a whole number of weeks (a custom sprint).
         duration_label (str | Unset): Derived: '2 weeks' for a preset length, 'Custom' otherwise. Default: ''.
         task_count (int | Unset): Tasks filed into this sprint (every status). Default: 0.
-        completed_count (int | Unset): How many of them are completed — the sprint header's done-against-total. Default:
+        completed_count (int | Unset): How many of them are completed - the sprint header's done-against-total. Default:
             0.
     """
 

@@ -45,6 +45,8 @@ class OrganizationMemberInDB:
             never.
         kind (str | Unset): `user` (a person) or `service_account` (a non-human member that holds access tokens).
             Default: 'user'.
+        mfa_enrolled (bool | None | Unset): Whether the member has set up two-step sign-in. Only in the members list,
+            and only for owners and admins; null otherwise.
     """
 
     user_id: UUID
@@ -65,6 +67,7 @@ class OrganizationMemberInDB:
     deleted_by: None | str | Unset = UNSET
     last_active_at: datetime.datetime | None | Unset = UNSET
     kind: str | Unset = "user"
+    mfa_enrolled: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -171,6 +174,12 @@ class OrganizationMemberInDB:
 
         kind = self.kind
 
+        mfa_enrolled: bool | None | Unset
+        if isinstance(self.mfa_enrolled, Unset):
+            mfa_enrolled = UNSET
+        else:
+            mfa_enrolled = self.mfa_enrolled
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -209,6 +218,8 @@ class OrganizationMemberInDB:
             field_dict["last_active_at"] = last_active_at
         if kind is not UNSET:
             field_dict["kind"] = kind
+        if mfa_enrolled is not UNSET:
+            field_dict["mfa_enrolled"] = mfa_enrolled
 
         return field_dict
 
@@ -392,6 +403,15 @@ class OrganizationMemberInDB:
 
         kind = d.pop("kind", UNSET)
 
+        def _parse_mfa_enrolled(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        mfa_enrolled = _parse_mfa_enrolled(d.pop("mfa_enrolled", UNSET))
+
         organization_member_in_db = cls(
             user_id=user_id,
             org_id=org_id,
@@ -411,6 +431,7 @@ class OrganizationMemberInDB:
             deleted_by=deleted_by,
             last_active_at=last_active_at,
             kind=kind,
+            mfa_enrolled=mfa_enrolled,
         )
 
         organization_member_in_db.additional_properties = d

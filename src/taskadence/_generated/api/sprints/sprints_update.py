@@ -122,7 +122,7 @@ def sync_detailed(
     Args:
         team_id (str):
         sprint_id (str):
-        body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
+        body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -161,7 +161,7 @@ def sync(
     Args:
         team_id (str):
         sprint_id (str):
-        body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
+        body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -195,7 +195,7 @@ async def asyncio_detailed(
     Args:
         team_id (str):
         sprint_id (str):
-        body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
+        body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -232,7 +232,7 @@ async def asyncio(
     Args:
         team_id (str):
         sprint_id (str):
-        body (SprintUpdate): A true partial — every field optional; an absent field is left alone.
+        body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

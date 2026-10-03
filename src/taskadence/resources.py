@@ -113,7 +113,7 @@ class OrganizationsResource:
     @overload
     def access_review(self, org_id: str, *, if_none_match: str) -> models.AccessReview | NotModifiedType: ...
     def access_review(self, org_id: str, *, if_none_match: str | None = None) -> models.AccessReview | NotModifiedType:
-        """Access review: every member and the tokens they hold (owner / admin; JSON or CSV).
+        """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or CSV).
 
         `GET /v1/organizations/{org_id}/access-review` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -1040,6 +1040,7 @@ class TaskAttachmentsResource:
         self,
         *,
         task_id: str,
+        inline: bool | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -1055,6 +1056,7 @@ class TaskAttachmentsResource:
                 _OPS["task-attachments.list"],
                 query={
                     "task_id": task_id,
+                    "inline": inline,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -1735,7 +1737,7 @@ class ReleasesResource:
         repository: str | None = None,
         if_none_match: str | None = None,
     ) -> models.WhatsNewResponse | NotModifiedType:
-        """What's new — recent release notes.
+        """What's new - recent release notes.
 
         `GET /v1/releases/whats-new` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -2223,7 +2225,7 @@ class GoalsResource:
 
 
 class MilestonesResource:
-    """Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`)."""
+    """Milestones: titled dates a project commits to, holding its tasks - one project's, or every project's you can read at once (`GET /v1/milestones`)."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -2551,6 +2553,73 @@ class AuditResource:
             ),
         )
 
+    @overload
+    def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: None = None,
+    ) -> builtins.list[models.AuditExportRow]: ...
+    @overload
+    def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: str,
+    ) -> builtins.list[models.AuditExportRow] | NotModifiedType: ...
+    def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: str | None = None,
+    ) -> builtins.list[models.AuditExportRow] | NotModifiedType:
+        """Export the audit log as a JSON array (owner / admin; S.8).
+
+        `GET /v1/audit.json` · scope `admin` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "builtins.list[models.AuditExportRow] | NotModifiedType",
+            self._client._call(
+                _OPS["audit.export_json"],
+                query={
+                    "org_id": org_id,
+                    "resource_type": resource_type,
+                    "resource_id": resource_id,
+                    "project_id": project_id,
+                    "action": action,
+                    "actor": actor,
+                    "from": from_,
+                    "to": to,
+                    "limit": limit,
+                },
+                if_none_match=if_none_match,
+            ),
+        )
+
 
 class ViewsResource:
     """Saved views and the tasks they show."""
@@ -2835,7 +2904,7 @@ class AsyncOrganizationsResource:
     async def access_review(
         self, org_id: str, *, if_none_match: str | None = None
     ) -> models.AccessReview | NotModifiedType:
-        """Access review: every member and the tokens they hold (owner / admin; JSON or CSV).
+        """Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or CSV).
 
         `GET /v1/organizations/{org_id}/access-review` · scope `org:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -3785,6 +3854,7 @@ class AsyncTaskAttachmentsResource:
         self,
         *,
         task_id: str,
+        inline: bool | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -3800,6 +3870,7 @@ class AsyncTaskAttachmentsResource:
                 _OPS["task-attachments.list"],
                 query={
                     "task_id": task_id,
+                    "inline": inline,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -4501,7 +4572,7 @@ class AsyncReleasesResource:
         repository: str | None = None,
         if_none_match: str | None = None,
     ) -> models.WhatsNewResponse | NotModifiedType:
-        """What's new — recent release notes.
+        """What's new - recent release notes.
 
         `GET /v1/releases/whats-new` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -5020,7 +5091,7 @@ class AsyncGoalsResource:
 
 
 class AsyncMilestonesResource:
-    """Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`)."""
+    """Milestones: titled dates a project commits to, holding its tasks - one project's, or every project's you can read at once (`GET /v1/milestones`)."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -5340,6 +5411,73 @@ class AsyncAuditResource:
             "str | NotModifiedType",
             await self._client._call(
                 _OPS["audit.export"],
+                query={
+                    "org_id": org_id,
+                    "resource_type": resource_type,
+                    "resource_id": resource_id,
+                    "project_id": project_id,
+                    "action": action,
+                    "actor": actor,
+                    "from": from_,
+                    "to": to,
+                    "limit": limit,
+                },
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    async def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: None = None,
+    ) -> builtins.list[models.AuditExportRow]: ...
+    @overload
+    async def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: str,
+    ) -> builtins.list[models.AuditExportRow] | NotModifiedType: ...
+    async def export_json(
+        self,
+        *,
+        org_id: str,
+        resource_type: str | None = None,
+        resource_id: str | None = None,
+        project_id: str | None = None,
+        action: str | None = None,
+        actor: str | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        limit: int | None = None,
+        if_none_match: str | None = None,
+    ) -> builtins.list[models.AuditExportRow] | NotModifiedType:
+        """Export the audit log as a JSON array (owner / admin; S.8).
+
+        `GET /v1/audit.json` · scope `admin` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "builtins.list[models.AuditExportRow] | NotModifiedType",
+            await self._client._call(
+                _OPS["audit.export_json"],
                 query={
                     "org_id": org_id,
                     "resource_type": resource_type,
@@ -5827,6 +5965,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "mcp.clients": ("mcp", "clients"),
     "audit.list": ("audit", "list"),
     "audit.export": ("audit", "export"),
+    "audit.export_json": ("audit", "export_json"),
     "views.list": ("views", "list"),
     "views.create": ("views", "create"),
     "views.read": ("views", "read"),

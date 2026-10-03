@@ -12,7 +12,6 @@ from ..types import UNSET, Unset
 
 from ..types import UNSET, Unset
 from typing import cast
-import datetime
 
 
 T = TypeVar("T", bound="TaskCommentUpdate")
@@ -23,48 +22,17 @@ class TaskCommentUpdate:
     """The request body of `task-comments.update`.
 
     Attributes:
-        task_id (None | str | Unset): Task ID (text)
-        task_title (None | str | Unset): Task title snapshot at time of comment
-        created_by (None | str | Unset): User ID (UUID)
         comment (None | str | Unset): Legacy/alternative comment field
         content (None | str | Unset): Comment content
-        created_at (datetime.datetime | None | Unset): When the comment was created
-        updated_at (datetime.datetime | None | Unset): When the comment was last updated
-        org_id (None | str | Unset): Organization ID (UUID)
     """
 
-    task_id: None | str | Unset = UNSET
-    task_title: None | str | Unset = UNSET
-    created_by: None | str | Unset = UNSET
     comment: None | str | Unset = UNSET
     content: None | str | Unset = UNSET
-    created_at: datetime.datetime | None | Unset = UNSET
-    updated_at: datetime.datetime | None | Unset = UNSET
-    org_id: None | str | Unset = UNSET
-    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        task_id: None | str | Unset
-        if isinstance(self.task_id, Unset):
-            task_id = UNSET
-        else:
-            task_id = self.task_id
-
-        task_title: None | str | Unset
-        if isinstance(self.task_title, Unset):
-            task_title = UNSET
-        else:
-            task_title = self.task_title
-
-        created_by: None | str | Unset
-        if isinstance(self.created_by, Unset):
-            created_by = UNSET
-        else:
-            created_by = self.created_by
-
         comment: None | str | Unset
         if isinstance(self.comment, Unset):
             comment = UNSET
@@ -77,80 +45,19 @@ class TaskCommentUpdate:
         else:
             content = self.content
 
-        created_at: None | str | Unset
-        if isinstance(self.created_at, Unset):
-            created_at = UNSET
-        elif isinstance(self.created_at, datetime.datetime):
-            created_at = self.created_at.isoformat()
-        else:
-            created_at = self.created_at
-
-        updated_at: None | str | Unset
-        if isinstance(self.updated_at, Unset):
-            updated_at = UNSET
-        elif isinstance(self.updated_at, datetime.datetime):
-            updated_at = self.updated_at.isoformat()
-        else:
-            updated_at = self.updated_at
-
-        org_id: None | str | Unset
-        if isinstance(self.org_id, Unset):
-            org_id = UNSET
-        else:
-            org_id = self.org_id
-
         field_dict: dict[str, Any] = {}
-        field_dict.update(self.additional_properties)
+
         field_dict.update({})
-        if task_id is not UNSET:
-            field_dict["task_id"] = task_id
-        if task_title is not UNSET:
-            field_dict["task_title"] = task_title
-        if created_by is not UNSET:
-            field_dict["created_by"] = created_by
         if comment is not UNSET:
             field_dict["comment"] = comment
         if content is not UNSET:
             field_dict["content"] = content
-        if created_at is not UNSET:
-            field_dict["created_at"] = created_at
-        if updated_at is not UNSET:
-            field_dict["updated_at"] = updated_at
-        if org_id is not UNSET:
-            field_dict["org_id"] = org_id
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-
-        def _parse_task_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        task_id = _parse_task_id(d.pop("task_id", UNSET))
-
-        def _parse_task_title(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        task_title = _parse_task_title(d.pop("task_title", UNSET))
-
-        def _parse_created_by(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        created_by = _parse_created_by(d.pop("created_by", UNSET))
 
         def _parse_comment(data: object) -> None | str | Unset:
             if data is None:
@@ -170,75 +77,9 @@ class TaskCommentUpdate:
 
         content = _parse_content(d.pop("content", UNSET))
 
-        def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
-
-                return created_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        created_at = _parse_created_at(d.pop("created_at", UNSET))
-
-        def _parse_updated_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
-
-                return updated_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        updated_at = _parse_updated_at(d.pop("updated_at", UNSET))
-
-        def _parse_org_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        org_id = _parse_org_id(d.pop("org_id", UNSET))
-
         task_comment_update = cls(
-            task_id=task_id,
-            task_title=task_title,
-            created_by=created_by,
             comment=comment,
             content=content,
-            created_at=created_at,
-            updated_at=updated_at,
-            org_id=org_id,
         )
 
-        task_comment_update.additional_properties = d
         return task_comment_update
-
-    @property
-    def additional_keys(self) -> list[str]:
-        return list(self.additional_properties.keys())
-
-    def __getitem__(self, key: str) -> Any:
-        return self.additional_properties[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        self.additional_properties[key] = value
-
-    def __delitem__(self, key: str) -> None:
-        del self.additional_properties[key]
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.additional_properties

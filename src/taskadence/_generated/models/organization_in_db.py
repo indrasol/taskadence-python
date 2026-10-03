@@ -28,7 +28,7 @@ class OrganizationInDB:
     Attributes:
         name (str): Organization name Example: Acme Corp.
         org_id (str):
-        description (str | Unset): Description of the organization Example: A global tech company..
+        description (None | str | Unset): Description of the organization (optional) Example: A global tech company..
         designations (list[str] | Unset): List of designation names available in this organization
         logo (None | str | Unset): Logo URL Example: https://example.com/logo.png.
         email (None | str | Unset): Contact email Example: info@acme.com.
@@ -53,7 +53,7 @@ class OrganizationInDB:
 
     name: str
     org_id: str
-    description: str | Unset = UNSET
+    description: None | str | Unset = UNSET
     designations: list[str] | Unset = UNSET
     logo: None | str | Unset = UNSET
     email: None | str | Unset = UNSET
@@ -84,7 +84,11 @@ class OrganizationInDB:
 
         org_id = self.org_id
 
-        description = self.description
+        description: None | str | Unset
+        if isinstance(self.description, Unset):
+            description = UNSET
+        else:
+            description = self.description
 
         designations: list[str] | Unset = UNSET
         if not isinstance(self.designations, Unset):
@@ -244,7 +248,14 @@ class OrganizationInDB:
 
         org_id = d.pop("org_id")
 
-        description = d.pop("description", UNSET)
+        def _parse_description(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        description = _parse_description(d.pop("description", UNSET))
 
         designations = cast(list[str], d.pop("designations", UNSET))
 

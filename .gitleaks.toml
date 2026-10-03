@@ -7,9 +7,9 @@
 useDefault = true
 
 [[allowlists]]
-description = "Response examples in the vendored public OpenAPI spec and the models generated from it: made-up tkd_live_/tkdr_/tkdcs_/whsec_ values (and their pre-rename tm_live_/tmr_/tmcs_ forms) copied from the backend schemas (hashed and checked against dev: no match)"
+description = "Response examples in the vendored public OpenAPI spec and the models generated from it: made-up tkd_live_/tkdr_/tkdcs_/tkdc_/tkdg_/tkdf_/whsec_ values (and their pre-rename tm_live_/tmr_/tmcs_ forms) copied from the backend schemas (hashed and checked against dev: no match)"
 targetRules = ["generic-api-key"]
 condition = "AND"
 paths = ['''^(spec/openapi\.public\.json|src/taskadence/_generated/models/[a-z_]+\.py)$''']
 regexTarget = "secret"
-regexes = ['''^(tkd_live_|tkdr_|tkdcs_|tm_live_|tmr_|tmcs_|whsec_)[A-Za-z0-9_=-]+$''']
+regexes = ['''^(tkd_live_|tkdr_|tkdcs_|tkdc_|tkdg_|tkdf_|tm_live_|tmr_|tmcs_|whsec_)[A-Za-z0-9_=-]+$''']

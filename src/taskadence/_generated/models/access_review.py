@@ -15,6 +15,8 @@ from typing import cast
 
 if TYPE_CHECKING:
     from ..models.review_member import ReviewMember
+    from ..models.review_meta import ReviewMeta
+    from ..models.review_summary import ReviewSummary
     from ..models.unattached_token import UnattachedToken
 
 
@@ -29,13 +31,19 @@ class AccessReview:
         org_id (str):
         generated_at (str):
         members (list[ReviewMember]):
+        summary (ReviewSummary): Part of `AccessReview`.
+        mfa_policy (str | Unset): The org's two-step sign-in policy: `off`, `admins` or `all` Default: 'off'.
         unattached_tokens (list[UnattachedToken] | Unset): Active tokens whose principal is no longer an active member
+        meta (ReviewMeta | Unset): Part of `AccessReview`.
     """
 
     org_id: str
     generated_at: str
     members: list[ReviewMember]
+    summary: ReviewSummary
+    mfa_policy: str | Unset = "off"
     unattached_tokens: list[UnattachedToken] | Unset = UNSET
+    meta: ReviewMeta | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -43,6 +51,8 @@ class AccessReview:
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.review_member import ReviewMember  # noqa: PLC0415
+        from ..models.review_meta import ReviewMeta  # noqa: PLC0415
+        from ..models.review_summary import ReviewSummary  # noqa: PLC0415
         from ..models.unattached_token import UnattachedToken  # noqa: PLC0415
 
         org_id = self.org_id
@@ -54,12 +64,20 @@ class AccessReview:
             members_item = members_item_data.to_dict()
             members.append(members_item)
 
+        summary = self.summary.to_dict()
+
+        mfa_policy = self.mfa_policy
+
         unattached_tokens: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.unattached_tokens, Unset):
             unattached_tokens = []
             for unattached_tokens_item_data in self.unattached_tokens:
                 unattached_tokens_item = unattached_tokens_item_data.to_dict()
                 unattached_tokens.append(unattached_tokens_item)
+
+        meta: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.meta, Unset):
+            meta = self.meta.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -68,16 +86,23 @@ class AccessReview:
                 "org_id": org_id,
                 "generated_at": generated_at,
                 "members": members,
+                "summary": summary,
             }
         )
+        if mfa_policy is not UNSET:
+            field_dict["mfa_policy"] = mfa_policy
         if unattached_tokens is not UNSET:
             field_dict["unattached_tokens"] = unattached_tokens
+        if meta is not UNSET:
+            field_dict["meta"] = meta
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.review_member import ReviewMember  # noqa: PLC0415
+        from ..models.review_meta import ReviewMeta  # noqa: PLC0415
+        from ..models.review_summary import ReviewSummary  # noqa: PLC0415
         from ..models.unattached_token import UnattachedToken  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -92,6 +117,10 @@ class AccessReview:
 
             members.append(members_item)
 
+        summary = ReviewSummary.from_dict(d.pop("summary"))
+
+        mfa_policy = d.pop("mfa_policy", UNSET)
+
         _unattached_tokens = d.pop("unattached_tokens", UNSET)
         unattached_tokens: list[UnattachedToken] | Unset = UNSET
         if _unattached_tokens is not UNSET:
@@ -101,11 +130,21 @@ class AccessReview:
 
                 unattached_tokens.append(unattached_tokens_item)
 
+        _meta = d.pop("meta", UNSET)
+        meta: ReviewMeta | Unset
+        if isinstance(_meta, Unset):
+            meta = UNSET
+        else:
+            meta = ReviewMeta.from_dict(_meta)
+
         access_review = cls(
             org_id=org_id,
             generated_at=generated_at,
             members=members,
+            summary=summary,
+            mfa_policy=mfa_policy,
             unattached_tokens=unattached_tokens,
+            meta=meta,
         )
 
         access_review.additional_properties = d
