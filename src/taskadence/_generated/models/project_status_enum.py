@@ -3,11 +3,10 @@
 from typing import Literal
 
 ProjectStatusEnum = Literal[
-    "active", "archived", "blocked", "completed", "in_progress", "not_started", "on_hold", "paused", "planning"
+    "archived", "blocked", "completed", "in_progress", "not_started", "on_hold", "paused", "planning"
 ]
 
 PROJECT_STATUS_ENUM_VALUES: set[ProjectStatusEnum] = {
-    "active",
     "archived",
     "blocked",
     "completed",

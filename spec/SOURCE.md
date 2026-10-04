@@ -6,12 +6,12 @@ snapshot of the public contract the Taskadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `feature/b1-b3-storage-metering` |
-| Backend commit | `f2705fe` — B.1-B.3 storage metering: `GET /v1/organizations/{org_id}/storage` → `organizations.storage` (`StorageUsage` and five more schemas), the `storage-limit-reached` problem type (402) |
+| Backend repo | `indrasol/taskadence-api`, branch `fix/mcp-project-status` |
+| Backend commit | `5fa0aa4` — fix(mcp): `ProjectStatusEnum` loses `active` (never a `project_status_enum` value: create / update with it was a 500); `invalid-parameter` is documented for 422 too (a body field outside its fixed set of values, `errors[].allowed`) |
 | Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-04 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
 | Size | 110 paths · 172 operations (166 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 222 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `347380538c55a6a2291c184cca95b9302c2ddddb16c0e63e2750a03051a15eab` |
+| SHA-256 | `7db026e13dc5afaffdc12a4166c60e7e9e8df2d4119e66d477c23c064b41fc6c` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

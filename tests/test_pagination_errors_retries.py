@@ -21,6 +21,7 @@ from taskadence import (
     InsufficientScopeError,
     InternalError,
     InvalidParameterError,
+    InvalidValueError,
     NotFoundError,
     PreconditionFailedError,
     RateLimitedError,
@@ -123,6 +124,7 @@ CASES = [
     (409, URN + "idempotency-key-in-flight", IdempotencyKeyInFlightError, ConflictError),
     (412, URN + "precondition-failed", PreconditionFailedError, TaskadenceError),
     (422, URN + "validation", ValidationError, UnprocessableEntityError),
+    (422, URN + "invalid-parameter", InvalidValueError, ValidationError),
     (422, URN + "idempotency-key-reused", IdempotencyKeyReusedError, UnprocessableEntityError),
     (422, URN + "url-refused", UrlRefusedError, UnprocessableEntityError),
     (429, URN + "rate-limit", RateLimitedError, TaskadenceError),
@@ -298,3 +300,19 @@ def test_debug_logging_never_contains_the_token(
     assert TOKEN not in logged and TOKEN[:20] not in logged
     assert TOKEN not in str(caught.value) and TOKEN not in repr(caught.value)
     assert not any("authorization" in r.getMessage().lower() for r in caplog.records)
+
+
+def test_a_422_invalid_parameter_is_caught_as_a_validation_error_and_as_an_invalid_parameter(
+    api: respx.MockRouter,
+) -> None:
+    allowed = ["planning", "in_progress", "not_started", "completed", "archived", "on_hold", "blocked", "paused"]
+    body = {
+        **problem(422, URN + "invalid-parameter", "status must be one of the allowed values"),
+        "errors": [{"loc": ["body", "status"], "msg": "x", "type": "enum", "allowed": allowed}],
+    }
+    api.post("/v1/projects").respond(422, json=body)
+    tm = Taskadence(token=TOKEN, base_url=BASE, max_retries=0)
+    for cls in (InvalidValueError, ValidationError, UnprocessableEntityError, InvalidParameterError):
+        with pytest.raises(cls) as caught:
+            tm.projects.create({"org_id": "O1", "name": "x", "status": "active"})
+        assert caught.value.status == 422 and caught.value.errors[0]["allowed"] == allowed
