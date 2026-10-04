@@ -5,6 +5,13 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 
 ## [Unreleased] — 0.1.0.dev0
 
+### Added (B.2 — the storage meter)
+- (B.2) `tm.organizations.storage(org_id)` → `StorageUsage`: bytes used of the included 1 TB, `status`
+  (`ok` / `warning` / `blocked` / `metered` / `exempt`), the breakdown by kind and project, the largest files, the 30-day trend.
+- (B.2) CLI `tm storage [--org O…] [--json]` (also `taskadence storage`).
+- (B.3) Problem type `urn:taskadence:problem:storage-limit-reached` (402 on an upload when the organization is full with no
+  payment method on file).
+
 ### Changed (5.8 — the product is Taskadence; nothing was published under the old names, so there is no shim)
 - (5.8) Distributions `taskadence` / `taskadence-mcp` (PyPI) and `@taskadence/mcp` (npm); was `tasksmate` / `tasksmate-mcp` / `@tasksmate/mcp`.
 - (5.8) Import `taskadence` (`Taskadence`, `AsyncTaskadence`, `TaskadenceError`); was `tasksmate` (`TasksMate`, …). No `tasksmate` import shim.

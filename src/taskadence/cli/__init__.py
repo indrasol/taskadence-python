@@ -6,6 +6,7 @@
     tm tasks create --org O0020 --title "Ship the SDK" --project P96441
     tm tasks update T123456 --status completed
     tm views rows V123456 --csv > rows.csv
+    tm storage --org O0020             # the storage meter: used of 1 TB, status, by kind, top projects and files
 
 Output: a table by default, `--json` for the raw API objects. Exit codes: 0 success; 1 an API or connection error (the
 problem is printed with its `request_id`); 2 a usage error. The token is never printed — only its 12-character prefix.
@@ -261,6 +262,58 @@ def me(json_: JsonOpt = False) -> None:
         + (f" <{principal['email']}>" if principal.get("email") else "")
     )
     _table(result.organizations or [], ["org_id", "name", "role", "designation"], title="Organizations")
+
+
+# ---------------------------------------------------------------------------
+# storage
+# ---------------------------------------------------------------------------
+
+
+def _bytes(n: Any) -> str:
+    """Decimal units, like the bill: 1 GB = 10^9 bytes."""
+    value = float(n or 0)
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if value < 1000 or unit == "TB":
+            return f"{value:.0f} {unit}" if unit == "B" else f"{value:.2f} {unit}"
+        value /= 1000
+    return f"{value:.2f} TB"  # pragma: no cover - the loop returns
+
+
+@app.command("storage")
+def storage(org: OrgOpt = None, json_: JsonOpt = False) -> None:
+    """The organization's storage: used of the included 1 TB, the status, by kind, top projects, largest files."""
+    result = _run(lambda tm: tm.organizations.storage(_resolve_org(tm, org)))
+    if json_:
+        _print_json(result)
+        return
+    data = _plain(result)
+    status = str(data.get("status"))
+    out.print(
+        f"[bold]{_bytes(data.get('bytes_used'))}[/bold] of {_bytes(data.get('included_bytes'))} included "
+        f"({data.get('percent')}%), {data.get('file_count')} files - status [bold]{status}[/bold]"
+        + (" (internal org, not billed)" if data.get("billing_exempt") else "")
+    )
+    if status == "blocked":
+        out.print("New uploads are paused until an owner or admin adds a payment method.", style="red")
+    breakdown = data.get("breakdown") or {}
+    kinds = breakdown.get("by_kind") or {}
+    _table(
+        [{"kind": k, "size": _bytes(kinds.get(k))} for k in ("task", "project", "bug")],
+        ["kind", "size"],
+        title="By kind",
+    )
+    if breakdown.get("by_project"):
+        _table(
+            [{**p, "size": _bytes(p.get("bytes"))} for p in breakdown["by_project"]],
+            ["project_id", "name", "size"],
+            title="Top projects",
+        )
+    if data.get("top_files"):
+        _table(
+            [{**f, "size": _bytes(f.get("bytes"))} for f in data["top_files"]],
+            ["kind", "id", "name", "size"],
+            title="Largest files",
+        )
 
 
 # ---------------------------------------------------------------------------

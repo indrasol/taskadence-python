@@ -155,6 +155,53 @@ def test_me(signed_in: None, api: respx.MockRouter) -> None:
     assert json.loads(as_json.output)["principal"] == example("me.read")["principal"]
 
 
+STORAGE = {
+    "org_id": "O0020",
+    "bytes_used": 1_000_400_000_000,
+    "file_count": 18342,
+    "included_bytes": 10**12,
+    "overage_bytes": 400_000_000,
+    "percent": 100.0,
+    "status": "blocked",
+    "payment_method_on_file": False,
+    "billing_exempt": False,
+    "breakdown": {
+        "by_kind": {"task": 710_000_000_000, "project": 270_000_000_000, "bug": 20_400_000_000},
+        "by_project": [{"project_id": "P0007", "name": "Website relaunch", "bytes": 340_000_000_000}],
+    },
+    "top_files": [
+        {
+            "kind": "task",
+            "id": "A0412",
+            "name": "launch.mp4",
+            "bytes": 2_100_000_000,
+            "created_at": None,
+            "parent_id": "T1201",
+            "project_id": "P0007",
+        }
+    ],
+    "trend": [{"day": "2026-10-01", "bytes_used": 990_000_000_000}],
+    "updated_at": None,
+    "manage_url": "https://taskadence.com/settings?tab=storage",
+}
+
+
+def test_storage(signed_in: None, api: respx.MockRouter) -> None:
+    route = api.get("/v1/organizations/O0020/storage").respond(json=STORAGE)
+    result = invoke("storage", "--org", "O0020")
+    assert result.exit_code == 0, result.output
+    assert "1.00 TB of 1.00 TB included" in result.output and "status blocked" in result.output
+    assert (
+        "New uploads are paused" in result.output
+        and "Website relaunch" in result.output
+        and "launch.mp4" in result.output
+    )
+    assert route.called
+    no_token_in(result)
+    as_json = invoke("storage", "--org", "O0020", "--json")
+    assert json.loads(as_json.output)["breakdown"]["by_kind"]["task"] == 710_000_000_000
+
+
 def test_tasks_list_table_and_json(signed_in: None, api: respx.MockRouter) -> None:
     route = api.get("/v1/tasks").mock(
         side_effect=[
