@@ -3,15 +3,15 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [project]
-name = "tasksmate"
+name = "taskadence"
 dynamic = ["version"]
-description = "The TasksMate API for Python: a typed client generated from the public OpenAPI, a `tm` CLI, and pandas helpers."
+description = "The Taskadence API for Python: a typed client generated from the public OpenAPI, a `tm` CLI, and pandas helpers."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "Indrasol" }]
-keywords = ["tasksmate", "tasks", "project management", "api", "sdk"]
+keywords = ["taskadence", "tasks", "project management", "api", "sdk"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -54,32 +54,33 @@ dev = [
 ]
 
 [project.scripts]
-tm = "tasksmate.cli:main"
+tm = "taskadence.cli:main"
+taskadence = "taskadence.cli:main"  # the same CLI under the product's name
 
 [project.urls]
-Homepage = "https://github.com/indrasol/tasksmate-python"
-Source = "https://github.com/indrasol/tasksmate-python"
-Changelog = "https://github.com/indrasol/tasksmate-python/blob/main/CHANGELOG.md"
+Homepage = "https://docs.taskadence.com"
+Source = "https://github.com/indrasol/taskadence-python"
+Changelog = "https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
-path = "src/tasksmate/_version.py"
+path = "src/taskadence/_version.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/tasksmate"]
+packages = ["src/taskadence"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/tasksmate", "spec", "tests", "README.md", "CHANGELOG.md", "LICENSE", "NOTICE", "SECURITY.md"]
+include = ["src/taskadence", "spec", "tests", "README.md", "CHANGELOG.md", "LICENSE", "NOTICE", "SECURITY.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: runs against a live API (TASKSMATE_TOKEN + TASKSMATE_API_URL); skipped without them"]
+markers = ["integration: runs against a live API (TASKADENCE_TOKEN + TASKADENCE_API_URL); skipped without them"]
 addopts = "-m 'not integration'"
-filterwarnings = ["error::DeprecationWarning:tasksmate.*"]
+filterwarnings = ["error::DeprecationWarning:taskadence.*"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-extend-exclude = ["src/tasksmate/_generated"]
+extend-exclude = ["src/taskadence/_generated"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "S"]
@@ -91,19 +92,19 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S105", "S106"]                           # fake tokens and secrets in fixtures
 "scripts/*" = ["S603", "S607"]                         # the generator runs the pinned local tools
-"src/tasksmate/resources.py" = ["E501"]                # generated: docstrings carry the full filter vocabulary
-"src/tasksmate/_operations.py" = ["E501"]              # generated: one operation per line
+"src/taskadence/resources.py" = ["E501"]                # generated: docstrings carry the full filter vocabulary
+"src/taskadence/_operations.py" = ["E501"]              # generated: one operation per line
 
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/tasksmate"]
+files = ["src/taskadence"]
 # The generated client is checked by its generator, not by us: it is excluded here and every facade call into it
 # is typed at the facade's boundary. `follow_imports = silent` still reads its annotations.
-exclude = ["src/tasksmate/_generated/"]
+exclude = ["src/taskadence/_generated/"]
 
 [[tool.mypy.overrides]]
-module = ["tasksmate._generated.*"]
+module = ["taskadence._generated.*"]
 follow_imports = "silent"
 ignore_errors = true
 

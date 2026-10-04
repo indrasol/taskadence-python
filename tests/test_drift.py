@@ -12,10 +12,10 @@ from typing import Any
 
 import pytest
 
-import tasksmate
-from tasksmate import AsyncTasksMate, TasksMate
-from tasksmate._operations import OPERATIONS
-from tasksmate.resources import RESOURCE_METHODS
+import taskadence
+from taskadence import AsyncTaskadence, Taskadence
+from taskadence._operations import OPERATIONS
+from taskadence.resources import RESOURCE_METHODS
 
 from .conftest import FULL_SPEC, SPEC, TOKEN
 
@@ -25,7 +25,7 @@ SPEC_OPS = {
 
 
 def test_every_public_operation_id_has_a_facade_method_sync_and_async() -> None:
-    tm, atm = TasksMate(token=TOKEN), AsyncTasksMate(token=TOKEN)
+    tm, atm = Taskadence(token=TOKEN), AsyncTaskadence(token=TOKEN)
     missing = []
     for op_id in SPEC_OPS:
         resource, verb = op_id.split(".", 1)
@@ -58,7 +58,7 @@ def test_the_facade_and_the_generated_client_build_the_same_url(op_id: str) -> N
         if param.default is inspect.Parameter.empty and name not in args:
             kwargs[name] = object() if name != "body" else _Body()
     generated = module._get_kwargs(*args.values(), **kwargs)
-    ours = tasksmate.TasksMate(token=TOKEN)._core._build(
+    ours = taskadence.Taskadence(token=TOKEN)._core._build(
         op, path=tuple(args.values()), body={} if op.body == "json" else None
     )
     assert generated["method"].upper() == ours.method
@@ -93,18 +93,18 @@ def test_every_list_is_a_page_and_every_create_is_idempotent() -> None:
 def test_generated_files_say_do_not_edit() -> None:
     from pathlib import Path
 
-    generated = Path(tasksmate.__file__).parent / "_generated"
+    generated = Path(taskadence.__file__).parent / "_generated"
     offenders = [
         p.name for p in generated.rglob("*.py") if "DO NOT EDIT BY HAND" not in p.read_text().split("\n", 2)[0]
     ]
     assert offenders == []
     for name in ("_operations.py", "resources.py"):
-        assert "DO NOT EDIT BY HAND" in (Path(tasksmate.__file__).parent / name).read_text().split("\n", 1)[0]
+        assert "DO NOT EDIT BY HAND" in (Path(taskadence.__file__).parent / name).read_text().split("\n", 1)[0]
 
 
 def test_the_sdk_knows_its_api_version_and_default_server() -> None:
-    assert tasksmate.API_VERSION == SPEC["info"]["version"] == "2026-09-25"
-    assert SPEC["servers"][0]["url"] == tasksmate.DEFAULT_BASE_URL
+    assert taskadence.API_VERSION == SPEC["info"]["version"] == "2026-09-25"
+    assert SPEC["servers"][0]["url"] == taskadence.DEFAULT_BASE_URL
 
 
 # ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ def _generator() -> Any:
     from pathlib import Path
 
     path = Path(__file__).resolve().parent.parent / "scripts" / "generate.py"
-    spec = importlib.util.spec_from_file_location("tasksmate_generate", path)
+    spec = importlib.util.spec_from_file_location("taskadence_generate", path)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module  # its dataclasses look their module up
@@ -157,7 +157,7 @@ def test_the_generator_refuses_a_spec_that_regressed(breakage: Any, message: str
 
 
 def test_update_bodies_in_the_spec_carry_no_defaults_and_the_generated_model_sends_only_what_is_set() -> None:
-    from tasksmate._generated.models import TaskUpdate
+    from taskadence._generated.models import TaskUpdate
 
     schema = SPEC["components"]["schemas"]["TaskUpdate"]["properties"]
     assert [name for name, prop in schema.items() if prop.get("default") is not None] == []
@@ -172,7 +172,7 @@ def test_list_and_create_come_from_x_kind() -> None:
 
 def test_the_oauth_protocol_operations_are_not_methods() -> None:
     """4.7: `/oauth/*` and `/.well-known/*` (`x-kind: oauth`) are the browser authorization flow, not SDK methods —
-    the access token it returns is used as `TasksMate(token=...)`. Everything else in the snapshot is a method.
+    the access token it returns is used as `Taskadence(token=...)`. Everything else in the snapshot is a method.
     5.5: `/oauth/register` (RFC 7591 dynamic client registration, what an MCP client calls) joins them."""
     oauth = {
         op["operationId"]: path
@@ -192,18 +192,18 @@ def test_the_oauth_protocol_operations_are_not_methods() -> None:
     assert not any(op.path.startswith(("/oauth/", "/.well-known/")) for op in OPERATIONS.values())
     everything_else = {op["operationId"] for item in FULL_SPEC["paths"].values() for op in item.values()} - set(oauth)
     assert everything_else == set(OPERATIONS)
-    assert not hasattr(TasksMate(token=TOKEN), "oauth")
+    assert not hasattr(Taskadence(token=TOKEN), "oauth")
 
 
 def test_the_5_5_surface_agent_task_review_mcp_clients_and_no_agent_type() -> None:
     """5.5 (backend 7de395c): 5.4's review step and 5.3's MCP clients table are methods; `agent` is not a task type
     any more (who made a task is `created_via`), and `tasks.list` filters on both new facets."""
-    from tasksmate._generated.models import TaskReviewDecision
+    from taskadence._generated.models import TaskReviewDecision
 
     review, clients = OPERATIONS["tasks.review"], OPERATIONS["mcp.clients"]
     assert (review.method, review.path) == ("POST", "/v1/tasks/{task_id}/review")
     assert (clients.method, clients.path) == ("GET", "/v1/mcp/clients")
-    assert callable(TasksMate(token=TOKEN).tasks.review) and callable(TasksMate(token=TOKEN).mcp.clients)
+    assert callable(Taskadence(token=TOKEN).tasks.review) and callable(Taskadence(token=TOKEN).mcp.clients)
     assert TaskReviewDecision(decision="accept").to_dict() == {"decision": "accept"}
     assert SPEC["components"]["schemas"]["TaskTypeEnum"]["enum"] == ["task", "bug"]
     assert {"created_via", "review"} <= set(OPERATIONS["tasks.list"].filters)

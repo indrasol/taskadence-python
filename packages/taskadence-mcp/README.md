@@ -1,0 +1,54 @@
+# taskadence-mcp — Taskadence's MCP server over stdio
+
+For MCP clients that **start a local process** instead of calling a URL. `uvx taskadence-mcp` speaks the Model Context
+Protocol over stdio to your client and forwards every message to Taskadence's **remote** MCP server
+(`<api>/mcp`, Streamable HTTP) with your access token. It is a proxy, not a second server: the tools, the read-only and
+tool-group enforcement, and the audit trail are the remote server's — the same tools, by construction.
+
+> **`0.x` is a pre-release**, and **not on PyPI yet** (Taskadence's stability gate). Until then, install from a checkout:
+> `pip install -e packages/taskadence-mcp`, then run `taskadence-mcp`.
+
+If your client can add a remote server by URL (Claude, Claude Code, Cursor, VS Code, …), use the URL instead — it signs
+in with OAuth and needs no token: [Connect](https://docs.taskadence.com/mcp/connect/). The npm twin is
+`npx -y @taskadence/mcp` (same variables, same flags).
+
+## Configure
+
+| Variable | Flag | |
+|---|---|---|
+| `TASKADENCE_TOKEN` | — | **Required.** An access token (`tkd_live_…`; a `tkd_test_…` token reads only) from Taskadence → **Developers → Tokens**. Its scopes decide which tools the server lists. |
+| `TASKADENCE_API_URL` | `--api-url` | The API's origin. Default: production. `/mcp` is added. |
+| `TASKADENCE_MCP_READONLY` | `--readonly` / `--no-readonly` | `1` → only read tools, enforced by the server (`?readonly=1`). |
+| `TASKADENCE_MCP_GROUPS` | `--groups` | e.g. `tasks,projects` → only those tool groups (`?groups=…`). Default: every group except `admin`; `me` is always on. |
+
+Flags win over the environment. There is no token flag: a command line is visible to every process on the machine.
+The names are `TASKADENCE_*` on purpose — the packages' (and the `tm` CLI's) environment; the `…_TM` suffix is the API
+server's own convention, not this one's.
+
+## Add it to your client
+
+```json
+{
+  "mcpServers": {
+    "taskadence": {
+      "command": "uvx",
+      "args": ["taskadence-mcp"],
+      "env": { "TASKADENCE_TOKEN": "tkd_live_…", "TASKADENCE_MCP_READONLY": "1" }
+    }
+  }
+}
+```
+
+Claude Code: `claude mcp add --env TASKADENCE_TOKEN=tkd_live_… --transport stdio taskadence -- uvx taskadence-mcp`.
+Taskadence's **Developers → MCP** tab writes this for your client, with a token scoped to your choice.
+
+## What it does, exactly
+
+- stdin → the remote server, unchanged (`initialize` included; the server is stateless); the server's answers →
+  stdout, unchanged. stdout carries JSON-RPC and nothing else; diagnostics go to stderr, never the token.
+- A refused token (401) is answered with a JSON-RPC error naming `TASKADENCE_TOKEN` (code `-32001`), any other HTTP
+  refusal with its status and the server's detail (`-32002` — an unknown group is a 400), an unreachable server with
+  `-32003`; each also writes one line to stderr.
+- It holds no tool of its own and reaches nothing but `<api>/mcp`.
+
+Python ≥ 3.10. Depends on `mcp` (the official SDK, `<2`) and `httpx`. Apache-2.0.

@@ -46,7 +46,7 @@ Update an organization's settings.
 
 ## `tm.organizations.access_review(org_id: str, if_none_match: str | None = None)`
 
-Access review: every member and the tokens they hold (owner / admin; JSON or CSV).
+Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or CSV).
 
 - **HTTP:** `GET /v1/organizations/{org_id}/access-review`
 - **operationId:** `organizations.access_review`

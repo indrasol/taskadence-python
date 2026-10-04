@@ -9,7 +9,7 @@ import httpx
 import pytest
 import respx
 
-from tasksmate import (
+from taskadence import (
     APIConnectionError,
     AuthenticationError,
     BadRequestError,
@@ -24,8 +24,8 @@ from tasksmate import (
     NotFoundError,
     PreconditionFailedError,
     RateLimitedError,
-    TasksMate,
-    TasksMateError,
+    Taskadence,
+    TaskadenceError,
     TestTokenReadOnlyError,
     TokenExpiredError,
     TokenInvalidError,
@@ -39,7 +39,7 @@ from tasksmate import (
 
 from .conftest import BASE, TOKEN, card, problem, task
 
-URN = "urn:tasksmate:problem:"
+URN = "urn:taskadence:problem:"
 
 # ---------------------------------------------------------------------------
 # pagination
@@ -57,7 +57,7 @@ def _pages(api: respx.MockRouter) -> respx.Route:
     )
 
 
-def test_iterating_a_page_follows_next_cursor_through_every_page(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_iterating_a_page_follows_next_cursor_through_every_page(tm: Taskadence, api: respx.MockRouter) -> None:
     route = _pages(api)
     page = tm.tasks.list(org_id="O0020", filter={"status": ["in_progress"]}, limit=2)
     assert [t.task_id for t in page.data] == ["T1", "T2"] and page.next_cursor == "c1" and page.has_more
@@ -69,7 +69,7 @@ def test_iterating_a_page_follows_next_cursor_through_every_page(tm: TasksMate, 
     assert {c.request.url.params["limit"] for c in route.calls} == {"2"}
 
 
-def test_pages_and_next_page(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_pages_and_next_page(tm: Taskadence, api: respx.MockRouter) -> None:
     _pages(api)
     first = tm.tasks.list(org_id="O0020")
     assert [len(p.data) for p in first.pages()] == [2, 0, 1]
@@ -78,28 +78,28 @@ def test_pages_and_next_page(tm: TasksMate, api: respx.MockRouter) -> None:
     assert second is not None and second.data == [] and second.next_cursor == "c2"
 
 
-def test_a_last_page_does_not_fetch_again(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_last_page_does_not_fetch_again(tm: Taskadence, api: respx.MockRouter) -> None:
     route = api.get("/v1/views/V1/rows").respond(json={"data": [card("T1")], "next_cursor": None})
     page = tm.views.rows("V1")
     assert [t.task_id for t in page] == ["T1"] and page.next_page() is None and route.call_count == 1
 
 
-def test_a_cursor_that_never_advances_stops_instead_of_looping(tm: TasksMate, api: respx.MockRouter) -> None:
-    from tasksmate.pagination import PaginationError
+def test_a_cursor_that_never_advances_stops_instead_of_looping(tm: Taskadence, api: respx.MockRouter) -> None:
+    from taskadence.pagination import PaginationError
 
     api.get("/v1/tasks").respond(json={"data": [card("T1")], "next_cursor": "same"})
     with pytest.raises(PaginationError):
         list(tm.tasks.list(org_id="O0020"))
 
 
-def test_a_bare_array_is_read_as_one_page(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_bare_array_is_read_as_one_page(tm: Taskadence, api: respx.MockRouter) -> None:
     """The pre-4.1 shape, tolerated exactly as the app's `unwrapList` tolerates it."""
     api.get("/v1/tasks").respond(json=[card("T1"), card("T2")])
     page = tm.tasks.list(org_id="O0020")
     assert [t.task_id for t in page] == ["T1", "T2"] and page.next_cursor is None
 
 
-def test_an_envelope_with_extras_keeps_them(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_an_envelope_with_extras_keeps_them(tm: Taskadence, api: respx.MockRouter) -> None:
     api.get("/v1/projects/P1/goals").respond(
         json={"project_id": "P1", "data": [], "next_cursor": None, "goals_tasks_total": 7, "goals_tasks_completed": 3}
     )
@@ -119,19 +119,19 @@ CASES = [
     (401, URN + "token-revoked", TokenRevokedError, AuthenticationError),
     (403, URN + "insufficient-scope", InsufficientScopeError, ForbiddenError),
     (403, URN + "test-token-read-only", TestTokenReadOnlyError, ForbiddenError),
-    (403, URN + "token-policy", TokenPolicyError, TasksMateError),
+    (403, URN + "token-policy", TokenPolicyError, TaskadenceError),
     (409, URN + "idempotency-key-in-flight", IdempotencyKeyInFlightError, ConflictError),
-    (412, URN + "precondition-failed", PreconditionFailedError, TasksMateError),
+    (412, URN + "precondition-failed", PreconditionFailedError, TaskadenceError),
     (422, URN + "validation", ValidationError, UnprocessableEntityError),
     (422, URN + "idempotency-key-reused", IdempotencyKeyReusedError, UnprocessableEntityError),
     (422, URN + "url-refused", UrlRefusedError, UnprocessableEntityError),
-    (429, URN + "rate-limit", RateLimitedError, TasksMateError),
-    (500, URN + "internal", InternalError, TasksMateError),
-    (401, "about:blank", AuthenticationError, TasksMateError),
-    (403, "about:blank", ForbiddenError, TasksMateError),
-    (404, "about:blank", NotFoundError, TasksMateError),
-    (409, "about:blank", ConflictError, TasksMateError),
-    (503, "about:blank", InternalError, TasksMateError),
+    (429, URN + "rate-limit", RateLimitedError, TaskadenceError),
+    (500, URN + "internal", InternalError, TaskadenceError),
+    (401, "about:blank", AuthenticationError, TaskadenceError),
+    (403, "about:blank", ForbiddenError, TaskadenceError),
+    (404, "about:blank", NotFoundError, TaskadenceError),
+    (409, "about:blank", ConflictError, TaskadenceError),
+    (503, "about:blank", InternalError, TaskadenceError),
 ]
 
 
@@ -142,7 +142,7 @@ def test_every_problem_type_is_its_own_exception(
     api.get("/v1/tasks/T1").respond(
         status, json=problem(status, type_, "the detail"), headers={"Retry-After": "0"} if status == 429 else {}
     )
-    tm = TasksMate(token=TOKEN, base_url=BASE, max_retries=0)
+    tm = Taskadence(token=TOKEN, base_url=BASE, max_retries=0)
     with pytest.raises(cls) as caught:
         tm.tasks.read("T1")
     err = caught.value
@@ -151,7 +151,7 @@ def test_every_problem_type_is_its_own_exception(
     assert "req-123" in str(err)
 
 
-def test_the_422_error_list_is_kept_and_the_scope_is_named(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_the_422_error_list_is_kept_and_the_scope_is_named(tm: Taskadence, api: respx.MockRouter) -> None:
     api.post("/v1/tasks").respond(
         422,
         json=problem(
@@ -172,7 +172,7 @@ def test_the_422_error_list_is_kept_and_the_scope_is_named(tm: TasksMate, api: r
     assert scoped.value.required_scope == "tasks:write" and scoped.value.slug == "insufficient-scope"
 
 
-def test_a_non_problem_body_still_maps_by_status(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_non_problem_body_still_maps_by_status(tm: Taskadence, api: respx.MockRouter) -> None:
     api.get("/v1/tasks/T1").respond(404, text="<html>gone</html>", headers={"X-Request-ID": "rid-7"})
     with pytest.raises(NotFoundError) as caught:
         tm.tasks.read("T1")
@@ -187,7 +187,7 @@ def test_a_non_problem_body_still_maps_by_status(tm: TasksMate, api: respx.MockR
 # ---------------------------------------------------------------------------
 
 
-def test_a_get_is_retried_on_503_with_backoff(tm: TasksMate, api: respx.MockRouter, slept: list[float]) -> None:
+def test_a_get_is_retried_on_503_with_backoff(tm: Taskadence, api: respx.MockRouter, slept: list[float]) -> None:
     route = api.get("/v1/tasks/T1").mock(
         side_effect=[httpx.Response(503), httpx.Response(502), httpx.Response(200, json=task("T1"))]
     )
@@ -196,7 +196,7 @@ def test_a_get_is_retried_on_503_with_backoff(tm: TasksMate, api: respx.MockRout
     assert 0.25 <= slept[0] <= 0.5 and 0.5 <= slept[1] <= 1.0  # exponential, with jitter
 
 
-def test_429_honours_retry_after(tm: TasksMate, api: respx.MockRouter, slept: list[float]) -> None:
+def test_429_honours_retry_after(tm: Taskadence, api: respx.MockRouter, slept: list[float]) -> None:
     api.get("/v1/tasks/T1").mock(
         side_effect=[
             httpx.Response(429, json=problem(429, URN + "rate-limit"), headers={"Retry-After": "7"}),
@@ -208,7 +208,7 @@ def test_429_honours_retry_after(tm: TasksMate, api: respx.MockRouter, slept: li
 
 
 def test_a_retry_after_beyond_the_cap_is_raised_not_waited(
-    tm: TasksMate, api: respx.MockRouter, slept: list[float]
+    tm: Taskadence, api: respx.MockRouter, slept: list[float]
 ) -> None:
     api.get("/v1/tasks/T1").respond(429, json=problem(429, URN + "rate-limit"), headers={"Retry-After": "3600"})
     with pytest.raises(RateLimitedError) as caught:
@@ -218,21 +218,21 @@ def test_a_retry_after_beyond_the_cap_is_raised_not_waited(
 
 def test_retries_stop_at_max_retries(api: respx.MockRouter, slept: list[float]) -> None:
     route = api.get("/v1/tasks/T1").respond(503)
-    tm = TasksMate(token=TOKEN, base_url=BASE, max_retries=2)
+    tm = Taskadence(token=TOKEN, base_url=BASE, max_retries=2)
     tm._core._sleep = slept.append
     with pytest.raises(InternalError):
         tm.tasks.read("T1")
     assert route.call_count == 3 and len(slept) == 2
 
 
-def test_a_create_is_retried_with_the_same_idempotency_key(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_create_is_retried_with_the_same_idempotency_key(tm: Taskadence, api: respx.MockRouter) -> None:
     route = api.post("/v1/tasks").mock(side_effect=[httpx.Response(503), httpx.Response(200, json=task("T9"))])
     assert tm.tasks.create({"org_id": "O0020", "title": "x"}).task_id == "T9"
     keys = [c.request.headers["idempotency-key"] for c in route.calls]
     assert len(keys) == 2 and keys[0] == keys[1]
 
 
-def test_a_post_without_an_idempotency_key_is_never_retried(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_post_without_an_idempotency_key_is_never_retried(tm: Taskadence, api: respx.MockRouter) -> None:
     route = api.post("/v1/tasks").respond(503)
     with pytest.raises(InternalError):
         tm.tasks.create({"org_id": "O0020", "title": "x"}, idempotency_key=None)
@@ -243,7 +243,7 @@ def test_a_post_without_an_idempotency_key_is_never_retried(tm: TasksMate, api: 
     assert other.call_count == 1
 
 
-def test_a_patch_is_retried_only_with_if_match(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_patch_is_retried_only_with_if_match(tm: Taskadence, api: respx.MockRouter) -> None:
     route = api.patch("/v1/tasks/T1").respond(503)
     with pytest.raises(InternalError):
         tm.tasks.update("T1", {"status": "completed"})
@@ -254,7 +254,7 @@ def test_a_patch_is_retried_only_with_if_match(tm: TasksMate, api: respx.MockRou
     assert route.call_count == 2
 
 
-def test_connection_errors_are_retried_then_raised(tm: TasksMate, api: respx.MockRouter, slept: list[float]) -> None:
+def test_connection_errors_are_retried_then_raised(tm: Taskadence, api: respx.MockRouter, slept: list[float]) -> None:
     route = api.get("/v1/tasks/T1").mock(side_effect=httpx.ConnectError("refused"))
     with pytest.raises(APIConnectionError, match="refused"):
         tm.tasks.read("T1")
@@ -266,7 +266,7 @@ def test_connection_errors_are_retried_then_raised(tm: TasksMate, api: respx.Moc
 # ---------------------------------------------------------------------------
 
 
-def test_a_deprecated_response_warns_once_per_operation(tm: TasksMate, api: respx.MockRouter) -> None:
+def test_a_deprecated_response_warns_once_per_operation(tm: Taskadence, api: respx.MockRouter) -> None:
     api.get("/v1/tasks/T1").respond(
         json=task("T1"),
         headers={
@@ -285,7 +285,7 @@ def test_a_deprecated_response_warns_once_per_operation(tm: TasksMate, api: resp
 
 
 def test_debug_logging_never_contains_the_token(
-    tm: TasksMate, api: respx.MockRouter, caplog: pytest.LogCaptureFixture
+    tm: Taskadence, api: respx.MockRouter, caplog: pytest.LogCaptureFixture
 ) -> None:
     api.get("/v1/tasks").respond(json={"data": [card("T1")], "next_cursor": None}, headers={"X-Request-ID": "rid-1"})
     api.get("/v1/tasks/T1").respond(401, json=problem(401, URN + "token-invalid"))

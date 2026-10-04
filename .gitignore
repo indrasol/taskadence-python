@@ -13,7 +13,7 @@ dist/
 htmlcov/
 sbom*.json
 
-# Secrets: never committed (the CLI's token lives in the OS keyring or ~/.config/tasksmate/, never in the repo)
+# Secrets: never committed (the CLI's token lives in the OS keyring or ~/.config/taskadence/, never in the repo)
 .env
 .env.*
 *.token

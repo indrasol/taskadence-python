@@ -1,22 +1,22 @@
 # Streamlit dashboard
 
-A one-file dashboard over the `tasksmate` SDK: pick an organization (from `tm.me()`), see its tasks as a table
+A one-file dashboard over the `taskadence` SDK: pick an organization (from `tm.me()`), see its tasks as a table
 (`tm.tasks.list(...).to_dataframe()`, every page), status and priority charts, a project drill-down, and your open tasks.
 
-**Configuration: `TASKSMATE_TOKEN` only** (plus `TASKSMATE_API_URL` when you are not using the default server).
+**Configuration: `TASKADENCE_TOKEN` only** (plus `TASKADENCE_API_URL` when you are not using the default server).
 
 ```bash
 cd examples/streamlit_dashboard
-pip install -e "../..[pandas]"        # until tasksmate is on PyPI; afterwards the next line is enough
+pip install -e "../..[pandas]"        # until taskadence is on PyPI; afterwards the next line is enough
 pip install -r requirements.txt
-export TASKSMATE_TOKEN=tm_live_…       # TasksMate → Developers → Tokens; tasks:read + projects:read are enough
-export TASKSMATE_API_URL=http://localhost:8000   # optional
+export TASKADENCE_TOKEN=tkd_live_…       # Taskadence → Developers → Tokens; tasks:read + projects:read are enough
+export TASKADENCE_API_URL=http://localhost:8000   # optional
 streamlit run app.py
 ```
 
 ![The dashboard at 1280 px, against dev org O0020](../../../docs/images/4.5/streamlit-1280.png)
 
-_(The screenshot lives in the TasksMate umbrella docs, `docs/images/4.5/streamlit-1280.png`; charts and projects tabs
+_(The screenshot lives in the Taskadence umbrella docs, `docs/images/4.5/streamlit-1280.png`; charts and projects tabs
 beside it.)_
 
 What it shows, and the SDK call behind each part:

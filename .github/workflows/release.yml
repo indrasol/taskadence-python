@@ -1,7 +1,7 @@
-# tasksmate-python release (task 4.5 Part E) — BUILT, NOT PUBLISHED (user decision 2026-09-21).
+# taskadence-python release (task 4.5 Part E) — BUILT, NOT PUBLISHED (user decision 2026-09-21).
 #
-# 5.3: one pipeline, three artefacts — the SDK `tasksmate`, the stdio MCP proxy `tasksmate-mcp` (both PyPI; `uvx
-# tasksmate-mcp`) and its Node twin `@tasksmate/mcp` (npm; `npx -y @tasksmate/mcp`), all stamped from the same tag.
+# 5.3: one pipeline, three artefacts — the SDK `taskadence`, the stdio MCP proxy `taskadence-mcp` (both PyPI; `uvx
+# taskadence-mcp`) and its Node twin `@taskadence/mcp` (npm; `npx -y @taskadence/mcp`), all stamped from the same tag.
 #
 # - A tag `v0.*` (a pre-release; `0.x` carries no compatibility promise) builds, checks, and publishes BOTH Python
 #   distributions to TestPyPI through trusted publishing (OIDC: no long-lived token anywhere). npm has no test registry:
@@ -11,14 +11,15 @@
 #   and every publish job needs it. Opening the gate is S.23's change to this file (and the registries' setup).
 #
 # 5.5: ONE GitHub environment per distribution and registry. PyPI refuses two pending trusted publishers with the same
-# (owner, repo, workflow, environment), so the four registered on 2026-09-27 (account `Rithin2569`, repo
-# `indrasol/tasksmate-python`, workflow `release.yml`) each name their own environment, and each publish job below
-# uploads one distribution under its own environment:
-#   TestPyPI `tasksmate` → `testpypi`   TestPyPI `tasksmate-mcp` → `testpypi-mcp`
-#   PyPI     `tasksmate` → `pypi`       PyPI     `tasksmate-mcp` → `pypi-mcp`
-# plus `npm` for `@tasksmate/mcp`. The GitHub environments (Settings → Environments) are the owner's to create:
+# (owner, repo, workflow, environment), so the four pending publishers (account `Rithin2569`, repo
+# `indrasol/taskadence-python`, workflow `release.yml`) each name their own environment, and each publish job below
+# uploads one distribution under its own environment. 5.8: the ones registered on 2026-09-27 were for the pre-rename
+# project names; the four below must be registered again under the new names before a release (owner, S.23a):
+#   TestPyPI `taskadence` → `testpypi`   TestPyPI `taskadence-mcp` → `testpypi-mcp`
+#   PyPI     `taskadence` → `pypi`       PyPI     `taskadence-mcp` → `pypi-mcp`
+# plus `npm` for `@taskadence/mcp`. The GitHub environments (Settings → Environments) are the owner's to create:
 # `testpypi` and `testpypi-mcp` with no reviewer; `pypi`, `pypi-mcp` and `npm` with a required reviewer.
-# npm: the `tasksmate` org exists (owner `rithin2569`); trusted publishing for `@tasksmate/mcp` is set up at S.23a, after
+# npm: the `taskadence` org is the owner's to create (5.8; owner `rithin2569`); trusted publishing for `@taskadence/mcp` is set up at S.23a, after
 # its first publish — then `npm publish --provenance` (below) needs no token.
 name: release
 
@@ -49,7 +50,7 @@ jobs:
       - run: echo "target=${{ inputs.target || 'testpypi' }} — allowed"
 
   build:
-    name: build, verify, SBOM (tasksmate, tasksmate-mcp, @tasksmate/mcp)
+    name: build, verify, SBOM (taskadence, taskadence-mcp, @taskadence/mcp)
     runs-on: ubuntu-latest
     needs: [gate]
     steps:
@@ -68,12 +69,12 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           case "$version" in 0.*) ;; *) echo "::error::only 0.x pre-releases are released before S.23 (got $version)"; exit 1 ;; esac
-          sed -i "s/^__version__ = .*/__version__ = \"$version\"/" src/tasksmate/_version.py packages/tasksmate-mcp/src/tasksmate_mcp/_version.py
+          sed -i "s/^__version__ = .*/__version__ = \"$version\"/" src/taskadence/_version.py packages/taskadence-mcp/src/taskadence_mcp/_version.py
           sed -i "s/^export const VERSION = .*/export const VERSION = '$version';/" packages/mcp-node/src/version.ts
           (cd packages/mcp-node && npm version "$version" --no-git-tag-version --allow-same-version)
-          grep -H __version__ src/tasksmate/_version.py packages/tasksmate-mcp/src/tasksmate_mcp/_version.py
+          grep -H __version__ src/taskadence/_version.py packages/taskadence-mcp/src/taskadence_mcp/_version.py
           grep -H VERSION packages/mcp-node/src/version.ts
-      - run: pip install -e ".[dev]" -e "./packages/tasksmate-mcp[dev]" cyclonedx-bom
+      - run: pip install -e ".[dev]" -e "./packages/taskadence-mcp[dev]" cyclonedx-bom
       - name: The code is what the spec generates
         run: |
           python scripts/generate.py
@@ -81,20 +82,20 @@ jobs:
       - run: pytest
       - run: mypy
       - run: pytest && mypy   # its own pyproject (config, testpaths)
-        working-directory: packages/tasksmate-mcp
+        working-directory: packages/taskadence-mcp
       # One directory (and one artifact) per distribution: each publish job uploads exactly its own files.
-      - run: python -m build --outdir dist/tasksmate
-      - run: python -m build packages/tasksmate-mcp --outdir dist/tasksmate-mcp
-      - run: twine check --strict dist/tasksmate/* dist/tasksmate-mcp/*
+      - run: python -m build --outdir dist/taskadence
+      - run: python -m build packages/taskadence-mcp --outdir dist/taskadence-mcp
+      - run: twine check --strict dist/taskadence/* dist/taskadence-mcp/*
       - name: CycloneDX SBOM of each installed wheel (S.2)
         run: |
           python -m venv /tmp/sbom
-          /tmp/sbom/bin/pip install dist/tasksmate/tasksmate-*.whl
+          /tmp/sbom/bin/pip install dist/taskadence/taskadence-*.whl
           cyclonedx-py environment /tmp/sbom/bin/python --of JSON -o sbom.cdx.json
           python -m venv /tmp/sbom-mcp
-          /tmp/sbom-mcp/bin/pip install dist/tasksmate-mcp/tasksmate_mcp-*.whl
-          cyclonedx-py environment /tmp/sbom-mcp/bin/python --of JSON -o sbom-tasksmate-mcp.cdx.json
-      - name: "@tasksmate/mcp: check, pack, SBOM"
+          /tmp/sbom-mcp/bin/pip install dist/taskadence-mcp/taskadence_mcp-*.whl
+          cyclonedx-py environment /tmp/sbom-mcp/bin/python --of JSON -o sbom-taskadence-mcp.cdx.json
+      - name: "@taskadence/mcp: check, pack, SBOM"
         working-directory: packages/mcp-node
         run: |
           npm ci
@@ -105,12 +106,12 @@ jobs:
           npx --yes @cyclonedx/cyclonedx-npm@6 --omit dev --output-format JSON --output-file ../../sbom-mcp-node.cdx.json
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist-tasksmate
-          path: dist/tasksmate/
+          name: dist-taskadence
+          path: dist/taskadence/
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist-tasksmate-mcp
-          path: dist/tasksmate-mcp/
+          name: dist-taskadence-mcp
+          path: dist/taskadence-mcp/
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: npm-dist
@@ -121,88 +122,88 @@ jobs:
           path: sbom*.cdx.json
 
   testpypi:
-    name: publish tasksmate to TestPyPI (trusted publishing)
+    name: publish taskadence to TestPyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
     if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/tasksmate
+      url: https://test.pypi.org/p/taskadence
     permissions:
       id-token: write   # OIDC for trusted publishing — the only permission it gets
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-tasksmate
+          name: dist-taskadence
           path: dist/
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
 
   testpypi-mcp:
-    name: publish tasksmate-mcp to TestPyPI (trusted publishing)
+    name: publish taskadence-mcp to TestPyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
     if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
     environment:
       name: testpypi-mcp
-      url: https://test.pypi.org/p/tasksmate-mcp
+      url: https://test.pypi.org/p/taskadence-mcp
     permissions:
       id-token: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-tasksmate-mcp
+          name: dist-taskadence-mcp
           path: dist/
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
 
   pypi:
-    name: publish tasksmate to PyPI (closed until S.23)
+    name: publish taskadence to PyPI (closed until S.23)
     runs-on: ubuntu-latest
     needs: [gate, build]
     # Unreachable while `gate` fails on target=pypi. S.23 removes the gate step and keeps this job.
     if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
     environment:
       name: pypi
-      url: https://pypi.org/p/tasksmate
+      url: https://pypi.org/p/taskadence
     permissions:
       id-token: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-tasksmate
+          name: dist-taskadence
           path: dist/
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
   pypi-mcp:
-    name: publish tasksmate-mcp to PyPI (closed until S.23)
+    name: publish taskadence-mcp to PyPI (closed until S.23)
     runs-on: ubuntu-latest
     needs: [gate, build]
     # Unreachable while `gate` fails on target=pypi — exactly as `pypi`.
     if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
     environment:
       name: pypi-mcp
-      url: https://pypi.org/p/tasksmate-mcp
+      url: https://pypi.org/p/taskadence-mcp
     permissions:
       id-token: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-tasksmate-mcp
+          name: dist-taskadence-mcp
           path: dist/
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
   npm:
-    name: publish @tasksmate/mcp to npm (closed until S.23)
+    name: publish @taskadence/mcp to npm (closed until S.23)
     runs-on: ubuntu-latest
     needs: [gate, build]
     # Unreachable while `gate` fails on target=npm — exactly as `pypi`. S.23 removes the gate step and keeps this job.
     if: github.event_name == 'workflow_dispatch' && inputs.target == 'npm'
     environment:
       name: npm
-      url: https://www.npmjs.com/package/@tasksmate/mcp
+      url: https://www.npmjs.com/package/@taskadence/mcp
     permissions:
       id-token: write   # npm trusted publishing + provenance (`--provenance`): a signed statement of this build
     steps:

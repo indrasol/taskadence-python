@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-/** `tasksmate-mcp` — the bin (`npx -y @tasksmate/mcp`). Diagnostics go to stderr; stdout is JSON-RPC only. */
+/** `taskadence-mcp` — the bin (`npx -y @taskadence/mcp`). Diagnostics go to stderr; stdout is JSON-RPC only. */
 import { parseArgs } from 'node:util';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { ConfigError, GROUPS_ENV, loadConfig, mcpUrl, READONLY_ENV, redact, TOKEN_ENV, URL_ENV } from './config.js';
+import { BRAND_NAME, ConfigError, GROUPS_ENV, loadConfig, mcpUrl, READONLY_ENV, redact, SLUG, TOKEN_ENV, URL_ENV } from './config.js';
 import { bridge, remoteTransport, stderrLog } from './proxy.js';
 import { VERSION } from './version.js';
 
-const HELP = `usage: tasksmate-mcp [--api-url URL] [--readonly | --no-readonly] [--groups a,b] [--version]
+const HELP = `usage: ${SLUG}-mcp [--api-url URL] [--readonly | --no-readonly] [--groups a,b] [--version]
 
-TasksMate's MCP server over stdio: a proxy to the remote server (<api>/mcp).
+${BRAND_NAME}'s MCP server over stdio: a proxy to the remote server (<api>/mcp).
 The token is read from ${TOKEN_ENV}, never from a flag.
 
 Environment: ${TOKEN_ENV} (required), ${URL_ENV}, ${READONLY_ENV}, ${GROUPS_ENV}. Flags win.
@@ -39,7 +39,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
     return 0;
   }
   if (values.version) {
-    process.stderr.write(`tasksmate-mcp ${VERSION}\n`);
+    process.stderr.write(`${SLUG}-mcp ${VERSION}\n`);
     return 0;
   }
   let config;

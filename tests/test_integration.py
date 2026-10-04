@@ -1,5 +1,5 @@
-"""The quickstart against a live API — `pytest -m integration`. Skipped unless TASKSMATE_TOKEN, TASKSMATE_API_URL and
-TASKSMATE_ORG are set (CI's `integration` job sets them from secrets when present). It writes one task and one saved
+"""The quickstart against a live API — `pytest -m integration`. Skipped unless TASKADENCE_TOKEN, TASKADENCE_API_URL and
+TASKADENCE_ORG are set (CI's `integration` job sets them from secrets when present). It writes one task and one saved
 view in that organization and deletes both."""
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ import pytest
 
 pytestmark = pytest.mark.integration
 
-REQUIRED = ("TASKSMATE_TOKEN", "TASKSMATE_API_URL", "TASKSMATE_ORG")
+REQUIRED = ("TASKADENCE_TOKEN", "TASKADENCE_API_URL", "TASKADENCE_ORG")
 
 
 @pytest.mark.skipif(not all(os.environ.get(k) for k in REQUIRED), reason="needs " + ", ".join(REQUIRED))

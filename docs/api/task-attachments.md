@@ -13,7 +13,7 @@ Upload an attachment to a task (multipart).
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskAttachmentInDB`
 
-## `tm.task_attachments.list(task_id: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+## `tm.task_attachments.list(task_id: str, inline: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 
 List a task's attachments.
 

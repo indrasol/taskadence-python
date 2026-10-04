@@ -1,6 +1,6 @@
 # `tm.milestones`
 
-Milestones: titled dates a project commits to, holding its tasks — one project's, or every project's you can read at once (`GET /v1/milestones`).
+Milestones: titled dates a project commits to, holding its tasks - one project's, or every project's you can read at once (`GET /v1/milestones`).
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
 

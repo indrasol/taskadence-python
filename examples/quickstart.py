@@ -1,6 +1,6 @@
 """The quickstart, end to end — and the CI integration check (`pytest -m integration` runs it).
 
-    export TASKSMATE_TOKEN=tm_live_… TASKSMATE_ORG=O0020      # + TASKSMATE_API_URL=http://localhost:8000 for dev
+    export TASKADENCE_TOKEN=tkd_live_… TASKADENCE_ORG=O0020      # + TASKADENCE_API_URL=http://localhost:8000 for dev
     python examples/quickstart.py
 
 The three lines everyone starts with, then a round trip that leaves nothing behind: create a task → update it with
@@ -13,14 +13,14 @@ from __future__ import annotations
 import os
 import sys
 
-from tasksmate import NotModified, PreconditionFailedError, TasksMate
+from taskadence import NotModified, PreconditionFailedError, Taskadence
 
 
 def main() -> int:
-    org_id = os.environ["TASKSMATE_ORG"]
+    org_id = os.environ["TASKADENCE_ORG"]
 
     # --- the three lines ----------------------------------------------------------------------------------------
-    tm = TasksMate()  # token from TASKSMATE_TOKEN
+    tm = Taskadence()  # token from TASKADENCE_TOKEN
     for t in tm.tasks.list(org_id=org_id):
         print(f"  {t.task_id}  {t.status:<12} {t.title}")
     # (tm.views.rows(view_id).to_dataframe() is below, once there is a view to read)

@@ -1,4 +1,4 @@
-"""`tasksmate.webhooks` against vectors signed by the backend's own signer, `to_dataframe()`, and `AsyncTasksMate`."""
+"""`taskadence.webhooks` against vectors signed by the backend's own signer, `to_dataframe()`, and `AsyncTaskadence`."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ import httpx
 import pytest
 import respx
 
-from tasksmate import AsyncTasksMate, NotFoundError, NotModified, webhooks
+from taskadence import AsyncTaskadence, NotFoundError, NotModified, webhooks
 
 from .conftest import card, problem, task
 
-# Signed by Tasks-Mate-Backend's `app.services.webhook_crypto.signature_header` (71a97a4) — the real signer.
+# Signed by taskadence-api's `app.services.webhook_crypto.signature_header` (71a97a4) — the real signer.
 OLD = "whsec_AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
 NEW = "whsec_ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj8="
 TS = 1790387945
@@ -46,7 +46,7 @@ def test_a_server_signature_verifies() -> None:
 
 
 def test_rotation_both_ways() -> None:
-    # during TasksMate's 24 h grace the header carries both signatures: either secret verifies
+    # during Taskadence's 24 h grace the header carries both signatures: either secret verifies
     assert webhooks.verify(OLD, headers(SIG_ROTATING), BODY, now=TS)
     assert webhooks.verify(NEW, headers(SIG_ROTATING), BODY, now=TS)
     # a receiver switching over may hold both secrets
@@ -80,7 +80,7 @@ def test_a_malformed_secret_is_named_without_echoing_it() -> None:
 
 def test_parse_gives_a_typed_event() -> None:
     """4.1b: the event is the spec's `WebhookEvent`, generated (the hand-written pydantic model is gone)."""
-    from tasksmate._generated.models import WebhookEvent
+    from taskadence._generated.models import WebhookEvent
 
     event = webhooks.parse(BODY)
     assert isinstance(event, WebhookEvent) and webhooks.WebhookEvent is WebhookEvent
@@ -172,17 +172,17 @@ def test_without_pandas_the_error_says_how_to_install(
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "__import__", blocked)
-    with pytest.raises(ImportError, match=r'pip install "tasksmate\[pandas\]"'):
+    with pytest.raises(ImportError, match=r'pip install "taskadence\[pandas\]"'):
         page.to_dataframe()
 
 
 # ---------------------------------------------------------------------------
-# AsyncTasksMate
+# AsyncTaskadence
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.anyio
-async def test_async_lists_auto_page(atm: AsyncTasksMate, api: respx.MockRouter) -> None:
+async def test_async_lists_auto_page(atm: AsyncTaskadence, api: respx.MockRouter) -> None:
     api.get("/v1/tasks").mock(
         side_effect=[
             httpx.Response(200, json={"data": [card("T1")], "next_cursor": "c1"}),
@@ -195,7 +195,7 @@ async def test_async_lists_auto_page(atm: AsyncTasksMate, api: respx.MockRouter)
 
 @pytest.mark.anyio
 async def test_async_reads_writes_errors_and_retries(
-    atm: AsyncTasksMate, api: respx.MockRouter, slept: list[float]
+    atm: AsyncTaskadence, api: respx.MockRouter, slept: list[float]
 ) -> None:
     api.get("/v1/tasks/T1").mock(
         side_effect=[httpx.Response(503), httpx.Response(200, json=task("T1"), headers={"ETag": '"e1"'})]
@@ -215,7 +215,7 @@ async def test_async_reads_writes_errors_and_retries(
 @pytest.mark.anyio
 async def test_async_to_dataframe_and_context_manager(api: respx.MockRouter) -> None:
     api.get("/v1/tasks").respond(json={"data": [card("T1"), card("T2")], "next_cursor": None})
-    async with AsyncTasksMate(token="tm_live_" + "y" * 43, base_url="https://api.tasksmate.test") as atm:
+    async with AsyncTaskadence(token="tkd_live_" + "y" * 43, base_url="https://api.taskadence.test") as atm:
         frame = await (await atm.tasks.list(org_id="O0020")).to_dataframe()
         assert frame.shape[0] == 2
         me_callable = callable(atm.me)
