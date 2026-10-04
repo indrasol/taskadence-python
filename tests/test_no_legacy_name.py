@@ -31,6 +31,9 @@ ALLOW: dict[str, re.Pattern[str] | None] = {
     "packages/mcp-node/test/proxy.test.ts": re.compile(LEGACY_ENV),
     # The CHANGELOG's rename entry names what was renamed (one `(5.8)` bullet per line).
     "CHANGELOG.md": re.compile(r"^- \(5\.8\) "),
+    # Git history is immutable: full-history gitleaks still sees the pre-rename generated models, so one allowlist
+    # entry there names their old path.
+    ".gitleaks.toml": re.compile(r"^paths = \['''\^src/" + "tasks" + r"mate/_generated/models/\("),
 }
 
 
