@@ -67,6 +67,7 @@ from ._generated.api.organizations import organizations_access_review as _organi
 from ._generated.api.organizations import organizations_list as _organizations_list
 from ._generated.api.organizations import organizations_read as _organizations_read
 from ._generated.api.organizations import organizations_settings as _organizations_settings
+from ._generated.api.organizations import organizations_storage as _organizations_storage
 from ._generated.api.organizations import organizations_update_settings as _organizations_update_settings
 from ._generated.api.project_members import project_members_create as _project_members_create
 from ._generated.api.project_members import project_members_delete as _project_members_delete
@@ -1032,6 +1033,16 @@ OPERATIONS: dict[str, Operation] = {
         parse=_organizations_access_review._parse_response,
         scopes=("org:read",),
         summary="Access review: every member, their MFA, last sign-in, projects and tokens (owner / admin; JSON or CSV)",
+    ),
+    "organizations.storage": Operation(
+        op_id="organizations.storage",
+        method="GET",
+        path="/v1/organizations/{org_id}/storage",
+        path_params=("org_id",),
+        if_none_match=True,
+        parse=_organizations_storage._parse_response,
+        scopes=("members:read",),
+        summary="Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend",
     ),
     "tokens.create": Operation(
         op_id="tokens.create",

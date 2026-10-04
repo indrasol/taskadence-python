@@ -209,6 +209,14 @@ from .sprint_deleted import SprintDeleted
 from .sprint_list_page import SprintListPage
 from .sprint_out import SprintOut
 from .sprint_update import SprintUpdate
+from .storage_breakdown import StorageBreakdown
+from .storage_by_kind import StorageByKind
+from .storage_day import StorageDay
+from .storage_file import StorageFile
+from .storage_file_kind import StorageFileKind
+from .storage_project import StorageProject
+from .storage_usage import StorageUsage
+from .storage_usage_status import StorageUsageStatus
 from .subtask_link import SubtaskLink
 from .task_attachment_in_db import TaskAttachmentInDB
 from .task_attachment_update import TaskAttachmentUpdate
@@ -504,6 +512,14 @@ __all__ = (
     "SprintListPage",
     "SprintOut",
     "SprintUpdate",
+    "StorageBreakdown",
+    "StorageByKind",
+    "StorageDay",
+    "StorageFile",
+    "StorageFileKind",
+    "StorageProject",
+    "StorageUsage",
+    "StorageUsageStatus",
     "SubtaskLink",
     "TaskAttachmentInDB",
     "TaskAttachmentUpdate",

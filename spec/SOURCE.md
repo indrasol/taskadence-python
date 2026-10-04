@@ -6,12 +6,12 @@ snapshot of the public contract the Taskadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `feature/rename-taskadence` |
-| Backend commit | `b34364d` — the 5.8 rename (`urn:taskadence:problem:*`, `TaskadenceToken`, `X-Taskadence-Event`, `tkd*_` token / secret prefixes, `servers` = `https://api.taskadence.com`), plus the drift since `b8385de` (`GET /v1/audit.json` → `audit.export_json`, `AuditExportRow`, MFA / upload problem types, access-review MFA and projects) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-03 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
+| Backend repo | `indrasol/taskadence-api`, branch `feature/b1-b3-storage-metering` |
+| Backend commit | `f2705fe` — B.1-B.3 storage metering: `GET /v1/organizations/{org_id}/storage` → `organizations.storage` (`StorageUsage` and five more schemas), the `storage-limit-reached` problem type (402) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-04 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
 | `info.version` | `2026-09-25` |
-| Size | 109 paths · 171 operations (165 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 216 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `aad0ef460622179c8ca0866889010232be476415349fd0a9022995b2b65ce2eb` |
+| Size | 110 paths · 172 operations (166 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 222 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `347380538c55a6a2291c184cca95b9302c2ddddb16c0e63e2750a03051a15eab` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

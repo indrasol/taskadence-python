@@ -132,6 +132,10 @@ def sync_detailed(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
+    B.3: when the organization has used its included storage and has no payment method on file, the
+    answer is 402
+    `storage-limit-reached`.
+
     **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
     mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
     bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
@@ -173,6 +177,10 @@ def sync(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
+    B.3: when the organization has used its included storage and has no payment method on file, the
+    answer is 402
+    `storage-limit-reached`.
+
     **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
     mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
     bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
@@ -208,6 +216,10 @@ async def asyncio_detailed(
     Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    B.3: when the organization has used its included storage and has no payment method on file, the
+    answer is 402
+    `storage-limit-reached`.
 
     **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
     mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
@@ -247,6 +259,10 @@ async def asyncio(
     Enforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap,
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
+
+    B.3: when the organization has used its included storage and has no payment method on file, the
+    answer is 402
+    `storage-limit-reached`.
 
     **Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
     mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's

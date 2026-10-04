@@ -122,6 +122,20 @@ class OrganizationsResource:
             self._client._call(_OPS["organizations.access_review"], path=(org_id,), if_none_match=if_none_match),
         )
 
+    @overload
+    def storage(self, org_id: str, *, if_none_match: None = None) -> models.StorageUsage: ...
+    @overload
+    def storage(self, org_id: str, *, if_none_match: str) -> models.StorageUsage | NotModifiedType: ...
+    def storage(self, org_id: str, *, if_none_match: str | None = None) -> models.StorageUsage | NotModifiedType:
+        """Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend.
+
+        `GET /v1/organizations/{org_id}/storage` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.StorageUsage | NotModifiedType",
+            self._client._call(_OPS["organizations.storage"], path=(org_id,), if_none_match=if_none_match),
+        )
+
     get = read
     """Alias of `read`."""
 
@@ -2911,6 +2925,20 @@ class AsyncOrganizationsResource:
         return cast(
             "models.AccessReview | NotModifiedType",
             await self._client._call(_OPS["organizations.access_review"], path=(org_id,), if_none_match=if_none_match),
+        )
+
+    @overload
+    async def storage(self, org_id: str, *, if_none_match: None = None) -> models.StorageUsage: ...
+    @overload
+    async def storage(self, org_id: str, *, if_none_match: str) -> models.StorageUsage | NotModifiedType: ...
+    async def storage(self, org_id: str, *, if_none_match: str | None = None) -> models.StorageUsage | NotModifiedType:
+        """Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend.
+
+        `GET /v1/organizations/{org_id}/storage` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.StorageUsage | NotModifiedType",
+            await self._client._call(_OPS["organizations.storage"], path=(org_id,), if_none_match=if_none_match),
         )
 
     get = read
@@ -5890,6 +5918,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "service-accounts.update": ("service_accounts", "update"),
     "service-accounts.delete": ("service_accounts", "delete"),
     "organizations.access_review": ("organizations", "access_review"),
+    "organizations.storage": ("organizations", "storage"),
     "tokens.create": ("tokens", "create"),
     "tokens.list": ("tokens", "list"),
     "tokens.read": ("tokens", "read"),

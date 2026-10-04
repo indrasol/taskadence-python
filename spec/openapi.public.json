@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Taskadence API",
-    "description": "The Taskadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a Taskadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 25 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |",
+    "description": "The Taskadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a Taskadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 25 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage (1 TB) and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |",
     "version": "2026-09-25"
   },
   "paths": {
@@ -15286,7 +15286,7 @@
           "task-attachments"
         ],
         "summary": "Upload an attachment to a task (multipart)",
-        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\n**Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
+        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
         "operationId": "task-attachments.create",
         "requestBody": {
           "required": true,
@@ -20873,6 +20873,272 @@
         ],
         "x-scopes": [
           "org:read"
+        ]
+      }
+    },
+    "/v1/organizations/{org_id}/storage": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend",
+        "description": "The organization's storage: used / included (1 TB), the status, a breakdown by kind and by project, the largest\nfiles, the 30-day trend. Any member; a guest sees the totals only (no project or file names).",
+        "operationId": "organizations.storage",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The organization",
+              "title": "Org Id"
+            },
+            "description": "The organization"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageUsage"
+                },
+                "example": {
+                  "org_id": "string",
+                  "bytes_used": 0,
+                  "file_count": 0,
+                  "included_bytes": 0,
+                  "overage_bytes": 0,
+                  "percent": 0.0,
+                  "status": "ok",
+                  "payment_method_on_file": false,
+                  "billing_exempt": false,
+                  "breakdown": {
+                    "by_kind": {
+                      "task": 0,
+                      "project": 0,
+                      "bug": 0
+                    },
+                    "by_project": [
+                      {
+                        "project_id": "string",
+                        "name": "string",
+                        "bytes": 0
+                      }
+                    ]
+                  },
+                  "top_files": [
+                    {
+                      "kind": "task",
+                      "id": "string",
+                      "name": "string",
+                      "bytes": 0,
+                      "created_at": "string",
+                      "parent_id": "string",
+                      "project_id": "string"
+                    }
+                  ],
+                  "trend": [
+                    {
+                      "day": "string",
+                      "bytes_used": 0
+                    }
+                  ],
+                  "updated_at": "string",
+                  "manage_url": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "members:read"
         ]
       }
     },
@@ -44202,7 +44468,8 @@
                         "urn:taskadence:problem:upload-too-large",
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
-                        "urn:taskadence:problem:upload-rejected"
+                        "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -44523,7 +44790,8 @@
                         "urn:taskadence:problem:upload-too-large",
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
-                        "urn:taskadence:problem:upload-rejected"
+                        "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -44639,7 +44907,8 @@
                         "urn:taskadence:problem:upload-too-large",
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
-                        "urn:taskadence:problem:upload-rejected"
+                        "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -55308,6 +55577,282 @@
         "title": "SprintUpdate",
         "description": "A true partial - every field optional; an absent field is left alone."
       },
+      "StorageBreakdown": {
+        "properties": {
+          "by_kind": {
+            "$ref": "#/components/schemas/StorageByKind"
+          },
+          "by_project": {
+            "items": {
+              "$ref": "#/components/schemas/StorageProject"
+            },
+            "type": "array",
+            "title": "By Project",
+            "description": "The 20 projects using the most storage (empty for a guest)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "by_kind"
+        ],
+        "title": "StorageBreakdown",
+        "description": "Part of `StorageUsage`."
+      },
+      "StorageByKind": {
+        "properties": {
+          "task": {
+            "type": "integer",
+            "title": "Task",
+            "description": "Bytes in task attachments (inline images included)",
+            "default": 0
+          },
+          "project": {
+            "type": "integer",
+            "title": "Project",
+            "description": "Bytes in project files",
+            "default": 0
+          },
+          "bug": {
+            "type": "integer",
+            "title": "Bug",
+            "description": "Bytes in legacy bug attachments",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "StorageByKind",
+        "description": "Part of `StorageBreakdown`."
+      },
+      "StorageDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "title": "Day",
+            "description": "UTC date, YYYY-MM-DD"
+          },
+          "bytes_used": {
+            "type": "integer",
+            "title": "Bytes Used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "bytes_used"
+        ],
+        "title": "StorageDay",
+        "description": "Part of `StorageUsage`."
+      },
+      "StorageFile": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "task",
+              "project",
+              "bug"
+            ],
+            "title": "Kind"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "The attachment id (task / bug) or the resource id (project file)"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "bytes": {
+            "type": "integer",
+            "title": "Bytes"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id",
+            "description": "The task (task), bug (bug) or project (project file) it belongs to"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "bytes"
+        ],
+        "title": "StorageFile",
+        "description": "Part of `StorageUsage`."
+      },
+      "StorageProject": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "bytes": {
+            "type": "integer",
+            "title": "Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "bytes"
+        ],
+        "title": "StorageProject",
+        "description": "Part of `StorageBreakdown`."
+      },
+      "StorageUsage": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "bytes_used": {
+            "type": "integer",
+            "title": "Bytes Used",
+            "description": "Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)"
+          },
+          "file_count": {
+            "type": "integer",
+            "title": "File Count"
+          },
+          "included_bytes": {
+            "type": "integer",
+            "title": "Included Bytes",
+            "description": "Storage included before overage: 10^12 bytes (1 TB)"
+          },
+          "overage_bytes": {
+            "type": "integer",
+            "title": "Overage Bytes",
+            "description": "max(0, bytes_used - included_bytes)"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent",
+            "description": "bytes_used / included_bytes, in percent, one decimal"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warning",
+              "blocked",
+              "metered",
+              "exempt"
+            ],
+            "title": "Status",
+            "description": "ok; warning (80 % or more); blocked (full, no payment method: new uploads answer 402); metered (full, a payment method on file: billed per GB-month at month end); exempt (full, an internal organization that is never billed or blocked)"
+          },
+          "payment_method_on_file": {
+            "type": "boolean",
+            "title": "Payment Method On File"
+          },
+          "billing_exempt": {
+            "type": "boolean",
+            "title": "Billing Exempt",
+            "description": "An internal organization: metered and shown, never billed or blocked"
+          },
+          "breakdown": {
+            "$ref": "#/components/schemas/StorageBreakdown"
+          },
+          "top_files": {
+            "items": {
+              "$ref": "#/components/schemas/StorageFile"
+            },
+            "type": "array",
+            "title": "Top Files",
+            "description": "The 20 largest files (empty for a guest)"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/StorageDay"
+            },
+            "type": "array",
+            "title": "Trend",
+            "description": "The last 30 days, one row per day recorded"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At",
+            "description": "When the ledger last changed"
+          },
+          "manage_url": {
+            "type": "string",
+            "title": "Manage Url",
+            "description": "The Storage and billing page in the web app"
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id",
+          "bytes_used",
+          "file_count",
+          "included_bytes",
+          "overage_bytes",
+          "percent",
+          "status",
+          "payment_method_on_file",
+          "billing_exempt",
+          "breakdown",
+          "manage_url"
+        ],
+        "title": "StorageUsage",
+        "description": "Returned by `organizations.storage`."
+      },
       "SubtaskLink": {
         "properties": {
           "subtask_id": {
@@ -60222,7 +60767,8 @@
               "urn:taskadence:problem:upload-too-large",
               "urn:taskadence:problem:upload-type-not-allowed",
               "urn:taskadence:problem:upload-type-mismatch",
-              "urn:taskadence:problem:upload-rejected"
+              "urn:taskadence:problem:upload-rejected",
+              "urn:taskadence:problem:storage-limit-reached"
             ]
           },
           "title": {
@@ -70413,6 +70959,13 @@
         503
       ],
       "description": "The malware scan refused the file (422), or could not scan it right now (503: retry later)."
+    },
+    {
+      "type": "urn:taskadence:problem:storage-limit-reached",
+      "statuses": [
+        402
+      ],
+      "description": "The organization has used its included storage (1 TB) and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work."
     }
   ],
   "x-scope-descriptions": [
