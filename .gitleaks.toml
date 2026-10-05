@@ -13,3 +13,11 @@ condition = "AND"
 paths = ['''^(spec/openapi\.public\.json|src/taskadence/_generated/models/[a-z_]+\.py)$''']
 regexTarget = "secret"
 regexes = ['''^(tkd_live_|tkdr_|tkdcs_|tkdc_|tkdg_|tkdf_|tm_live_|tmr_|tmcs_|whsec_)[A-Za-z0-9_=-]+$''']
+
+[[allowlists]]
+description = "The same made-up response examples in the models as generated before the 5.8 rename, under the old package path (commits c2e417cc, 25669a53; triaged in S.1). Full-history scans still see them there"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^src/tasksmate/_generated/models/(token_response|token_created|o_auth_client_created|webhook_out|webhook_created)\.py$''']
+regexTarget = "secret"
+regexes = ['''^(tm_live_|tmcs_|whsec_)[A-Za-z0-9_=-]+$''']
