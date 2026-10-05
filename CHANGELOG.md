@@ -12,6 +12,13 @@ versions follow semver, and **`0.x` is a pre-release with no compatibility promi
 - (B.3) Problem type `urn:taskadence:problem:storage-limit-reached` (402 on an upload when the organization is full with no
   payment method on file).
 
+### Fixed (spec from backend `5fa0aa4`)
+- `ProjectStatusEnum` no longer lists `active`: the API never stored it (a create / update with it was a 500). A project
+  being worked on is `in_progress`. A status outside the list is now a 422 `invalid-parameter` problem whose
+  `errors[].allowed` names the accepted values, raised as the new `InvalidValueError`. It subclasses both
+  `ValidationError` (what the same request raised before, so `except ValidationError` still catches it) and
+  `InvalidParameterError`.
+
 ### Changed (5.8 — the product is Taskadence; nothing was published under the old names, so there is no shim)
 - (5.8) Distributions `taskadence` / `taskadence-mcp` (PyPI) and `@taskadence/mcp` (npm); was `tasksmate` / `tasksmate-mcp` / `@tasksmate/mcp`.
 - (5.8) Import `taskadence` (`Taskadence`, `AsyncTaskadence`, `TaskadenceError`); was `tasksmate` (`TasksMate`, …). No `tasksmate` import shim.

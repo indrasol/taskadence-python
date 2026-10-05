@@ -14,6 +14,7 @@
         ├── ConflictError (409)           └── IdempotencyKeyInFlightError
         ├── PreconditionFailedError (412)
         ├── UnprocessableEntityError (422) ├── ValidationError, IdempotencyKeyReusedError, UrlRefusedError
+        │                                 └── InvalidValueError   422 invalid-parameter: also an InvalidParameterError
         ├── RateLimitedError (429)        (.retry_after)
         ├── InternalError (5xx)
         └── TokenPolicyError              403 or 422: the organization's token policy
@@ -175,6 +176,13 @@ class ValidationError(UnprocessableEntityError):
     """The body or query did not validate; `.errors` lists each failure (`loc`, `msg`, `type`)."""
 
 
+class InvalidValueError(InvalidParameterError, ValidationError):
+    """422 `invalid-parameter`: a body field outside its fixed set of values (a status, a priority, a type);
+    `errors[0]["allowed"]` lists the valid values. Before the API named it (backend `5fa0aa4`) the same request was a
+    `ValidationError`, and it still is one: `except ValidationError` / `UnprocessableEntityError` keep catching it,
+    and so does `except InvalidParameterError`."""
+
+
 class IdempotencyKeyReusedError(UnprocessableEntityError):
     """This `Idempotency-Key` was first used for a different request."""
 
@@ -288,6 +296,8 @@ def retry_after_seconds(headers: Mapping[str, str]) -> float | None:
 
 def error_class(status: int, type_: str) -> type[TaskadenceError]:
     slug = problem_slug(type_)
+    if slug == "invalid-parameter" and status == 422:
+        return InvalidValueError
     if slug is not None and URN + slug in BY_TYPE:
         return BY_TYPE[URN + slug]
     if status >= 500:
