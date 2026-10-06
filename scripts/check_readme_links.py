@@ -29,13 +29,6 @@ BARE = re.compile(r"(?<![(<])\bhttps?://[^\s)>\]]+")
 REGISTRY_FOR = {
     "https://www.npmjs.com/package/@taskadence/mcp": "https://registry.npmjs.org/@taskadence%2fmcp",
 }
-# Registry pages of packages not published yet: alive from the first release on. Kept here, named, so the list is
-# reviewed (and emptied) at the release, rather than hidden in a pattern.
-UNPUBLISHED = {
-    "https://pypi.org/project/taskadence/",
-    "https://pypi.org/project/taskadence-mcp/",
-    "https://www.npmjs.com/package/@taskadence/mcp",
-}
 
 
 def links(text: str) -> list[str]:
@@ -79,8 +72,6 @@ def main(argv: list[str]) -> int:
                 ok, why = alive(client, url)
                 if ok:
                     print(f"ok   {why}  {url}")
-                elif url in UNPUBLISHED and why == "404":
-                    print(f"skip 404  {url} (not published yet)")
                 else:
                     failures.append(f"{', '.join(where)}: {url} answered {why}")
     print(f"{len(urls)} URLs in {len(READMES)} READMEs; {len(failures)} problem(s)")
