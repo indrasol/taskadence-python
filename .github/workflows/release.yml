@@ -232,4 +232,5 @@ jobs:
           path: npm-dist/
       - run: npm --version
       - name: Publish (OIDC; no token)
-        run: npm publish npm-dist/*.tgz --provenance --access public
+        # `./` is required: npm reads a bare `npm-dist/x.tgz` as GitHub shorthand (user/repo) and runs `git ls-remote`.
+        run: npm publish ./npm-dist/*.tgz --provenance --access public

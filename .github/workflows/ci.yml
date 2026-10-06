@@ -247,6 +247,14 @@ jobs:
           tar -xzf "$RUNNER_TEMP/actionlint.tgz" -C "$RUNNER_TEMP" actionlint
       - name: Lint workflows
         run: '"$RUNNER_TEMP/actionlint" -color'
+      - name: npm publish takes an explicit local path
+        # S.23c: a bare `npm-dist/x.tgz` after npm publish is read as GitHub shorthand (git ls-remote ssh://git@github.com/…)
+        # and failed the 0.1.1 npm release. A path argument must start with ./, ../ or /.
+        run: |
+          if grep -nE 'npm publish[[:space:]]+[^-.$/[:space:]][^[:space:]]*/' .github/workflows/*.yml; then
+            echo "::error::npm publish needs ./path/to/pkg.tgz, not path/to/pkg.tgz (npm reads it as GitHub shorthand)"
+            exit 1
+          fi
       - name: zizmor (workflow security)
         uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
         with:
