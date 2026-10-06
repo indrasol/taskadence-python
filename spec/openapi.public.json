@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Taskadence API",
-    "description": "The Taskadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a Taskadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 25 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage (1 TB) and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |",
+    "title": "TasKadence API",
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |",
     "version": "2026-09-25"
   },
   "paths": {
@@ -8728,6 +8728,25 @@
             }
           },
           {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(all|pending|expired|cancelled|accepted)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Which invites to return. The default is the open ones (pending and expired). Name one status, or `all` for every one, including accepted and cancelled.",
+              "title": "Status"
+            },
+            "description": "Which invites to return. The default is the open ones (pending and expired). Name one status, or `all` for every one, including accepted and cancelled."
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -9023,8 +9042,28 @@
           "organization-invites"
         ],
         "summary": "Invites addressed to you",
+        "description": "The caller's own invites. N5: the open ones by default, so an invite they already accepted stops offering itself.",
         "operationId": "organization-invites.mine",
         "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(all|pending|expired|cancelled|accepted)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Which invites to return. The default is the open ones (pending and expired). Name one status, or `all` for every one, including accepted and cancelled.",
+              "title": "Status"
+            },
+            "description": "Which invites to return. The default is the open ones (pending and expired). Name one status, or `all` for every one, including accepted and cancelled."
+          },
           {
             "name": "limit",
             "in": "query",
@@ -9311,8 +9350,7 @@
         "x-kind": "list",
         "x-scopes": [
           "org:read"
-        ],
-        "description": "Invites addressed to you."
+        ]
       }
     },
     "/v1/organization-invites/{invite_id}": {
@@ -15219,7 +15257,7 @@
           "projects:write"
         ],
         "x-upload-limits": {
-          "max_bytes": 26214400,
+          "max_bytes": 104857600,
           "allowed_extensions": [
             "csv",
             "docx",
@@ -15286,7 +15324,7 @@
           "task-attachments"
         ],
         "summary": "Upload an attachment to a task (multipart)",
-        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 25 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
+        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
         "operationId": "task-attachments.create",
         "requestBody": {
           "required": true,
@@ -15554,7 +15592,7 @@
           "tasks:write"
         ],
         "x-upload-limits": {
-          "max_bytes": 26214400,
+          "max_bytes": 104857600,
           "allowed_extensions": [
             "csv",
             "docx",
@@ -16665,6 +16703,535 @@
           "tasks:write"
         ],
         "description": "Delete an attachment."
+      }
+    },
+    "/v1/uploads": {
+      "post": {
+        "tags": [
+          "uploads"
+        ],
+        "summary": "Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with",
+        "description": "Start a direct upload: returns a URL the client PUTs the file to, and the id to finalize with.\n\nEverything that can be refused without moving a byte is refused here: the parent's permission check, the\nextension, the declared size against the cap, and the organization's storage block (B.3 / N1).",
+        "operationId": "uploads.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadCreateIn"
+              },
+              "example": {
+                "kind": "attachment",
+                "filename": "string",
+                "size": 0,
+                "content_type": "string",
+                "task_id": "string",
+                "project_id": "string",
+                "is_inline": false,
+                "project_name": "string",
+                "title": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadCreateOut"
+                },
+                "example": {
+                  "upload_id": "string",
+                  "upload_url": "string",
+                  "method": "PUT",
+                  "headers": {},
+                  "expires_at": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-kind": "create",
+        "x-scopes": [],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "description": "Replay the first response for 24 h when the same request is retried with this key."
+          }
+        ]
+      }
+    },
+    "/v1/uploads/{upload_id}/complete": {
+      "post": {
+        "tags": [
+          "uploads"
+        ],
+        "summary": "Finish a direct upload: the file is checked and becomes an attachment or a project file",
+        "description": "Finalize: check the file that was actually uploaded, then create the row exactly as the multipart route does.\n\nAnswers the SAME object the multipart route answers. 201 the first time; a repeat answers 200 with the same row\nrather than storing the file twice.",
+        "operationId": "uploads.complete",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Upload Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "description": "Replay the first response for 24 h when the same request is retried with this key."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/UploadCompleteIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              },
+              "example": {
+                "title": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The file was accepted and the row created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskAttachmentInDB"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProjectResourceInDB"
+                    }
+                  ],
+                  "title": "Response 201 Complete Upload V1 Uploads  Upload Id  Complete Post"
+                },
+                "example": {
+                  "task_id": "task-1234",
+                  "title": "Design Doc",
+                  "name": "design.pdf",
+                  "url": "https://example.com/design.pdf",
+                  "uploaded_by": "string",
+                  "uploaded_at": "2026-09-25T12:00:00Z",
+                  "deleted_at": "2026-09-25T12:00:00Z",
+                  "deleted_by": "string",
+                  "is_inline": false,
+                  "attachment_id": "string",
+                  "url_expires_at": "2026-09-25T12:00:00Z",
+                  "content_type": "string"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "This upload was already finished: the same row, not a second copy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskAttachmentInDB"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProjectResourceInDB"
+                    }
+                  ],
+                  "title": "Response 200 Complete Upload V1 Uploads  Upload Id  Complete Post"
+                },
+                "example": {
+                  "task_id": "task-1234",
+                  "title": "Design Doc",
+                  "name": "design.pdf",
+                  "url": "https://example.com/design.pdf",
+                  "uploaded_by": "string",
+                  "uploaded_at": "2026-09-25T12:00:00Z",
+                  "deleted_at": "2026-09-25T12:00:00Z",
+                  "deleted_by": "string",
+                  "is_inline": false,
+                  "attachment_id": "string",
+                  "url_expires_at": "2026-09-25T12:00:00Z",
+                  "content_type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-kind": "create",
+        "x-scopes": []
       }
     },
     "/v1/task-comments": {
@@ -20881,8 +21448,8 @@
         "tags": [
           "organizations"
         ],
-        "summary": "Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend",
-        "description": "The organization's storage: used / included (1 TB), the status, a breakdown by kind and by project, the largest\nfiles, the 30-day trend. Any member; a guest sees the totals only (no project or file names).",
+        "summary": "Storage used / included, the status, the breakdown, the largest files and the 30-day trend",
+        "description": "The organization's storage: used / included, the status, a breakdown by kind and by project, the largest\nfiles, the 30-day trend. Any member; a guest sees the totals only (no project or file names).",
         "operationId": "organizations.storage",
         "parameters": [
           {
@@ -44469,6 +45036,7 @@
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
                         "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
@@ -44791,6 +45359,7 @@
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
                         "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
@@ -44908,6 +45477,7 @@
                         "urn:taskadence:problem:upload-type-not-allowed",
                         "urn:taskadence:problem:upload-type-mismatch",
                         "urn:taskadence:problem:upload-rejected",
+                        "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
@@ -53711,7 +54281,7 @@
           "deleted_at"
         ],
         "title": "ProjectResourceInDB",
-        "description": "Returned by `project-resources.create`, `project-resources.read`, `project-resources.update` and `project-resources.upload`."
+        "description": "Returned by `project-resources.create`, `project-resources.read`, `project-resources.update`, `project-resources.upload` and 1 more."
       },
       "ProjectResourceUpdate": {
         "properties": {
@@ -55765,7 +56335,7 @@
           "included_bytes": {
             "type": "integer",
             "title": "Included Bytes",
-            "description": "Storage included before overage: 10^12 bytes (1 TB)"
+            "description": "Storage included before overage, in bytes (decimal). The plan's value is 10^10 (10 GB); an organization may have its own."
           },
           "overage_bytes": {
             "type": "integer",
@@ -56017,7 +56587,7 @@
           "attachment_id"
         ],
         "title": "TaskAttachmentInDB",
-        "description": "Returned by `task-attachments.create`, `task-attachments.read` and `task-attachments.update`."
+        "description": "Returned by `task-attachments.create`, `task-attachments.read`, `task-attachments.update` and `uploads.complete`."
       },
       "TaskAttachmentUpdate": {
         "properties": {
@@ -59526,7 +60096,7 @@
           "access_token": {
             "type": "string",
             "title": "Access Token",
-            "description": "A Taskadence access token (`tkd_live_\u2026`), 1 hour"
+            "description": "A TasKadence access token (`tkd_live_\u2026`), 1 hour"
           },
           "token_type": {
             "type": "string",
@@ -59667,6 +60237,180 @@
         ],
         "title": "UnattachedToken",
         "description": "Part of `AccessReview`."
+      },
+      "UploadCompleteIn": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Optional display name for the created row"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "UploadCompleteIn",
+        "description": "The request body of `uploads.complete`."
+      },
+      "UploadCreateIn": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "attachment",
+              "project_file"
+            ],
+            "title": "Kind",
+            "description": "attachment (a task's) or project_file"
+          },
+          "filename": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Filename",
+            "description": "The name as the person sees it; cleaned before use"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Size",
+            "description": "Bytes the client is about to PUT. Checked again against the blob at complete"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type",
+            "description": "What the client believes it is; the bytes decide"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id",
+            "description": "attachment: the task the file belongs to"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id",
+            "description": "project_file: the project. attachment: optional, must match the task's"
+          },
+          "is_inline": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Inline",
+            "description": "attachment: an inline image in the description, not a listed attachment"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name",
+            "description": "project_file: the project's display name, as the form takes it"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Optional display name; `complete` can also set it"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "filename",
+          "size"
+        ],
+        "title": "UploadCreateIn",
+        "description": "The request body of `uploads.create`."
+      },
+      "UploadCreateOut": {
+        "properties": {
+          "upload_id": {
+            "type": "string",
+            "title": "Upload Id"
+          },
+          "upload_url": {
+            "type": "string",
+            "title": "Upload Url",
+            "description": "PUT the file here. Create+write on this one blob, nothing else"
+          },
+          "method": {
+            "type": "string",
+            "const": "PUT",
+            "title": "Method",
+            "default": "PUT"
+          },
+          "headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Headers",
+            "description": "Send exactly these with the PUT"
+          },
+          "expires_at": {
+            "type": "string",
+            "title": "Expires At",
+            "description": "After this the URL and the session are both dead; start again"
+          }
+        },
+        "type": "object",
+        "required": [
+          "upload_id",
+          "upload_url",
+          "headers",
+          "expires_at"
+        ],
+        "title": "UploadCreateOut",
+        "description": "Returned by `uploads.create`."
       },
       "ValidationError": {
         "properties": {
@@ -60767,6 +61511,7 @@
               "urn:taskadence:problem:upload-type-not-allowed",
               "urn:taskadence:problem:upload-type-mismatch",
               "urn:taskadence:problem:upload-rejected",
+              "urn:taskadence:problem:sso-required",
               "urn:taskadence:problem:storage-limit-reached"
             ]
           },
@@ -61140,17 +61885,17 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "A Supabase session token (`Authorization: Bearer <jwt>`) - what the Taskadence app sends. It holds every scope. Rate limit: 600 requests a minute per user, apart from any token's; every response carries `X-RateLimit-*`."
+        "description": "A Supabase session token (`Authorization: Bearer <jwt>`) - what the TasKadence app sends. It holds every scope. Rate limit: 600 requests a minute per user, apart from any token's; every response carries `X-RateLimit-*`."
       },
       "TaskadenceToken": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tkd_live_\u2026 / tkd_test_\u2026",
-        "description": "A Taskadence access token: `Authorization: Bearer tkd_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tkd_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and milestones. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals and milestones (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasKadence access token: `Authorization: Bearer tkd_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tkd_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history, sections and saved views. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments, sections and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals and milestones. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals and milestones (implies projects:read). |\n| `teams:read` | Read teams, their members, sprints and availability. |\n| `teams:write` | Create, update and delete teams, their members, sprints and availability (implies teams:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active) and the designation catalog. |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
-        "description": "For third-party apps acting for a Taskadence user: the authorization-code flow with PKCE (S256, required). The access token it returns is a `tkd_live_\u2026` token for one organization, valid 1 hour; refresh tokens rotate on every use.",
+        "description": "For third-party apps acting for a TasKadence user: the authorization-code flow with PKCE (S256, required). The access token it returns is a `tkd_live_\u2026` token for one organization, valid 1 hour; refresh tokens rotate on every use.",
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "/oauth/authorize",
@@ -61178,7 +61923,7 @@
   "servers": [
     {
       "url": "https://api.taskadence.com",
-      "description": "The deployed Taskadence API (production)"
+      "description": "The deployed TasKadence API (production)"
     }
   ],
   "webhooks": {
@@ -61239,7 +61984,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61279,7 +62024,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61341,7 +62086,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61381,7 +62126,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61443,7 +62188,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61485,7 +62230,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61547,7 +62292,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61587,7 +62332,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61649,7 +62394,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61691,7 +62436,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61753,7 +62498,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61795,7 +62540,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61857,7 +62602,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -61899,7 +62644,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -61961,7 +62706,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62003,7 +62748,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62065,7 +62810,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62105,7 +62850,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62167,7 +62912,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62207,7 +62952,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62269,7 +63014,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62311,7 +63056,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62373,7 +63118,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62415,7 +63160,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62477,7 +63222,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62519,7 +63264,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62581,7 +63326,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62623,7 +63368,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62685,7 +63430,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62727,7 +63472,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62789,7 +63534,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62829,7 +63574,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62891,7 +63636,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -62933,7 +63678,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -62995,7 +63740,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63037,7 +63782,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63099,7 +63844,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63141,7 +63886,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63203,7 +63948,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63245,7 +63990,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63307,7 +64052,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63347,7 +64092,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63409,7 +64154,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63451,7 +64196,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63513,7 +64258,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63555,7 +64300,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63617,7 +64362,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63657,7 +64402,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63719,7 +64464,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63761,7 +64506,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63823,7 +64568,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63865,7 +64610,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -63927,7 +64672,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -63967,7 +64712,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64029,7 +64774,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64069,7 +64814,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64131,7 +64876,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64173,7 +64918,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64235,7 +64980,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64277,7 +65022,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64339,7 +65084,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64381,7 +65126,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64443,7 +65188,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64485,7 +65230,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64547,7 +65292,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64587,7 +65332,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64649,7 +65394,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64689,7 +65434,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64751,7 +65496,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64791,7 +65536,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64853,7 +65598,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64895,7 +65640,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -64957,7 +65702,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -64999,7 +65744,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65061,7 +65806,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65103,7 +65848,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65165,7 +65910,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65207,7 +65952,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65269,7 +66014,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65309,7 +66054,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65371,7 +66116,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65413,7 +66158,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65475,7 +66220,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65515,7 +66260,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65577,7 +66322,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65619,7 +66364,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65681,7 +66426,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65721,7 +66466,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65783,7 +66528,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65823,7 +66568,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65885,7 +66630,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -65927,7 +66672,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -65989,7 +66734,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66031,7 +66776,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66093,7 +66838,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66135,7 +66880,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66197,7 +66942,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66239,7 +66984,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66301,7 +67046,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66343,7 +67088,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66405,7 +67150,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66447,7 +67192,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66509,7 +67254,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66549,7 +67294,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66611,7 +67356,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66653,7 +67398,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66715,7 +67460,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66757,7 +67502,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66819,7 +67564,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66859,7 +67604,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -66921,7 +67666,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -66961,7 +67706,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67023,7 +67768,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67065,7 +67810,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67127,7 +67872,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67167,7 +67912,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67229,7 +67974,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67269,7 +68014,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67331,7 +68076,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67371,7 +68116,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67433,7 +68178,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67473,7 +68218,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67535,7 +68280,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67577,7 +68322,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67639,7 +68384,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67679,7 +68424,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67741,7 +68486,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67781,7 +68526,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67843,7 +68588,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67883,7 +68628,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -67945,7 +68690,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -67985,7 +68730,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68047,7 +68792,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68089,7 +68834,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68151,7 +68896,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68193,7 +68938,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68255,7 +69000,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68297,7 +69042,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68359,7 +69104,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68399,7 +69144,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68461,7 +69206,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68501,7 +69246,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68563,7 +69308,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68605,7 +69350,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68667,7 +69412,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68707,7 +69452,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68769,7 +69514,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68809,7 +69554,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68871,7 +69616,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -68911,7 +69656,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -68973,7 +69718,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69013,7 +69758,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69075,7 +69820,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69117,7 +69862,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69179,7 +69924,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69221,7 +69966,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69283,7 +70028,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69325,7 +70070,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69387,7 +70132,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69427,7 +70172,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69489,7 +70234,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69531,7 +70276,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69593,7 +70338,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69635,7 +70380,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69697,7 +70442,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69739,7 +70484,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69801,7 +70546,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69841,7 +70586,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -69903,7 +70648,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -69943,7 +70688,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70005,7 +70750,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70047,7 +70792,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70109,7 +70854,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70151,7 +70896,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70213,7 +70958,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70255,7 +71000,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70317,7 +71062,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70359,7 +71104,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70421,7 +71166,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70463,7 +71208,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70525,7 +71270,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70567,7 +71312,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70629,7 +71374,7 @@
               "type": "string"
             },
             "example": "Taskadence-Webhooks/1",
-            "description": "Identifies Taskadence's sender."
+            "description": "Identifies TasKadence's sender."
           }
         ],
         "requestBody": {
@@ -70671,7 +71416,7 @@
             "description": "Received - any 2xx within 20 s ends the delivery"
           },
           "410": {
-            "description": "Gone - Taskadence disables the webhook and stops sending"
+            "description": "Gone - TasKadence disables the webhook and stops sending"
           }
         }
       }
@@ -70704,7 +71449,7 @@
     },
     {
       "name": "tokens",
-      "description": "Taskadence access tokens (`tkd_live_\u2026` / `tkd_test_\u2026`): mint, list, rename, revoke, rotate."
+      "description": "TasKadence access tokens (`tkd_live_\u2026` / `tkd_test_\u2026`): mint, list, rename, revoke, rotate."
     },
     {
       "name": "webhooks",
@@ -70747,6 +71492,10 @@
       "description": "Files attached to a task."
     },
     {
+      "name": "uploads",
+      "description": "Direct uploads: ask for a URL, PUT the file straight to storage, then finish. The standard way to upload a file, and the only one that is practical at 100 MB. The multipart routes under `task-attachments` and `project-resources` still work for clients that cannot PUT."
+    },
+    {
       "name": "task-history",
       "description": "A task's change history."
     },
@@ -70784,7 +71533,7 @@
     },
     {
       "name": "releases",
-      "description": "What's new in Taskadence."
+      "description": "What's new in TasKadence."
     },
     {
       "name": "mcp",
@@ -70796,7 +71545,7 @@
     },
     {
       "name": "connected-apps",
-      "description": "The OAuth apps you have connected to Taskadence, and disconnecting them."
+      "description": "The OAuth apps you have connected to TasKadence, and disconnecting them."
     },
     {
       "name": "oauth",
@@ -70936,7 +71685,7 @@
       "statuses": [
         413
       ],
-      "description": "The file is over the size limit (`detail` names it): 25 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large."
+      "description": "The file is over the size limit (`detail` names it): 100 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large."
     },
     {
       "type": "urn:taskadence:problem:upload-type-not-allowed",
@@ -70961,11 +71710,18 @@
       "description": "The malware scan refused the file (422), or could not scan it right now (503: retry later)."
     },
     {
+      "type": "urn:taskadence:problem:sso-required",
+      "statuses": [
+        403
+      ],
+      "description": "The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected."
+    },
+    {
       "type": "urn:taskadence:problem:storage-limit-reached",
       "statuses": [
         402
       ],
-      "description": "The organization has used its included storage (1 TB) and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work."
+      "description": "The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work."
     }
   ],
   "x-scope-descriptions": [

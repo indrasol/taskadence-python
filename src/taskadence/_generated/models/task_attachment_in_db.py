@@ -20,7 +20,7 @@ T = TypeVar("T", bound="TaskAttachmentInDB")
 
 @_attrs_define
 class TaskAttachmentInDB:
-    """Returned by `task-attachments.create`, `task-attachments.read` and `task-attachments.update`.
+    """Returned by `task-attachments.create`, `task-attachments.read`, `task-attachments.update` and `uploads.complete`.
 
     Attributes:
         task_id (str): Task ID (text) Example: task-1234.

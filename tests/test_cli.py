@@ -327,7 +327,14 @@ SAS_URL = "https://tkdfiles.blob.core.windows.net/files/pending/O0020/up_1?sp=cw
 
 def _direct(api: respx.MockRouter, answer: dict[str, Any]) -> tuple[Any, Any, Any]:
     create = api.post("/v1/uploads").respond(
-        201, json={"upload_id": "up_1", "upload_url": SAS_URL, "method": "PUT", "headers": {}}
+        201,
+        json={
+            "upload_id": "up_1",
+            "upload_url": SAS_URL,
+            "method": "PUT",
+            "headers": {},
+            "expires_at": "2026-10-06T12:15:00Z",
+        },
     )
     put = api.put(SAS_URL).respond(201)
     complete = api.post("/v1/uploads/up_1/complete").respond(201, json=answer)
@@ -350,7 +357,7 @@ def test_tasks_attach_uploads_direct(signed_in: None, api: respx.MockRouter, tmp
 def test_projects_upload_falls_back_to_multipart(signed_in: None, api: respx.MockRouter, tmp_path: Path) -> None:
     path = tmp_path / "plan.txt"
     path.write_bytes(b"plan")
-    api.post("/v1/uploads").respond(404, json=problem(404))
+    api.post("/v1/uploads").respond(404, json=problem(404, detail="Not Found"))  # an API without the route
     legacy = api.post("/v1/project-resources/upload").respond(201, json=example("project-resources.upload"))
     result = invoke("projects", "upload", "P1", str(path), "--json")
     assert result.exit_code == 0, result.output

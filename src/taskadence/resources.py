@@ -128,7 +128,7 @@ class OrganizationsResource:
     @overload
     def storage(self, org_id: str, *, if_none_match: str) -> models.StorageUsage | NotModifiedType: ...
     def storage(self, org_id: str, *, if_none_match: str | None = None) -> models.StorageUsage | NotModifiedType:
-        """Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend.
+        """Storage used / included, the status, the breakdown, the largest files and the 30-day trend.
 
         `GET /v1/organizations/{org_id}/storage` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -543,6 +543,7 @@ class OrganizationInvitesResource:
         *,
         search: str | None = None,
         email: str | None = None,
+        status: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -560,6 +561,7 @@ class OrganizationInvitesResource:
                 query={
                     "search": search,
                     "email": email,
+                    "status": status,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -571,6 +573,7 @@ class OrganizationInvitesResource:
     def mine(
         self,
         *,
+        status: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -584,7 +587,13 @@ class OrganizationInvitesResource:
             "Page[models.OrganizationInviteInDB]",
             self._client._call(
                 _OPS["organization-invites.mine"],
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                query={
+                    "status": status,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
             ),
         )
 
@@ -1128,6 +1137,41 @@ class TaskAttachmentsResource:
 
     get = read
     """Alias of `read`."""
+
+
+class UploadsResource:
+    """Direct uploads: ask for a URL, PUT the file straight to storage, then finish. The standard way to upload a file, and the only one that is practical at 100 MB. The multipart routes under `task-attachments` and `project-resources` still work for clients that cannot PUT."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def create(
+        self, body: models.UploadCreateIn | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.UploadCreateOut:
+        """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with.
+
+        `POST /v1/uploads` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.UploadCreateOut",
+            self._client._call(_OPS["uploads.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    def complete(
+        self,
+        upload_id: str,
+        body: models.UploadCompleteIn | Mapping[str, Any] | None = None,
+        *,
+        idempotency_key: str | _Auto | None = AUTO,
+    ) -> models.TaskAttachmentInDB | models.ProjectResourceInDB:
+        """Finish a direct upload: the file is checked and becomes an attachment or a project file.
+
+        `POST /v1/uploads/{upload_id}/complete` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskAttachmentInDB | models.ProjectResourceInDB",
+            self._client._call(_OPS["uploads.complete"], path=(upload_id,), body=body, idempotency_key=idempotency_key),
+        )
 
 
 class TaskCommentsResource:
@@ -2942,7 +2986,7 @@ class AsyncOrganizationsResource:
     @overload
     async def storage(self, org_id: str, *, if_none_match: str) -> models.StorageUsage | NotModifiedType: ...
     async def storage(self, org_id: str, *, if_none_match: str | None = None) -> models.StorageUsage | NotModifiedType:
-        """Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend.
+        """Storage used / included, the status, the breakdown, the largest files and the 30-day trend.
 
         `GET /v1/organizations/{org_id}/storage` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
@@ -3373,6 +3417,7 @@ class AsyncOrganizationInvitesResource:
         *,
         search: str | None = None,
         email: str | None = None,
+        status: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -3390,6 +3435,7 @@ class AsyncOrganizationInvitesResource:
                 query={
                     "search": search,
                     "email": email,
+                    "status": status,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -3401,6 +3447,7 @@ class AsyncOrganizationInvitesResource:
     async def mine(
         self,
         *,
+        status: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -3414,7 +3461,13 @@ class AsyncOrganizationInvitesResource:
             "AsyncPage[models.OrganizationInviteInDB]",
             await self._client._call(
                 _OPS["organization-invites.mine"],
-                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                query={
+                    "status": status,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
             ),
         )
 
@@ -3967,6 +4020,43 @@ class AsyncTaskAttachmentsResource:
 
     get = read
     """Alias of `read`."""
+
+
+class AsyncUploadsResource:
+    """Direct uploads: ask for a URL, PUT the file straight to storage, then finish. The standard way to upload a file, and the only one that is practical at 100 MB. The multipart routes under `task-attachments` and `project-resources` still work for clients that cannot PUT."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def create(
+        self, body: models.UploadCreateIn | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.UploadCreateOut:
+        """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with.
+
+        `POST /v1/uploads` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.UploadCreateOut",
+            await self._client._call(_OPS["uploads.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    async def complete(
+        self,
+        upload_id: str,
+        body: models.UploadCompleteIn | Mapping[str, Any] | None = None,
+        *,
+        idempotency_key: str | _Auto | None = AUTO,
+    ) -> models.TaskAttachmentInDB | models.ProjectResourceInDB:
+        """Finish a direct upload: the file is checked and becomes an attachment or a project file.
+
+        `POST /v1/uploads/{upload_id}/complete` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskAttachmentInDB | models.ProjectResourceInDB",
+            await self._client._call(
+                _OPS["uploads.complete"], path=(upload_id,), body=body, idempotency_key=idempotency_key
+            ),
+        )
 
 
 class AsyncTaskCommentsResource:
@@ -5739,6 +5829,7 @@ class SyncResources:
     project_members: ProjectMembersResource
     project_resources: ProjectResourcesResource
     task_attachments: TaskAttachmentsResource
+    uploads: UploadsResource
     task_comments: TaskCommentsResource
     task_history: TaskHistoryResource
     project_stats: ProjectStatsResource
@@ -5771,6 +5862,7 @@ class SyncResources:
         self.project_members = ProjectMembersResource(core)
         self.project_resources = ProjectResourcesResource(core)
         self.task_attachments = TaskAttachmentsResource(core)
+        self.uploads = UploadsResource(core)
         self.task_comments = TaskCommentsResource(core)
         self.task_history = TaskHistoryResource(core)
         self.project_stats = ProjectStatsResource(core)
@@ -5806,6 +5898,7 @@ class AsyncResources:
     project_members: AsyncProjectMembersResource
     project_resources: AsyncProjectResourcesResource
     task_attachments: AsyncTaskAttachmentsResource
+    uploads: AsyncUploadsResource
     task_comments: AsyncTaskCommentsResource
     task_history: AsyncTaskHistoryResource
     project_stats: AsyncProjectStatsResource
@@ -5838,6 +5931,7 @@ class AsyncResources:
         self.project_members = AsyncProjectMembersResource(core)
         self.project_resources = AsyncProjectResourcesResource(core)
         self.task_attachments = AsyncTaskAttachmentsResource(core)
+        self.uploads = AsyncUploadsResource(core)
         self.task_comments = AsyncTaskCommentsResource(core)
         self.task_history = AsyncTaskHistoryResource(core)
         self.project_stats = AsyncProjectStatsResource(core)
@@ -5921,6 +6015,8 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "task-attachments.read": ("task_attachments", "read"),
     "task-attachments.update": ("task_attachments", "update"),
     "task-attachments.delete": ("task_attachments", "delete"),
+    "uploads.create": ("uploads", "create"),
+    "uploads.complete": ("uploads", "complete"),
     "task-comments.create": ("task_comments", "create"),
     "task-comments.list": ("task_comments", "list"),
     "task-comments.reply": ("task_comments", "reply"),

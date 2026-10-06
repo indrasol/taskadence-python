@@ -32,7 +32,8 @@ class StorageUsage:
         org_id (str):
         bytes_used (int): Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)
         file_count (int):
-        included_bytes (int): Storage included before overage: 10^12 bytes (1 TB)
+        included_bytes (int): Storage included before overage, in bytes (decimal). The plan's value is 10^10 (10 GB); an
+            organization may have its own.
         overage_bytes (int): max(0, bytes_used - included_bytes)
         percent (float): bytes_used / included_bytes, in percent, one decimal
         status (StorageUsageStatus): ok; warning (80 % or more); blocked (full, no payment method: new uploads answer

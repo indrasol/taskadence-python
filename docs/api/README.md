@@ -16,6 +16,7 @@ Every operation is `tm.<resource>.<method>(…)` on `Taskadence` (and `await` on
 | [`tm.project_members`](project-members.md) | 6 | The members of a project and their roles. |
 | [`tm.project_resources`](project-resources.md) | 6 | Links and files attached to a project. |
 | [`tm.task_attachments`](task-attachments.md) | 5 | Files attached to a task. |
+| [`tm.uploads`](uploads.md) | 2 | Direct uploads: ask for a URL, PUT the file straight to storage, then finish. The standard way to upload a file, and the only one that is practical at 100 MB. The multipart routes under `task-attachments` and `project-resources` still work for clients that cannot PUT. |
 | [`tm.task_comments`](task-comments.md) | 6 | Comments on a task (threaded). |
 | [`tm.task_history`](task-history.md) | 2 | A task's change history. |
 | [`tm.project_stats`](project-stats.md) | 1 | A project's task statistics. |

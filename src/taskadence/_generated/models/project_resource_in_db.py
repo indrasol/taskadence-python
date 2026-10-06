@@ -20,8 +20,8 @@ T = TypeVar("T", bound="ProjectResourceInDB")
 
 @_attrs_define
 class ProjectResourceInDB:
-    """Returned by `project-resources.create`, `project-resources.read`, `project-resources.update` and `project-
-    resources.upload`.
+    """Returned by `project-resources.create`, `project-resources.read`, `project-resources.update`, `project-
+    resources.upload` and 1 more.
 
         Attributes:
             project_id (str): Project ID (text) Example: project-1234.

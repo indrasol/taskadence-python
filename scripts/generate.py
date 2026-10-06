@@ -305,7 +305,12 @@ class Facade:
             op.body_required = bool(body.get("required"))
             if "application/json" in content:
                 op.body = "json"
-                op.body_model = self.cls(content["application/json"]["schema"]["$ref"])
+                schema = content["application/json"]["schema"]
+                # `anyOf: [{$ref}, {type: null}]`: an optional body (`uploads.complete`'s `{title}`)
+                refs = [s["$ref"] for s in schema.get("anyOf", [schema]) if "$ref" in s]
+                if len(refs) != 1:
+                    sys.exit(f"{op_id}: a JSON body must be one schema (optionally or null)")
+                op.body_model = self.cls(refs[0])
             else:
                 op.body = "multipart"
                 schema = self.schema(next(iter(content.values()))["schema"]["$ref"])

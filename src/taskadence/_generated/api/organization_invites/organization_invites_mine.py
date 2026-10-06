@@ -18,6 +18,7 @@ from typing import cast
 
 def _get_kwargs(
     *,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -29,6 +30,13 @@ def _get_kwargs(
         headers["If-None-Match"] = if_none_match
 
     params: dict[str, Any] = {}
+
+    json_status: None | str | Unset
+    if isinstance(status, Unset):
+        json_status = UNSET
+    else:
+        json_status = status
+    params["status"] = json_status
 
     params["limit"] = limit
 
@@ -137,6 +145,7 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -145,9 +154,13 @@ def sync_detailed(
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
 
-     Invites addressed to you.
+     The caller's own invites. N5: the open ones by default, so an invite they already accepted stops
+    offering itself.
 
     Args:
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -164,6 +177,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -181,6 +195,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -189,9 +204,13 @@ def sync(
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
 
-     Invites addressed to you.
+     The caller's own invites. N5: the open ones by default, so an invite they already accepted stops
+    offering itself.
 
     Args:
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -209,6 +228,7 @@ def sync(
 
     return sync_detailed(
         client=client,
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -220,6 +240,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -228,9 +249,13 @@ async def asyncio_detailed(
 ) -> Response[Any | PageOrganizationInviteInDB | Problem]:
     """Invites addressed to you
 
-     Invites addressed to you.
+     The caller's own invites. N5: the open ones by default, so an invite they already accepted stops
+    offering itself.
 
     Args:
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -247,6 +272,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -262,6 +288,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -270,9 +297,13 @@ async def asyncio(
 ) -> Any | PageOrganizationInviteInDB | Problem | None:
     """Invites addressed to you
 
-     Invites addressed to you.
+     The caller's own invites. N5: the open ones by default, so an invite they already accepted stops
+    offering itself.
 
     Args:
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -291,6 +322,7 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
+            status=status,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

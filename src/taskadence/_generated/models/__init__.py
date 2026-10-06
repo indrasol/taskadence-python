@@ -271,6 +271,11 @@ from .token_out_status import TokenOutStatus
 from .token_response import TokenResponse
 from .token_update import TokenUpdate
 from .unattached_token import UnattachedToken
+from .upload_complete_in import UploadCompleteIn
+from .upload_create_in import UploadCreateIn
+from .upload_create_in_kind import UploadCreateInKind
+from .upload_create_out import UploadCreateOut
+from .upload_create_out_headers import UploadCreateOutHeaders
 from .validation_error import ValidationError
 from .validation_error_context import ValidationErrorContext
 from .view_create import ViewCreate
@@ -574,6 +579,11 @@ __all__ = (
     "TokenResponse",
     "TokenUpdate",
     "UnattachedToken",
+    "UploadCompleteIn",
+    "UploadCreateIn",
+    "UploadCreateInKind",
+    "UploadCreateOut",
+    "UploadCreateOutHeaders",
     "ValidationError",
     "ValidationErrorContext",
     "ViewCreate",

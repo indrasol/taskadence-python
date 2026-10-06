@@ -1,20 +1,21 @@
 """Direct-to-storage uploads: the one path every file upload in this package takes (both clients and `tm`).
 
-THE FLOW (the API's `POST /v1/uploads` contract):
+THE FLOW (the generated `uploads.create` / `uploads.complete` operations):
 
-    1. create    POST /v1/uploads {kind, <parent id>, filename, size, content_type}
-                 -> {upload_id, upload_url, method: "PUT", headers, expires_at}. Size, type, permission and the
-                 organization's storage are checked here, before a byte is sent.
+    1. create    POST /v1/uploads {kind, <parent id>, filename, size, content_type, [project_id, is_inline,
+                 project_name]} -> `UploadCreateOut` {upload_id, upload_url, method: "PUT", headers, expires_at}. Size,
+                 type, permission and the organization's storage are checked here, before a byte is sent.
     2. PUT       the file goes straight to Azure Blob Storage at `upload_url` (a SAS URL for one pending blob,
                  create + write only, 15 minutes): streamed in chunks from the path / file object, never read whole.
                  Retried on 5xx and connection failures (the file is rewound), with the client's backoff.
     3. complete  POST /v1/uploads/{upload_id}/complete {title} -> the attachment / resource, the same model the old
                  multipart method returned. The API inspects and scans the blob here; a refusal is a `TaskadenceError`.
 
-FALLBACK. An API without direct uploads answers create with 404 (or 405); the upload is then sent the old way, as
-multipart to the operation's own route. So this package works against an API that has not shipped the routes yet and
-switches by itself when it has. Fields the direct flow does not carry (`is_inline`, `project_name`) also take the
-multipart route when passed.
+FALLBACK. An API without direct uploads answers create with its router's plain 404 (`about:blank`, detail exactly
+"Not Found") or a 405; the upload is then sent the old way, as multipart to the operation's own route. So this package
+works against an API that has not shipped the routes and switches by itself when it has. Any other 404 is the API's own
+answer about the parent (a task / project that does not exist or that the caller cannot read: a typed `type` or the
+route's own `detail`) and is raised as `NotFoundError`, never retried as multipart.
 
 THE SAS URL IS A CREDENTIAL. It never reaches a log line or an exception: messages carry it without its query string,
 and a filter on the `httpx` logger (which logs every request URL at INFO) strips the query from storage URLs.
@@ -23,12 +24,10 @@ and a filter on the `httpx` logger (which logs every request URL at INFO) strips
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import mimetypes
 import os
 import time
-import uuid
 from collections.abc import AsyncIterator, Callable, Iterator, Mapping
 from dataclasses import dataclass
 from io import BytesIO
@@ -39,7 +38,9 @@ from urllib.parse import urlsplit, urlunsplit
 import httpx
 
 from . import errors
+from ._brand import problem_slug
 from ._generated import models as _models
+from ._operations import OPERATIONS as _OPS
 
 if TYPE_CHECKING:
     from ._core import AsyncCore, FileInput, Operation, SyncCore, _BaseClient
@@ -49,31 +50,28 @@ logger = logging.getLogger("taskadence")
 UploadProgress = Callable[[int, int], object]
 """`progress(sent, total)`: called as bytes reach storage (and once at the end of a multipart fallback)."""
 
-CREATE_PATH: Final = "/v1/uploads"
-COMPLETE_PATH: Final = "/v1/uploads/{upload_id}/complete"
 CHUNK_SIZE: Final = 1024 * 1024
 PUT_TIMEOUT: Final = httpx.Timeout(600.0, connect=30.0)  # 100 MB on a slow link; per read / write, not in total
 PUT_RETRY_STATUSES: Final = frozenset({408, 429, 500, 502, 503, 504})
-FALLBACK_STATUSES: Final = frozenset({404, 405})
+ROUTER_NOT_FOUND: Final = "Not Found"  # the API router's detail for a path it does not mount (Starlette's default)
 
 
 @dataclass(frozen=True)
 class DirectKind:
     """How one multipart operation maps onto the direct flow."""
 
-    kind: str  # the create body's `kind`
+    kind: str  # `UploadCreateIn.kind`
     parent: str  # the form / query field that names the parent (task / project)
     model: str  # the generated model `complete` answers with (the old route's 201 model)
-    extra: tuple[str, ...] = ()  # optional fields also sent to create
-    multipart_only: tuple[str, ...] = ()  # fields the direct flow does not carry: passing one takes the old route
+    extra: tuple[str, ...] = ()  # optional `UploadCreateIn` fields the multipart method also takes
 
 
 DIRECT: Final[Mapping[str, DirectKind]] = {
     "task-attachments.create": DirectKind(
-        "attachment", "task_id", "TaskAttachmentInDB", extra=("project_id",), multipart_only=("is_inline",)
+        "attachment", "task_id", "TaskAttachmentInDB", extra=("project_id", "is_inline")
     ),
     "project-resources.upload": DirectKind(
-        "project_file", "project_id", "ProjectResourceInDB", multipart_only=("project_name",)
+        "project_file", "project_id", "ProjectResourceInDB", extra=("project_name",)
     ),
 }
 
@@ -230,16 +228,12 @@ def _wanted(op: Operation, form: Mapping[str, Any], query: Mapping[str, Any]) ->
     direct = DIRECT.get(op.op_id)
     if direct is None:
         return None
-    if any(form.get(name) is not None for name in direct.multipart_only):
-        return None
     if (form.get(direct.parent) or query.get(direct.parent)) is None:
         return None
     return direct
 
 
-def _create_request(direct: DirectKind, source: _Source, form: Mapping[str, Any], query: Mapping[str, Any]) -> Any:
-    from ._core import _Request
-
+def _create_body(direct: DirectKind, source: _Source, form: Mapping[str, Any], query: Mapping[str, Any]) -> Any:
     fields = {**query, **form}
     body: dict[str, Any] = {
         "kind": direct.kind,
@@ -251,17 +245,31 @@ def _create_request(direct: DirectKind, source: _Source, form: Mapping[str, Any]
     for name in direct.extra:
         if fields.get(name) is not None:
             body[name] = fields[name]
-    # create is safe to repeat (an unused session expires) and complete is idempotent: the key lets the core retry them
-    headers = {"Content-Type": "application/json", "Idempotency-Key": str(uuid.uuid4())}
-    return _Request("POST", CREATE_PATH, [], headers, content=json.dumps(body).encode())
+    return _models.UploadCreateIn.from_dict(body)
 
 
-def _complete_request(upload_id: str, title: Any) -> Any:
-    from ._core import _Request, _scalar
+def _complete_body(title: Any) -> Any:
+    from ._core import _scalar
 
-    body = {"title": _scalar(title)} if title is not None else {}
-    headers = {"Content-Type": "application/json", "Idempotency-Key": str(uuid.uuid4())}
-    return _Request("POST", COMPLETE_PATH.format(upload_id=upload_id), [], headers, content=json.dumps(body).encode())
+    return _models.UploadCompleteIn(title=_scalar(title)) if title is not None else None
+
+
+def _route_missing(response: httpx.Response) -> bool:
+    """True when create's answer says the API has no direct uploads (fall back to multipart), False when it is the
+    API's own answer (a 404 about the parent is raised: a missing task must not be retried as multipart)."""
+    if response.status_code == 405:
+        return True
+    if response.status_code != 404:
+        return False
+    try:
+        body = response.json()
+    except ValueError:
+        return True  # not the API's problem+json: a proxy / gateway in front of a server without the route
+    if not isinstance(body, dict):
+        return True
+    if problem_slug(str(body.get("type") or "about:blank")) is not None:
+        return False  # a typed problem is always the API's own answer
+    return body.get("detail") in (None, "", ROUTER_NOT_FOUND)
 
 
 @dataclass(frozen=True)
@@ -272,24 +280,27 @@ class _Ticket:
     headers: dict[str, str]
 
 
-def _ticket(response: httpx.Response) -> _Ticket:
+def _ticket(core: SyncCore | AsyncCore, response: httpx.Response) -> _Ticket:
+    """`UploadCreateOut` (or the API's error), through the generated parser. A malformed answer never carries the
+    signed URL into the exception."""
+    from .pagination import Page
+
     try:
-        raw = response.json()
-        return _Ticket(
-            str(raw["upload_id"]),
-            str(raw["upload_url"]),
-            str(raw.get("method") or "PUT").upper(),
-            {str(k): str(v) for k, v in (raw.get("headers") or {}).items()},
-        )
-    except (ValueError, KeyError, TypeError, AttributeError) as exc:
-        body = response.text
-        if "sig=" in body:
-            body = "<a create answer carrying a signed URL, not shown>"
+        out = core._answer(_OPS["uploads.create"], response, core._parse_client, None, Page)
+    except errors.ResponseValidationError as exc:
+        if "sig=" not in response.text:
+            raise
+        exc.body = None  # it held the answer, signed URL included; the chained original must not carry it either
         raise errors.ResponseValidationError(
-            f"uploads.create: the answer is not an upload ticket ({type(exc).__name__})",
+            "uploads.create: the answer is not an upload ticket (body withheld: it carries a signed URL)",
             operation="uploads.create",
-            body=body,
+            body=None,
         ) from None
+    method = out.method if isinstance(out.method, str) else "PUT"
+    headers = out.headers.additional_properties if hasattr(out.headers, "additional_properties") else {}
+    return _Ticket(
+        str(out.upload_id), str(out.upload_url), method.upper(), {str(k): str(v) for k, v in headers.items()}
+    )
 
 
 def _put_headers(ticket: _Ticket, source: _Source) -> dict[str, str]:
@@ -328,18 +339,15 @@ def _put_delay(core: _BaseClient, attempt: int, source: _Source) -> float | None
     return core._retry_delay(attempt, None)
 
 
-def _parse(direct: DirectKind, response: httpx.Response) -> Any:
-    if response.status_code >= 400:
-        raise errors.from_response(response)
-    model = getattr(_models, direct.model)
-    try:
-        return model.from_dict(response.json())
-    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+def _checked(direct: DirectKind, result: Any) -> Any:
+    """`uploads.complete` answers a union: the model must be the one the old method returned for this kind."""
+    if not isinstance(result, getattr(_models, direct.model)):
         raise errors.ResponseValidationError(
-            f"uploads.complete: the answer does not match {direct.model} ({exc!r})",
+            f"uploads.complete: expected {direct.model}, got {type(result).__name__}",
             operation="uploads.complete",
-            body=response.text,
-        ) from exc
+            body=result.to_dict() if hasattr(result, "to_dict") else result,
+        )
+    return result
 
 
 def _log_put(ticket: _Ticket, status: Any, started: float, attempt: int) -> None:
@@ -370,17 +378,16 @@ def upload(
     if direct is None or source is None:
         return _multipart(core, op, query, form, progress)
     try:
-        created = core._send(_create_request(direct, source, form, query))
-        if created.status_code in FALLBACK_STATUSES:
+        created = core._send(core._build(_OPS["uploads.create"], body=_create_body(direct, source, form, query)))
+        if _route_missing(created):
             created.close()
             if source.rewindable:
                 source.rewind()
             return _multipart(core, op, query, form, progress)
-        if created.status_code >= 400:
-            raise errors.from_response(created)
-        ticket = _ticket(created)
+        ticket = _ticket(core, created)
         _put(core, ticket, source, progress)
-        return _parse(direct, core._send(_complete_request(ticket.upload_id, form.get("title"))))
+        result = core._call(_OPS["uploads.complete"], path=(ticket.upload_id,), body=_complete_body(form.get("title")))
+        return _checked(direct, result)
     finally:
         source.close()
 
@@ -461,17 +468,18 @@ async def aupload(
     if direct is None or source is None:
         return await _amultipart(core, op, query, form, progress)
     try:
-        created = await core._send(_create_request(direct, source, form, query))
-        if created.status_code in FALLBACK_STATUSES:
+        created = await core._send(core._build(_OPS["uploads.create"], body=_create_body(direct, source, form, query)))
+        if _route_missing(created):
             await created.aclose()
             if source.rewindable:
                 source.rewind()
             return await _amultipart(core, op, query, form, progress)
-        if created.status_code >= 400:
-            raise errors.from_response(created)
-        ticket = _ticket(created)
+        ticket = _ticket(core, created)
         await _aput(core, ticket, source, progress)
-        return _parse(direct, await core._send(_complete_request(ticket.upload_id, form.get("title"))))
+        result = await core._call(
+            _OPS["uploads.complete"], path=(ticket.upload_id,), body=_complete_body(form.get("title"))
+        )
+        return _checked(direct, result)
     finally:
         source.close()
 

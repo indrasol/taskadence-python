@@ -13,7 +13,7 @@ Invite someone to an organization.
 - **Token scope:** `org:write`
 - **Returns:** `OrganizationInviteInDB`
 
-## `tm.organization_invites.list(org_id: str, search: str | None = None, email: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+## `tm.organization_invites.list(org_id: str, search: str | None = None, email: str | None = None, status: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 
 List an organization's pending invites.
 
@@ -23,7 +23,7 @@ List an organization's pending invites.
 - **Returns:** `Page[OrganizationInviteInDB]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
 
-## `tm.organization_invites.mine(limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+## `tm.organization_invites.mine(status: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 
 Invites addressed to you.
 

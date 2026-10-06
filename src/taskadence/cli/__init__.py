@@ -8,7 +8,7 @@
     tm views rows V123456 --csv > rows.csv
     tm tasks attach T123456 ./report.pdf    # a file to a task (direct to storage, with a progress bar)
     tm projects upload P96441 ./plan.xlsx   # a file to a project's resources
-    tm storage --org O0020             # the storage meter: used of 1 TB, status, by kind, top projects and files
+    tm storage --org O0020             # the storage meter: used of included, status, by kind, top projects and files
 
 Output: a table by default, `--json` for the raw API objects. Exit codes: 0 success; 1 an API or connection error (the
 problem is printed with its `request_id`); 2 a usage error. The token is never printed — only its 12-character prefix.
@@ -286,7 +286,7 @@ def _bytes(n: Any) -> str:
 
 @app.command("storage")
 def storage(org: OrgOpt = None, json_: JsonOpt = False) -> None:
-    """The organization's storage: used of the included 1 TB, the status, by kind, top projects, largest files."""
+    """The organization's storage: used of the included storage, the status, by kind, top projects, largest files."""
     result = _run(lambda tm: tm.organizations.storage(_resolve_org(tm, org)))
     if json_:
         _print_json(result)

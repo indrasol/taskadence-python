@@ -1,6 +1,7 @@
-"""Direct-to-storage uploads (`taskadence._uploads`): create -> PUT to the SAS URL -> complete, the 404 fallback to
-multipart, PUT retries, refusals, SAS redaction and streaming. One fake (an `httpx.MockTransport`) plays both the API
-and Azure Blob Storage, since the PUT goes to another host."""
+"""Direct-to-storage uploads (`taskadence._uploads`): the generated `uploads.create` -> PUT to the SAS URL -> the
+generated `uploads.complete`; the fallback to multipart (only on the router's plain 404 or a 405); PUT retries,
+refusals, SAS redaction and streaming. One fake (an `httpx.MockTransport`) plays both the API and Azure Blob Storage,
+since the PUT goes to another host."""
 
 from __future__ import annotations
 
@@ -22,6 +23,10 @@ BLOB = "https://tkdfiles.blob.core.windows.net/files/pending/O0020/up_1"
 SIG = "sig=S3CR3T%2Bsignature"
 SAS_URL = f"{BLOB}?sv=2025-01-05&sr=b&sp=cw&se=2026-10-05T12%3A15%3A00Z&spr=https&{SIG}"
 SECRET = "S3CR3T"
+
+
+# What an API without `POST /v1/uploads` answers: its router's plain 404 (Starlette's "Not Found", as a problem).
+ROUTER_404 = (404, problem(404, detail="Not Found"))
 
 
 def ticket(**over: Any) -> dict[str, Any]:
@@ -153,7 +158,7 @@ def test_project_files_take_the_same_flow(tm: Taskadence, fake: Fake, tmp_path: 
         "content_type": "application/pdf",
     }
     assert fake.named("put")[0][3] == path.read_bytes()
-    assert body(fake.named("complete")[0][3]) == {}  # no title: an empty body
+    assert fake.named("complete")[0][3] == b""  # no title: no body (`UploadCompleteIn` is optional)
 
 
 def test_a_file_object_is_sent_from_where_it_stands(tm: Taskadence, fake: Fake) -> None:
@@ -185,15 +190,54 @@ def test_an_api_without_direct_uploads_gets_multipart(tm: Taskadence, fake: Fake
 
 
 def test_the_fallback_resends_a_file_object_from_its_start(tm: Taskadence, fake: Fake) -> None:
-    fake.answers["create"] = [(404, problem(404))]
+    fake.answers["create"] = [ROUTER_404]
     handle = io.BytesIO(b"whole file")
     tm.task_attachments.create(task_id="T1", file=("f.txt", handle))
     assert b"whole file" in fake.named("legacy")[0][3]
 
 
-def test_fields_only_multipart_carries_take_the_old_route(tm: Taskadence, fake: Fake) -> None:
+def test_is_inline_and_project_name_go_direct(tm: Taskadence, fake: Fake) -> None:
     tm.task_attachments.create(task_id="T1", file=("img.png", b"\x89PNG"), is_inline=True)
-    assert [c[0] for c in fake.calls] == ["legacy"]
+    assert body(fake.named("create")[0][3])["is_inline"] is True
+    fake.answers["complete"] = [(201, example("project-resources.upload"))]
+    tm.project_resources.upload(project_id="P1", project_name="Launch", file=("r.txt", b"r"))
+    assert body(fake.named("create")[1][3])["project_name"] == "Launch"
+    assert fake.named("legacy") == []
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        problem(404, detail="Not found"),  # an unreadable task (S.21: not disclosed)
+        problem(404, detail="Project not found"),
+        problem(404, "urn:taskadence:problem:not-found", "Not Found"),  # a typed problem, whatever its detail
+    ],
+)
+def test_the_apis_own_404_is_raised_not_retried_as_multipart(tm: Taskadence, fake: Fake, answer: Any) -> None:
+    fake.answers["create"] = [(404, answer)]
+    with pytest.raises(errors.NotFoundError):
+        tm.task_attachments.create(task_id="T404", file=("a.txt", b"abc"))
+    assert [c[0] for c in fake.calls] == ["create"]
+
+
+def test_a_404_that_is_not_the_apis_falls_back(tm: Taskadence, fake: Fake) -> None:
+    fake.answers["create"] = [(404, "<html>not here</html>")]  # a gateway in front of an API without the route
+    tm.task_attachments.create(task_id="T1", file=("a.txt", b"abc"))
+    assert [c[0] for c in fake.calls] == ["create", "legacy"]
+
+
+def test_complete_must_answer_the_model_of_the_kind(tm: Taskadence, fake: Fake) -> None:
+    fake.answers["complete"] = [(201, example("project-resources.upload"))]  # a project file for an attachment
+    with pytest.raises(errors.ResponseValidationError, match="expected TaskAttachmentInDB"):
+        tm.task_attachments.create(task_id="T1", file=("a.txt", b"abc"))
+
+
+def test_a_malformed_ticket_never_shows_the_signed_url(tm: Taskadence, fake: Fake) -> None:
+    fake.answers["create"] = [(201, {"upload_url": SAS_URL})]  # no upload_id / headers / expires_at
+    with pytest.raises(errors.ResponseValidationError) as caught:
+        tm.task_attachments.create(task_id="T1", file=("a.txt", b"abc"))
+    shown = f"{caught.value} {caught.value.body!r} {caught.value.__cause__!r} {caught.value.__context__!r}"
+    assert SECRET not in shown and fake.named("put") == []
 
 
 def test_a_stream_of_unknown_size_takes_the_old_route(tm: Taskadence, fake: Fake) -> None:
@@ -385,7 +429,7 @@ async def test_async_create_put_complete(fake: Fake, slept: list[float]) -> None
 
 @pytest.mark.anyio
 async def test_async_falls_back_to_multipart(fake: Fake, slept: list[float]) -> None:
-    fake.answers["create"] = [(404, problem(404))]
+    fake.answers["create"] = [ROUTER_404]
     fake.answers["legacy"] = [(201, example("project-resources.upload"))]
     async with make_async(fake, slept) as atm:
         result = await atm.project_resources.upload(project_id="P1", file=("r.txt", b"abc"))

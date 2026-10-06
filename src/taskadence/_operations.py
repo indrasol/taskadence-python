@@ -148,6 +148,8 @@ from ._generated.api.tokens import tokens_list as _tokens_list
 from ._generated.api.tokens import tokens_read as _tokens_read
 from ._generated.api.tokens import tokens_rotate as _tokens_rotate
 from ._generated.api.tokens import tokens_update as _tokens_update
+from ._generated.api.uploads import uploads_complete as _uploads_complete
+from ._generated.api.uploads import uploads_create as _uploads_create
 from ._generated.api.view_pins import view_pins_list as _view_pins_list
 from ._generated.api.view_pins import view_pins_pin_project as _view_pins_pin_project
 from ._generated.api.view_pins import view_pins_pin_view as _view_pins_pin_view
@@ -546,7 +548,7 @@ OPERATIONS: dict[str, Operation] = {
         method="GET",
         path="/v1/organization-invites/org/{org_id}",
         path_params=("org_id",),
-        query=("search", "email", "limit", "cursor", "sort_by", "sort_order"),
+        query=("search", "email", "status", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_organization_invites_list._parse_response,
         item=OrganizationInviteInDB.from_dict,
@@ -557,7 +559,7 @@ OPERATIONS: dict[str, Operation] = {
         op_id="organization-invites.mine",
         method="GET",
         path="/v1/organization-invites/user",
-        query=("limit", "cursor", "sort_by", "sort_order"),
+        query=("status", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_organization_invites_mine._parse_response,
         item=OrganizationInviteInDB.from_dict,
@@ -869,6 +871,25 @@ OPERATIONS: dict[str, Operation] = {
         scopes=("tasks:write",),
         summary="Delete an attachment",
     ),
+    "uploads.create": Operation(
+        op_id="uploads.create",
+        method="POST",
+        path="/v1/uploads",
+        body="json",
+        is_create=True,
+        parse=_uploads_create._parse_response,
+        summary="Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with",
+    ),
+    "uploads.complete": Operation(
+        op_id="uploads.complete",
+        method="POST",
+        path="/v1/uploads/{upload_id}/complete",
+        path_params=("upload_id",),
+        body="json",
+        is_create=True,
+        parse=_uploads_complete._parse_response,
+        summary="Finish a direct upload: the file is checked and becomes an attachment or a project file",
+    ),
     "task-comments.create": Operation(
         op_id="task-comments.create",
         method="POST",
@@ -1042,7 +1063,7 @@ OPERATIONS: dict[str, Operation] = {
         if_none_match=True,
         parse=_organizations_storage._parse_response,
         scopes=("members:read",),
-        summary="Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend",
+        summary="Storage used / included, the status, the breakdown, the largest files and the 30-day trend",
     ),
     "tokens.create": Operation(
         op_id="tokens.create",
