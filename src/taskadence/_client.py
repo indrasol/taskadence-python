@@ -23,7 +23,7 @@ class Taskadence(SyncResources):
         from taskadence import Taskadence
 
         tm = Taskadence()                                  # token from TASKADENCE_TOKEN
-        for task in tm.tasks.list(org_id="O0020", filter={"status": ["in_progress"]}):
+        for task in tm.tasks.list(org_id="O123456", filter={"status": ["in_progress"]}):
             print(task.task_id, task.title)
 
     `token`: a TasKadence access token (`tkd_live_…`; a pre-rename `tm_live_…` works too), else `TASKADENCE_TOKEN`.

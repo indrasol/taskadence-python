@@ -3,7 +3,7 @@
     from taskadence import Taskadence
 
     tm = Taskadence(token="tkd_live_…")              # or set TASKADENCE_TOKEN
-    for task in tm.tasks.list(org_id="O0020"):
+    for task in tm.tasks.list(org_id="O123456"):
         print(task.task_id, task.title)
     tm.views.rows("V…").to_dataframe()             # pip install "taskadence[pandas]"
 

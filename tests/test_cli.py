@@ -156,7 +156,7 @@ def test_me(signed_in: None, api: respx.MockRouter) -> None:
 
 
 STORAGE = {
-    "org_id": "O0020",
+    "org_id": "O123456",
     "bytes_used": 1_000_400_000_000,
     "file_count": 18342,
     "included_bytes": 10**12,
@@ -187,8 +187,8 @@ STORAGE = {
 
 
 def test_storage(signed_in: None, api: respx.MockRouter) -> None:
-    route = api.get("/v1/organizations/O0020/storage").respond(json=STORAGE)
-    result = invoke("storage", "--org", "O0020")
+    route = api.get("/v1/organizations/O123456/storage").respond(json=STORAGE)
+    result = invoke("storage", "--org", "O123456")
     assert result.exit_code == 0, result.output
     assert "1.00 TB of 1.00 TB included" in result.output and "status blocked" in result.output
     assert (
@@ -198,7 +198,7 @@ def test_storage(signed_in: None, api: respx.MockRouter) -> None:
     )
     assert route.called
     no_token_in(result)
-    as_json = invoke("storage", "--org", "O0020", "--json")
+    as_json = invoke("storage", "--org", "O123456", "--json")
     assert json.loads(as_json.output)["breakdown"]["by_kind"]["task"] == 710_000_000_000
 
 
@@ -209,34 +209,34 @@ def test_tasks_list_table_and_json(signed_in: None, api: respx.MockRouter) -> No
             httpx.Response(200, json={"data": [card("T2", title="Test it")], "next_cursor": None}),
         ]
     )
-    result = invoke("tasks", "list", "--org", "O0020", "--status", "in_progress", "--status", "blocked", "--table")
+    result = invoke("tasks", "list", "--org", "O123456", "--status", "in_progress", "--status", "blocked", "--table")
     assert result.exit_code == 0, result.output
     assert "T1" in result.output and "T2" in result.output and "2 rows" in result.output  # every page
     assert route.calls[0].request.url.params["filter[status]"] == "in_progress,blocked"
     no_token_in(result)
     api.get("/v1/tasks").respond(json={"data": [card("T3")], "next_cursor": None})
-    as_json = invoke("tasks", "list", "--org", "O0020", "--json")
+    as_json = invoke("tasks", "list", "--org", "O123456", "--json")
     assert [t["task_id"] for t in json.loads(as_json.output)] == ["T3"]
 
 
 def test_tasks_list_uses_your_only_org_and_limit(signed_in: None, api: respx.MockRouter) -> None:
     me = example("me.read")
-    me["organizations"] = [me["organizations"][0] | {"org_id": "O0020"}]
+    me["organizations"] = [me["organizations"][0] | {"org_id": "O123456"}]
     api.get("/v1/me").respond(json=me)
     route = api.get("/v1/tasks").respond(json={"data": [card("T1"), card("T2")], "next_cursor": "c"})
     result = invoke("tasks", "list", "--limit", "1")
     assert result.exit_code == 0 and "1 row" in result.output
-    assert route.calls.last.request.url.params["org_id"] == "O0020" and route.call_count == 1
+    assert route.calls.last.request.url.params["org_id"] == "O123456" and route.call_count == 1
 
 
 def test_tasks_get_create_update(signed_in: None, api: respx.MockRouter) -> None:
     api.get("/v1/tasks/T1").respond(json=task("T1", title="Ship"), headers={"ETag": '"e1"'})
     assert "Ship" in invoke("tasks", "get", "T1").output
     created = api.post("/v1/tasks").respond(json=task("T9", title="New"))
-    result = invoke("tasks", "create", "--org", "O0020", "--title", "New", "--project", "P1", "--due", "2026-10-01")
+    result = invoke("tasks", "create", "--org", "O123456", "--title", "New", "--project", "P1", "--due", "2026-10-01")
     assert result.exit_code == 0 and "Created T9" in result.output
     assert json.loads(created.calls.last.request.content) == {
-        "org_id": "O0020",
+        "org_id": "O123456",
         "title": "New",
         "project_id": "P1",
         "due_date": "2026-10-01",
@@ -259,7 +259,7 @@ def test_an_api_error_prints_the_problem_and_exits_1(signed_in: None, api: respx
 def test_projects_list(signed_in: None, api: respx.MockRouter) -> None:
     # the spec's own example for this list is all nulls (its example generator stops at depth 4) — a real card:
     project = {
-        "org_id": "O0020",
+        "org_id": "O123456",
         "name": "Platform",
         "project_id": "P96441",
         "tasks_total": 12,
@@ -269,8 +269,8 @@ def test_projects_list(signed_in: None, api: respx.MockRouter) -> None:
         "position": 0,
         "status": "in_progress",
     }
-    api.get("/v1/projects/O0020").respond(json={"data": [project], "next_cursor": None})
-    result = invoke("projects", "list", "--org", "O0020")
+    api.get("/v1/projects/O123456").respond(json={"data": [project], "next_cursor": None})
+    result = invoke("projects", "list", "--org", "O123456")
     assert result.exit_code == 0 and "P96441" in result.output and "Platform" in result.output
 
 
@@ -288,7 +288,7 @@ def test_views_rows_csv_json_table(signed_in: None, api: respx.MockRouter) -> No
 
 def test_webhooks_list_test_deliveries(signed_in: None, api: respx.MockRouter) -> None:
     api.get("/v1/webhooks").respond(json=example("webhooks.list") | {"next_cursor": None})
-    listed = invoke("webhooks", "list", "--org", "O0020")
+    listed = invoke("webhooks", "list", "--org", "O123456")
     assert listed.exit_code == 0 and example("webhooks.list")["data"][0]["subscription_id"] in listed.output
     api.post("/v1/webhooks/WH1/test").respond(
         json=example("webhooks.test") | {"delivery_id": "WD9", "status": "succeeded", "response_status": 200}
@@ -305,7 +305,7 @@ def test_webhooks_list_test_deliveries(signed_in: None, api: respx.MockRouter) -
 
 def test_tokens_list_shows_prefixes_only(signed_in: None, api: respx.MockRouter) -> None:
     api.get("/v1/tokens").respond(json=example("tokens.list") | {"next_cursor": None})
-    result = invoke("tokens", "list", "--org", "O0020")
+    result = invoke("tokens", "list", "--org", "O123456")
     assert result.exit_code == 0 and example("tokens.list")["data"][0]["token_prefix"] in result.output
     no_token_in(result)
 
@@ -322,7 +322,7 @@ def test_timestamps_print_to_the_minute_in_utc() -> None:
 # uploads (`tm tasks attach`, `tm projects upload`): the SDK's direct-upload helper
 # ---------------------------------------------------------------------------
 
-SAS_URL = "https://tkdfiles.blob.core.windows.net/files/pending/O0020/up_1?sp=cw&sig=S3CR3T"
+SAS_URL = "https://tkdfiles.blob.core.windows.net/files/pending/O123456/up_1?sp=cw&sig=S3CR3T"
 
 
 def _direct(api: respx.MockRouter, answer: dict[str, Any]) -> tuple[Any, Any, Any]:

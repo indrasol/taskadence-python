@@ -19,7 +19,7 @@ from taskadence._uploads import CHUNK_SIZE, redact
 
 from .conftest import BASE, TOKEN, example, problem
 
-BLOB = "https://tkdfiles.blob.core.windows.net/files/pending/O0020/up_1"
+BLOB = "https://tkdfiles.blob.core.windows.net/files/pending/O123456/up_1"
 SIG = "sig=S3CR3T%2Bsignature"
 SAS_URL = f"{BLOB}?sv=2025-01-05&sr=b&sp=cw&se=2026-10-05T12%3A15%3A00Z&spr=https&{SIG}"
 SECRET = "S3CR3T"

@@ -1,6 +1,6 @@
 """The quickstart, end to end — and the CI integration check (`pytest -m integration` runs it).
 
-    export TASKADENCE_TOKEN=tkd_live_… TASKADENCE_ORG=O0020
+    export TASKADENCE_TOKEN=tkd_live_… TASKADENCE_ORG=O123456
     python examples/quickstart.py
 
 The three lines everyone starts with, then a round trip that leaves nothing behind: create a task → update it with
