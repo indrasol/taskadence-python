@@ -13716,7 +13716,8 @@
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -14046,7 +14047,8 @@
                       "updated_at": "2026-09-25T12:00:00Z",
                       "deleted_at": "2026-09-25T12:00:00Z",
                       "url_expires_at": "2026-09-25T12:00:00Z",
-                      "content_type": "string"
+                      "content_type": "string",
+                      "size_bytes": 1048576
                     }
                   ],
                   "next_cursor": "string"
@@ -14296,7 +14298,8 @@
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -14557,7 +14560,8 @@
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -15021,7 +15025,8 @@
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -15356,7 +15361,8 @@
                   "is_inline": false,
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -15774,7 +15780,8 @@
                       "is_inline": false,
                       "attachment_id": "string",
                       "url_expires_at": "2026-09-25T12:00:00Z",
-                      "content_type": "string"
+                      "content_type": "string",
+                      "size_bytes": 1048576
                     }
                   ],
                   "next_cursor": "string"
@@ -16029,7 +16036,8 @@
                   "is_inline": false,
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -16295,7 +16303,8 @@
                   "is_inline": false,
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -17020,7 +17029,8 @@
                   "is_inline": false,
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -17052,7 +17062,8 @@
                   "is_inline": false,
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
-                  "content_type": "string"
+                  "content_type": "string",
+                  "size_bytes": 1048576
                 }
               }
             }
@@ -54268,6 +54279,19 @@
             ],
             "title": "Content Type",
             "description": "A stored file's detected type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes",
+            "description": "The stored file's size in bytes (null for a link resource)",
+            "example": 1048576
           }
         },
         "type": "object",
@@ -56579,6 +56603,19 @@
             ],
             "title": "Content Type",
             "description": "The file's detected type"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes",
+            "description": "The stored file's size in bytes (null when nothing is stored)",
+            "example": 1048576
           }
         },
         "type": "object",

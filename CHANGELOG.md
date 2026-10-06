@@ -14,8 +14,10 @@ semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
   API without direct uploads (its router's plain 404, or a 405) gets multipart as before, so the switch is automatic; a
   404 about the task / project itself is raised as `NotFoundError`. Signatures are unchanged apart from a new optional
   `progress(sent, total)` argument.
-- The spec is pinned to API `dev` `bb0a640` (release 2): the upload limit is 100 MB, the included storage 10 GB, the
+- The spec is pinned to API `dev` `af56676` (release 2): the upload limit is 100 MB, the included storage 10 GB, the
   wordmark is TasKadence, `organization_invites.mine` takes `status`, and `sso-required` (403) is a problem type.
+- `TaskAttachmentInDB` and `ProjectResourceInDB` carry `size_bytes`, the stored file's size in bytes, on every response
+  that returns them (create, read, list, update); it is null when nothing is stored (a link resource).
 
 ### Added
 - `tm.uploads.create` / `tm.uploads.complete` (`POST /v1/uploads`, `POST /v1/uploads/{upload_id}/complete`), the
