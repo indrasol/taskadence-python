@@ -1,4 +1,4 @@
-"""Taskadence for Python.
+"""TasKadence for Python.
 
     from taskadence import Taskadence
 

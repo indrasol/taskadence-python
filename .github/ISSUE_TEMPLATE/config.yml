@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/indrasol/taskadence-python/security/advisories/new
+    about: Please report security issues privately, never in a public issue.
+  - name: TasKadence documentation
+    url: https://docs.taskadence.com
+    about: Guides and the API reference.

@@ -2,7 +2,7 @@
 
 Who the caller is: the principal and its organizations / roles.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.me.read(if_none_match: str | None = None)`
 

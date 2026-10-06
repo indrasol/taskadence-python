@@ -3,20 +3,21 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 # A second distribution in the taskadence-python repo (task 5.3): the stdio ↔ Streamable HTTP proxy to the remote
-# Taskadence MCP server. Its own package — not a `[mcp]` extra of `taskadence` — because `uvx <name>` runs the script
+# TasKadence MCP server. Its own package — not a `[mcp]` extra of `taskadence` — because `uvx <name>` runs the script
 # named like the package: `uvx taskadence-mcp` works; an extra would need `uvx --from "taskadence[mcp]" taskadence-mcp`.
 [project]
 name = "taskadence-mcp"
 dynamic = ["version"]
-description = "Taskadence's MCP server for clients that start a local process: a stdio proxy to the remote server."
+description = "The TasKadence MCP server for clients that start a local process: a stdio proxy to the remote server (uvx taskadence-mcp)."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "Indrasol" }]
-keywords = ["taskadence", "mcp", "model context protocol", "claude", "agents"]
+keywords = ["taskadence", "mcp", "model context protocol", "stdio", "claude", "agents", "ai"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -25,6 +26,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Scheduling",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
 ]
 dependencies = [
@@ -39,8 +42,11 @@ dev = ["pytest>=8", "anyio>=4", "starlette>=0.40", "ruff==0.16.9", "mypy>=1.11,<
 taskadence-mcp = "taskadence_mcp.cli:main"
 
 [project.urls]
-Homepage = "https://docs.taskadence.com/mcp/connect/"
+Homepage = "https://taskadence.com"
+Documentation = "https://docs.taskadence.com/mcp/connect/"
 Source = "https://github.com/indrasol/taskadence-python/tree/main/packages/taskadence-mcp"
+Issues = "https://github.com/indrasol/taskadence-python/issues"
+Changelog = "https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "src/taskadence_mcp/_version.py"

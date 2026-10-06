@@ -18,7 +18,7 @@ DEFAULT_MAX_RETRY_AFTER = 60.0
 
 
 class Taskadence(SyncResources):
-    """The Taskadence API.
+    """The TasKadence API.
 
         from taskadence import Taskadence
 
@@ -26,7 +26,7 @@ class Taskadence(SyncResources):
         for task in tm.tasks.list(org_id="O0020", filter={"status": ["in_progress"]}):
             print(task.task_id, task.title)
 
-    `token`: a Taskadence access token (`tkd_live_…`; a pre-rename `tm_live_…` works too), else `TASKADENCE_TOKEN`.
+    `token`: a TasKadence access token (`tkd_live_…`; a pre-rename `tm_live_…` works too), else `TASKADENCE_TOKEN`.
     `base_url`: else `TASKADENCE_API_URL`, else the spec's first server (`taskadence.DEFAULT_BASE_URL`); a trailing
     `/v1` is accepted. Safe requests are retried `max_retries` times (see `taskadence._core`); a `Retry-After` over
     `max_retry_after` seconds is not waited out.

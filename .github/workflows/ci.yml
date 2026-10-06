@@ -1,5 +1,6 @@
 # taskadence-python CI (task 4.5 Part E). Every job runs offline except `integration`, which runs only when the
-# TASKADENCE_TOKEN secret exists. Nothing here publishes anything (that is release.yml, and PyPI is gated on S.23).
+# TASKADENCE_TOKEN secret exists. Nothing here publishes anything (that is release.yml: TestPyPI on a tag; PyPI and npm
+# by a manual run from a tag, behind environment reviewers).
 # 5.3: + the two stdio MCP proxies in packages/ — `taskadence-mcp` (Python, `uvx`) and `@taskadence/mcp` (Node, `npx`).
 name: ci
 

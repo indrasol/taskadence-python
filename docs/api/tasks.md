@@ -2,7 +2,7 @@
 
 Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.tasks.create(body: TaskCreate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
 

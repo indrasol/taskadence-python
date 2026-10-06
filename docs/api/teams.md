@@ -2,7 +2,7 @@
 
 Teams, their members and their task list.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.teams.create(body: TeamCreate | Mapping[str, Any])`
 

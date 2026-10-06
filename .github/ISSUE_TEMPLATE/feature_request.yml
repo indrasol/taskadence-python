@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest an improvement to the SDK, the tm command line or the MCP packages.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The task or workflow, and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help?
+      description: An API, flag or behaviour you have in mind, if any.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Anything you tried instead?

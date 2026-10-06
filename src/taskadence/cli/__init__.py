@@ -1,4 +1,4 @@
-"""`tm` (also installed as `taskadence`) — the Taskadence command line (`pip install "taskadence[cli]"`).
+"""`tm` (also installed as `taskadence`) : the TasKadence command line (`pip install "taskadence[cli]"`).
 
     tm auth login                      # prompts for a tkd_live_ token (hidden), verifies it, stores it
     tm me
@@ -80,7 +80,7 @@ state = _State()
 
 def _version(value: bool) -> None:
     if value:
-        out.print(f"{SLUG} {__version__}")
+        out.print(f"{BRAND_NAME} CLI ({SLUG}) {__version__}")
         raise typer.Exit()
 
 
@@ -338,7 +338,7 @@ def tasks_list(
     json_: JsonOpt = False,
     table: TableOpt = False,
 ) -> None:
-    """List tasks — the list grammar's filters, every page unless --limit."""
+    """List tasks: the list grammar's filters, every page unless --limit."""
     filters = {"status": status, "priority": priority, "project": project, "assignee": assignee, "search": search}
 
     def call(tm: Taskadence) -> list[Any]:
@@ -506,7 +506,7 @@ def webhooks_deliveries(
 
 @tokens_app.command("list")
 def tokens_list(org: OrgOpt = None, json_: JsonOpt = False, table: TableOpt = False) -> None:
-    """Your access tokens (an owner / admin: the organization's). Prefixes only — never a token."""
+    """Your access tokens (an owner / admin: the organization's). Prefixes only, never a token."""
     rows = _run(lambda tm: list(tm.tokens.list(org_id=_resolve_org(tm, org))))
     _print_json(rows) if json_ else _table(
         rows,

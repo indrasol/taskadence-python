@@ -2,12 +2,15 @@
 
 ## Reporting a vulnerability
 
-Please report security issues **privately** — never in a public issue, pull request or discussion.
+Please report security issues **privately**, never in a public issue, pull request or discussion. Either:
 
-- Use GitHub's **private vulnerability reporting** on this repository (Security → Report a vulnerability) with a
-  description, the affected version (`python -c "import taskadence; print(taskadence.__version__)"`) and steps to
-  reproduce. Please do not include live access tokens; a token prefix (`tkd_live_ab12…`) is enough.
-- A security email address joins this file with Taskadence's `security.txt` (task S.16).
+- use GitHub's **private vulnerability reporting** on this repository
+  ([Security > Report a vulnerability](https://github.com/indrasol/taskadence-python/security/advisories/new)), or
+- email **srvcs.infra@indrasol.com** (the contact in [taskadence.com/.well-known/security.txt](https://taskadence.com/.well-known/security.txt)).
+
+Include a description, the affected package and version (`python -c "import taskadence; print(taskadence.__version__)"`,
+`taskadence-mcp --version` or `npx -y @taskadence/mcp --version`) and steps to reproduce. Please do not include live
+access tokens; a token prefix (`tkd_live_ab12…`) is enough.
 
 We acknowledge a report within **3 business days**, send an assessment within **10 business days**, and credit reporters
 who want to be credited once a fix is released. Please give us a reasonable window to fix before any disclosure.
@@ -17,7 +20,7 @@ who want to be credited once a fix is released. Please give us a reasonable wind
 | Version | Supported |
 |---|---|
 | `0.x` (pre-release) | The latest `0.x` release only. `0.x` carries no compatibility promise; fixes ship as a new `0.x`. |
-| `1.x` | Not released yet (task S.23, the stability gate). |
+| `1.x` | Not released yet. |
 
 ## Update cadence
 
@@ -40,5 +43,4 @@ The SDK repository holds no credentials. The examples in `spec/openapi.public.js
 made-up values copied from the API's OpenAPI document. The `secrets` job in `.github/workflows/ci.yml` runs gitleaks
 on every pull request and over the full history on pushes to `main`. Locally, `pre-commit install` enables the same
 check on each commit (opt-in). `.gitleaks.toml` allowlists only those spec examples, by path and value shape. How
-Taskadence handles its own secrets, and how they are rotated, is in the API's security policy
-(`taskadence-api/SECURITY.md`).
+TasKadence handles security for the service itself is described at [taskadence.com/security](https://taskadence.com/security).

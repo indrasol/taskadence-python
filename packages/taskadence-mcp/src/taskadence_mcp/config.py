@@ -24,7 +24,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from urllib.parse import quote
 
-BRAND_NAME = "Taskadence"
+BRAND_NAME = "TasKadence"  # the wordmark (5.8c), prose only; `_brand.py` in the SDK is the source
 SLUG = "taskadence"
 ENV_PREFIX = "TASKADENCE_"
 LEGACY_ENV_PREFIX = "TASKSMATE_"  # pre-rename; read with a DeprecationWarning when the new name is unset

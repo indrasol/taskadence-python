@@ -2,7 +2,7 @@
 
 Invitations into an organization.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.organization_invites.create(body: OrganizationInviteCreate | Mapping[str, Any])`
 

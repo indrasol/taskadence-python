@@ -2,7 +2,7 @@
 
 Sections of a project, a team or a person's own list.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.sections.list(org_id: str, scope_type: str, scope_id: str | None = None, scope_ids: Sequence[str] | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 

@@ -30,7 +30,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--groups", help=f"comma-separated tool groups, e.g. tasks,projects (else {GROUPS_ENV}; default: all but admin)"
     )
-    p.add_argument("--version", action="version", version=f"{SLUG}-mcp {__version__}")
+    p.add_argument("--version", action="version", version=f"{BRAND_NAME} MCP ({SLUG}-mcp) {__version__}")
     return p
 
 
