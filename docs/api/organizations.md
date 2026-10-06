@@ -56,7 +56,7 @@ Access review: every member, their MFA, last sign-in, projects and tokens (owner
 
 ## `tm.organizations.storage(org_id: str, if_none_match: str | None = None)`
 
-Storage used / included (1 TB), the status, the breakdown, the largest files and the 30-day trend.
+Storage used / included, the status, the breakdown, the largest files and the 30-day trend.
 
 - **HTTP:** `GET /v1/organizations/{org_id}/storage`
 - **operationId:** `organizations.storage`

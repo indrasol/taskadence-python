@@ -21,6 +21,7 @@ def _get_kwargs(
     *,
     search: None | str | Unset = UNSET,
     email: None | str | Unset = UNSET,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 20,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = "email",
@@ -46,6 +47,13 @@ def _get_kwargs(
     else:
         json_email = email
     params["email"] = json_email
+
+    json_status: None | str | Unset
+    if isinstance(status, Unset):
+        json_status = UNSET
+    else:
+        json_status = status
+    params["status"] = json_status
 
     params["limit"] = limit
 
@@ -159,6 +167,7 @@ def sync_detailed(
     client: AuthenticatedClient,
     search: None | str | Unset = UNSET,
     email: None | str | Unset = UNSET,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 20,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = "email",
@@ -173,6 +182,9 @@ def sync_detailed(
         org_id (str):
         search (None | str | Unset):
         email (None | str | Unset):
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 20, capped at 1000. Default: 20.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -192,6 +204,7 @@ def sync_detailed(
         org_id=org_id,
         search=search,
         email=email,
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -212,6 +225,7 @@ def sync(
     client: AuthenticatedClient,
     search: None | str | Unset = UNSET,
     email: None | str | Unset = UNSET,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 20,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = "email",
@@ -226,6 +240,9 @@ def sync(
         org_id (str):
         search (None | str | Unset):
         email (None | str | Unset):
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 20, capped at 1000. Default: 20.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -246,6 +263,7 @@ def sync(
         client=client,
         search=search,
         email=email,
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -260,6 +278,7 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     search: None | str | Unset = UNSET,
     email: None | str | Unset = UNSET,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 20,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = "email",
@@ -274,6 +293,9 @@ async def asyncio_detailed(
         org_id (str):
         search (None | str | Unset):
         email (None | str | Unset):
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 20, capped at 1000. Default: 20.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -293,6 +315,7 @@ async def asyncio_detailed(
         org_id=org_id,
         search=search,
         email=email,
+        status=status,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -311,6 +334,7 @@ async def asyncio(
     client: AuthenticatedClient,
     search: None | str | Unset = UNSET,
     email: None | str | Unset = UNSET,
+    status: None | str | Unset = UNSET,
     limit: int | Unset = 20,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = "email",
@@ -325,6 +349,9 @@ async def asyncio(
         org_id (str):
         search (None | str | Unset):
         email (None | str | Unset):
+        status (None | str | Unset): Which invites to return. The default is the open ones
+            (pending and expired). Name one status, or `all` for every one, including accepted and
+            cancelled.
         limit (int | Unset): Page size; default 20, capped at 1000. Default: 20.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
         sort_by (None | str | Unset): One of: email, created_at, updated_at, sent_at, role,
@@ -346,6 +373,7 @@ async def asyncio(
             client=client,
             search=search,
             email=email,
+            status=status,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

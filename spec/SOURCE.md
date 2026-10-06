@@ -6,12 +6,12 @@ snapshot of the public contract the TasKadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `fix/mcp-project-status` |
-| Backend commit | `5fa0aa4` — fix(mcp): `ProjectStatusEnum` loses `active` (never a `project_status_enum` value: create / update with it was a 500); `invalid-parameter` is documented for 422 too (a body field outside its fixed set of values, `errors[].allowed`) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-04 — the same document `taskadence-docs/scripts/sync-spec.sh` writes, byte for byte |
+| Backend repo | `indrasol/taskadence-api`, branch `dev` |
+| Backend commit | `af56676` — Merge #201 (the stored file's `size_bytes` in the attachment and project-resource responses), after #199 / #198 (release 2: direct uploads `uploads.create` / `uploads.complete` public, 100 MB uploads, 10 GB included storage, A.3 SSO, the TasKadence wordmark) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-06, from a detached worktree with **placeholder** production settings (no `.env.production` read: only `BASE_API_URL` and a random `WEBHOOK_SECRET_KEK_TM`). Against the previous pin the only difference is `size_bytes` on `TaskAttachmentInDB` and `ProjectResourceInDB` (and the response examples that carry them); paths, operations, schemas and `servers` are unchanged |
 | `info.version` | `2026-09-25` |
-| Size | 110 paths · 172 operations (166 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 222 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `7db026e13dc5afaffdc12a4166c60e7e9e8df2d4119e66d477c23c064b41fc6c` |
+| Size | 112 paths · 174 operations (168 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 225 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `ca56ccaf8fe57dd912b90ee1fcec0f13e52aaf3e34adf7e1af00adac89bcabf2` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

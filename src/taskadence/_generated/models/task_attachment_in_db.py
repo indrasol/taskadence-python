@@ -20,7 +20,7 @@ T = TypeVar("T", bound="TaskAttachmentInDB")
 
 @_attrs_define
 class TaskAttachmentInDB:
-    """Returned by `task-attachments.create`, `task-attachments.read` and `task-attachments.update`.
+    """Returned by `task-attachments.create`, `task-attachments.read`, `task-attachments.update` and `uploads.complete`.
 
     Attributes:
         task_id (str): Task ID (text) Example: task-1234.
@@ -36,6 +36,7 @@ class TaskAttachmentInDB:
         url_expires_at (datetime.datetime | None | Unset): When `url` stops working (null for a link that does not
             expire)
         content_type (None | str | Unset): The file's detected type
+        size_bytes (int | None | Unset): The stored file's size in bytes (null when nothing is stored) Example: 1048576.
     """
 
     task_id: str
@@ -50,6 +51,7 @@ class TaskAttachmentInDB:
     is_inline: bool | None | Unset = False
     url_expires_at: datetime.datetime | None | Unset = UNSET
     content_type: None | str | Unset = UNSET
+    size_bytes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -126,6 +128,12 @@ class TaskAttachmentInDB:
         else:
             content_type = self.content_type
 
+        size_bytes: int | None | Unset
+        if isinstance(self.size_bytes, Unset):
+            size_bytes = UNSET
+        else:
+            size_bytes = self.size_bytes
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -154,6 +162,8 @@ class TaskAttachmentInDB:
             field_dict["url_expires_at"] = url_expires_at
         if content_type is not UNSET:
             field_dict["content_type"] = content_type
+        if size_bytes is not UNSET:
+            field_dict["size_bytes"] = size_bytes
 
         return field_dict
 
@@ -278,6 +288,15 @@ class TaskAttachmentInDB:
 
         content_type = _parse_content_type(d.pop("content_type", UNSET))
 
+        def _parse_size_bytes(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        size_bytes = _parse_size_bytes(d.pop("size_bytes", UNSET))
+
         task_attachment_in_db = cls(
             task_id=task_id,
             attachment_id=attachment_id,
@@ -291,6 +310,7 @@ class TaskAttachmentInDB:
             is_inline=is_inline,
             url_expires_at=url_expires_at,
             content_type=content_type,
+            size_bytes=size_bytes,
         )
 
         task_attachment_in_db.additional_properties = d

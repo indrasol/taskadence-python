@@ -53,7 +53,7 @@ Delete a project resource.
 - **Returns:** `Acknowledgement`
 - **Conditional write:** `if_match=obj.etag` → `PreconditionFailedError` (412) when stale.
 
-## `tm.project_resources.upload(project_id: str, file: FileInput, project_name: str | None = None, title: str | None = None)`
+## `tm.project_resources.upload(project_id: str, file: FileInput, project_name: str | None = None, title: str | None = None, progress: UploadProgress | None = None)`
 
 Upload a file resource (multipart).
 

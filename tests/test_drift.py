@@ -85,6 +85,8 @@ def test_every_list_is_a_page_and_every_create_is_idempotent() -> None:
         "milestones.create",
         "task-comments.create",
         "task-comments.reply",
+        "uploads.create",
+        "uploads.complete",
     }
     for op_id in lists:
         assert OPERATIONS[op_id].item is not None, op_id

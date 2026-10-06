@@ -6,6 +6,30 @@ semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
 
 ## [Unreleased]
 
+### Changed
+- Uploads go straight to storage: `task_attachments.create` and `project_resources.upload` (sync and async) create an
+  upload (`POST /v1/uploads`), stream the file to its upload URL (1 MB chunks, never read whole; retried on 5xx and
+  connection failures) and complete it (`POST /v1/uploads/{upload_id}/complete`), returning the same models as before.
+  The limit is 100 MB per file. Every argument (`is_inline`, `project_name`, `title`) goes through the direct flow. An
+  API without direct uploads (its router's plain 404, or a 405) gets multipart as before, so the switch is automatic; a
+  404 about the task / project itself is raised as `NotFoundError`. Signatures are unchanged apart from a new optional
+  `progress(sent, total)` argument.
+- The spec is pinned to API `dev` `af56676` (release 2): the upload limit is 100 MB, the included storage 10 GB, the
+  wordmark is TasKadence, `organization_invites.mine` takes `status`, and `sso-required` (403) is a problem type.
+- `TaskAttachmentInDB` and `ProjectResourceInDB` carry `size_bytes`, the stored file's size in bytes, on every response
+  that returns them (create, read, list, update); it is null when nothing is stored (a link resource).
+
+### Added
+- `tm.uploads.create` / `tm.uploads.complete` (`POST /v1/uploads`, `POST /v1/uploads/{upload_id}/complete`), the
+  direct-upload operations; the upload methods use them for you.
+- CLI `tm tasks attach TASK_ID FILE` and `tm projects upload PROJECT_ID FILE` (`--title`, `--json`), with a progress bar.
+- `taskadence.BlobUploadError`: the storage `PUT` failed after its retries (`.status`, `.code`; the URL is redacted).
+- `taskadence.UploadProgress`: the type of the `progress` callback.
+
+### Security
+- The signed upload URL never reaches a log line or an exception: the SDK logs it without its query string, and a
+  filter on the `httpx` logger strips the query from signed storage URLs.
+
 ## [0.1.0] - 2026-10-05
 
 The first public release of TasKadence's Python SDK, command line and local MCP packages.

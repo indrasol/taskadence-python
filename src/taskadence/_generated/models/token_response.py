@@ -27,7 +27,7 @@ class TokenResponse:
             'Bearer'}
 
     Attributes:
-        access_token (str): A Taskadence access token (`tkd_live_…`), 1 hour
+        access_token (str): A TasKadence access token (`tkd_live_…`), 1 hour
         expires_in (int): Seconds
         refresh_token (str): `tkdr_…` - single use: each refresh returns a new one
         scope (str): Space-separated scopes this access token holds

@@ -11,26 +11,29 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models.problem import Problem
-from ...models.storage_usage import StorageUsage
+from ...models.upload_create_in import UploadCreateIn
+from ...models.upload_create_out import UploadCreateOut
 from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
-    org_id: str,
     *,
-    if_none_match: str | Unset = UNSET,
+    body: UploadCreateIn,
+    idempotency_key: str | Unset = UNSET,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
-    if not isinstance(if_none_match, Unset):
-        headers["If-None-Match"] = if_none_match
+    if not isinstance(idempotency_key, Unset):
+        headers["Idempotency-Key"] = idempotency_key
 
     _kwargs: dict[str, Any] = {
-        "method": "get",
-        "url": "/v1/organizations/{org_id}/storage".format(
-            org_id=quote(str(org_id), safe=""),
-        ),
+        "method": "post",
+        "url": "/v1/uploads",
     }
+
+    _kwargs["json"] = body.to_dict()
+
+    headers["Content-Type"] = "application/json"
 
     _kwargs["headers"] = headers
     return _kwargs
@@ -38,15 +41,11 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | Problem | StorageUsage | None:
-    if response.status_code == 200:
-        response_200 = StorageUsage.from_dict(response.json())
+) -> Problem | UploadCreateOut | None:
+    if response.status_code == 201:
+        response_201 = UploadCreateOut.from_dict(response.json())
 
-        return response_200
-
-    if response.status_code == 304:
-        response_304 = cast(Any, None)
-        return response_304
+        return response_201
 
     if response.status_code == 400:
         response_400 = Problem.from_dict(response.json())
@@ -101,7 +100,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | Problem | StorageUsage]:
+) -> Response[Problem | UploadCreateOut]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -111,32 +110,34 @@ def _build_response(
 
 
 def sync_detailed(
-    org_id: str,
     *,
     client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | StorageUsage]:
-    """Storage used / included, the status, the breakdown, the largest files and the 30-day trend
+    body: UploadCreateIn,
+    idempotency_key: str | Unset = UNSET,
+) -> Response[Problem | UploadCreateOut]:
+    """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with
 
-     The organization's storage: used / included, the status, a breakdown by kind and by project, the
-    largest
-    files, the 30-day trend. Any member; a guest sees the totals only (no project or file names).
+     Start a direct upload: returns a URL the client PUTs the file to, and the id to finalize with.
+
+    Everything that can be refused without moving a byte is refused here: the parent's permission check,
+    the
+    extension, the declared size against the cap, and the organization's storage block (B.3 / N1).
 
     Args:
-        org_id (str): The organization
-        if_none_match (str | Unset):
+        idempotency_key (str | Unset):
+        body (UploadCreateIn): The request body of `uploads.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | StorageUsage]
+        Response[Problem | UploadCreateOut]
     """
 
     kwargs = _get_kwargs(
-        org_id=org_id,
-        if_none_match=if_none_match,
+        body=body,
+        idempotency_key=idempotency_key,
     )
 
     response = client.get_httpx_client().request(
@@ -147,63 +148,67 @@ def sync_detailed(
 
 
 def sync(
-    org_id: str,
     *,
     client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Any | Problem | StorageUsage | None:
-    """Storage used / included, the status, the breakdown, the largest files and the 30-day trend
+    body: UploadCreateIn,
+    idempotency_key: str | Unset = UNSET,
+) -> Problem | UploadCreateOut | None:
+    """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with
 
-     The organization's storage: used / included, the status, a breakdown by kind and by project, the
-    largest
-    files, the 30-day trend. Any member; a guest sees the totals only (no project or file names).
+     Start a direct upload: returns a URL the client PUTs the file to, and the id to finalize with.
+
+    Everything that can be refused without moving a byte is refused here: the parent's permission check,
+    the
+    extension, the declared size against the cap, and the organization's storage block (B.3 / N1).
 
     Args:
-        org_id (str): The organization
-        if_none_match (str | Unset):
+        idempotency_key (str | Unset):
+        body (UploadCreateIn): The request body of `uploads.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | StorageUsage
+        Problem | UploadCreateOut
     """
 
     return sync_detailed(
-        org_id=org_id,
         client=client,
-        if_none_match=if_none_match,
+        body=body,
+        idempotency_key=idempotency_key,
     ).parsed
 
 
 async def asyncio_detailed(
-    org_id: str,
     *,
     client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | StorageUsage]:
-    """Storage used / included, the status, the breakdown, the largest files and the 30-day trend
+    body: UploadCreateIn,
+    idempotency_key: str | Unset = UNSET,
+) -> Response[Problem | UploadCreateOut]:
+    """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with
 
-     The organization's storage: used / included, the status, a breakdown by kind and by project, the
-    largest
-    files, the 30-day trend. Any member; a guest sees the totals only (no project or file names).
+     Start a direct upload: returns a URL the client PUTs the file to, and the id to finalize with.
+
+    Everything that can be refused without moving a byte is refused here: the parent's permission check,
+    the
+    extension, the declared size against the cap, and the organization's storage block (B.3 / N1).
 
     Args:
-        org_id (str): The organization
-        if_none_match (str | Unset):
+        idempotency_key (str | Unset):
+        body (UploadCreateIn): The request body of `uploads.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | StorageUsage]
+        Response[Problem | UploadCreateOut]
     """
 
     kwargs = _get_kwargs(
-        org_id=org_id,
-        if_none_match=if_none_match,
+        body=body,
+        idempotency_key=idempotency_key,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -212,33 +217,35 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    org_id: str,
     *,
     client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Any | Problem | StorageUsage | None:
-    """Storage used / included, the status, the breakdown, the largest files and the 30-day trend
+    body: UploadCreateIn,
+    idempotency_key: str | Unset = UNSET,
+) -> Problem | UploadCreateOut | None:
+    """Start a direct upload: a short-lived URL to PUT the file to, and the id to finish with
 
-     The organization's storage: used / included, the status, a breakdown by kind and by project, the
-    largest
-    files, the 30-day trend. Any member; a guest sees the totals only (no project or file names).
+     Start a direct upload: returns a URL the client PUTs the file to, and the id to finalize with.
+
+    Everything that can be refused without moving a byte is refused here: the parent's permission check,
+    the
+    extension, the declared size against the cap, and the organization's storage block (B.3 / N1).
 
     Args:
-        org_id (str): The organization
-        if_none_match (str | Unset):
+        idempotency_key (str | Unset):
+        body (UploadCreateIn): The request body of `uploads.create`.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | StorageUsage
+        Problem | UploadCreateOut
     """
 
     return (
         await asyncio_detailed(
-            org_id=org_id,
             client=client,
-            if_none_match=if_none_match,
+            body=body,
+            idempotency_key=idempotency_key,
         )
     ).parsed

@@ -122,6 +122,8 @@ def test_a_mapping_body_is_sent_as_is_with_dates_encoded(tm: Taskadence, api: re
 
 
 def test_uploads_are_multipart_with_the_file(tm: Taskadence, api: respx.MockRouter, tmp_path: object) -> None:
+    """An API without direct uploads (404 on `POST /v1/uploads`): the old multipart route (tests/test_uploads.py)."""
+    api.post("/v1/uploads").respond(404, json={"type": "about:blank", "status": 404, "detail": "Not Found"})
     route = api.post("/v1/task-attachments").respond(201, json=example("task-attachments.create"))
     tm.task_attachments.create(task_id="T1", file=("notes.txt", b"hello"), title="Notes")
     body = route.calls.last.request.content
@@ -132,6 +134,7 @@ def test_uploads_are_multipart_with_the_file(tm: Taskadence, api: respx.MockRout
 def test_the_upload_sends_project_id_once_as_the_query(tm: Taskadence, api: respx.MockRouter) -> None:
     """4.1b: the spec declares `project_id` once (the query the permission check reads); it used to be a form field too,
     and the facade sent it in both places."""
+    api.post("/v1/uploads").respond(404, json={"type": "about:blank", "status": 404, "detail": "Not Found"})
     route = api.post("/v1/project-resources/upload").respond(201, json=example("project-resources.upload"))
     tm.project_resources.upload(project_id="P1", file=b"x")
     request = route.calls.last.request
