@@ -6,34 +6,10 @@ semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
 
 ## [Unreleased]
 
-### Changed
-- READMEs (S.23b): the PyPI and npm pages open with "Get started in 3 steps" (token, install, first call with its
-  expected output) and "Key ideas"; the MCP READMEs with "Set up in 3 steps" (copy-paste configs for Claude Desktop,
-  Claude Code, Cursor and VS Code), "Check it works" and Troubleshooting. Retries, idempotency, ETags, deprecations
-  and logging moved under "Advanced". Every link is absolute and checked in CI (`scripts/check_readme_links.py`); a
-  test keeps the two MCP READMEs in sync. Examples use placeholder ids (`O123456`, `T123456`) and future dates.
-- Uploads go straight to storage: `task_attachments.create` and `project_resources.upload` (sync and async) create an
-  upload (`POST /v1/uploads`), stream the file to its upload URL (1 MB chunks, never read whole; retried on 5xx and
-  connection failures) and complete it (`POST /v1/uploads/{upload_id}/complete`), returning the same models as before.
-  The limit is 100 MB per file. Every argument (`is_inline`, `project_name`, `title`) goes through the direct flow. An
-  API without direct uploads (its router's plain 404, or a 405) gets multipart as before, so the switch is automatic; a
-  404 about the task / project itself is raised as `NotFoundError`. Signatures are unchanged apart from a new optional
-  `progress(sent, total)` argument.
-- The spec is pinned to API `dev` `af56676` (release 2): the upload limit is 100 MB, the included storage 10 GB, the
-  wordmark is TasKadence, `organization_invites.mine` takes `status`, and `sso-required` (403) is a problem type.
-- `TaskAttachmentInDB` and `ProjectResourceInDB` carry `size_bytes`, the stored file's size in bytes, on every response
-  that returns them (create, read, list, update); it is null when nothing is stored (a link resource).
+## [0.1.1] - 2026-10-06
 
-### Added
-- `tm.uploads.create` / `tm.uploads.complete` (`POST /v1/uploads`, `POST /v1/uploads/{upload_id}/complete`), the
-  direct-upload operations; the upload methods use them for you.
-- CLI `tm tasks attach TASK_ID FILE` and `tm projects upload PROJECT_ID FILE` (`--title`, `--json`), with a progress bar.
-- `taskadence.BlobUploadError`: the storage `PUT` failed after its retries (`.status`, `.code`; the URL is redacted).
-- `taskadence.UploadProgress`: the type of the `progress` callback.
-
-### Security
-- The signed upload URL never reaches a log line or an exception: the SDK logs it without its query string, and a
-  filter on the `httpx` logger strips the query from signed storage URLs.
+First release published entirely through trusted publishing on PyPI and npm (with npm provenance). No API or
+behaviour changes.
 
 ## [0.1.0] - 2026-10-05
 
@@ -56,6 +32,38 @@ The first public release of TasKadence's Python SDK, command line and local MCP 
 ### Changed
 - Prose, help text and messages use the TasKadence wordmark. Package names, imports, environment variables and URLs
   are unchanged (`taskadence`, `Taskadence`, `TASKADENCE_*`).
+
+The items below were listed under Unreleased until 0.1.1; the `v0.1.0` tag was moved to the commit that has them,
+so they shipped in 0.1.0.
+
+### Also in 0.1.0: Changed
+- READMEs (S.23b): the PyPI and npm pages open with "Get started in 3 steps" (token, install, first call with its
+  expected output) and "Key ideas"; the MCP READMEs with "Set up in 3 steps" (copy-paste configs for Claude Desktop,
+  Claude Code, Cursor and VS Code), "Check it works" and Troubleshooting. Retries, idempotency, ETags, deprecations
+  and logging moved under "Advanced". Every link is absolute and checked in CI (`scripts/check_readme_links.py`); a
+  test keeps the two MCP READMEs in sync. Examples use placeholder ids (`O123456`, `T123456`) and future dates.
+- Uploads go straight to storage: `task_attachments.create` and `project_resources.upload` (sync and async) create an
+  upload (`POST /v1/uploads`), stream the file to its upload URL (1 MB chunks, never read whole; retried on 5xx and
+  connection failures) and complete it (`POST /v1/uploads/{upload_id}/complete`), returning the same models as before.
+  The limit is 100 MB per file. Every argument (`is_inline`, `project_name`, `title`) goes through the direct flow. An
+  API without direct uploads (its router's plain 404, or a 405) gets multipart as before, so the switch is automatic; a
+  404 about the task / project itself is raised as `NotFoundError`. Signatures are unchanged apart from a new optional
+  `progress(sent, total)` argument.
+- The spec is pinned to API `dev` `af56676` (release 2): the upload limit is 100 MB, the included storage 10 GB, the
+  wordmark is TasKadence, `organization_invites.mine` takes `status`, and `sso-required` (403) is a problem type.
+- `TaskAttachmentInDB` and `ProjectResourceInDB` carry `size_bytes`, the stored file's size in bytes, on every response
+  that returns them (create, read, list, update); it is null when nothing is stored (a link resource).
+
+### Also in 0.1.0: Added
+- `tm.uploads.create` / `tm.uploads.complete` (`POST /v1/uploads`, `POST /v1/uploads/{upload_id}/complete`), the
+  direct-upload operations; the upload methods use them for you.
+- CLI `tm tasks attach TASK_ID FILE` and `tm projects upload PROJECT_ID FILE` (`--title`, `--json`), with a progress bar.
+- `taskadence.BlobUploadError`: the storage `PUT` failed after its retries (`.status`, `.code`; the URL is redacted).
+- `taskadence.UploadProgress`: the type of the `progress` callback.
+
+### Also in 0.1.0: Security
+- The signed upload URL never reaches a log line or an exception: the SDK logs it without its query string, and a
+  filter on the `httpx` logger strips the query from signed storage URLs.
 
 ## Development history before 0.1.0 (never published)
 
