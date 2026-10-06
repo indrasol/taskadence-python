@@ -12,6 +12,7 @@ from typing import Any, cast, overload
 from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto
 from ._generated import models
 from ._operations import OPERATIONS as _OPS
+from ._uploads import UploadProgress
 from .pagination import AsyncPage, Page
 
 __all__ = ["RESOURCE_METHODS", "AsyncResources", "SyncResources"]
@@ -998,18 +999,25 @@ class ProjectResourcesResource:
         )
 
     def upload(
-        self, *, project_id: str, file: FileInput, project_name: str | None = None, title: str | None = None
+        self,
+        *,
+        project_id: str,
+        file: FileInput,
+        project_name: str | None = None,
+        title: str | None = None,
+        progress: UploadProgress | None = None,
     ) -> models.ProjectResourceInDB:
         """Upload a file resource (multipart).
 
-        `POST /v1/project-resources/upload` · scope `projects:write`
+        `POST /v1/project-resources/upload` · scope `projects:write` · sent direct to storage (`POST /v1/uploads`), else multipart
         """
         return cast(
             "models.ProjectResourceInDB",
-            self._client._call(
+            self._client._upload(
                 _OPS["project-resources.upload"],
                 query={"project_id": project_id},
                 form={"project_name": project_name, "title": title, "file": file},
+                progress=progress,
             ),
         )
 
@@ -1031,14 +1039,15 @@ class TaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
 
-        `POST /v1/task-attachments` · scope `tasks:write`
+        `POST /v1/task-attachments` · scope `tasks:write` · sent direct to storage (`POST /v1/uploads`), else multipart
         """
         return cast(
             "models.TaskAttachmentInDB",
-            self._client._call(
+            self._client._upload(
                 _OPS["task-attachments.create"],
                 form={
                     "task_id": task_id,
@@ -1047,6 +1056,7 @@ class TaskAttachmentsResource:
                     "is_inline": is_inline,
                     "file": file,
                 },
+                progress=progress,
             ),
         )
 
@@ -3826,18 +3836,25 @@ class AsyncProjectResourcesResource:
         )
 
     async def upload(
-        self, *, project_id: str, file: FileInput, project_name: str | None = None, title: str | None = None
+        self,
+        *,
+        project_id: str,
+        file: FileInput,
+        project_name: str | None = None,
+        title: str | None = None,
+        progress: UploadProgress | None = None,
     ) -> models.ProjectResourceInDB:
         """Upload a file resource (multipart).
 
-        `POST /v1/project-resources/upload` · scope `projects:write`
+        `POST /v1/project-resources/upload` · scope `projects:write` · sent direct to storage (`POST /v1/uploads`), else multipart
         """
         return cast(
             "models.ProjectResourceInDB",
-            await self._client._call(
+            await self._client._upload(
                 _OPS["project-resources.upload"],
                 query={"project_id": project_id},
                 form={"project_name": project_name, "title": title, "file": file},
+                progress=progress,
             ),
         )
 
@@ -3859,14 +3876,15 @@ class AsyncTaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
 
-        `POST /v1/task-attachments` · scope `tasks:write`
+        `POST /v1/task-attachments` · scope `tasks:write` · sent direct to storage (`POST /v1/uploads`), else multipart
         """
         return cast(
             "models.TaskAttachmentInDB",
-            await self._client._call(
+            await self._client._upload(
                 _OPS["task-attachments.create"],
                 form={
                     "task_id": task_id,
@@ -3875,6 +3893,7 @@ class AsyncTaskAttachmentsResource:
                     "is_inline": is_inline,
                     "file": file,
                 },
+                progress=progress,
             ),
         )
 

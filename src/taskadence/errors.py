@@ -4,6 +4,7 @@
     ├── APIConnectionError                the request never got an HTTP answer (DNS, refused, reset)
     │   └── APITimeoutError
     ├── ResponseValidationError           a 2xx whose body does not match the spec this SDK was generated from
+    ├── BlobUploadError                   a direct upload's PUT to storage failed (.status .code; the URL is redacted)
     └── TaskadenceError                    an HTTP error answer: .status .type .title .detail .request_id .errors
         ├── BadRequestError (400)         ├── InvalidParameterError   urn:taskadence:problem:invalid-parameter
         │                                 └── IdempotencyKeyInvalidError
@@ -61,6 +62,18 @@ class ResponseValidationError(APIError):
         super().__init__(message)
         self.operation = operation
         self.body = body
+
+
+class BlobUploadError(APIError):
+    """A direct upload's PUT to Azure Blob Storage failed after its retries (or was refused: an expired upload URL is
+    403 `AuthenticationFailed`). Nothing was attached; call the upload again for a fresh URL. The message and every
+    attribute carry the URL without its query string (the signature), never the signed URL itself."""
+
+    def __init__(self, message: str, *, status: int | None = None, code: str | None = None, url: str = "") -> None:
+        super().__init__(message)
+        self.status = status
+        self.code = code
+        self.url = url
 
 
 class TaskadenceError(APIError):

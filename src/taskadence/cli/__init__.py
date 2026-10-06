@@ -6,6 +6,8 @@
     tm tasks create --org O0020 --title "Ship the SDK" --project P96441
     tm tasks update T123456 --status completed
     tm views rows V123456 --csv > rows.csv
+    tm tasks attach T123456 ./report.pdf    # a file to a task (direct to storage, with a progress bar)
+    tm projects upload P96441 ./plan.xlsx   # a file to a project's resources
     tm storage --org O0020             # the storage meter: used of 1 TB, status, by kind, top projects and files
 
 Output: a table by default, `--json` for the raw API objects. Exit codes: 0 success; 1 an API or connection error (the
@@ -20,12 +22,15 @@ import json
 import re
 import sys
 import warnings
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from contextlib import contextmanager
+from pathlib import Path
 from typing import Annotated, Any, TypeVar
 
 try:
     import typer
     from rich.console import Console
+    from rich.progress import BarColumn, DownloadColumn, Progress, TextColumn, TransferSpeedColumn
     from rich.table import Table
 except ImportError as exc:  # pragma: no cover - the extra is not installed
     raise SystemExit('The tm CLI needs the cli extra: pip install "taskadence[cli]"') from exc
@@ -44,8 +49,8 @@ app = typer.Typer(
     pretty_exceptions_enable=False,
 )
 auth_app = typer.Typer(help="Store, check and remove your access token.", no_args_is_help=True)
-tasks_app = typer.Typer(help="Tasks: list (the filter grammar), get, create, update.", no_args_is_help=True)
-projects_app = typer.Typer(help="Projects.", no_args_is_help=True)
+tasks_app = typer.Typer(help="Tasks: list (the filter grammar), get, create, update, attach.", no_args_is_help=True)
+projects_app = typer.Typer(help="Projects: list, upload.", no_args_is_help=True)
 views_app = typer.Typer(help="Saved views.", no_args_is_help=True)
 webhooks_app = typer.Typer(help="Webhooks (owner / admin).", no_args_is_help=True)
 tokens_app = typer.Typer(help="Access tokens.", no_args_is_help=True)
@@ -522,6 +527,80 @@ def tokens_list(org: OrgOpt = None, json_: JsonOpt = False, table: TableOpt = Fa
             "last_used_at",
         ],
     )
+
+
+# ---------------------------------------------------------------------------
+# uploads (direct to storage, `taskadence._uploads`; multipart on an API without it)
+# ---------------------------------------------------------------------------
+
+FileArg = Annotated[
+    Path, typer.Argument(exists=True, dir_okay=False, readable=True, resolve_path=True, help="The file to upload.")
+]
+
+
+@contextmanager
+def _upload_progress(path: Path, quiet: bool) -> Iterator[Callable[[int, int], object] | None]:
+    """A progress bar on stderr (so `--json` output stays clean); none when stderr is not a terminal or --json."""
+    if quiet or not err.is_terminal:
+        yield None
+        return
+    with Progress(
+        TextColumn("[bold]{task.description}"),
+        BarColumn(),
+        DownloadColumn(binary_units=False),
+        TransferSpeedColumn(),
+        console=err,
+        transient=True,
+    ) as bar:
+        task = bar.add_task(path.name, total=path.stat().st_size)
+
+        def advance(sent: int, total: int) -> None:
+            bar.update(task, completed=sent, total=total)
+
+        yield advance
+
+
+@tasks_app.command("attach")
+def tasks_attach(
+    task_id: str,
+    file: FileArg,
+    title: Annotated[str | None, typer.Option("--title", help="A title (default: the file name).")] = None,
+    project: Annotated[str | None, typer.Option("--project", help="The task's project id.")] = None,
+    json_: JsonOpt = False,
+) -> None:
+    """Attach a file to a task (up to 100 MB; sent straight to storage, then checked and scanned by the API)."""
+    with _upload_progress(file, json_) as progress:
+        result = _run(
+            lambda tm: tm.task_attachments.create(
+                task_id=task_id, file=file, title=title, project_id=project, progress=progress
+            )
+        )
+    if json_:
+        _print_json(result)
+        return
+    data = _plain(result)
+    size = _bytes(file.stat().st_size)
+    out.print(f"Attached {data.get('name') or file.name} ({size}) to {task_id}: {data.get('attachment_id')}")
+
+
+@projects_app.command("upload")
+def projects_upload(
+    project_id: str,
+    file: FileArg,
+    title: Annotated[str | None, typer.Option("--title", help="A title (default: the file name).")] = None,
+    json_: JsonOpt = False,
+) -> None:
+    """Upload a file to a project's resources (up to 100 MB; straight to storage, then checked and scanned)."""
+    with _upload_progress(file, json_) as progress:
+        result = _run(
+            lambda tm: tm.project_resources.upload(project_id=project_id, file=file, title=title, progress=progress)
+        )
+    if json_:
+        _print_json(result)
+        return
+    data = _plain(result)
+    size = _bytes(file.stat().st_size)
+    out.print(f"Uploaded {data.get('resource_name') or file.name} ({size}) to {project_id}: {data.get('resource_id')}")
 
 
 def main() -> None:

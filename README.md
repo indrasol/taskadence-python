@@ -161,6 +161,18 @@ if tm.tasks.get("T123456", if_none_match=task.etag) is NotModified:      # 304: 
     ...
 ```
 
+### Uploading files
+
+Files go straight to storage (create an upload, stream the file to its URL, complete it), up to 100 MB each. You call
+the same methods and get the same models; against an API without direct uploads the SDK sends multipart as before.
+How it works: [Uploading files](https://github.com/indrasol/taskadence-python/blob/main/docs/uploading-files.md).
+
+```python
+tm.task_attachments.create(task_id="T123456", file="report.pdf", title="Q3 report")   # a path, bytes or a file object
+tm.project_resources.upload(project_id="P96441", file=open("plan.xlsx", "rb"),
+                            progress=lambda sent, total: print(f"{sent * 100 // total}%"))
+```
+
 ### Deprecations
 
 When the API answers with `Deprecation` / `Sunset` headers, the SDK emits one `DeprecationWarning` per operation per
@@ -198,7 +210,8 @@ with the reason instead of returning `False`.
 ### Logging
 
 The SDK logs to the `taskadence` logger at DEBUG: one line per request (method, path, status, time, attempt,
-`request_id`). It never logs the token, and never logs headers.
+`request_id`). It never logs the token, and never logs headers. An upload URL (a signed storage URL) is logged without
+its query string, by the SDK and by `httpx`.
 
 ## The command line
 
@@ -212,6 +225,8 @@ tm tasks create --title "Ship the SDK" --project P96441 --due 2026-10-01
 tm tasks update T123456 --status completed      # reads the ETag first: a concurrent change is a 412, not an overwrite
 tm projects list
 tm views rows V123456 --csv > rows.csv
+tm tasks attach T123456 ./report.pdf --title "Q3 report"   # straight to storage, with a progress bar
+tm projects upload P96441 ./plan.xlsx
 tm webhooks list · tm webhooks test WH123456 · tm webhooks deliveries WH123456
 tm tokens list
 tm storage

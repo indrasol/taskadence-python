@@ -316,3 +316,76 @@ def test_timestamps_print_to_the_minute_in_utc() -> None:
     assert _cell("2026-09-28T04:10:59.221500+00:00") == "2026-09-28 04:10Z"
     assert _cell("2026-09-28T04:10:59Z") == "2026-09-28 04:10Z"
     assert _cell("2026-09-28") == "2026-09-28" and _cell(["a", "b"]) == "a, b" and _cell(None) == ""
+
+
+# ---------------------------------------------------------------------------
+# uploads (`tm tasks attach`, `tm projects upload`): the SDK's direct-upload helper
+# ---------------------------------------------------------------------------
+
+SAS_URL = "https://tkdfiles.blob.core.windows.net/files/pending/O0020/up_1?sp=cw&sig=S3CR3T"
+
+
+def _direct(api: respx.MockRouter, answer: dict[str, Any]) -> tuple[Any, Any, Any]:
+    create = api.post("/v1/uploads").respond(
+        201, json={"upload_id": "up_1", "upload_url": SAS_URL, "method": "PUT", "headers": {}}
+    )
+    put = api.put(SAS_URL).respond(201)
+    complete = api.post("/v1/uploads/up_1/complete").respond(201, json=answer)
+    return create, put, complete
+
+
+def test_tasks_attach_uploads_direct(signed_in: None, api: respx.MockRouter, tmp_path: Path) -> None:
+    path = tmp_path / "report.pdf"
+    path.write_bytes(b"%PDF-1.7 report")
+    create, put, complete = _direct(api, example("task-attachments.create"))
+    result = invoke("tasks", "attach", "T1", str(path), "--title", "Report")
+    assert result.exit_code == 0, result.output
+    assert json.loads(create.calls.last.request.content)["task_id"] == "T1"
+    assert put.calls.last.request.content == b"%PDF-1.7 report"
+    assert json.loads(complete.calls.last.request.content) == {"title": "Report"}
+    assert "Attached" in result.output and "to T1" in result.output and "S3CR3T" not in result.output
+    no_token_in(result)
+
+
+def test_projects_upload_falls_back_to_multipart(signed_in: None, api: respx.MockRouter, tmp_path: Path) -> None:
+    path = tmp_path / "plan.txt"
+    path.write_bytes(b"plan")
+    api.post("/v1/uploads").respond(404, json=problem(404))
+    legacy = api.post("/v1/project-resources/upload").respond(201, json=example("project-resources.upload"))
+    result = invoke("projects", "upload", "P1", str(path), "--json")
+    assert result.exit_code == 0, result.output
+    assert legacy.called and json.loads(result.output)["project_id"]
+
+
+def test_an_upload_refusal_is_printed_and_exits_1(signed_in: None, api: respx.MockRouter, tmp_path: Path) -> None:
+    path = tmp_path / "big.bin"
+    path.write_bytes(b"x")
+    api.post("/v1/uploads").respond(
+        413, json=problem(413, "urn:taskadence:problem:upload-too-large", "The file is over 100 MB.")
+    )
+    result = invoke("tasks", "attach", "T1", str(path))
+    assert result.exit_code == 1 and "over 100 MB" in result.output
+
+
+def test_a_missing_file_is_a_usage_error(signed_in: None, tmp_path: Path) -> None:
+    assert invoke("tasks", "attach", "T1", str(tmp_path / "nope.txt")).exit_code == 2
+
+
+def test_the_progress_bar_follows_the_upload(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import io
+
+    from rich.console import Console
+
+    from taskadence import cli
+
+    path = tmp_path / "f.bin"
+    path.write_bytes(b"x" * 2000)
+    screen = io.StringIO()
+    monkeypatch.setattr(cli, "err", Console(file=screen, force_terminal=True, width=100))
+    with cli._upload_progress(path, quiet=False) as progress:
+        assert progress is not None
+        progress(1000, 2000)
+        progress(2000, 2000)
+    assert "f.bin" in screen.getvalue()
+    with cli._upload_progress(path, quiet=True) as progress:
+        assert progress is None

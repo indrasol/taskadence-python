@@ -442,6 +442,9 @@ class Facade:
         if op.is_create:
             kw.append("idempotency_key: str | _Auto | None = AUTO")
             call.append("idempotency_key=idempotency_key")
+        if op.files:  # every upload goes direct to storage (`_uploads`); `progress(sent, total)` is optional
+            kw.append("progress: UploadProgress | None = None")
+            call.append("progress=progress")
         if kw:
             params.append("*")
             params += kw
@@ -461,6 +464,8 @@ class Facade:
             bits.append("`if_match=<etag>` → 412 when stale")
         if op.if_none_match:
             bits.append("`if_none_match=<etag>` → `NotModified` when unchanged")
+        if op.files:
+            bits.append("sent direct to storage (`POST /v1/uploads`), else multipart")
         summary = op.summary.replace('"""', "'''").replace("\\", "\\\\")
         return f'"""{summary}.\n\n        ' + " · ".join(bits) + '\n        """'
 
@@ -469,7 +474,7 @@ class Facade:
         ret = op.return_type.replace("Page[", "AsyncPage[") if is_async else op.return_type
         defn = "async def" if is_async else "def"
         awaited = "await " if is_async else ""
-        target = "_call"
+        target = "_upload" if op.files else "_call"
         body_call = f"self._client.{target}(_OPS[{op.op_id!r}]{''.join(', ' + c for c in call)})"
         lines: list[str] = []
         if op.if_none_match:
@@ -510,6 +515,7 @@ class Facade:
             "from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto",
             "from ._generated import models",
             "from ._operations import OPERATIONS as _OPS",
+            "from ._uploads import UploadProgress",
             "from .pagination import AsyncPage, Page",
             "",
             "__all__ = ['AsyncResources', 'SyncResources', 'RESOURCE_METHODS']",

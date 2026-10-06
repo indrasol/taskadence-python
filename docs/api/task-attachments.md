@@ -4,7 +4,7 @@ Files attached to a task.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
-## `tm.task_attachments.create(task_id: str, file: FileInput, project_id: str | None = None, title: str | None = None, is_inline: bool | None = None)`
+## `tm.task_attachments.create(task_id: str, file: FileInput, project_id: str | None = None, title: str | None = None, is_inline: bool | None = None, progress: UploadProgress | None = None)`
 
 Upload an attachment to a task (multipart).
 

@@ -16,6 +16,7 @@ from . import errors, models, webhooks
 from ._client import AsyncTaskadence, Taskadence
 from ._core import AUTO, ConfigurationError, FileInput, NotModified, NotModifiedType, Operation
 from ._operations import API_VERSION, DEFAULT_BASE_URL, OPERATIONS
+from ._uploads import UploadProgress
 from ._version import __version__
 from .errors import (
     APIConnectionError,
@@ -23,6 +24,7 @@ from .errors import (
     APITimeoutError,
     AuthenticationError,
     BadRequestError,
+    BlobUploadError,
     ConflictError,
     ForbiddenError,
     IdempotencyKeyInFlightError,
@@ -60,6 +62,7 @@ __all__ = [
     "AsyncTaskadence",
     "AuthenticationError",
     "BadRequestError",
+    "BlobUploadError",
     "ConfigurationError",
     "ConflictError",
     "FileInput",
@@ -87,6 +90,7 @@ __all__ = [
     "TokenPolicyError",
     "TokenRevokedError",
     "UnprocessableEntityError",
+    "UploadProgress",
     "UrlRefusedError",
     "ValidationError",
     "__version__",

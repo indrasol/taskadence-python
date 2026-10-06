@@ -479,6 +479,12 @@ class SyncCore(_BaseClient):
 
         return self._answer(op, response, self._parse_client, again, Page)
 
+    def _upload(self, op: Operation, *, progress: Callable[[int, int], object] | None = None, **kwargs: Any) -> Any:
+        """A file upload: direct to storage, else the operation's multipart route (`_uploads`)."""
+        from ._uploads import upload
+
+        return upload(self, op, query=kwargs.get("query"), form=kwargs.get("form"), progress=progress)
+
     def close(self) -> None:
         if self._owns_http:
             self._http.close()
@@ -543,6 +549,14 @@ class AsyncCore(_BaseClient):
             return await self._call(op, **{**kwargs, "query": {**(kwargs.get("query") or {}), "cursor": cursor}})
 
         return self._answer(op, response, self._parse_client, again, AsyncPage)
+
+    async def _upload(
+        self, op: Operation, *, progress: Callable[[int, int], object] | None = None, **kwargs: Any
+    ) -> Any:
+        """A file upload: direct to storage, else the operation's multipart route (`_uploads`)."""
+        from ._uploads import aupload
+
+        return await aupload(self, op, query=kwargs.get("query"), form=kwargs.get("form"), progress=progress)
 
     async def aclose(self) -> None:
         if self._owns_http:
