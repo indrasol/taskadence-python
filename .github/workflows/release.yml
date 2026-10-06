@@ -84,9 +84,10 @@ jobs:
           grep -H VERSION packages/mcp-node/src/version.ts
       - run: pip install -e ".[dev]" -e "./packages/taskadence-mcp[dev]" cyclonedx-bom
       - name: The code is what the spec generates
+        # The stamp step above has just rewritten _version.py on a tag: that is the release, not drift.
         run: |
           python scripts/generate.py
-          git diff --exit-code -- src docs
+          git diff --exit-code -- src docs ':(exclude)src/taskadence/_version.py'
       - run: pytest
       - run: mypy
       - run: pytest && mypy   # its own pyproject (config, testpaths)
