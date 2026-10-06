@@ -2,7 +2,7 @@
 
 A task's change history.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.task_history.list(task_id: str, title: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 

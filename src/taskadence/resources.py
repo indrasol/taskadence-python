@@ -1356,7 +1356,7 @@ class ServiceAccountsResource:
 
 
 class TokensResource:
-    """Taskadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate."""
+    """TasKadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -1686,7 +1686,7 @@ class OauthClientsResource:
 
 
 class ConnectedAppsResource:
-    """The OAuth apps you have connected to Taskadence, and disconnecting them."""
+    """The OAuth apps you have connected to TasKadence, and disconnecting them."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -1720,7 +1720,7 @@ class ConnectedAppsResource:
 
 
 class ReleasesResource:
-    """What's new in Taskadence."""
+    """What's new in TasKadence."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
@@ -4196,7 +4196,7 @@ class AsyncServiceAccountsResource:
 
 
 class AsyncTokensResource:
-    """Taskadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate."""
+    """TasKadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -4533,7 +4533,7 @@ class AsyncOauthClientsResource:
 
 
 class AsyncConnectedAppsResource:
-    """The OAuth apps you have connected to Taskadence, and disconnecting them."""
+    """The OAuth apps you have connected to TasKadence, and disconnecting them."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
@@ -4569,7 +4569,7 @@ class AsyncConnectedAppsResource:
 
 
 class AsyncReleasesResource:
-    """What's new in Taskadence."""
+    """What's new in TasKadence."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client

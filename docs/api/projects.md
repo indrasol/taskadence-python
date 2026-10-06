@@ -2,7 +2,7 @@
 
 Projects: create, read, update, delete, reorder.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.projects.create(body: ProjectCreate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
 

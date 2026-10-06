@@ -1,5 +1,3 @@
-# The dashboard's dependencies. Until taskadence is on PyPI (task S.23), install the SDK from this checkout first:
-#   pip install -e "../..[pandas]"      (from examples/streamlit_dashboard)   — or the built wheel
-# and then:  pip install -r requirements.txt
-taskadence[pandas]>=0.1.0.dev0
+# The dashboard's dependencies: pip install -r requirements.txt
+taskadence[pandas]>=0.1.0
 streamlit>=1.40

@@ -1,8 +1,8 @@
 # `tm.connected_apps`
 
-The OAuth apps you have connected to Taskadence, and disconnecting them.
+The OAuth apps you have connected to TasKadence, and disconnecting them.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.connected_apps.list(limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 

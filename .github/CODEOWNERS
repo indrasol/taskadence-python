@@ -1,0 +1,9 @@
+# CODEOWNERS - taskadence-python (TasKadence)
+#
+# Routing only: GitHub requests a review from these owners when a pull request touches a path below. Any teammate with
+# write access can still satisfy the one-approval rule. Keep at least two owners so nobody is a single point of failure.
+
+*                       @DharmatejN-Indrasol @Rithin25295 @VasaviChavala
+
+# Release and CI configuration: the same owners, listed so the rule is visible when only workflows change.
+/.github/               @DharmatejN-Indrasol @Rithin25295 @VasaviChavala

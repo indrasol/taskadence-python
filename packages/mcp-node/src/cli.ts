@@ -39,7 +39,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
     return 0;
   }
   if (values.version) {
-    process.stderr.write(`${SLUG}-mcp ${VERSION}\n`);
+    process.stderr.write(`${BRAND_NAME} MCP (${SLUG}-mcp) ${VERSION}\n`);
     return 0;
   }
   let config;

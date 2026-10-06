@@ -1,8 +1,8 @@
 # `tm.tokens`
 
-Taskadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate.
+TasKadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.tokens.create(body: TokenCreate | Mapping[str, Any])`
 

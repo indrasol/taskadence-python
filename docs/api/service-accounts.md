@@ -2,7 +2,7 @@
 
 Non-human organization members that hold access tokens. They cannot sign in.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.service_accounts.create(org_id: str, body: ServiceAccountCreate | Mapping[str, Any])`
 

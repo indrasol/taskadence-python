@@ -1,0 +1,44 @@
+name: Bug report
+description: Something in the SDK, the tm command line or the MCP packages does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Never paste a live access token**: a prefix such as `tkd_live_ab12…` is enough.
+        Security issues go to private reporting instead (see SECURITY.md), not here.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - taskadence (Python SDK)
+        - taskadence[cli] (tm command line)
+        - taskadence-mcp (uvx)
+        - "@taskadence/mcp (npx)"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`tm --version`, `taskadence-mcp --version` or `npx -y @taskadence/mcp --version`"
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Python or Node version, and OS
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the `request_id` from the error if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The smallest code or command that shows the problem.
+      render: python

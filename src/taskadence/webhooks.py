@@ -1,4 +1,4 @@
-"""Receiving Taskadence webhooks: verify the signature, then parse the event.
+"""Receiving TasKadence webhooks: verify the signature, then parse the event.
 
     from taskadence import webhooks
 
@@ -14,7 +14,7 @@ The recipe is `taskadence-api/docs/api/WEBHOOKS_WORKFLOW.md` (Standard Webhooks)
 `"{webhook-id}.{webhook-timestamp}.{raw body}"`, the HMAC-SHA256 key is the base64-DECODED part of the secret after
 `whsec_`, and `webhook-signature` holds one or more space-separated `v1,<base64>` values.
 
-ROTATION, both ways. After "rotate secret" Taskadence signs with the old AND the new secret for 24 h (two values in the
+ROTATION, both ways. After "rotate secret" TasKadence signs with the old AND the new secret for 24 h (two values in the
 header), so a receiver still holding the old secret keeps verifying; and a receiver may pass BOTH secrets
 (`verify([new, old], …)`) while it switches over. A timestamp further than `tolerance` seconds from now is refused
 (a replayed capture). Compare in constant time; verify the raw bytes — never a re-serialized JSON.
@@ -47,7 +47,7 @@ class WebhookVerificationError(ValueError):
 
 
 class WebhookParseError(ValueError):
-    """Raised by `parse` when the body is not a Taskadence webhook event (not a JSON object, or a field missing)."""
+    """Raised by `parse` when the body is not a TasKadence webhook event (not a JSON object, or a field missing)."""
 
 
 # The generated models parse with `datetime.fromisoformat`, which on Python 3.10 accepts neither a `Z` suffix nor a
@@ -74,11 +74,11 @@ def _key(secret: str) -> bytes:
     try:
         return base64.b64decode(secret.removeprefix(SECRET_PREFIX), validate=True)
     except (binascii.Error, ValueError):
-        raise WebhookVerificationError("the secret is not a Taskadence webhook secret (`whsec_` + base64)") from None
+        raise WebhookVerificationError("the secret is not a TasKadence webhook secret (`whsec_` + base64)") from None
 
 
 def sign(secret: str, msg_id: str, timestamp: int, body: bytes) -> str:
-    """The `v1,<base64>` signature Taskadence sends — for tests of your own receiver."""
+    """The `v1,<base64>` signature TasKadence sends — for tests of your own receiver."""
     digest = hmac.new(_key(secret), f"{msg_id}.{timestamp}.".encode() + body, hashlib.sha256).digest()
     return "v1," + base64.b64encode(digest).decode()
 
@@ -92,7 +92,7 @@ def verify(
     now: float | None = None,
     raise_on_failure: bool = False,
 ) -> bool:
-    """True when `body` was signed by Taskadence with `secret` (or any of several secrets) within `tolerance` seconds.
+    """True when `body` was signed by TasKadence with `secret` (or any of several secrets) within `tolerance` seconds.
 
     `headers`: the request's headers (any mapping; names are matched case-insensitively). `body`: the RAW request body.
     """
@@ -133,7 +133,7 @@ def parse(body: bytes | str | Mapping[str, Any]) -> WebhookEvent:
     except WebhookParseError:
         raise
     except (KeyError, TypeError, ValueError, AttributeError) as exc:
-        raise WebhookParseError(f"not a Taskadence webhook event ({type(exc).__name__}: {exc})") from None
+        raise WebhookParseError(f"not a TasKadence webhook event ({type(exc).__name__}: {exc})") from None
 
 
 __all__ = [

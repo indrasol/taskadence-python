@@ -2,7 +2,7 @@
 
 The organization's audit log (owners and admins).
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.audit.list(org_id: str, cursor: str | None = None, resource_type: str | None = None, resource_id: str | None = None, project_id: str | None = None, action: str | None = None, actor: str | None = None, from_: str | None = None, to: str | None = None, limit: int | None = None)`
 

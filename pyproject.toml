@@ -5,15 +5,16 @@ build-backend = "hatchling.build"
 [project]
 name = "taskadence"
 dynamic = ["version"]
-description = "The Taskadence API for Python: a typed client generated from the public OpenAPI, a `tm` CLI, and pandas helpers."
+description = "The official Python SDK for the TasKadence API: a typed client generated from the public OpenAPI, the `tm` command line, and pandas helpers."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "Indrasol" }]
-keywords = ["taskadence", "tasks", "project management", "api", "sdk"]
+keywords = ["taskadence", "tasks", "project management", "api", "sdk", "client", "cli", "pandas", "webhooks"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -22,6 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Scheduling",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
 dependencies = [
@@ -58,8 +61,10 @@ tm = "taskadence.cli:main"
 taskadence = "taskadence.cli:main"  # the same CLI under the product's name
 
 [project.urls]
-Homepage = "https://docs.taskadence.com"
+Homepage = "https://taskadence.com"
+Documentation = "https://docs.taskadence.com"
 Source = "https://github.com/indrasol/taskadence-python"
+Issues = "https://github.com/indrasol/taskadence-python/issues"
 Changelog = "https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]

@@ -1,7 +1,8 @@
 """The product's name and every name derived from it, in ONE place — plus the pre-rename (TasksMate) spellings that
 are still accepted on input. Nothing here is emitted under the old name: the legacy values are read, never sent.
 
-- `BRAND_NAME`: what messages and help text call the product.
+- `BRAND_NAME`: the wordmark, what prose, messages and help text call the product (5.8c). Identifiers, package names,
+  imports, environment variables and URLs stay `Taskadence` / `taskadence`; `wordmark()` applies it to generated prose.
 - Environment: `TASKADENCE_*` first; a `TASKSMATE_*` variable still works, with a `DeprecationWarning` (`getenv`).
 - Problem types: the API emits `urn:taskadence:problem:…`; `urn:tasksmate:problem:…` (older servers) is read the same.
 - Access tokens: issued as `tkd_live_…` / `tkd_test_…`; `tm_live_…` / `tm_test_…` tokens minted before the rename
@@ -11,11 +12,12 @@ are still accepted on input. Nothing here is emitted under the old name: the leg
 from __future__ import annotations
 
 import os
+import re
 import sys
 import warnings
 from types import FrameType
 
-BRAND_NAME = "Taskadence"
+BRAND_NAME = "TasKadence"
 SLUG = "taskadence"
 
 ENV_PREFIX = "TASKADENCE_"
@@ -28,6 +30,10 @@ URN_PREFIXES = (URN_PREFIX, LEGACY_URN_PREFIX)
 TOKEN_PREFIXES = ("tkd_live_", "tkd_test_")
 LEGACY_TOKEN_PREFIXES = ("tm_live_", "tm_test_")  # minted before the rename; still valid
 ACCEPTED_TOKEN_PREFIXES = TOKEN_PREFIXES + LEGACY_TOKEN_PREFIXES
+
+# The class-style name in running prose: not inside code (`Taskadence(...)`, `AsyncTaskadence`, `TaskadenceError`,
+# `X-Taskadence-Event`, `Taskadence-Version`) and not a path or URL.
+_PROSE_NAME = re.compile(r"(?<![\w`./-])Taskadence(?![\w(`/-])")
 
 LEGACY_SLUG = "tasksmate"  # the CLI's keyring service and config directory before the rename (read, then migrated)
 
@@ -60,6 +66,12 @@ def _caller_level() -> int:
     while frame is not None and str(frame.f_globals.get("__name__", "")).startswith(SLUG):
         level, frame = level + 1, frame.f_back
     return level
+
+
+def wordmark(text: str) -> str:
+    """`text` with the product name in prose spelled as the wordmark; code spans (`…`) are left as they are."""
+    parts = text.split("`")
+    return "`".join(part if i % 2 else _PROSE_NAME.sub(BRAND_NAME, part) for i, part in enumerate(parts))
 
 
 def problem_slug(type_: str) -> str | None:

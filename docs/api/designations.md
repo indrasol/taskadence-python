@@ -2,7 +2,7 @@
 
 Job designations (global and per-organization).
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.designations.list(org_id: str | None = None, grouped: bool | None = None, with_usage: bool | None = None, include_hidden: bool | None = None, include_inactive: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 

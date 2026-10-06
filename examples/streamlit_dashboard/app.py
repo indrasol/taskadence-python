@@ -1,7 +1,6 @@
-"""Taskadence dashboard — a Streamlit example of the `taskadence` SDK.
+"""TasKadence dashboard — a Streamlit example of the `taskadence` SDK.
 
     export TASKADENCE_TOKEN=tkd_live_…                 # an access token with tasks:read + projects:read
-    export TASKADENCE_API_URL=http://localhost:8000   # optional; default: the SDK's server
     streamlit run examples/streamlit_dashboard/app.py
 
 No other configuration: the organizations come from `tm.me()`, everything else from the API.
@@ -18,7 +17,7 @@ import streamlit as st
 
 from taskadence import APIError, Taskadence, TaskadenceError
 
-st.set_page_config(page_title="Taskadence dashboard", page_icon="✅", layout="wide")
+st.set_page_config(page_title="TasKadence dashboard", page_icon="✅", layout="wide")
 
 DONE = {"completed", "archived"}
 STATUS_ORDER = ["backlog", "not_started", "in_progress", "blocked", "on_hold", "completed", "archived"]
@@ -27,8 +26,8 @@ PRIORITY_ORDER = ["critical", "high", "medium", "low", "none"]
 
 if not os.environ.get("TASKADENCE_TOKEN"):
     st.error(
-        "Set **TASKADENCE_TOKEN** to a Taskadence access token (`tkd_live_…`) and restart: "
-        "`TASKADENCE_TOKEN=tkd_live_… streamlit run app.py`. Mint one in Taskadence → Developers → Tokens."
+        "Set **TASKADENCE_TOKEN** to a TasKadence access token (`tkd_live_…`) and restart: "
+        "`TASKADENCE_TOKEN=tkd_live_… streamlit run app.py`. Mint one in TasKadence → Developers → Tokens."
     )
     st.stop()
 
@@ -99,11 +98,11 @@ def show(frame: pd.DataFrame) -> None:
 try:
     username, orgs = whoami()
 except (TaskadenceError, APIError) as exc:
-    st.error(f"The Taskadence API refused the request: {exc}")
+    st.error(f"The TasKadence API refused the request: {exc}")
     st.stop()
 
 with st.sidebar:
-    st.title("Taskadence")
+    st.title("TasKadence")
     st.caption(f"Signed in as **{username or 'a service account'}** · {client().base_url}")
     if not orgs:
         st.warning("This token belongs to no organization.")

@@ -1,7 +1,7 @@
 # Where `openapi.public.json` came from
 
 `spec/openapi.public.json` is **the only input** the SDK is generated from (`python scripts/generate.py`). It is a
-snapshot of the public contract the Taskadence API serves at `/openapi.public.json`, pretty-printed
+snapshot of the public contract the TasKadence API serves at `/openapi.public.json`, pretty-printed
 (`python -m json.tool --indent 2`), committed so that a regeneration never depends on a live server.
 
 | | |

@@ -23,7 +23,7 @@ LEGACY_TOKEN = "tm_live_" + "z" * 43  # minted before the rename: still a valid 
 
 
 def test_the_brand_is_taskadence() -> None:
-    assert BRAND_NAME == "Taskadence"
+    assert BRAND_NAME == "TasKadence"  # the wordmark (5.8c); identifiers below stay `Taskadence`
     assert taskadence.Taskadence.__name__ == "Taskadence" and taskadence.AsyncTaskadence.__name__ == "AsyncTaskadence"
     assert taskadence.DEFAULT_BASE_URL == "https://api.taskadence.com"
 
@@ -43,7 +43,7 @@ def test_a_legacy_variable_still_works_with_a_deprecation_warning(monkeypatch: p
     monkeypatch.setenv("TASKSMATE_API_URL", "https://legacy.example.test/v1")
     with pytest.warns(DeprecationWarning) as caught:
         tm = taskadence.Taskadence()
-    assert any("TASKSMATE_TOKEN is deprecated: Taskadence reads TASKADENCE_TOKEN" in str(w.message) for w in caught)
+    assert any("TASKSMATE_TOKEN is deprecated: TasKadence reads TASKADENCE_TOKEN" in str(w.message) for w in caught)
     assert tm.base_url == "https://legacy.example.test"
     assert tm._core._headers["Authorization"] == f"Bearer {LEGACY_TOKEN}"
     assert {str(w.message).split(" ")[0] for w in caught} == {"TASKSMATE_TOKEN", "TASKSMATE_API_URL"}

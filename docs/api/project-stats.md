@@ -2,7 +2,7 @@
 
 A project's task statistics.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.project_stats.read(project_id: str, if_none_match: str | None = None)`
 

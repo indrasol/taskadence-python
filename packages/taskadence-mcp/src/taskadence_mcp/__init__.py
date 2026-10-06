@@ -1,7 +1,7 @@
-"""taskadence-mcp — Taskadence's MCP server for clients that start a local process.
+"""taskadence-mcp — TasKadence's MCP server for clients that start a local process.
 
 A PROXY, not a second server: it speaks MCP over stdio to the client and forwards every JSON-RPC message to the
-remote Taskadence MCP server (`<TASKADENCE_API_URL>/mcp`, Streamable HTTP) with
+remote TasKadence MCP server (`<TASKADENCE_API_URL>/mcp`, Streamable HTTP) with
 `Authorization: Bearer $TASKADENCE_TOKEN`.
 The tools, the read-only / tool-group enforcement and the audit trail are the remote server's; this package has no
 tool of its own (a test fails if it grows one).

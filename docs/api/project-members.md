@@ -2,7 +2,7 @@
 
 The members of a project and their roles.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.project_members.create(body: ProjectMemberCreate | Mapping[str, Any])`
 

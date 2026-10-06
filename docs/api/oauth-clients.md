@@ -2,7 +2,7 @@
 
 Third-party OAuth apps your organization registers: redirect URIs, allowed scopes, the client secret (shown once, rotated with a 24 h grace), revocation.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.oauth_clients.list(org_id: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 

@@ -1,8 +1,8 @@
 # `tm.releases`
 
-What's new in Taskadence.
+What's new in TasKadence.
 
-_Generated from `spec/openapi.public.json` by `scripts/generate.py` — do not edit by hand._
+_Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
 ## `tm.releases.whats_new(environment: str | None = None, since_days: int | None = None, repository: str | None = None, if_none_match: str | None = None)`
 

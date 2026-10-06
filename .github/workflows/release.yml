@@ -1,26 +1,28 @@
-# taskadence-python release (task 4.5 Part E) — BUILT, NOT PUBLISHED (user decision 2026-09-21).
+# taskadence-python release (task 4.5 Part E; S.23a opened PyPI and npm).
 #
-# 5.3: one pipeline, three artefacts — the SDK `taskadence`, the stdio MCP proxy `taskadence-mcp` (both PyPI; `uvx
+# 5.3: one pipeline, three artefacts: the SDK `taskadence`, the stdio MCP proxy `taskadence-mcp` (both PyPI; `uvx
 # taskadence-mcp`) and its Node twin `@taskadence/mcp` (npm; `npx -y @taskadence/mcp`), all stamped from the same tag.
 #
-# - A tag `v0.*` (a pre-release; `0.x` carries no compatibility promise) builds, checks, and publishes BOTH Python
-#   distributions to TestPyPI through trusted publishing (OIDC: no long-lived token anywhere). npm has no test registry:
-#   the tarball is built, checked and kept as an artifact.
-# - `workflow_dispatch` with target=testpypi does the same for the current version.
-# - target=pypi and target=npm are DISABLED until the stability gate, task S.23: the `gate` job fails with "S.23 gate",
-#   and every publish job needs it. Opening the gate is S.23's change to this file (and the registries' setup).
+# - A pushed tag `v0.*` (`0.x` carries no compatibility promise) builds, checks, and publishes BOTH Python
+#   distributions to TestPyPI through trusted publishing (OIDC: no long-lived token anywhere). Nothing else: npm has no
+#   test registry, so the tarball is built, checked and kept as an artifact.
+# - `workflow_dispatch` target=testpypi does the same for whatever ref it runs on.
+# - S.23 is OPEN: `workflow_dispatch` target=pypi publishes both Python distributions to PyPI, target=npm publishes
+#   `@taskadence/mcp` to npm. Both run ONLY from a tag (Run workflow → "Use workflow from" → Tags → `v0.x.y`), so the
+#   version is always the tag's: the `gate` job fails any other ref. Still `0.x` only (the stamp step).
 #
 # 5.5: ONE GitHub environment per distribution and registry. PyPI refuses two pending trusted publishers with the same
-# (owner, repo, workflow, environment), so the four pending publishers (account `Rithin2569`, repo
-# `indrasol/taskadence-python`, workflow `release.yml`) each name their own environment, and each publish job below
-# uploads one distribution under its own environment. 5.8: the ones registered on 2026-09-27 were for the pre-rename
-# project names; the four below must be registered again under the new names before a release (owner, S.23a):
-#   TestPyPI `taskadence` → `testpypi`   TestPyPI `taskadence-mcp` → `testpypi-mcp`
-#   PyPI     `taskadence` → `pypi`       PyPI     `taskadence-mcp` → `pypi-mcp`
-# plus `npm` for `@taskadence/mcp`. The GitHub environments (Settings → Environments) are the owner's to create:
-# `testpypi` and `testpypi-mcp` with no reviewer; `pypi`, `pypi-mcp` and `npm` with a required reviewer.
-# npm: the `taskadence` org is the owner's to create (5.8; owner `rithin2569`); trusted publishing for `@taskadence/mcp` is set up at S.23a, after
-# its first publish — then `npm publish --provenance` (below) needs no token.
+# (owner, repo, workflow, environment), so each publish job uploads one distribution under its own environment:
+#   TestPyPI `taskadence` → `testpypi`   TestPyPI `taskadence-mcp` → `testpypi-mcp`   (no reviewer)
+#   PyPI     `taskadence` → `pypi`       PyPI     `taskadence-mcp` → `pypi-mcp`       (required reviewer)
+#   npm      `@taskadence/mcp` → `npm`                                                (required reviewer)
+# Each trusted publisher names repo `indrasol/taskadence-python`, workflow `release.yml` and that environment.
+#
+# npm: trusted publishing (OIDC, `id-token: write`) plus `--provenance`; there is no npm token anywhere. npm can only
+# attach a trusted publisher to a package that exists, so the FIRST publish of `@taskadence/mcp` is manual, once, by the
+# owner (2FA, `--provenance=false`); then the package's Settings → Trusted publisher names this workflow and the `npm`
+# environment, and every later version goes through the `npm` job below. Trusted publishing needs npm >= 11.5.1:
+# the job runs Node 24.
 name: release
 
 on:
@@ -39,15 +41,21 @@ permissions:
 
 jobs:
   gate:
-    name: S.23 gate
+    name: release gate (pypi and npm only from a tag)
     runs-on: ubuntu-latest
     steps:
-      - name: PyPI and npm are closed until S.23
-        if: github.event_name == 'workflow_dispatch' && (inputs.target == 'pypi' || inputs.target == 'npm')
+      - name: PyPI and npm publish only from a v* tag, so the version is the tag's
+        if: github.event_name == 'workflow_dispatch' && (inputs.target == 'pypi' || inputs.target == 'npm') && !startsWith(github.ref, 'refs/tags/v')
+        env:
+          TARGET: ${{ inputs.target }}
+          REF: ${{ github.ref }}
         run: |
-          echo "::error::S.23 gate — publishing to ${{ inputs.target }} is disabled until the stability gate (task S.23). Use target=testpypi."
+          echo "::error::target=$TARGET runs only from a tag ref refs/tags/v* (got $REF). Run workflow → Use workflow from → Tags → v0.x.y."
           exit 1
-      - run: echo "target=${{ inputs.target || 'testpypi' }} — allowed"
+      - env:
+          TARGET: ${{ inputs.target || 'testpypi' }}
+          REF: ${{ github.ref }}
+        run: echo "target=$TARGET ref=$REF allowed"
 
   build:
     name: build, verify, SBOM (taskadence, taskadence-mcp, @taskadence/mcp)
@@ -68,7 +76,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           version="${GITHUB_REF_NAME#v}"
-          case "$version" in 0.*) ;; *) echo "::error::only 0.x pre-releases are released before S.23 (got $version)"; exit 1 ;; esac
+          case "$version" in 0.*) ;; *) echo "::error::only 0.x versions are released for now (got $version)"; exit 1 ;; esac
           sed -i "s/^__version__ = .*/__version__ = \"$version\"/" src/taskadence/_version.py packages/taskadence-mcp/src/taskadence_mcp/_version.py
           sed -i "s/^export const VERSION = .*/export const VERSION = '$version';/" packages/mcp-node/src/version.ts
           (cd packages/mcp-node && npm version "$version" --no-git-tag-version --allow-same-version)
@@ -125,7 +133,8 @@ jobs:
     name: publish taskadence to TestPyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
-    if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
+    # A tag push, or target=testpypi. Not a pypi / npm dispatch on a tag: TestPyPI already has that version.
+    if: github.event_name == 'push' || inputs.target == 'testpypi'
     environment:
       name: testpypi
       url: https://test.pypi.org/p/taskadence
@@ -144,7 +153,7 @@ jobs:
     name: publish taskadence-mcp to TestPyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
-    if: startsWith(github.ref, 'refs/tags/v0.') || inputs.target == 'testpypi'
+    if: github.event_name == 'push' || inputs.target == 'testpypi'
     environment:
       name: testpypi-mcp
       url: https://test.pypi.org/p/taskadence-mcp
@@ -160,11 +169,11 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
 
   pypi:
-    name: publish taskadence to PyPI (closed until S.23)
+    name: publish taskadence to PyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
-    # Unreachable while `gate` fails on target=pypi. S.23 removes the gate step and keeps this job.
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
+    # From a tag only (`gate` fails any other ref); the `pypi` environment's reviewer approves the upload.
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi' && startsWith(github.ref, 'refs/tags/v')
     environment:
       name: pypi
       url: https://pypi.org/p/taskadence
@@ -178,11 +187,11 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
   pypi-mcp:
-    name: publish taskadence-mcp to PyPI (closed until S.23)
+    name: publish taskadence-mcp to PyPI (trusted publishing)
     runs-on: ubuntu-latest
     needs: [gate, build]
-    # Unreachable while `gate` fails on target=pypi — exactly as `pypi`.
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi'
+    # Exactly as `pypi`, under its own environment `pypi-mcp`.
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'pypi' && startsWith(github.ref, 'refs/tags/v')
     environment:
       name: pypi-mcp
       url: https://pypi.org/p/taskadence-mcp
@@ -196,11 +205,11 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
   npm:
-    name: publish @taskadence/mcp to npm (closed until S.23)
+    name: publish @taskadence/mcp to npm (trusted publishing + provenance)
     runs-on: ubuntu-latest
     needs: [gate, build]
-    # Unreachable while `gate` fails on target=npm — exactly as `pypi`. S.23 removes the gate step and keeps this job.
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'npm'
+    # From a tag only, like `pypi`. Needs the trusted publisher set up after the manual first publish (header).
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'npm' && startsWith(github.ref, 'refs/tags/v')
     environment:
       name: npm
       url: https://www.npmjs.com/package/@taskadence/mcp
@@ -209,11 +218,13 @@ jobs:
     steps:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "22"
+          node-version: "24"             # bundles npm >= 11.5.1, which trusted publishing needs (Node 22 has npm 10)
           package-manager-cache: false   # S.19: no cache in a release build (cache poisoning)
           registry-url: https://registry.npmjs.org
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: npm-dist
           path: npm-dist/
-      - run: npm publish npm-dist/*.tgz --access public --provenance
+      - run: npm --version
+      - name: Publish (OIDC; no token)
+        run: npm publish npm-dist/*.tgz --provenance --access public

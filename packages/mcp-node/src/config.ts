@@ -13,7 +13,8 @@
  * one-line deprecation notice on stderr. Flags `--api-url`, `--readonly` / `--no-readonly`, `--groups` win. No
  * `--token`: argv is public.
  */
-export const BRAND_NAME = 'Taskadence';
+/** The wordmark (5.8c), prose only: the twin of the SDK's `_brand.BRAND_NAME`. Identifiers and URLs stay lowercase. */
+export const BRAND_NAME = 'TasKadence';
 export const SLUG = 'taskadence';
 export const ENV_PREFIX = 'TASKADENCE_';
 /** Pre-rename prefix: read (with a stderr deprecation notice) when the `TASKADENCE_*` variable is unset. */

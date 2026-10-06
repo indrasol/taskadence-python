@@ -21,7 +21,7 @@
 
 A problem type from a server older than the rename (`_brand.LEGACY_URN_PREFIX`) maps exactly like its
 `urn:taskadence:problem:…` twin. `about:blank` problems (and non-problem bodies) map by status.
- The mapping mirrors the Taskadence app's own reader
+ The mapping mirrors the TasKadence app's own reader
 (`apiService.ts`): the message is `detail`, else `message`, else the reason phrase; a `detail` that is a list (a
 422's per-field errors) is joined.
 """
@@ -64,7 +64,7 @@ class ResponseValidationError(APIError):
 
 
 class TaskadenceError(APIError):
-    """An HTTP error answered by the Taskadence API (a problem+json body, or a plain one mapped the same way)."""
+    """An HTTP error answered by the TasKadence API (a problem+json body, or a plain one mapped the same way)."""
 
     status: int
     type: str
