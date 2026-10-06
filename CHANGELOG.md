@@ -7,6 +7,11 @@ semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
 ## [Unreleased]
 
 ### Changed
+- READMEs (S.23b): the PyPI and npm pages open with "Get started in 3 steps" (token, install, first call with its
+  expected output) and "Key ideas"; the MCP READMEs with "Set up in 3 steps" (copy-paste configs for Claude Desktop,
+  Claude Code, Cursor and VS Code), "Check it works" and Troubleshooting. Retries, idempotency, ETags, deprecations
+  and logging moved under "Advanced". Every link is absolute and checked in CI (`scripts/check_readme_links.py`); a
+  test keeps the two MCP READMEs in sync. Examples use placeholder ids (`O123456`, `T123456`) and future dates.
 - Uploads go straight to storage: `task_attachments.create` and `project_resources.upload` (sync and async) create an
   upload (`POST /v1/uploads`), stream the file to its upload URL (1 MB chunks, never read whole; retried on 5xx and
   connection failures) and complete it (`POST /v1/uploads/{upload_id}/complete`), returning the same models as before.

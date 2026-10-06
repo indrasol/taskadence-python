@@ -2,13 +2,13 @@
 
     tm auth login                      # prompts for a tkd_live_ token (hidden), verifies it, stores it
     tm me
-    tm tasks list --org O0020 --status in_progress --table
-    tm tasks create --org O0020 --title "Ship the SDK" --project P96441
+    tm tasks list --org O123456 --status in_progress --table
+    tm tasks create --org O123456 --title "Ship the SDK" --project P123456
     tm tasks update T123456 --status completed
     tm views rows V123456 --csv > rows.csv
     tm tasks attach T123456 ./report.pdf    # a file to a task (direct to storage, with a progress bar)
-    tm projects upload P96441 ./plan.xlsx   # a file to a project's resources
-    tm storage --org O0020             # the storage meter: used of included, status, by kind, top projects and files
+    tm projects upload P123456 ./plan.xlsx   # a file to a project's resources
+    tm storage --org O123456             # the storage meter: used of included, status, by kind, top projects and files
 
 Output: a table by default, `--json` for the raw API objects. Exit codes: 0 success; 1 an API or connection error (the
 problem is printed with its `request_id`); 2 a usage error. The token is never printed — only its 12-character prefix.

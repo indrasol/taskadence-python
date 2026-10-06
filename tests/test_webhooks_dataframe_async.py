@@ -155,7 +155,7 @@ def test_to_dataframe_flattens_and_types(tm: Any, api: respx.MockRouter) -> None
 
 def test_to_dataframe_one_page_only(tm: Any, api: respx.MockRouter) -> None:
     route = api.get("/v1/tasks").respond(json={"data": [card("T1")], "next_cursor": "c1"})
-    frame = tm.tasks.list(org_id="O0020").to_dataframe(all_pages=False)
+    frame = tm.tasks.list(org_id="O123456").to_dataframe(all_pages=False)
     assert frame.shape[0] == 1 and route.call_count == 1
 
 
@@ -163,7 +163,7 @@ def test_without_pandas_the_error_says_how_to_install(
     tm: Any, api: respx.MockRouter, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     api.get("/v1/tasks").respond(json={"data": [card("T1")], "next_cursor": None})
-    page = tm.tasks.list(org_id="O0020")
+    page = tm.tasks.list(org_id="O123456")
     real_import = builtins.__import__
 
     def blocked(name: str, *args: Any, **kwargs: Any) -> Any:
@@ -189,7 +189,7 @@ async def test_async_lists_auto_page(atm: AsyncTaskadence, api: respx.MockRouter
             httpx.Response(200, json={"data": [card("T2")], "next_cursor": None}),
         ]
     )
-    page = await atm.tasks.list(org_id="O0020")
+    page = await atm.tasks.list(org_id="O123456")
     assert [t.task_id async for t in page] == ["T1", "T2"]
 
 
@@ -208,7 +208,7 @@ async def test_async_reads_writes_errors_and_retries(
     with pytest.raises(NotFoundError):
         await atm.tasks.read("T3")
     route = api.post("/v1/tasks").respond(json=task("T4"))
-    assert (await atm.tasks.create({"org_id": "O0020", "title": "x"})).task_id == "T4"
+    assert (await atm.tasks.create({"org_id": "O123456", "title": "x"})).task_id == "T4"
     assert "idempotency-key" in route.calls.last.request.headers
 
 
@@ -216,7 +216,7 @@ async def test_async_reads_writes_errors_and_retries(
 async def test_async_to_dataframe_and_context_manager(api: respx.MockRouter) -> None:
     api.get("/v1/tasks").respond(json={"data": [card("T1"), card("T2")], "next_cursor": None})
     async with AsyncTaskadence(token="tkd_live_" + "y" * 43, base_url="https://api.taskadence.test") as atm:
-        frame = await (await atm.tasks.list(org_id="O0020")).to_dataframe()
+        frame = await (await atm.tasks.list(org_id="O123456")).to_dataframe()
         assert frame.shape[0] == 2
         me_callable = callable(atm.me)
     assert me_callable

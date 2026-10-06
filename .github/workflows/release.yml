@@ -149,6 +149,8 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
+          # S.23b: TestPyPI already holds the 0.1.0 rehearsal; moving the v0.1.0 tag must not fail on it. TestPyPI only.
+          skip-existing: true
 
   testpypi-mcp:
     name: publish taskadence-mcp to TestPyPI (trusted publishing)
@@ -168,6 +170,8 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
+          # S.23b: TestPyPI already holds the 0.1.0 rehearsal; moving the v0.1.0 tag must not fail on it. TestPyPI only.
+          skip-existing: true
 
   pypi:
     name: publish taskadence to PyPI (trusted publishing)

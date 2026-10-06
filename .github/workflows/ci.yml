@@ -119,6 +119,26 @@ jobs:
       - run: npm run check   # tsc --noEmit, build + vitest, npm pack --dry-run
       - run: npm audit --audit-level=moderate
 
+  readmes:
+    name: READMEs (PyPI / npm render, absolute links, link check)
+    # S.23b: the three READMEs the registries show. readme_renderer is what PyPI renders with (twine check --strict
+    # runs it too, in `build`); npm pack --dry-run is in `mcp-node`. The link check fetches every URL.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install "readme_renderer[md]" httpx
+      - name: Render both Python READMEs as PyPI does
+        run: |
+          python -m readme_renderer README.md -o /dev/null
+          python -m readme_renderer packages/taskadence-mcp/README.md -o /dev/null
+      - run: python scripts/check_readme_links.py
+
   audit:
     name: pip-audit (runtime + extras)
     runs-on: ubuntu-latest
