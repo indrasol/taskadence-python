@@ -136,11 +136,11 @@ def sync_detailed(
     answer is 402
     `storage-limit-reached`.
 
-    **Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
-    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
-    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
-    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
-    type-mismatch`, 422 `upload-rejected` (the malware scan).
+    **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
+    m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
+    from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and
+    macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-
+    allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -181,11 +181,11 @@ def sync(
     answer is 402
     `storage-limit-reached`.
 
-    **Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
-    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
-    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
-    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
-    type-mismatch`, 422 `upload-rejected` (the malware scan).
+    **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
+    m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
+    from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and
+    macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-
+    allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -221,11 +221,11 @@ async def asyncio_detailed(
     answer is 402
     `storage-limit-reached`.
 
-    **Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
-    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
-    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
-    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
-    type-mismatch`, 422 `upload-rejected` (the malware scan).
+    **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
+    m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
+    from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and
+    macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-
+    allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-
@@ -264,11 +264,11 @@ async def asyncio(
     answer is 402
     `storage-limit-reached`.
 
-    **Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3,
-    mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's
-    bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled
-    Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-
-    type-mismatch`, 422 `upload-rejected` (the malware scan).
+    **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
+    m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
+    from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and
+    macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-
+    allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).
 
     Args:
         body (BodyUploadAttachmentV1TaskAttachmentsPost): The request body of `task-

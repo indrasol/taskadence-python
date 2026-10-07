@@ -6,6 +6,28 @@ semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-07
+
+Re-generated from the API contract at `taskadence-api` `b3b5f14` (API version `2026-09-25`, unchanged). Additive only:
+no public operation, model or field was removed. `@taskadence/mcp` and `taskadence-mcp` have no generated code and do
+not change beyond the shared version.
+
+### Added
+- `tm.organizations.storage_projects(org_id)`: every project holding files, largest first, with its file count and
+  biggest file (`GET /v1/organizations/{org_id}/storage/projects`; one `PageStorageProject`, `limit` / `cursor`).
+- `tm.organizations.storage_files(org_id)`: every counted file of the organization, largest first
+  (`GET /v1/organizations/{org_id}/storage/files`; one `PageStorageFile`, `limit` / `cursor`).
+- `StorageUsage.project_count`: projects holding at least one counted file.
+- `StorageProject.file_count` and `StorageProject.largest` (a new `StorageFileBrief`: `kind`, `id`, `name`, `bytes`,
+  `parent_id`, `project_id`), the project's biggest file.
+- New models `StorageFileBrief`, `PageStorageProject`, `PageStorageFile`, and the `StorageFileBriefKind` literal
+  (`task`, `project`, `bug`).
+
+### Changed
+- Docstrings state the upload limits in decimal bytes (100 MB = 100,000,000 bytes; an avatar 2 MB = 2,000,000 bytes),
+  like the bill. The limits themselves are unchanged.
+- Example `org_id` values in docstrings read `O123456`.
+
 ## [0.1.1] - 2026-10-06
 
 First release published entirely through trusted publishing on PyPI and npm (with npm provenance). No API or

@@ -30,7 +30,7 @@ class TokenOut:
 
     Example:
         {'created_at': '2026-09-25T12:00:00Z', 'created_by': '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'expires_at':
-            '2026-12-31T00:00:00Z', 'grant_type': 'personal', 'kind': 'live', 'name': 'CI deploys', 'org_id': 'O0020',
+            '2026-12-31T00:00:00Z', 'grant_type': 'personal', 'kind': 'live', 'name': 'CI deploys', 'org_id': 'O123456',
             'principal_display': 'ada', 'principal_user_id': '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'scopes':
             ['tasks:write'], 'status': 'active', 'token_id': 'TK123456', 'token_prefix': 'tkd_live_Ab3x', 'updated_at':
             '2026-09-25T12:00:00Z', 'use_count': 0}

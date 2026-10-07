@@ -13,29 +13,39 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 
+if TYPE_CHECKING:
+    from ..models.storage_file_brief import StorageFileBrief
+
 
 T = TypeVar("T", bound="StorageProject")
 
 
 @_attrs_define
 class StorageProject:
-    """Part of `StorageBreakdown`.
+    """Part of `Page_StorageProject_` and `StorageBreakdown`.
 
     Attributes:
         project_id (str):
         bytes_ (int):
         name (None | str | Unset):
+        file_count (int | Unset): Counted files in the project (task attachments, project files, legacy bug attachments)
+            Default: 0.
+        largest (None | StorageFileBrief | Unset): The project's biggest file; null for a project with no counted file
     """
 
     project_id: str
     bytes_: int
     name: None | str | Unset = UNSET
+    file_count: int | Unset = 0
+    largest: None | StorageFileBrief | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.storage_file_brief import StorageFileBrief  # noqa: PLC0415
+
         project_id = self.project_id
 
         bytes_ = self.bytes_
@@ -45,6 +55,16 @@ class StorageProject:
             name = UNSET
         else:
             name = self.name
+
+        file_count = self.file_count
+
+        largest: dict[str, Any] | None | Unset
+        if isinstance(self.largest, Unset):
+            largest = UNSET
+        elif isinstance(self.largest, StorageFileBrief):
+            largest = self.largest.to_dict()
+        else:
+            largest = self.largest
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -56,11 +76,17 @@ class StorageProject:
         )
         if name is not UNSET:
             field_dict["name"] = name
+        if file_count is not UNSET:
+            field_dict["file_count"] = file_count
+        if largest is not UNSET:
+            field_dict["largest"] = largest
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.storage_file_brief import StorageFileBrief  # noqa: PLC0415
+
         d = dict(src_dict)
         project_id = d.pop("project_id")
 
@@ -75,10 +101,31 @@ class StorageProject:
 
         name = _parse_name(d.pop("name", UNSET))
 
+        file_count = d.pop("file_count", UNSET)
+
+        def _parse_largest(data: object) -> None | StorageFileBrief | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                largest_type_0 = StorageFileBrief.from_dict(data)
+
+                return largest_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | StorageFileBrief | Unset, data)
+
+        largest = _parse_largest(d.pop("largest", UNSET))
+
         storage_project = cls(
             project_id=project_id,
             bytes_=bytes_,
             name=name,
+            file_count=file_count,
+            largest=largest,
         )
 
         storage_project.additional_properties = d

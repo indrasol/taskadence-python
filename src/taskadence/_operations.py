@@ -68,6 +68,8 @@ from ._generated.api.organizations import organizations_list as _organizations_l
 from ._generated.api.organizations import organizations_read as _organizations_read
 from ._generated.api.organizations import organizations_settings as _organizations_settings
 from ._generated.api.organizations import organizations_storage as _organizations_storage
+from ._generated.api.organizations import organizations_storage_files as _organizations_storage_files
+from ._generated.api.organizations import organizations_storage_projects as _organizations_storage_projects
 from ._generated.api.organizations import organizations_update_settings as _organizations_update_settings
 from ._generated.api.project_members import project_members_create as _project_members_create
 from ._generated.api.project_members import project_members_delete as _project_members_delete
@@ -1064,6 +1066,28 @@ OPERATIONS: dict[str, Operation] = {
         parse=_organizations_storage._parse_response,
         scopes=("members:read",),
         summary="Storage used / included, the status, the breakdown, the largest files and the 30-day trend",
+    ),
+    "organizations.storage_projects": Operation(
+        op_id="organizations.storage_projects",
+        method="GET",
+        path="/v1/organizations/{org_id}/storage/projects",
+        path_params=("org_id",),
+        query=("limit", "cursor", "sort_by", "sort_order"),
+        if_none_match=True,
+        parse=_organizations_storage_projects._parse_response,
+        scopes=("members:read",),
+        summary="Every project holding files, largest first, with its file count and biggest file",
+    ),
+    "organizations.storage_files": Operation(
+        op_id="organizations.storage_files",
+        method="GET",
+        path="/v1/organizations/{org_id}/storage/files",
+        path_params=("org_id",),
+        query=("limit", "cursor", "sort_by", "sort_order"),
+        if_none_match=True,
+        parse=_organizations_storage_files._parse_response,
+        scopes=("members:read",),
+        summary="Every counted file of the organization, largest first",
     ),
     "tokens.create": Operation(
         op_id="tokens.create",

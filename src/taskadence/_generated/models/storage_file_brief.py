@@ -10,34 +10,32 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..models.storage_file_kind import check_storage_file_kind
-from ..models.storage_file_kind import StorageFileKind
+from ..models.storage_file_brief_kind import check_storage_file_brief_kind
+from ..models.storage_file_brief_kind import StorageFileBriefKind
 from ..types import UNSET, Unset
 from typing import cast
 
 
-T = TypeVar("T", bound="StorageFile")
+T = TypeVar("T", bound="StorageFileBrief")
 
 
 @_attrs_define
-class StorageFile:
-    """Part of `Page_StorageFile_` and `StorageUsage`.
+class StorageFileBrief:
+    """Part of `StorageProject`.
 
     Attributes:
-        kind (StorageFileKind):
-        id (str): The attachment id (task / bug) or the resource id (project file)
+        kind (StorageFileBriefKind):
+        id (str):
         bytes_ (int):
         name (None | str | Unset):
-        created_at (None | str | Unset):
         parent_id (None | str | Unset): The task (task), bug (bug) or project (project file) it belongs to
         project_id (None | str | Unset):
     """
 
-    kind: StorageFileKind
+    kind: StorageFileBriefKind
     id: str
     bytes_: int
     name: None | str | Unset = UNSET
-    created_at: None | str | Unset = UNSET
     parent_id: None | str | Unset = UNSET
     project_id: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -57,12 +55,6 @@ class StorageFile:
             name = UNSET
         else:
             name = self.name
-
-        created_at: None | str | Unset
-        if isinstance(self.created_at, Unset):
-            created_at = UNSET
-        else:
-            created_at = self.created_at
 
         parent_id: None | str | Unset
         if isinstance(self.parent_id, Unset):
@@ -87,8 +79,6 @@ class StorageFile:
         )
         if name is not UNSET:
             field_dict["name"] = name
-        if created_at is not UNSET:
-            field_dict["created_at"] = created_at
         if parent_id is not UNSET:
             field_dict["parent_id"] = parent_id
         if project_id is not UNSET:
@@ -99,7 +89,7 @@ class StorageFile:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        kind = check_storage_file_kind(d.pop("kind"))
+        kind = check_storage_file_brief_kind(d.pop("kind"))
 
         id = d.pop("id")
 
@@ -113,15 +103,6 @@ class StorageFile:
             return cast(None | str | Unset, data)
 
         name = _parse_name(d.pop("name", UNSET))
-
-        def _parse_created_at(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        created_at = _parse_created_at(d.pop("created_at", UNSET))
 
         def _parse_parent_id(data: object) -> None | str | Unset:
             if data is None:
@@ -141,18 +122,17 @@ class StorageFile:
 
         project_id = _parse_project_id(d.pop("project_id", UNSET))
 
-        storage_file = cls(
+        storage_file_brief = cls(
             kind=kind,
             id=id,
             bytes_=bytes_,
             name=name,
-            created_at=created_at,
             parent_id=parent_id,
             project_id=project_id,
         )
 
-        storage_file.additional_properties = d
-        return storage_file
+        storage_file_brief.additional_properties = d
+        return storage_file_brief
 
     @property
     def additional_keys(self) -> list[str]:

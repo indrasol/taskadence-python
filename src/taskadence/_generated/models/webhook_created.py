@@ -27,7 +27,7 @@ class WebhookCreated:
     Example:
         {'api_version': '2026-09-25', 'consecutive_failures': 0, 'created_at': '2026-09-25T12:00:00Z', 'created_by':
             '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'events': ['task.*'], 'key_version': 1, 'name': 'Deploy notifier',
-            'org_id': 'O0020', 'secret': 'whsec_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da0Bq0RU=', 'secret_prefix':
+            'org_id': 'O123456', 'secret': 'whsec_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da0Bq0RU=', 'secret_prefix':
             'whsec_Ab3xQ9', 'status': 'active', 'subscription_id': 'WH123456', 'updated_at': '2026-09-25T12:00:00Z', 'url':
             'https://hooks.example.com/taskadence'}
 
