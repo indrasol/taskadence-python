@@ -2,6 +2,7 @@
 # TASKADENCE_TOKEN secret exists. Nothing here publishes anything (that is release.yml: TestPyPI on a tag; PyPI and npm
 # by a manual run from a tag, behind environment reviewers).
 # 5.3: + the two stdio MCP proxies in packages/ — `taskadence-mcp` (Python, `uvx`) and `@taskadence/mcp` (Node, `npx`).
+# CI minutes (2026-10): pull requests test the newest Python only; a push to main runs the full 3.10-3.13 matrix.
 name: ci
 
 on:
@@ -41,7 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        # PRs: the newest Python only; main: every supported version (CI minutes, 2026-10)
+        python: ${{ fromJSON(github.event_name == 'pull_request' && '["3.13"]' || '["3.10", "3.11", "3.12", "3.13"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -78,7 +80,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        # PRs: the newest Python only; main: every supported version (CI minutes, 2026-10)
+        python: ${{ fromJSON(github.event_name == 'pull_request' && '["3.13"]' || '["3.10", "3.11", "3.12", "3.13"]') }}
     defaults:
       run:
         working-directory: packages/taskadence-mcp
