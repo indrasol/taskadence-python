@@ -63,3 +63,23 @@ Storage used / included, the status, the breakdown, the largest files and the 30
 - **Token scope:** `members:read`
 - **Returns:** `StorageUsage`
 - **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+
+## `tm.organizations.storage_projects(org_id: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, if_none_match: str | None = None)`
+
+Every project holding files, largest first, with its file count and biggest file.
+
+- **HTTP:** `GET /v1/organizations/{org_id}/storage/projects`
+- **operationId:** `organizations.storage_projects`
+- **Token scope:** `members:read`
+- **Returns:** `PageStorageProject`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+
+## `tm.organizations.storage_files(org_id: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, if_none_match: str | None = None)`
+
+Every counted file of the organization, largest first.
+
+- **HTTP:** `GET /v1/organizations/{org_id}/storage/files`
+- **operationId:** `organizations.storage_files`
+- **Token scope:** `members:read`
+- **Returns:** `PageStorageFile`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.

@@ -27,7 +27,7 @@ class MeOut:
     """Returned by `me.read`.
 
     Example:
-        {'organizations': [{'designation': 'Engineering Manager', 'name': 'Indrasol', 'org_id': 'O0020', 'role':
+        {'organizations': [{'designation': 'Engineering Manager', 'name': 'Indrasol', 'org_id': 'O123456', 'role':
             'owner'}], 'principal': {'email': 'ada@example.com', 'email_verified': True, 'id': '3f1c…', 'type': 'user',
             'username': 'ada'}}
 

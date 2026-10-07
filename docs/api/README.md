@@ -7,7 +7,7 @@ Every operation is `tm.<resource>.<method>(…)` on `Taskadence` (and `await` on
 | Resource | Operations | |
 |---|---|---|
 | [`tm.health`](health.md) | 1 | Liveness. |
-| [`tm.organizations`](organizations.md) | 6 | Organizations you belong to, and their settings. |
+| [`tm.organizations`](organizations.md) | 8 | Organizations you belong to, and their settings. |
 | [`tm.projects`](projects.md) | 7 | Projects: create, read, update, delete, reorder. |
 | [`tm.tasks`](tasks.md) | 15 | Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links. |
 | [`tm.organization_members`](organization-members.md) | 5 | The members of an organization and their roles. |

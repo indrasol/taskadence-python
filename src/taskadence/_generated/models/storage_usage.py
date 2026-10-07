@@ -31,7 +31,8 @@ class StorageUsage:
     Attributes:
         org_id (str):
         bytes_used (int): Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)
-        file_count (int):
+        file_count (int): Counted files (task attachments, project files, legacy bug attachments); `GET
+            .../storage/files` lists them
         included_bytes (int): Storage included before overage, in bytes (decimal). The plan's value is 10^10 (10 GB); an
             organization may have its own.
         overage_bytes (int): max(0, bytes_used - included_bytes)
@@ -43,6 +44,8 @@ class StorageUsage:
         billing_exempt (bool): An internal organization: metered and shown, never billed or blocked
         breakdown (StorageBreakdown): Part of `StorageUsage`.
         manage_url (str): The Storage and billing page in the web app
+        project_count (int | Unset): Projects holding at least one counted file; `GET .../storage/projects` lists them
+            Default: 0.
         top_files (list[StorageFile] | Unset): The 20 largest files (empty for a guest)
         trend (list[StorageDay] | Unset): The last 30 days, one row per day recorded
         updated_at (None | str | Unset): When the ledger last changed
@@ -59,6 +62,7 @@ class StorageUsage:
     billing_exempt: bool
     breakdown: StorageBreakdown
     manage_url: str
+    project_count: int | Unset = 0
     top_files: list[StorageFile] | Unset = UNSET
     trend: list[StorageDay] | Unset = UNSET
     updated_at: None | str | Unset = UNSET
@@ -93,6 +97,8 @@ class StorageUsage:
         breakdown = self.breakdown.to_dict()
 
         manage_url = self.manage_url
+
+        project_count = self.project_count
 
         top_files: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.top_files, Unset):
@@ -131,6 +137,8 @@ class StorageUsage:
                 "manage_url": manage_url,
             }
         )
+        if project_count is not UNSET:
+            field_dict["project_count"] = project_count
         if top_files is not UNSET:
             field_dict["top_files"] = top_files
         if trend is not UNSET:
@@ -168,6 +176,8 @@ class StorageUsage:
         breakdown = StorageBreakdown.from_dict(d.pop("breakdown"))
 
         manage_url = d.pop("manage_url")
+
+        project_count = d.pop("project_count", UNSET)
 
         _top_files = d.pop("top_files", UNSET)
         top_files: list[StorageFile] | Unset = UNSET
@@ -208,6 +218,7 @@ class StorageUsage:
             billing_exempt=billing_exempt,
             breakdown=breakdown,
             manage_url=manage_url,
+            project_count=project_count,
             top_files=top_files,
             trend=trend,
             updated_at=updated_at,

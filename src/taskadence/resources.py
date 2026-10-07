@@ -137,6 +137,98 @@ class OrganizationsResource:
             self._client._call(_OPS["organizations.storage"], path=(org_id,), if_none_match=if_none_match),
         )
 
+    @overload
+    def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: None = None,
+    ) -> models.PageStorageProject: ...
+    @overload
+    def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str,
+    ) -> models.PageStorageProject | NotModifiedType: ...
+    def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.PageStorageProject | NotModifiedType:
+        """Every project holding files, largest first, with its file count and biggest file.
+
+        `GET /v1/organizations/{org_id}/storage/projects` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.PageStorageProject | NotModifiedType",
+            self._client._call(
+                _OPS["organizations.storage_projects"],
+                path=(org_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: None = None,
+    ) -> models.PageStorageFile: ...
+    @overload
+    def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str,
+    ) -> models.PageStorageFile | NotModifiedType: ...
+    def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.PageStorageFile | NotModifiedType:
+        """Every counted file of the organization, largest first.
+
+        `GET /v1/organizations/{org_id}/storage/files` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.PageStorageFile | NotModifiedType",
+            self._client._call(
+                _OPS["organizations.storage_files"],
+                path=(org_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                if_none_match=if_none_match,
+            ),
+        )
+
     get = read
     """Alias of `read`."""
 
@@ -2993,6 +3085,98 @@ class AsyncOrganizationsResource:
         return cast(
             "models.StorageUsage | NotModifiedType",
             await self._client._call(_OPS["organizations.storage"], path=(org_id,), if_none_match=if_none_match),
+        )
+
+    @overload
+    async def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: None = None,
+    ) -> models.PageStorageProject: ...
+    @overload
+    async def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str,
+    ) -> models.PageStorageProject | NotModifiedType: ...
+    async def storage_projects(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.PageStorageProject | NotModifiedType:
+        """Every project holding files, largest first, with its file count and biggest file.
+
+        `GET /v1/organizations/{org_id}/storage/projects` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.PageStorageProject | NotModifiedType",
+            await self._client._call(
+                _OPS["organizations.storage_projects"],
+                path=(org_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    async def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: None = None,
+    ) -> models.PageStorageFile: ...
+    @overload
+    async def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str,
+    ) -> models.PageStorageFile | NotModifiedType: ...
+    async def storage_files(
+        self,
+        org_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.PageStorageFile | NotModifiedType:
+        """Every counted file of the organization, largest first.
+
+        `GET /v1/organizations/{org_id}/storage/files` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.PageStorageFile | NotModifiedType",
+            await self._client._call(
+                _OPS["organizations.storage_files"],
+                path=(org_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+                if_none_match=if_none_match,
+            ),
         )
 
     get = read
@@ -6034,6 +6218,8 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "service-accounts.delete": ("service_accounts", "delete"),
     "organizations.access_review": ("organizations", "access_review"),
     "organizations.storage": ("organizations", "storage"),
+    "organizations.storage_projects": ("organizations", "storage_projects"),
+    "organizations.storage_files": ("organizations", "storage_files"),
     "tokens.create": ("tokens", "create"),
     "tokens.list": ("tokens", "list"),
     "tokens.read": ("tokens", "read"),

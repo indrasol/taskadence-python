@@ -34,7 +34,7 @@ class OAuthClientOut:
         {'allowed_scopes': ['tasks:write', 'projects:read'], 'client_id': 'tkdc_Q2x9eLr0v2Zk5n8WcHt1YpUo',
             'client_type': 'confidential', 'created_at': '2026-09-26T12:00:00Z', 'created_by':
             '3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10', 'grants_count': 3, 'homepage_url': 'https://hr.example.com',
-            'last_used_at': '2026-09-26T12:00:00Z', 'name': 'Acme HR', 'org_id': 'O0020', 'redirect_uris':
+            'last_used_at': '2026-09-26T12:00:00Z', 'name': 'Acme HR', 'org_id': 'O123456', 'redirect_uris':
             ['https://hr.example.com/oauth/callback'], 'registration': 'developer', 'review_state': 'private', 'status':
             'active', 'updated_at': '2026-09-26T12:00:00Z', 'use_count': 1204}
 

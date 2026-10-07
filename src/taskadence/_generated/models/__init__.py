@@ -139,6 +139,8 @@ from .page_project_member_in_db import PageProjectMemberInDB
 from .page_project_resource_in_db import PageProjectResourceInDB
 from .page_section_out import PageSectionOut
 from .page_service_account_out import PageServiceAccountOut
+from .page_storage_file import PageStorageFile
+from .page_storage_project import PageStorageProject
 from .page_task_attachment_in_db import PageTaskAttachmentInDB
 from .page_task_comment_in_db import PageTaskCommentInDB
 from .page_task_history_in_db import PageTaskHistoryInDB
@@ -213,6 +215,8 @@ from .storage_breakdown import StorageBreakdown
 from .storage_by_kind import StorageByKind
 from .storage_day import StorageDay
 from .storage_file import StorageFile
+from .storage_file_brief import StorageFileBrief
+from .storage_file_brief_kind import StorageFileBriefKind
 from .storage_file_kind import StorageFileKind
 from .storage_project import StorageProject
 from .storage_usage import StorageUsage
@@ -447,6 +451,8 @@ __all__ = (
     "PageProjectResourceInDB",
     "PageSectionOut",
     "PageServiceAccountOut",
+    "PageStorageFile",
+    "PageStorageProject",
     "PageTaskAttachmentInDB",
     "PageTaskCommentInDB",
     "PageTaskHistoryInDB",
@@ -521,6 +527,8 @@ __all__ = (
     "StorageByKind",
     "StorageDay",
     "StorageFile",
+    "StorageFileBrief",
+    "StorageFileBriefKind",
     "StorageFileKind",
     "StorageProject",
     "StorageUsage",

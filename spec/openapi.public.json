@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasKadence API",
-    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |",
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |",
     "version": "2026-09-25"
   },
   "paths": {
@@ -15262,7 +15262,7 @@
           "projects:write"
         ],
         "x-upload-limits": {
-          "max_bytes": 104857600,
+          "max_bytes": 100000000,
           "allowed_extensions": [
             "csv",
             "docx",
@@ -15329,7 +15329,7 @@
           "task-attachments"
         ],
         "summary": "Upload an attachment to a task (multipart)",
-        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 100 MB. Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
+        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
         "operationId": "task-attachments.create",
         "requestBody": {
           "required": true,
@@ -15598,7 +15598,7 @@
           "tasks:write"
         ],
         "x-upload-limits": {
-          "max_bytes": 104857600,
+          "max_bytes": 100000000,
           "allowed_extensions": [
             "csv",
             "docx",
@@ -20194,11 +20194,11 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.taskadence.invalid",
+                  "email": "ci-bot@service.o123456.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "role": "member",
                   "user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "username": "sa-ci-bot"
@@ -20484,11 +20484,11 @@
                     {
                       "active_tokens": 1,
                       "created_at": "2026-09-25T12:00:00Z",
-                      "email": "ci-bot@service.o0020.taskadence.invalid",
+                      "email": "ci-bot@service.o123456.taskadence.invalid",
                       "is_active": true,
                       "kind": "service_account",
                       "name": "CI bot",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "role": "member",
                       "user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                       "username": "sa-ci-bot"
@@ -20733,11 +20733,11 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.taskadence.invalid",
+                  "email": "ci-bot@service.o123456.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "role": "member",
                   "user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "username": "sa-ci-bot"
@@ -20960,11 +20960,11 @@
                 "example": {
                   "active_tokens": 1,
                   "created_at": "2026-09-25T12:00:00Z",
-                  "email": "ci-bot@service.o0020.taskadence.invalid",
+                  "email": "ci-bot@service.o123456.taskadence.invalid",
                   "is_active": true,
                   "kind": "service_account",
                   "name": "CI bot",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "role": "member",
                   "user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "username": "sa-ci-bot"
@@ -21496,6 +21496,7 @@
                   "org_id": "string",
                   "bytes_used": 0,
                   "file_count": 0,
+                  "project_count": 0,
                   "included_bytes": 0,
                   "overage_bytes": 0,
                   "percent": 0.0,
@@ -21512,7 +21513,16 @@
                       {
                         "project_id": "string",
                         "name": "string",
-                        "bytes": 0
+                        "bytes": 0,
+                        "file_count": 0,
+                        "largest": {
+                          "kind": "task",
+                          "id": "string",
+                          "name": "string",
+                          "bytes": 0,
+                          "parent_id": "string",
+                          "project_id": "string"
+                        }
                       }
                     ]
                   },
@@ -21535,6 +21545,607 @@
                   ],
                   "updated_at": "string",
                   "manage_url": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "members:read"
+        ]
+      }
+    },
+    "/v1/organizations/{org_id}/storage/projects": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Every project holding files, largest first, with its file count and biggest file",
+        "description": "Every project holding files, largest first, with its file count and biggest file. The summary's\n`breakdown.by_project` is the top 20 of this list; page through here for the rest. Any member except a guest.",
+        "operationId": "organizations.storage_projects",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The organization",
+              "title": "Org Id"
+            },
+            "description": "The organization"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 50, capped at 1000.",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Page size; default 50, capped at 1000."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: bytes, name, file_count. Default: `bytes`.",
+              "default": "bytes",
+              "title": "Sort By"
+            },
+            "description": "One of: bytes, name, file_count. Default: `bytes`."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "desc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_StorageProject_"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "project_id": "string",
+                      "name": "string",
+                      "bytes": 0,
+                      "file_count": 0,
+                      "largest": {
+                        "kind": "task",
+                        "id": "string",
+                        "name": "string",
+                        "bytes": 0,
+                        "parent_id": "string",
+                        "project_id": "string"
+                      }
+                    }
+                  ],
+                  "next_cursor": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "members:read"
+        ]
+      }
+    },
+    "/v1/organizations/{org_id}/storage/files": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Every counted file of the organization, largest first",
+        "description": "Every counted file, largest first. The summary's `top_files` is the top 20 of this list; page through here for\nthe rest. Any member except a guest.",
+        "operationId": "organizations.storage_files",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The organization",
+              "title": "Org Id"
+            },
+            "description": "The organization"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 50, capped at 1000.",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Page size; default 50, capped at 1000."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One of: bytes, name, created_at, kind. Default: `bytes`.",
+              "default": "bytes",
+              "title": "Sort By"
+            },
+            "description": "One of: bytes, name, created_at, kind. Default: `bytes`."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "desc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_StorageFile_"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "kind": "task",
+                      "id": "string",
+                      "name": "string",
+                      "bytes": 0,
+                      "created_at": "string",
+                      "parent_id": "string",
+                      "project_id": "string"
+                    }
+                  ],
+                  "next_cursor": "string"
                 }
               }
             }
@@ -21767,7 +22378,7 @@
                   "grant_type": "personal",
                   "kind": "live",
                   "name": "CI deploys",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "principal_display": "ada",
                   "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "scopes": [
@@ -22067,7 +22678,7 @@
                       "grant_type": "personal",
                       "kind": "live",
                       "name": "CI deploys",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "principal_display": "ada",
                       "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                       "scopes": [
@@ -22309,7 +22920,7 @@
                   "grant_type": "personal",
                   "kind": "live",
                   "name": "CI deploys",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "principal_display": "ada",
                   "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "scopes": [
@@ -22551,7 +23162,7 @@
                   "grant_type": "personal",
                   "kind": "live",
                   "name": "CI deploys",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "principal_display": "ada",
                   "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "scopes": [
@@ -22776,7 +23387,7 @@
                   "grant_type": "personal",
                   "kind": "live",
                   "name": "CI deploys",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "principal_display": "ada",
                   "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "scopes": [
@@ -23003,7 +23614,7 @@
                   "grant_type": "personal",
                   "kind": "live",
                   "name": "CI deploys",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "principal_display": "ada",
                   "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
                   "scopes": [
@@ -23527,7 +24138,7 @@
                   ],
                   "key_version": 1,
                   "name": "Deploy notifier",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "secret": "whsec_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da0Bq0RU=",
                   "secret_prefix": "whsec_Ab3xQ9",
                   "status": "active",
@@ -23825,7 +24436,7 @@
                       ],
                       "key_version": 1,
                       "name": "Deploy notifier",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "secret_prefix": "whsec_Ab3xQ9",
                       "status": "active",
                       "subscription_id": "WH123456",
@@ -24065,7 +24676,7 @@
                   ],
                   "key_version": 1,
                   "name": "Deploy notifier",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "secret_prefix": "whsec_Ab3xQ9",
                   "status": "active",
                   "subscription_id": "WH123456",
@@ -24322,7 +24933,7 @@
                   ],
                   "key_version": 1,
                   "name": "Deploy notifier",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "secret_prefix": "whsec_Ab3xQ9",
                   "status": "active",
                   "subscription_id": "WH123456",
@@ -24554,7 +25165,7 @@
                   ],
                   "key_version": 1,
                   "name": "Deploy notifier",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "secret_prefix": "whsec_Ab3xQ9",
                   "status": "active",
                   "subscription_id": "WH123456",
@@ -24779,7 +25390,7 @@
                   ],
                   "key_version": 1,
                   "name": "Deploy notifier",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "secret": "whsec_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da0Bq0RU=",
                   "secret_prefix": "whsec_Ab3xQ9",
                   "status": "active",
@@ -26107,7 +26718,7 @@
                       "homepage_url": "https://hr.example.com",
                       "last_used_at": "2026-09-26T12:00:00Z",
                       "name": "Acme HR",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "redirect_uris": [
                         "https://hr.example.com/oauth/callback"
                       ],
@@ -26358,7 +26969,7 @@
                   "homepage_url": "https://hr.example.com",
                   "last_used_at": "2026-09-26T12:00:00Z",
                   "name": "Acme HR",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "redirect_uris": [
                     "https://hr.example.com/oauth/callback"
                   ],
@@ -26598,7 +27209,7 @@
                   "homepage_url": "https://hr.example.com",
                   "last_used_at": "2026-09-26T12:00:00Z",
                   "name": "Acme HR",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "redirect_uris": [
                     "https://hr.example.com/oauth/callback"
                   ],
@@ -26852,7 +27463,7 @@
                   "homepage_url": "https://hr.example.com",
                   "last_used_at": "2026-09-26T12:00:00Z",
                   "name": "Acme HR",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "redirect_uris": [
                     "https://hr.example.com/oauth/callback"
                   ],
@@ -27081,7 +27692,7 @@
                   "homepage_url": "https://hr.example.com",
                   "last_used_at": "2026-09-26T12:00:00Z",
                   "name": "Acme HR",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "redirect_uris": [
                     "https://hr.example.com/oauth/callback"
                   ],
@@ -27313,7 +27924,7 @@
                   "homepage_url": "https://hr.example.com",
                   "last_used_at": "2026-09-26T12:00:00Z",
                   "name": "Acme HR",
-                  "org_id": "O0020",
+                  "org_id": "O123456",
                   "redirect_uris": [
                     "https://hr.example.com/oauth/callback"
                   ],
@@ -27601,7 +28212,7 @@
                       "grant_id": "tkdg_Xy12Ab34Cd56",
                       "homepage_url": "https://hr.example.com",
                       "last_used_at": "2026-09-26T13:00:00Z",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "org_name": "Indrasol",
                       "scopes": [
                         "tasks:write"
@@ -39811,7 +40422,7 @@
                     {
                       "designation": "Engineering Manager",
                       "name": "Indrasol",
-                      "org_id": "O0020",
+                      "org_id": "O123456",
                       "role": "owner"
                     }
                   ],
@@ -46514,7 +47125,7 @@
           "grant_id": "tkdg_Xy12Ab34Cd56",
           "homepage_url": "https://hr.example.com",
           "last_used_at": "2026-09-26T13:00:00Z",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "org_name": "Indrasol",
           "scopes": [
             "tasks:write"
@@ -48638,7 +49249,7 @@
             {
               "designation": "Engineering Manager",
               "name": "Indrasol",
-              "org_id": "O0020",
+              "org_id": "O123456",
               "role": "owner"
             }
           ],
@@ -49951,7 +50562,7 @@
           "homepage_url": "https://hr.example.com",
           "last_used_at": "2026-09-26T12:00:00Z",
           "name": "Acme HR",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "redirect_uris": [
             "https://hr.example.com/oauth/callback"
           ],
@@ -50192,7 +50803,7 @@
           "homepage_url": "https://hr.example.com",
           "last_used_at": "2026-09-26T12:00:00Z",
           "name": "Acme HR",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "redirect_uris": [
             "https://hr.example.com/oauth/callback"
           ],
@@ -52218,6 +52829,64 @@
         ],
         "title": "Page[ServiceAccountOut]",
         "description": "Returned by `service-accounts.list`."
+      },
+      "Page_StorageFile_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/StorageFile"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[StorageFile]",
+        "description": "Returned by `organizations.storage_files`."
+      },
+      "Page_StorageProject_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/StorageProject"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[StorageProject]",
+        "description": "Returned by `organizations.storage_projects`."
       },
       "Page_TaskAttachmentInDB_": {
         "properties": {
@@ -55738,11 +56407,11 @@
         "example": {
           "active_tokens": 1,
           "created_at": "2026-09-25T12:00:00Z",
-          "email": "ci-bot@service.o0020.taskadence.invalid",
+          "email": "ci-bot@service.o123456.taskadence.invalid",
           "is_active": true,
           "kind": "service_account",
           "name": "CI bot",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "role": "member",
           "user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
           "username": "sa-ci-bot"
@@ -56309,7 +56978,70 @@
           "bytes"
         ],
         "title": "StorageFile",
-        "description": "Part of `StorageUsage`."
+        "description": "Part of `Page_StorageFile_` and `StorageUsage`."
+      },
+      "StorageFileBrief": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "task",
+              "project",
+              "bug"
+            ],
+            "title": "Kind"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "bytes": {
+            "type": "integer",
+            "title": "Bytes"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id",
+            "description": "The task (task), bug (bug) or project (project file) it belongs to"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "id",
+          "bytes"
+        ],
+        "title": "StorageFileBrief",
+        "description": "Part of `StorageProject`."
       },
       "StorageProject": {
         "properties": {
@@ -56331,6 +57063,23 @@
           "bytes": {
             "type": "integer",
             "title": "Bytes"
+          },
+          "file_count": {
+            "type": "integer",
+            "title": "File Count",
+            "description": "Counted files in the project (task attachments, project files, legacy bug attachments)",
+            "default": 0
+          },
+          "largest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StorageFileBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The project's biggest file; null for a project with no counted file"
           }
         },
         "type": "object",
@@ -56339,7 +57088,7 @@
           "bytes"
         ],
         "title": "StorageProject",
-        "description": "Part of `StorageBreakdown`."
+        "description": "Part of `Page_StorageProject_` and `StorageBreakdown`."
       },
       "StorageUsage": {
         "properties": {
@@ -56354,7 +57103,14 @@
           },
           "file_count": {
             "type": "integer",
-            "title": "File Count"
+            "title": "File Count",
+            "description": "Counted files (task attachments, project files, legacy bug attachments); `GET .../storage/files` lists them"
+          },
+          "project_count": {
+            "type": "integer",
+            "title": "Project Count",
+            "description": "Projects holding at least one counted file; `GET .../storage/projects` lists them",
+            "default": 0
           },
           "included_bytes": {
             "type": "integer",
@@ -59878,7 +60634,7 @@
           "grant_type": "personal",
           "kind": "live",
           "name": "CI deploys",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "principal_display": "ada",
           "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
           "scopes": [
@@ -60114,7 +60870,7 @@
           "grant_type": "personal",
           "kind": "live",
           "name": "CI deploys",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "principal_display": "ada",
           "principal_user_id": "3f1c2a9e-0b7d-4c1e-9a55-2b8f0d6e4a10",
           "scopes": [
@@ -61151,7 +61907,7 @@
           ],
           "key_version": 1,
           "name": "Deploy notifier",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "secret": "whsec_Ab3xQ9eLr0v2Zk5n8WcHt1YpUo4MiGs7Fj6Da0Bq0RU=",
           "secret_prefix": "whsec_Ab3xQ9",
           "status": "active",
@@ -61389,7 +62145,7 @@
           ],
           "key_version": 1,
           "name": "Deploy notifier",
-          "org_id": "O0020",
+          "org_id": "O123456",
           "secret_prefix": "whsec_Ab3xQ9",
           "status": "active",
           "subscription_id": "WH123456",
@@ -61795,7 +62551,7 @@
           },
           "org_id": {
             "examples": [
-              "O0020"
+              "O123456"
             ],
             "title": "Org Id",
             "type": "string"
@@ -62036,7 +62792,7 @@
                 "type": "availability.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62138,7 +62894,7 @@
                 "type": "availability.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62240,7 +62996,7 @@
                 "type": "availability.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62344,7 +63100,7 @@
                 "type": "designation.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62446,7 +63202,7 @@
                 "type": "designation.deactivated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62550,7 +63306,7 @@
                 "type": "designation.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62654,7 +63410,7 @@
                 "type": "designation.visibility_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -62758,7 +63514,7 @@
                 "type": "goal.closed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -62862,7 +63618,7 @@
                 "type": "goal.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -62964,7 +63720,7 @@
                 "type": "goal.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -63066,7 +63822,7 @@
                 "type": "goal.moved",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -63170,7 +63926,7 @@
                 "type": "goal.reopened",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -63274,7 +64030,7 @@
                 "type": "goal.reordered",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -63378,7 +64134,7 @@
                 "type": "goal.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -63482,7 +64238,7 @@
                 "type": "invite.accepted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -63586,7 +64342,7 @@
                 "type": "invite.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -63688,7 +64444,7 @@
                 "type": "invite.external_override",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -63792,7 +64548,7 @@
                 "type": "invite.rejected",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -63896,7 +64652,7 @@
                 "type": "invite.revoked",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64000,7 +64756,7 @@
                 "type": "invite.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64104,7 +64860,7 @@
                 "type": "member.added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64206,7 +64962,7 @@
                 "type": "member.auto_joined",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64310,7 +65066,7 @@
                 "type": "member.designation_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64414,7 +65170,7 @@
                 "type": "member.removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64516,7 +65272,7 @@
                 "type": "member.role_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64620,7 +65376,7 @@
                 "type": "milestone.closed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64724,7 +65480,7 @@
                 "type": "milestone.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64826,7 +65582,7 @@
                 "type": "milestone.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -64928,7 +65684,7 @@
                 "type": "milestone.moved",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65032,7 +65788,7 @@
                 "type": "milestone.reopened",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65136,7 +65892,7 @@
                 "type": "milestone.reordered",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65240,7 +65996,7 @@
                 "type": "milestone.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65344,7 +66100,7 @@
                 "type": "org.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65353,7 +66109,7 @@
                 },
                 "data": {
                   "resource_type": "organization",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": {
                     "name": "Before"
                   },
@@ -65446,7 +66202,7 @@
                 "type": "org.domain_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65455,7 +66211,7 @@
                 },
                 "data": {
                   "resource_type": "organization",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": null,
                   "after": {
                     "name": "After"
@@ -65548,7 +66304,7 @@
                 "type": "org.domain_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65557,7 +66313,7 @@
                 },
                 "data": {
                   "resource_type": "organization",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": {
                     "name": "Before"
                   },
@@ -65650,7 +66406,7 @@
                 "type": "org.domain_verified",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65659,7 +66415,7 @@
                 },
                 "data": {
                   "resource_type": "organization",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": {
                     "name": "Before"
                   },
@@ -65754,7 +66510,7 @@
                 "type": "org.join_request_decided",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65858,7 +66614,7 @@
                 "type": "org.settings_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65867,7 +66623,7 @@
                 },
                 "data": {
                   "resource_type": "settings",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": {
                     "name": "Before"
                   },
@@ -65962,7 +66718,7 @@
                 "type": "org.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -65971,7 +66727,7 @@
                 },
                 "data": {
                   "resource_type": "organization",
-                  "resource_id": "O0020",
+                  "resource_id": "O123456",
                   "before": {
                     "name": "Before"
                   },
@@ -66066,7 +66822,7 @@
                 "type": "project.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66168,7 +66924,7 @@
                 "type": "project.delegation_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66272,7 +67028,7 @@
                 "type": "project.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66374,7 +67130,7 @@
                 "type": "project.leads_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66478,7 +67234,7 @@
                 "type": "project.member_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66580,7 +67336,7 @@
                 "type": "project.member_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66682,7 +67438,7 @@
                 "type": "project.member_role_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66786,7 +67542,7 @@
                 "type": "project.member_updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66890,7 +67646,7 @@
                 "type": "project.owner_transferred",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -66994,7 +67750,7 @@
                 "type": "project.reordered",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -67098,7 +67854,7 @@
                 "type": "project.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -67202,7 +67958,7 @@
                 "type": "project.visibility_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -67306,7 +68062,7 @@
                 "type": "service_account.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67408,7 +68164,7 @@
                 "type": "service_account.deactivated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67512,7 +68268,7 @@
                 "type": "service_account.renamed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67616,7 +68372,7 @@
                 "type": "sprint.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67718,7 +68474,7 @@
                 "type": "sprint.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67820,7 +68576,7 @@
                 "type": "sprint.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -67924,7 +68680,7 @@
                 "type": "task.attachment_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68026,7 +68782,7 @@
                 "type": "task.attachment_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68128,7 +68884,7 @@
                 "type": "task.comment_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68230,7 +68986,7 @@
                 "type": "task.comment_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68332,7 +69088,7 @@
                 "type": "task.comment_updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68436,7 +69192,7 @@
                 "type": "task.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68538,7 +69294,7 @@
                 "type": "task.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68640,7 +69396,7 @@
                 "type": "task.dependency_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68742,7 +69498,7 @@
                 "type": "task.dependency_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68844,7 +69600,7 @@
                 "type": "task.moved",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -68948,7 +69704,7 @@
                 "type": "task.restricted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -69052,7 +69808,7 @@
                 "type": "task.reviewed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -69156,7 +69912,7 @@
                 "type": "task.subtask_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -69258,7 +70014,7 @@
                 "type": "task.subtask_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -69360,7 +70116,7 @@
                 "type": "task.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": "P30104",
                 "actor": {
                   "kind": "user",
@@ -69464,7 +70220,7 @@
                 "type": "team.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -69566,7 +70322,7 @@
                 "type": "team.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -69668,7 +70424,7 @@
                 "type": "team.member_added",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -69770,7 +70526,7 @@
                 "type": "team.member_removed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -69872,7 +70628,7 @@
                 "type": "team.member_role_changed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -69976,7 +70732,7 @@
                 "type": "team.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70080,7 +70836,7 @@
                 "type": "token.auth_failed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70184,7 +70940,7 @@
                 "type": "token.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70286,7 +71042,7 @@
                 "type": "token.renamed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70390,7 +71146,7 @@
                 "type": "token.revoked",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70494,7 +71250,7 @@
                 "type": "token.rotated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70598,7 +71354,7 @@
                 "type": "webhook.created",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70700,7 +71456,7 @@
                 "type": "webhook.deleted",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70802,7 +71558,7 @@
                 "type": "webhook.delivery_replayed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -70906,7 +71662,7 @@
                 "type": "webhook.disabled",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71010,7 +71766,7 @@
                 "type": "webhook.paused",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71114,7 +71870,7 @@
                 "type": "webhook.resumed",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71218,7 +71974,7 @@
                 "type": "webhook.rotated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71322,7 +72078,7 @@
                 "type": "webhook.test",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71426,7 +72182,7 @@
                 "type": "webhook.updated",
                 "api_version": "2026-09-25",
                 "created_at": "2026-09-25T12:00:00Z",
-                "org_id": "O0020",
+                "org_id": "O123456",
                 "project_id": null,
                 "actor": {
                   "kind": "user",
@@ -71722,7 +72478,7 @@
       "statuses": [
         413
       ],
-      "description": "The file is over the size limit (`detail` names it): 100 MB for attachments and project files, 2 MB for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large."
+      "description": "The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large."
     },
     {
       "type": "urn:taskadence:problem:upload-type-not-allowed",
