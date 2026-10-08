@@ -19,8 +19,8 @@ who want to be credited once a fix is released. Please give us a reasonable wind
 
 | Version | Supported |
 |---|---|
-| `0.x` (pre-release) | The latest `0.x` release only. `0.x` carries no compatibility promise; fixes ship as a new `0.x`. |
-| `1.x` | Not released yet. |
+| `1.x` | The latest `1.x` release. Fixes ship as a new `1.x`; semver applies (no breaking change within `1.x`). |
+| `0.x` (pre-release) | Not supported. Upgrade to `1.x`. |
 
 ## Update cadence
 

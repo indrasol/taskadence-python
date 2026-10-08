@@ -1,6 +1,6 @@
 {
   "name": "@taskadence/mcp",
-  "version": "0.1.0-dev.0",
+  "version": "1.0.0",
   "description": "The TasKadence MCP server for clients that start a local process: a stdio proxy to the remote server (npx -y @taskadence/mcp).",
   "license": "Apache-2.0",
   "author": "Indrasol",

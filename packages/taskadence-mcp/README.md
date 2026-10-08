@@ -15,7 +15,8 @@ a local program (a "stdio" server), or when you want it to use a token you creat
 
 Its twin on npm, `npx -y @taskadence/mcp`, does exactly the same with Node.js; pick whichever runtime you have.
 
-> **`0.x` is a pre-release.** Any `0.x` release may change anything; pin a version in configs you depend on.
+> **Stable since 1.0.** Versions follow [semantic versioning](https://semver.org/) and the API's
+> [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within `1.x`.
 
 **Documentation:** [docs.taskadence.com](https://docs.taskadence.com/mcp/) ·
 **Source:** [GitHub](https://github.com/indrasol/taskadence-python) · **Issues:** [GitHub issues](https://github.com/indrasol/taskadence-python/issues)

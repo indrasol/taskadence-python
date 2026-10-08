@@ -3,13 +3,13 @@
 # 5.3: one pipeline, three artefacts: the SDK `taskadence`, the stdio MCP proxy `taskadence-mcp` (both PyPI; `uvx
 # taskadence-mcp`) and its Node twin `@taskadence/mcp` (npm; `npx -y @taskadence/mcp`), all stamped from the same tag.
 #
-# - A pushed tag `v0.*` (`0.x` carries no compatibility promise) builds, checks, and publishes BOTH Python
-#   distributions to TestPyPI through trusted publishing (OIDC: no long-lived token anywhere). Nothing else: npm has no
-#   test registry, so the tarball is built, checked and kept as an artifact.
+# - A pushed tag `v*` (`v1.0.0`, the first stable release; semver from there) builds, checks, and publishes BOTH
+#   Python distributions to TestPyPI through trusted publishing (OIDC: no long-lived token anywhere). Nothing else: npm
+#   has no test registry, so the tarball is built, checked and kept as an artifact.
 # - `workflow_dispatch` target=testpypi does the same for whatever ref it runs on.
 # - S.23 is OPEN: `workflow_dispatch` target=pypi publishes both Python distributions to PyPI, target=npm publishes
-#   `@taskadence/mcp` to npm. Both run ONLY from a tag (Run workflow → "Use workflow from" → Tags → `v0.x.y`), so the
-#   version is always the tag's: the `gate` job fails any other ref. Still `0.x` only (the stamp step).
+#   `@taskadence/mcp` to npm. Both run ONLY from a tag (Run workflow → "Use workflow from" → Tags → `vX.Y.Z`), so the
+#   version is always the tag's: the `gate` job fails any other ref. The stamp step takes a plain `X.Y.Z` only.
 #
 # 5.5: ONE GitHub environment per distribution and registry. PyPI refuses two pending trusted publishers with the same
 # (owner, repo, workflow, environment), so each publish job uploads one distribution under its own environment:
@@ -27,7 +27,7 @@ name: release
 
 on:
   push:
-    tags: ["v0.*"]
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       target:
@@ -50,7 +50,7 @@ jobs:
           TARGET: ${{ inputs.target }}
           REF: ${{ github.ref }}
         run: |
-          echo "::error::target=$TARGET runs only from a tag ref refs/tags/v* (got $REF). Run workflow → Use workflow from → Tags → v0.x.y."
+          echo "::error::target=$TARGET runs only from a tag ref refs/tags/v* (got $REF). Run workflow → Use workflow from → Tags → vX.Y.Z."
           exit 1
       - env:
           TARGET: ${{ inputs.target || 'testpypi' }}
@@ -72,11 +72,11 @@ jobs:
         with:
           node-version: "22"
           package-manager-cache: false   # S.19: no cache in a release build (cache poisoning)
-      - name: Stamp the version from the tag (v0.2.0 → 0.2.0) — all three packages
+      - name: Stamp the version from the tag (v1.0.0 → 1.0.0), all three packages
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           version="${GITHUB_REF_NAME#v}"
-          case "$version" in 0.*) ;; *) echo "::error::only 0.x versions are released for now (got $version)"; exit 1 ;; esac
+          echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "::error::the tag must be vX.Y.Z (got $version)"; exit 1; }
           sed -i "s/^__version__ = .*/__version__ = \"$version\"/" src/taskadence/_version.py packages/taskadence-mcp/src/taskadence_mcp/_version.py
           sed -i "s/^export const VERSION = .*/export const VERSION = '$version';/" packages/mcp-node/src/version.ts
           (cd packages/mcp-node && npm version "$version" --no-git-tag-version --allow-same-version)

@@ -7,7 +7,8 @@
 [TasKadence](https://taskadence.com) is task and project management for teams. This package lets your Python code
 read and change your organization's tasks, projects and teams, and it adds `tm`, a command line for the same things.
 
-> **`0.x` is a pre-release.** Any `0.x` release may change anything. Pin an exact version and read the
+> **Stable since 1.0.** The SDK follows [semantic versioning](https://semver.org/) and the API's
+> [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within `1.x`. Read the
 > [changelog](https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md) before upgrading.
 
 **Documentation:** [docs.taskadence.com](https://docs.taskadence.com/sdks/python/) ·
@@ -117,8 +118,9 @@ Four things that make the rest of this page easier to read.
   `O123456`, saved views `V123456`, webhooks `WH123456`. Find them with `tm.me()` (your organization), with any
   list (`tm.tasks.list(...)`, `tm tasks list`, `tm projects list`), or in the app's address bar: a task's page is
   `https://taskadence.com/tasks/T123456`, and `org_id=O123456` in the address names the organization.
-- **Pre-release.** Versions `0.x` may change anything between releases, so pin one (`pip install taskadence==0.1.0`).
-  From 1.0 on, the SDK follows [semantic versioning](https://semver.org/).
+- **Versions.** The SDK follows [semantic versioning](https://semver.org/) and the API's
+  [versioning policy](https://docs.taskadence.com/guides/versioning/): a `1.x` release never breaks your code,
+  and anything deprecated warns first. Pin a major version if you like (`pip install "taskadence>=1,<2"`).
 
 ## Using the client
 
