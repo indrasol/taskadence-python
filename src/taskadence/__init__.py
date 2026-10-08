@@ -9,7 +9,7 @@
 
 `tm.<resource>.<verb>(…)` exists for every public operation of the API (`tm.tasks.list`, `tm.projects.read`, …); the
 models are in `taskadence.models`, the exceptions in `taskadence.errors`, webhook verification in `taskadence.webhooks`.
-`0.x` is a pre-release: no compatibility promise until 1.0.
+Versions follow semver and the API's versioning policy (https://docs.taskadence.com/guides/versioning/).
 """
 
 from . import errors, models, webhooks

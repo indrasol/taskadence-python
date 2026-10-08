@@ -1,3 +1,3 @@
-"""The package version. `release.yml` stamps it from the tag (`v0.1.0` → `0.1.0`); `0.x` is pre-release."""
+"""The package version. `release.yml` stamps it from the tag (`v1.0.0` → `1.0.0`); semver."""
 
-__version__ = "0.1.0.dev0"
+__version__ = "1.0.0"

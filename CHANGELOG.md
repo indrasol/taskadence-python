@@ -1,16 +1,29 @@
 # Changelog
 
 All notable changes to `taskadence` (the TasKadence Python SDK), `taskadence-mcp` and `@taskadence/mcp`, which are
-released together from one tag. The format follows [Keep a Changelog](https://keepachangelog.com/). Versions follow
-semver, and **`0.x` is a pre-release with no compatibility promise** until 1.0.
+released together from one tag. The format follows [Keep a Changelog](https://keepachangelog.com/). From 1.0.0 the
+versions follow semver and the API's [versioning policy](https://docs.taskadence.com/guides/versioning/); the `0.x`
+entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
-## [0.1.2] - 2026-10-07
+## [1.0.0] - 2026-10-08
+
+First stable release: the public API is /v1 and follows docs.taskadence.com/guides/versioning.
 
 Re-generated from the API contract at `taskadence-api` `b3b5f14` (API version `2026-09-25`, unchanged). Additive only:
-no public operation, model or field was removed. `@taskadence/mcp` and `taskadence-mcp` have no generated code and do
-not change beyond the shared version.
+no public operation, model or field was removed since 0.1.1. `@taskadence/mcp` and `taskadence-mcp` have no generated
+code and do not change beyond the shared version. This section was prepared as 0.1.2, which was never published.
+
+### Stable
+- `taskadence`, `taskadence-mcp` and `@taskadence/mcp` follow semver from here: a breaking change to a public method,
+  model, field, CLI command or flag needs a 2.0, and anything deprecated warns first (the SDK issues a
+  `DeprecationWarning` when the API answers with a `Deprecation` or `Sunset` header).
+- The included storage is 10 GB per organization, as the API reports it (`included_bytes`); the SDK and `tm storage`
+  show the API's figure rather than a constant of their own.
+- The `tm` command line (`pip install "taskadence[cli]"`): `auth`, `me`, `tasks` (with `attach`), `projects` (with
+  `upload`), `views`, `webhooks`, `tokens` and `storage`. Its commands, flags, `--json` output and exit codes
+  (0, 1, 2) are covered by the same promise.
 
 ### Added
 - `tm.organizations.storage_projects(org_id)`: every project holding files, largest first, with its file count and
