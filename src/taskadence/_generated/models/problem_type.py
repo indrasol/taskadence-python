@@ -4,6 +4,7 @@ from typing import Literal
 
 ProblemType = Literal[
     "about:blank",
+    "urn:taskadence:problem:database-unavailable",
     "urn:taskadence:problem:email-unverified",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",
@@ -31,6 +32,7 @@ ProblemType = Literal[
 
 PROBLEM_TYPE_VALUES: set[ProblemType] = {
     "about:blank",
+    "urn:taskadence:problem:database-unavailable",
     "urn:taskadence:problem:email-unverified",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",

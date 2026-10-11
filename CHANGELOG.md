@@ -7,6 +7,12 @@ entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
+Re-generated from the API contract at `taskadence-api` `5069093` (API version `2026-09-25`, unchanged).
+
+### Added
+- `ProblemType` includes `urn:taskadence:problem:database-unavailable` (503: the database did not answer after
+  retries, nothing was applied; retry after `Retry-After` seconds).
+
 ## [1.0.0] - 2026-10-08
 
 First stable release: the public API is /v1 and follows docs.taskadence.com/guides/versioning.

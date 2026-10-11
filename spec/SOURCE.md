@@ -6,12 +6,12 @@ snapshot of the public contract the TasKadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `dev` |
-| Backend commit | `b3b5f14` - Merge #207 (`origin/dev` HEAD), after #204 (storage and billing follow-ups: `GET .../storage/projects` and `GET .../storage/files`, `project_count`, each project's `file_count` and `largest` with its `parent_id` / `project_id`) and the decimal upload limits (100 MB = 100,000,000 bytes) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-07, from a detached worktree with **placeholder** production settings (no `.env.production` read: only `BASE_API_URL` and a random `WEBHOOK_SECRET_KEK_TM`). Against the previous pin (`af56676`): 2 operations and 3 schemas added, `project_count` on `StorageUsage`, `file_count` / `largest` on `StorageProject`, the decimal upload-limit wording, and the `org_id` example (`O0020` to `O123456`); nothing removed, `servers` unchanged |
+| Backend repo | `indrasol/taskadence-api`, branch `main` |
+| Backend commit | `5069093` - Merge #230 (`origin/main` HEAD), after #229 (the comment webhook examples show the comment's fields: `comment_id`, `parent_comment_id`, `content`) and the `database-unavailable` problem type (503) |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-11, from a detached worktree with **placeholder** production settings (no `.env.production` read: only `BASE_API_URL` and a random `WEBHOOK_SECRET_KEK_TM`). Against the previous pin (`b3b5f14`): the `comment.created` / `comment.deleted` / `comment.updated` webhook examples, and `urn:taskadence:problem:database-unavailable` in the problem types (`ProblemType` gains a member); no operation, schema or webhook added or removed, `servers` unchanged |
 | `info.version` | `2026-09-25` |
 | Size | 114 paths · 176 operations (170 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 228 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `98f8c768021991e77d206dbd93a1fc83ad3d6ae018b6ea72cd0b1dc27f2f55aa` |
+| SHA-256 | `d68011395c41b204bea9aef328e1b6ddf3f725f4e71853eb59af989856aca29e` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).
