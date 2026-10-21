@@ -7,9 +7,18 @@ entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
-Re-generated from the API contract at `taskadence-api` `5069093` (API version `2026-09-25`, unchanged).
+Re-generated from the API contract at `taskadence-api` `9b7e748` (branch `feat/sub-projects`, API version `2026-09-25`,
+unchanged). Additive only: no operation, schema or webhook removed.
 
 ### Added
+- Sub-projects (N.3): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry `parent_project_id`;
+  `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children` (`ProjectChildOut`);
+  `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes `include_children`.
+  Webhooks `project.parent_changed` and `project.children_detached`. Example in the README.
+- From the batch branch since the previous pin: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`,
+  `tm.tasks.reopen`, `tm.view_pins.pin_team` / `unpin_team`, and their models; webhooks `member.admin_grants_changed`,
+  `project.managers_changed`, `project.team_linked`, `project.team_unlinked`, `team.leads_changed`,
+  `team.managers_changed`.
 - `ProblemType` includes `urn:taskadence:problem:database-unavailable` (503: the database did not answer after
   retries, nothing was applied; retry after `Retry-After` seconds).
 

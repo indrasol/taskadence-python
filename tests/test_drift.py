@@ -77,9 +77,11 @@ def test_every_list_is_a_page_and_every_create_is_idempotent() -> None:
     lists = {k for k, op in OPERATIONS.items() if op.is_list}
     creates = {k for k, op in OPERATIONS.items() if op.is_create}
     assert {"tasks.list", "views.rows", "projects.list", "webhooks.deliveries", "audit.list"} <= lists
-    # 5.9: + milestones.create (a project's milestones, goals' create)
+    # 5.9: + milestones.create (a project's milestones, goals' create); the batch creates / updates (re-pin for N.3)
     assert creates == {
         "tasks.create",
+        "tasks.create_batch",
+        "tasks.update_batch",
         "projects.create",
         "goals.create",
         "milestones.create",
@@ -207,5 +209,41 @@ def test_the_5_5_surface_agent_task_review_mcp_clients_and_no_agent_type() -> No
     assert (clients.method, clients.path) == ("GET", "/v1/mcp/clients")
     assert callable(Taskadence(token=TOKEN).tasks.review) and callable(Taskadence(token=TOKEN).mcp.clients)
     assert TaskReviewDecision(decision="accept").to_dict() == {"decision": "accept"}
-    assert SPEC["components"]["schemas"]["TaskTypeEnum"]["enum"] == ["task", "bug"]
+    # `access` (an access request) arrived with the N.3 re-pin; `agent` stays gone
+    assert SPEC["components"]["schemas"]["TaskTypeEnum"]["enum"] == ["task", "bug", "access"]
     assert {"created_via", "review"} <= set(OPERATIONS["tasks.list"].filters)
+
+
+def test_sub_projects_n3() -> None:
+    """N.3 (backend feat/sub-projects): a project's parent and children ride on the project models, a delete reports
+    the detached children, and the project task list takes `include_children`."""
+    from taskadence._generated.models import (
+        ProjectCard,
+        ProjectChildOut,
+        ProjectCreate,
+        ProjectDeleted,
+        ProjectInDB,
+        ProjectUpdate,
+    )
+
+    assert "include_children" in OPERATIONS["tasks.list"].query
+    assert ProjectUpdate(parent_project_id=None).to_dict() == {"parent_project_id": None}
+    assert ProjectCreate(org_id="O1", name="Child", parent_project_id="P1").to_dict()["parent_project_id"] == "P1"
+    card = SPEC["components"]["schemas"]["ProjectCard"]["properties"]
+    assert {"parent_project_id", "child_count"} <= set(card) and ProjectCard is not None
+    detail = ProjectInDB.from_dict(
+        {
+            "org_id": "O1",
+            "name": "Parent",
+            "project_id": "P1",
+            "created_at": None,
+            "updated_at": None,
+            "deleted_at": None,
+            "parent": None,
+            "children": [{"project_id": "P2", "name": "Child", "status": "in_progress", "progress": 50.0}],
+        }
+    )
+    assert isinstance(detail.children[0], ProjectChildOut) and detail.children[0].progress == 50.0
+    gone = ProjectDeleted.from_dict({"ok": True, "children_detached": [{"project_id": "P2", "name": "Child"}]})
+    assert gone.children_detached[0].project_id == "P2"
+    assert {"project.parent_changed", "project.children_detached"} <= set(SPEC["webhooks"])

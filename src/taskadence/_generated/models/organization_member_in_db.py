@@ -47,6 +47,9 @@ class OrganizationMemberInDB:
             Default: 'user'.
         mfa_enrolled (bool | None | Unset): Whether the member has set up two-step sign-in. Only in the members list,
             and only for owners and admins; null otherwise.
+        admin_grants (list[str] | Unset): The owner-only powers an owner granted this admin (`manage_sso`,
+            `manage_domain_restriction`, `manage_retention`). Empty for anyone else; an owner holds all three without a
+            grant.
     """
 
     user_id: UUID
@@ -68,6 +71,7 @@ class OrganizationMemberInDB:
     last_active_at: datetime.datetime | None | Unset = UNSET
     kind: str | Unset = "user"
     mfa_enrolled: bool | None | Unset = UNSET
+    admin_grants: list[str] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -180,6 +184,10 @@ class OrganizationMemberInDB:
         else:
             mfa_enrolled = self.mfa_enrolled
 
+        admin_grants: list[str] | Unset = UNSET
+        if not isinstance(self.admin_grants, Unset):
+            admin_grants = self.admin_grants
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -220,6 +228,8 @@ class OrganizationMemberInDB:
             field_dict["kind"] = kind
         if mfa_enrolled is not UNSET:
             field_dict["mfa_enrolled"] = mfa_enrolled
+        if admin_grants is not UNSET:
+            field_dict["admin_grants"] = admin_grants
 
         return field_dict
 
@@ -412,6 +422,8 @@ class OrganizationMemberInDB:
 
         mfa_enrolled = _parse_mfa_enrolled(d.pop("mfa_enrolled", UNSET))
 
+        admin_grants = cast(list[str], d.pop("admin_grants", UNSET))
+
         organization_member_in_db = cls(
             user_id=user_id,
             org_id=org_id,
@@ -432,6 +444,7 @@ class OrganizationMemberInDB:
             last_active_at=last_active_at,
             kind=kind,
             mfa_enrolled=mfa_enrolled,
+            admin_grants=admin_grants,
         )
 
         organization_member_in_db.additional_properties = d

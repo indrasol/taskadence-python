@@ -121,11 +121,14 @@ from ._generated.api.task_history import task_history_read as _task_history_read
 from ._generated.api.tasks import tasks_add_dependency as _tasks_add_dependency
 from ._generated.api.tasks import tasks_add_subtask as _tasks_add_subtask
 from ._generated.api.tasks import tasks_create as _tasks_create
+from ._generated.api.tasks import tasks_create_batch as _tasks_create_batch
 from ._generated.api.tasks import tasks_delete as _tasks_delete
 from ._generated.api.tasks import tasks_list as _tasks_list
+from ._generated.api.tasks import tasks_list_dependents as _tasks_list_dependents
 from ._generated.api.tasks import tasks_read as _tasks_read
 from ._generated.api.tasks import tasks_remove_dependency as _tasks_remove_dependency
 from ._generated.api.tasks import tasks_remove_subtask as _tasks_remove_subtask
+from ._generated.api.tasks import tasks_reopen as _tasks_reopen
 from ._generated.api.tasks import tasks_replace as _tasks_replace
 from ._generated.api.tasks import tasks_review as _tasks_review
 from ._generated.api.tasks import tasks_set_milestone as _tasks_set_milestone
@@ -133,6 +136,7 @@ from ._generated.api.tasks import tasks_set_project as _tasks_set_project
 from ._generated.api.tasks import tasks_set_section as _tasks_set_section
 from ._generated.api.tasks import tasks_set_sprint as _tasks_set_sprint
 from ._generated.api.tasks import tasks_update as _tasks_update
+from ._generated.api.tasks import tasks_update_batch as _tasks_update_batch
 from ._generated.api.teams import teams_add_member as _teams_add_member
 from ._generated.api.teams import teams_create as _teams_create
 from ._generated.api.teams import teams_delete as _teams_delete
@@ -154,9 +158,11 @@ from ._generated.api.uploads import uploads_complete as _uploads_complete
 from ._generated.api.uploads import uploads_create as _uploads_create
 from ._generated.api.view_pins import view_pins_list as _view_pins_list
 from ._generated.api.view_pins import view_pins_pin_project as _view_pins_pin_project
+from ._generated.api.view_pins import view_pins_pin_team as _view_pins_pin_team
 from ._generated.api.view_pins import view_pins_pin_view as _view_pins_pin_view
 from ._generated.api.view_pins import view_pins_reorder as _view_pins_reorder
 from ._generated.api.view_pins import view_pins_unpin_project as _view_pins_unpin_project
+from ._generated.api.view_pins import view_pins_unpin_team as _view_pins_unpin_team
 from ._generated.api.view_pins import view_pins_unpin_view as _view_pins_unpin_view
 from ._generated.api.views import views_create as _views_create
 from ._generated.api.views import views_delete as _views_delete
@@ -321,11 +327,13 @@ OPERATIONS: dict[str, Operation] = {
         query=(
             "org_id",
             "project_id",
+            "include_children",
             "limit",
             "cursor",
             "sort_by",
             "sort_order",
             "include_inaccessible",
+            "subtasks",
             "section_scope",
         ),
         filters=(
@@ -345,12 +353,37 @@ OPERATIONS: dict[str, Operation] = {
             "task_type",
             "created_via",
             "review",
+            "parent",
+            "blocked",
+            "has_subtasks",
+            "blocks",
+            "created_by",
         ),
         is_list=True,
         parse=_tasks_list._parse_response,
         item=TaskCardView.from_dict,
         scopes=("tasks:read",),
         summary="List / search tasks (the filter grammar; `filter[search]` is search)",
+    ),
+    "tasks.create_batch": Operation(
+        op_id="tasks.create_batch",
+        method="POST",
+        path="/v1/tasks/batch",
+        body="json",
+        is_create=True,
+        parse=_tasks_create_batch._parse_response,
+        scopes=("tasks:write",),
+        summary="Create up to 50 tasks (per-item results)",
+    ),
+    "tasks.update_batch": Operation(
+        op_id="tasks.update_batch",
+        method="PATCH",
+        path="/v1/tasks/batch",
+        body="json",
+        is_create=True,
+        parse=_tasks_update_batch._parse_response,
+        scopes=("tasks:write",),
+        summary="Update up to 100 tasks (per-item results)",
     ),
     "tasks.read": Operation(
         op_id="tasks.read",
@@ -393,6 +426,16 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_delete._parse_response,
         scopes=("tasks:write",),
         summary="Delete a task",
+    ),
+    "tasks.list_dependents": Operation(
+        op_id="tasks.list_dependents",
+        method="GET",
+        path="/v1/tasks/{task_id}/dependents",
+        path_params=("task_id",),
+        if_none_match=True,
+        parse=_tasks_list_dependents._parse_response,
+        scopes=("tasks:read",),
+        summary="List the tasks that depend on a task",
     ),
     "tasks.set_project": Operation(
         op_id="tasks.set_project",
@@ -462,6 +505,15 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_remove_subtask._parse_response,
         scopes=("tasks:write",),
         summary="Remove a subtask link",
+    ),
+    "tasks.reopen": Operation(
+        op_id="tasks.reopen",
+        method="POST",
+        path="/v1/tasks/{task_id}/reopen",
+        path_params=("task_id",),
+        parse=_tasks_reopen._parse_response,
+        scopes=("tasks:write",),
+        summary="Reopen a completed task",
     ),
     "tasks.add_dependency": Operation(
         op_id="tasks.add_dependency",
@@ -1980,6 +2032,25 @@ OPERATIONS: dict[str, Operation] = {
         parse=_view_pins_unpin_project._parse_response,
         scopes=("tasks:write",),
         summary="Unpin a project",
+    ),
+    "view-pins.pin_team": Operation(
+        op_id="view-pins.pin_team",
+        method="PUT",
+        path="/v1/view-pins/teams/{team_id}",
+        path_params=("team_id",),
+        query=("org_id",),
+        parse=_view_pins_pin_team._parse_response,
+        scopes=("tasks:write",),
+        summary="Pin a team",
+    ),
+    "view-pins.unpin_team": Operation(
+        op_id="view-pins.unpin_team",
+        method="DELETE",
+        path="/v1/view-pins/teams/{team_id}",
+        path_params=("team_id",),
+        parse=_view_pins_unpin_team._parse_response,
+        scopes=("tasks:write",),
+        summary="Unpin a team",
     ),
     "view-pins.reorder": Operation(
         op_id="view-pins.reorder",

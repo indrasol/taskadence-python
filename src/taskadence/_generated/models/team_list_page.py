@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
+    from ..models.team_list_summary import TeamListSummary
     from ..models.team_out import TeamOut
 
 
@@ -26,19 +27,22 @@ class TeamListPage:
 
     Attributes:
         data (list[TeamOut]):
-        total (int): Teams matching the query the caller may read, before `limit` / `offset`
+        total (int): Teams matching the query the caller may list, before `limit` / `offset`
         next_cursor (None | str | Unset): The next page's cursor; null on the last page.
+        summary (None | TeamListSummary | Unset): Batch 7: header stats over every listable team, ignoring `search`
     """
 
     data: list[TeamOut]
     total: int
     next_cursor: None | str | Unset = UNSET
+    summary: None | TeamListSummary | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.team_list_summary import TeamListSummary  # noqa: PLC0415
         from ..models.team_out import TeamOut  # noqa: PLC0415
 
         data = []
@@ -54,6 +58,14 @@ class TeamListPage:
         else:
             next_cursor = self.next_cursor
 
+        summary: dict[str, Any] | None | Unset
+        if isinstance(self.summary, Unset):
+            summary = UNSET
+        elif isinstance(self.summary, TeamListSummary):
+            summary = self.summary.to_dict()
+        else:
+            summary = self.summary
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -64,11 +76,14 @@ class TeamListPage:
         )
         if next_cursor is not UNSET:
             field_dict["next_cursor"] = next_cursor
+        if summary is not UNSET:
+            field_dict["summary"] = summary
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.team_list_summary import TeamListSummary  # noqa: PLC0415
         from ..models.team_out import TeamOut  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -90,10 +105,28 @@ class TeamListPage:
 
         next_cursor = _parse_next_cursor(d.pop("next_cursor", UNSET))
 
+        def _parse_summary(data: object) -> None | TeamListSummary | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                summary_type_0 = TeamListSummary.from_dict(data)
+
+                return summary_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | TeamListSummary | Unset, data)
+
+        summary = _parse_summary(d.pop("summary", UNSET))
+
         team_list_page = cls(
             data=data,
             total=total,
             next_cursor=next_cursor,
+            summary=summary,
         )
 
         team_list_page.additional_properties = d

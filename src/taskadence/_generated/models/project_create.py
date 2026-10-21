@@ -51,8 +51,13 @@ class ProjectCreate:
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
             organization (422 otherwise). null = none.
-        owner_designation (None | str | Unset): Designation of the project owner Example: manager.
-        team_member_designations (list[TeamMemberDesignation] | None | Unset): Designations for team members
+        parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
+            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            parent (422). null = top-level.
+        owner_designation (None | str | Unset): Accepted and ignored: a project member shows their live org designation
+            Example: manager.
+        team_member_designations (list[TeamMemberDesignation] | None | Unset): Accepted and ignored: a project member
+            shows their live org designation
     """
 
     org_id: str
@@ -71,6 +76,7 @@ class ProjectCreate:
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
     team_id: None | str | Unset = UNSET
+    parent_project_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -184,6 +190,12 @@ class ProjectCreate:
         else:
             team_id = self.team_id
 
+        parent_project_id: None | str | Unset
+        if isinstance(self.parent_project_id, Unset):
+            parent_project_id = UNSET
+        else:
+            parent_project_id = self.parent_project_id
+
         owner_designation: None | str | Unset
         if isinstance(self.owner_designation, Unset):
             owner_designation = UNSET
@@ -238,6 +250,8 @@ class ProjectCreate:
             field_dict["visibility"] = visibility
         if team_id is not UNSET:
             field_dict["team_id"] = team_id
+        if parent_project_id is not UNSET:
+            field_dict["parent_project_id"] = parent_project_id
         if owner_designation is not UNSET:
             field_dict["owner_designation"] = owner_designation
         if team_member_designations is not UNSET:
@@ -437,6 +451,15 @@ class ProjectCreate:
 
         team_id = _parse_team_id(d.pop("team_id", UNSET))
 
+        def _parse_parent_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
+
         def _parse_owner_designation(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -487,6 +510,7 @@ class ProjectCreate:
             team_members=team_members,
             visibility=visibility,
             team_id=team_id,
+            parent_project_id=parent_project_id,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,
         )

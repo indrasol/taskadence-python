@@ -28,9 +28,10 @@ class ProjectMemberCreate:
         project_id (str): Project ID (text) Example: project-1234.
         user_id (str): User ID (UUID) Example: b3c1e2d4-1234-5678-9abc-def012345678.
         username (None | str | Unset): Username of the member Example: john_doe.
-        designation (None | str | Unset): Designation name Example: developer.
-        designation_id (None | str | Unset): The designation's id (a global designation or the organization's own). Send
-            this or `designation` (a name, label or alias); responses carry both. Example: DG0001.
+        designation (None | str | Unset): The member's LIVE org designation (display name) on read. Accepted and ignored
+            on write: a project has no designation of its own Example: Senior Software Engineer.
+        designation_id (None | str | Unset): The member's live org designation id (DG… seed / DO… org row) on read.
+            Accepted and ignored on write Example: DG0001.
         role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
             omitted. Prefer `project_role`. Example: owner.
         project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when

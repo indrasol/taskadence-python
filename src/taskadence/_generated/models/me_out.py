@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ..models.me_auth import MeAuth
     from ..models.me_organization import MeOrganization
     from ..models.me_principal import MePrincipal
+    from ..models.me_reconnect_organization import MeReconnectOrganization
 
 
 T = TypeVar("T", bound="MeOut")
@@ -33,16 +34,21 @@ class MeOut:
 
     Attributes:
         principal (MePrincipal): Part of `MeOut`.
-        organizations (list[MeOrganization] | Unset): Active memberships, by name (a token: only its own organization)
+        organizations (list[MeOrganization] | Unset): Active memberships, by name (a token: only the organizations it
+            reaches)
         auth (MeAuth | None | Unset): The access token behind this request; absent for a session token.
+        organizations_needing_reconnect (list[MeReconnectOrganization] | None | Unset): N.2: an "All my organizations"
+            token only - organizations the person belongs to that it skips until the app is reconnected (two-step sign-in is
+            required there)
         idle_timeout_minutes (int | None | Unset): S.6: a signed-in session only - the STRICTEST idle sign-out (minutes)
-            across the person's organizations; the web app signs out after it. 60 when none sets one. Absent for an access
-            token
+            across the person's organizations; the web app signs out after it. 1440 (24 hours) when none sets one. Absent
+            for an access token
     """
 
     principal: MePrincipal
     organizations: list[MeOrganization] | Unset = UNSET
     auth: MeAuth | None | Unset = UNSET
+    organizations_needing_reconnect: list[MeReconnectOrganization] | None | Unset = UNSET
     idle_timeout_minutes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -53,6 +59,7 @@ class MeOut:
         from ..models.me_auth import MeAuth  # noqa: PLC0415
         from ..models.me_organization import MeOrganization  # noqa: PLC0415
         from ..models.me_principal import MePrincipal  # noqa: PLC0415
+        from ..models.me_reconnect_organization import MeReconnectOrganization  # noqa: PLC0415
 
         principal = self.principal.to_dict()
 
@@ -71,6 +78,18 @@ class MeOut:
         else:
             auth = self.auth
 
+        organizations_needing_reconnect: list[dict[str, Any]] | None | Unset
+        if isinstance(self.organizations_needing_reconnect, Unset):
+            organizations_needing_reconnect = UNSET
+        elif isinstance(self.organizations_needing_reconnect, list):
+            organizations_needing_reconnect = []
+            for organizations_needing_reconnect_type_0_item_data in self.organizations_needing_reconnect:
+                organizations_needing_reconnect_type_0_item = organizations_needing_reconnect_type_0_item_data.to_dict()
+                organizations_needing_reconnect.append(organizations_needing_reconnect_type_0_item)
+
+        else:
+            organizations_needing_reconnect = self.organizations_needing_reconnect
+
         idle_timeout_minutes: int | None | Unset
         if isinstance(self.idle_timeout_minutes, Unset):
             idle_timeout_minutes = UNSET
@@ -88,6 +107,8 @@ class MeOut:
             field_dict["organizations"] = organizations
         if auth is not UNSET:
             field_dict["auth"] = auth
+        if organizations_needing_reconnect is not UNSET:
+            field_dict["organizations_needing_reconnect"] = organizations_needing_reconnect
         if idle_timeout_minutes is not UNSET:
             field_dict["idle_timeout_minutes"] = idle_timeout_minutes
 
@@ -98,6 +119,7 @@ class MeOut:
         from ..models.me_auth import MeAuth  # noqa: PLC0415
         from ..models.me_organization import MeOrganization  # noqa: PLC0415
         from ..models.me_principal import MePrincipal  # noqa: PLC0415
+        from ..models.me_reconnect_organization import MeReconnectOrganization  # noqa: PLC0415
 
         d = dict(src_dict)
         principal = MePrincipal.from_dict(d.pop("principal"))
@@ -128,6 +150,32 @@ class MeOut:
 
         auth = _parse_auth(d.pop("auth", UNSET))
 
+        def _parse_organizations_needing_reconnect(data: object) -> list[MeReconnectOrganization] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                organizations_needing_reconnect_type_0 = []
+                _organizations_needing_reconnect_type_0 = data
+                for organizations_needing_reconnect_type_0_item_data in _organizations_needing_reconnect_type_0:
+                    organizations_needing_reconnect_type_0_item = MeReconnectOrganization.from_dict(
+                        organizations_needing_reconnect_type_0_item_data
+                    )
+
+                    organizations_needing_reconnect_type_0.append(organizations_needing_reconnect_type_0_item)
+
+                return organizations_needing_reconnect_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[MeReconnectOrganization] | None | Unset, data)
+
+        organizations_needing_reconnect = _parse_organizations_needing_reconnect(
+            d.pop("organizations_needing_reconnect", UNSET)
+        )
+
         def _parse_idle_timeout_minutes(data: object) -> int | None | Unset:
             if data is None:
                 return data
@@ -141,6 +189,7 @@ class MeOut:
             principal=principal,
             organizations=organizations,
             auth=auth,
+            organizations_needing_reconnect=organizations_needing_reconnect,
             idle_timeout_minutes=idle_timeout_minutes,
         )
 

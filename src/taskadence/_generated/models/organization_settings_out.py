@@ -58,7 +58,7 @@ class OrganizationSettingsOut:
             - `admins`: owners and admins.
             - `all`: every member, guests included.
         idle_timeout_minutes (int | Unset): S.6: the web app signs people out after this many idle minutes (15, 30, 60,
-            240 or 480) Default: 60.
+            240, 480 or 1440) Default: 1440.
         restrict_to_verified_domains (bool | Unset): S.7: only people with an email at a verified domain get in by
             themselves (invites to other domains need an owner) Default: False.
         deleted_item_retention_days (int | Unset): S.13: days a deleted task, project, goal, milestone, sprint, team or
@@ -82,7 +82,7 @@ class OrganizationSettingsOut:
     require_token_expiry: bool | Unset = False
     agent_task_review: AgentTaskReviewEnum | Unset = UNSET
     require_mfa: MfaRequirementEnum | Unset = UNSET
-    idle_timeout_minutes: int | Unset = 60
+    idle_timeout_minutes: int | Unset = 1440
     restrict_to_verified_domains: bool | Unset = False
     deleted_item_retention_days: int | Unset = 30
     attachment_retention_days: int | Unset = 30

@@ -14,7 +14,7 @@ Create a task.
 - **Returns:** `TaskInDB`
 - **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
 
-## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, section_scope: str | None = None, filter: Mapping[str, Any] | None = None)`
+## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, include_children: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, subtasks: str | None = None, section_scope: str | None = None, filter: Mapping[str, Any] | None = None)`
 
 List / search tasks (the filter grammar; `filter[search]` is search).
 
@@ -23,7 +23,27 @@ List / search tasks (the filter grammar; `filter[search]` is search).
 - **Token scope:** `tasks:read`
 - **Returns:** `Page[TaskCardView]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
-- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `team`, `task_type`, `created_via`, `review`
+- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `team`, `task_type`, `created_via`, `review`, `parent`, `blocked`, `has_subtasks`, `blocks`, `created_by`
+
+## `tm.tasks.create_batch(body: TaskBatchCreate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
+
+Create up to 50 tasks (per-item results).
+
+- **HTTP:** `POST /v1/tasks/batch`
+- **operationId:** `tasks.create_batch`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskBatchCreated`
+- **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
+
+## `tm.tasks.update_batch(body: TaskBatchUpdate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
+
+Update up to 100 tasks (per-item results).
+
+- **HTTP:** `PATCH /v1/tasks/batch`
+- **operationId:** `tasks.update_batch`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskBatchUpdated`
+- **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
 
 ## `tm.tasks.read(task_id: str, if_none_match: str | None = None)`
 
@@ -64,6 +84,16 @@ Delete a task.
 - **Token scope:** `tasks:write`
 - **Returns:** `Acknowledgement`
 - **Conditional write:** `if_match=obj.etag` → `PreconditionFailedError` (412) when stale.
+
+## `tm.tasks.list_dependents(task_id: str, if_none_match: str | None = None)`
+
+List the tasks that depend on a task.
+
+- **HTTP:** `GET /v1/tasks/{task_id}/dependents`
+- **operationId:** `tasks.list_dependents`
+- **Token scope:** `tasks:read`
+- **Returns:** `TaskDependentsPage`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
 
 ## `tm.tasks.set_project(task_id: str, body: TaskProjectSet | Mapping[str, Any])`
 
@@ -125,6 +155,15 @@ Remove a subtask link.
 
 - **HTTP:** `DELETE /v1/tasks/{task_id}/subtasks/{subtask_id}`
 - **operationId:** `tasks.remove_subtask`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskInDB`
+
+## `tm.tasks.reopen(task_id: str)`
+
+Reopen a completed task.
+
+- **HTTP:** `POST /v1/tasks/{task_id}/reopen`
+- **operationId:** `tasks.reopen`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
 

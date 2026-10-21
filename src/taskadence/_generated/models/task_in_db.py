@@ -30,7 +30,7 @@ T = TypeVar("T", bound="TaskInDB")
 
 @_attrs_define
 class TaskInDB:
-    """Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 8 more.
+    """Returned by `tasks.add_dependency`, `tasks.add_subtask`, `tasks.create`, `tasks.read` and 9 more.
 
     Attributes:
         title (str): Task title Example: Implement Login.
@@ -88,6 +88,9 @@ class TaskInDB:
         created_by_token_id (None | str | Unset): The access token (personal, service-account or OAuth) that created the
             task; null for a task created in a signed-in session or before this was recorded. That token cannot review the
             task. Response only. Example: TK123456.
+        created_by_agent (None | str | Unset): Batch 7: the agent that created the task - `oauth:<client_id>`,
+            `service_account:<user id>` or `token:<token_id>` (a `filter[created_by]` value; `GET /v1/tasks/agents` names
+            it); null for a person. Response only.
         restricted_to_user_ids (list[str] | None | Unset): User ids allowed on this task (authoritative when set; null =
             decided by `restricted_to` usernames). Response only.
         has_access (bool | None | Unset): Whether the current user can access this task based on restrictions
@@ -96,6 +99,21 @@ class TaskInDB:
         can_delete (bool | None | Unset): Whether the caller may delete this task (exactly what `DELETE
             /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor,
             its creator, its assignee, or the person behind the access token that created it. Response only.
+        parent_task_id (None | str | Unset): The task this one is a subtask of (one parent at most); null for a top-
+            level task. Linked through POST /tasks/{id}/subtasks. Response only. Example: T123456.
+        parent_title (None | str | Unset): The parent's title, for a subtask; null for a top-level task or a parent the
+            caller may not read. Response only.
+        subtasks_done (int | Unset): How many of this task's subtasks are completed. Response only. Default: 0.
+        subtasks_total (int | Unset): How many subtasks this task has (deleted ones excluded). Response only. Default:
+            0.
+        blocked_by_count (int | Unset): How many live tasks this one waits on (its `dependencies` whose task is not
+            completed, archived or deleted). Response only. Default: 0.
+        blocks_count (int | Unset): How many live tasks wait on this one (tasks whose `dependencies` contain its id); 0
+            when this task is itself completed or archived. Response only. Default: 0.
+        subtask_count (int | Unset): How many subtasks this task has (deleted ones excluded); the same number as
+            `subtasks_total`. Response only. Default: 0.
+        subtask_done_count (int | Unset): How many of them are completed; the same number as `subtasks_done`. Response
+            only. Default: 0.
     """
 
     title: str
@@ -132,10 +150,19 @@ class TaskInDB:
     reviewed_at: datetime.datetime | None | Unset = UNSET
     reviewed_by: None | str | Unset = UNSET
     created_by_token_id: None | str | Unset = UNSET
+    created_by_agent: None | str | Unset = UNSET
     restricted_to_user_ids: list[str] | None | Unset = UNSET
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
     can_delete: bool | None | Unset = UNSET
+    parent_task_id: None | str | Unset = UNSET
+    parent_title: None | str | Unset = UNSET
+    subtasks_done: int | Unset = 0
+    subtasks_total: int | Unset = 0
+    blocked_by_count: int | Unset = 0
+    blocks_count: int | Unset = 0
+    subtask_count: int | Unset = 0
+    subtask_done_count: int | Unset = 0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -373,6 +400,12 @@ class TaskInDB:
         else:
             created_by_token_id = self.created_by_token_id
 
+        created_by_agent: None | str | Unset
+        if isinstance(self.created_by_agent, Unset):
+            created_by_agent = UNSET
+        else:
+            created_by_agent = self.created_by_agent
+
         restricted_to_user_ids: list[str] | None | Unset
         if isinstance(self.restricted_to_user_ids, Unset):
             restricted_to_user_ids = UNSET
@@ -399,6 +432,30 @@ class TaskInDB:
             can_delete = UNSET
         else:
             can_delete = self.can_delete
+
+        parent_task_id: None | str | Unset
+        if isinstance(self.parent_task_id, Unset):
+            parent_task_id = UNSET
+        else:
+            parent_task_id = self.parent_task_id
+
+        parent_title: None | str | Unset
+        if isinstance(self.parent_title, Unset):
+            parent_title = UNSET
+        else:
+            parent_title = self.parent_title
+
+        subtasks_done = self.subtasks_done
+
+        subtasks_total = self.subtasks_total
+
+        blocked_by_count = self.blocked_by_count
+
+        blocks_count = self.blocks_count
+
+        subtask_count = self.subtask_count
+
+        subtask_done_count = self.subtask_done_count
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -470,6 +527,8 @@ class TaskInDB:
             field_dict["reviewed_by"] = reviewed_by
         if created_by_token_id is not UNSET:
             field_dict["created_by_token_id"] = created_by_token_id
+        if created_by_agent is not UNSET:
+            field_dict["created_by_agent"] = created_by_agent
         if restricted_to_user_ids is not UNSET:
             field_dict["restricted_to_user_ids"] = restricted_to_user_ids
         if has_access is not UNSET:
@@ -478,6 +537,22 @@ class TaskInDB:
             field_dict["has_edit_access"] = has_edit_access
         if can_delete is not UNSET:
             field_dict["can_delete"] = can_delete
+        if parent_task_id is not UNSET:
+            field_dict["parent_task_id"] = parent_task_id
+        if parent_title is not UNSET:
+            field_dict["parent_title"] = parent_title
+        if subtasks_done is not UNSET:
+            field_dict["subtasks_done"] = subtasks_done
+        if subtasks_total is not UNSET:
+            field_dict["subtasks_total"] = subtasks_total
+        if blocked_by_count is not UNSET:
+            field_dict["blocked_by_count"] = blocked_by_count
+        if blocks_count is not UNSET:
+            field_dict["blocks_count"] = blocks_count
+        if subtask_count is not UNSET:
+            field_dict["subtask_count"] = subtask_count
+        if subtask_done_count is not UNSET:
+            field_dict["subtask_done_count"] = subtask_done_count
 
         return field_dict
 
@@ -892,6 +967,15 @@ class TaskInDB:
 
         created_by_token_id = _parse_created_by_token_id(d.pop("created_by_token_id", UNSET))
 
+        def _parse_created_by_agent(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        created_by_agent = _parse_created_by_agent(d.pop("created_by_agent", UNSET))
+
         def _parse_restricted_to_user_ids(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -936,6 +1020,36 @@ class TaskInDB:
 
         can_delete = _parse_can_delete(d.pop("can_delete", UNSET))
 
+        def _parse_parent_task_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_task_id = _parse_parent_task_id(d.pop("parent_task_id", UNSET))
+
+        def _parse_parent_title(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_title = _parse_parent_title(d.pop("parent_title", UNSET))
+
+        subtasks_done = d.pop("subtasks_done", UNSET)
+
+        subtasks_total = d.pop("subtasks_total", UNSET)
+
+        blocked_by_count = d.pop("blocked_by_count", UNSET)
+
+        blocks_count = d.pop("blocks_count", UNSET)
+
+        subtask_count = d.pop("subtask_count", UNSET)
+
+        subtask_done_count = d.pop("subtask_done_count", UNSET)
+
         task_in_db = cls(
             title=title,
             task_id=task_id,
@@ -971,10 +1085,19 @@ class TaskInDB:
             reviewed_at=reviewed_at,
             reviewed_by=reviewed_by,
             created_by_token_id=created_by_token_id,
+            created_by_agent=created_by_agent,
             restricted_to_user_ids=restricted_to_user_ids,
             has_access=has_access,
             has_edit_access=has_edit_access,
             can_delete=can_delete,
+            parent_task_id=parent_task_id,
+            parent_title=parent_title,
+            subtasks_done=subtasks_done,
+            subtasks_total=subtasks_total,
+            blocked_by_count=blocked_by_count,
+            blocks_count=blocks_count,
+            subtask_count=subtask_count,
+            subtask_done_count=subtask_done_count,
         )
 
         task_in_db.additional_properties = d

@@ -180,6 +180,28 @@ for p in page.pages():               # or page by page
 naming the allowed ones. A page may be short, or even empty, while more follow; the loop handles it. `page.envelope`
 is the full answer, for the lists that carry totals beside `data`.
 
+### Sub-projects
+
+A project can sit under a parent project, one level deep. Filing one needs the owner or editor role on the parent;
+the sub-project keeps its own members and visibility (nothing is inherited from the parent).
+
+```python
+from taskadence import Taskadence
+
+tm = Taskadence()
+org_id = tm.me().organizations[0].org_id
+
+child = tm.projects.create({"org_id": org_id, "name": "Mobile app", "parent_project_id": "P31304"})
+parent = tm.projects.read("P31304")
+print([c.name for c in parent.children])                    # the sub-projects you can read, with status and progress
+top_level = [p for p in tm.projects.list(org_id) if not p.parent_project_id]   # every card has parent_project_id, child_count
+tasks = tm.tasks.list(project_id="P31304", include_children=True)            # the parent's tasks and its sub-projects'
+tm.projects.update(child.project_id, {"parent_project_id": None})          # top-level again
+```
+
+Deleting a parent keeps its sub-projects: they become top-level (`tm.projects.delete(...)` returns
+`children_detached`).
+
 ### Errors
 
 When the API says no, you get an exception that says why, with the `request_id` support needs to find it.

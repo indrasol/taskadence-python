@@ -6,12 +6,12 @@ snapshot of the public contract the TasKadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `main` |
-| Backend commit | `5069093` - Merge #230 (`origin/main` HEAD), after #229 (the comment webhook examples show the comment's fields: `comment_id`, `parent_comment_id`, `content`) and the `database-unavailable` problem type (503) |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-11, from a detached worktree with **placeholder** production settings (no `.env.production` read: only `BASE_API_URL` and a random `WEBHOOK_SECRET_KEK_TM`). Against the previous pin (`b3b5f14`): the `comment.created` / `comment.deleted` / `comment.updated` webhook examples, and `urn:taskadence:problem:database-unavailable` in the problem types (`ProblemType` gains a member); no operation, schema or webhook added or removed, `servers` unchanged |
+| Backend repo | `indrasol/taskadence-api`, branch `feat/sub-projects` (cut from `batch/2026-10-post-release8`; NOT yet on `main`) |
+| Backend commit | `9b7e748` - N.3 sub-projects (MCP commit on top of the API commit `c93c5ad`): `parent_project_id` on the project models, `ProjectCard.child_count`, `ProjectInDB.parent` / `children`, `ProjectDeleted`, `include_children` on `GET /v1/tasks`, webhooks `project.parent_changed` / `project.children_detached`. Against the previous pin (`5069093`) it also carries the batch branch's additions: 6 operations (task batch create / update, task dependents, reopen, team view pins) and their schemas, 6 more webhooks, `TaskTypeEnum` + `access`. Nothing removed |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-21, from the feature worktree with **placeholder** production settings (`env -i`; no `.env.production` read: only `BASE_API_URL`, a random `WEBHOOK_SECRET_KEK_TM` and a random `ACCESS_CONNECTOR_KEK_TM`). `servers` unchanged |
 | `info.version` | `2026-09-25` |
-| Size | 114 paths · 176 operations (170 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 228 component schemas · 92 `webhooks` (91 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `d68011395c41b204bea9aef328e1b6ddf3f725f4e71853eb59af989856aca29e` |
+| Size | 118 paths · 182 operations (176 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 246 component schemas · 100 `webhooks` (99 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `99bf7b459d0b6618798844b152d4e383c03e47a6ceb073ea63b7543be03488cd` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

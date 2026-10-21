@@ -23,6 +23,7 @@ import datetime
 if TYPE_CHECKING:
     from ..models.project_card_metadata_type_0 import ProjectCardMetadataType0
     from ..models.project_lead_out import ProjectLeadOut
+    from ..models.project_manager_out import ProjectManagerOut
 
 
 T = TypeVar("T", bound="ProjectCard")
@@ -55,11 +56,24 @@ class ProjectCard:
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
             organization (422 otherwise). null = none.
+        parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
+            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            parent (422). null = top-level.
         created_at (datetime.datetime | None | Unset): Timestamp when the project was created
         updated_at (datetime.datetime | None | Unset): When the project was last changed.
         leads (list[ProjectLeadOut] | Unset): The project's leads; optional, usually empty.
+        managers (list[ProjectManagerOut] | Unset): The project's managers (a label, no extra access); optional, usually
+            empty.
         position (int | Unset): The project's place in the organization's manual order. Lists sort by position, then
             name. Default: 0.
+        child_count (int | Unset): How many active sub-projects sit under this project (N.3), readable or not. Default:
+            0.
+        owner_username (None | str | Unset): The owner's username, also for an owner who has left the organization. null
+            when the account is gone.
+        owner_email (None | str | Unset): The owner's email. null for a caller who is an organization guest (a guest is
+            not shown members' emails).
+        logo_url (None | str | Unset): A link to the project's logo (a 256 px square PNG, JPEG or WebP), valid for 60
+            minutes; fetch the project again for a fresh one. null when the project has no logo.
     """
 
     org_id: str
@@ -82,10 +96,16 @@ class ProjectCard:
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
     team_id: None | str | Unset = UNSET
+    parent_project_id: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
     leads: list[ProjectLeadOut] | Unset = UNSET
+    managers: list[ProjectManagerOut] | Unset = UNSET
     position: int | Unset = 0
+    child_count: int | Unset = 0
+    owner_username: None | str | Unset = UNSET
+    owner_email: None | str | Unset = UNSET
+    logo_url: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -94,6 +114,7 @@ class ProjectCard:
     def to_dict(self) -> dict[str, Any]:
         from ..models.project_card_metadata_type_0 import ProjectCardMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
+        from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
 
         org_id = self.org_id
 
@@ -206,6 +227,12 @@ class ProjectCard:
         else:
             team_id = self.team_id
 
+        parent_project_id: None | str | Unset
+        if isinstance(self.parent_project_id, Unset):
+            parent_project_id = UNSET
+        else:
+            parent_project_id = self.parent_project_id
+
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
             created_at = UNSET
@@ -229,7 +256,34 @@ class ProjectCard:
                 leads_item = leads_item_data.to_dict()
                 leads.append(leads_item)
 
+        managers: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.managers, Unset):
+            managers = []
+            for managers_item_data in self.managers:
+                managers_item = managers_item_data.to_dict()
+                managers.append(managers_item)
+
         position = self.position
+
+        child_count = self.child_count
+
+        owner_username: None | str | Unset
+        if isinstance(self.owner_username, Unset):
+            owner_username = UNSET
+        else:
+            owner_username = self.owner_username
+
+        owner_email: None | str | Unset
+        if isinstance(self.owner_email, Unset):
+            owner_email = UNSET
+        else:
+            owner_email = self.owner_email
+
+        logo_url: None | str | Unset
+        if isinstance(self.logo_url, Unset):
+            logo_url = UNSET
+        else:
+            logo_url = self.logo_url
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -271,14 +325,26 @@ class ProjectCard:
             field_dict["visibility"] = visibility
         if team_id is not UNSET:
             field_dict["team_id"] = team_id
+        if parent_project_id is not UNSET:
+            field_dict["parent_project_id"] = parent_project_id
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
         if updated_at is not UNSET:
             field_dict["updated_at"] = updated_at
         if leads is not UNSET:
             field_dict["leads"] = leads
+        if managers is not UNSET:
+            field_dict["managers"] = managers
         if position is not UNSET:
             field_dict["position"] = position
+        if child_count is not UNSET:
+            field_dict["child_count"] = child_count
+        if owner_username is not UNSET:
+            field_dict["owner_username"] = owner_username
+        if owner_email is not UNSET:
+            field_dict["owner_email"] = owner_email
+        if logo_url is not UNSET:
+            field_dict["logo_url"] = logo_url
 
         return field_dict
 
@@ -286,6 +352,7 @@ class ProjectCard:
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.project_card_metadata_type_0 import ProjectCardMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
+        from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
 
         d = dict(src_dict)
         org_id = d.pop("org_id")
@@ -482,6 +549,15 @@ class ProjectCard:
 
         team_id = _parse_team_id(d.pop("team_id", UNSET))
 
+        def _parse_parent_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
+
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
                 return data
@@ -525,7 +601,45 @@ class ProjectCard:
 
                 leads.append(leads_item)
 
+        _managers = d.pop("managers", UNSET)
+        managers: list[ProjectManagerOut] | Unset = UNSET
+        if _managers is not UNSET:
+            managers = []
+            for managers_item_data in _managers:
+                managers_item = ProjectManagerOut.from_dict(managers_item_data)
+
+                managers.append(managers_item)
+
         position = d.pop("position", UNSET)
+
+        child_count = d.pop("child_count", UNSET)
+
+        def _parse_owner_username(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        owner_username = _parse_owner_username(d.pop("owner_username", UNSET))
+
+        def _parse_owner_email(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        owner_email = _parse_owner_email(d.pop("owner_email", UNSET))
+
+        def _parse_logo_url(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
 
         project_card = cls(
             org_id=org_id,
@@ -548,10 +662,16 @@ class ProjectCard:
             team_members=team_members,
             visibility=visibility,
             team_id=team_id,
+            parent_project_id=parent_project_id,
             created_at=created_at,
             updated_at=updated_at,
             leads=leads,
+            managers=managers,
             position=position,
+            child_count=child_count,
+            owner_username=owner_username,
+            owner_email=owner_email,
+            logo_url=logo_url,
         )
 
         project_card.additional_properties = d

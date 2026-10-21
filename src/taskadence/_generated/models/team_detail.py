@@ -18,6 +18,7 @@ import datetime
 
 if TYPE_CHECKING:
     from ..models.team_member_out import TeamMemberOut
+    from ..models.team_tag_out import TeamTagOut
 
 
 T = TypeVar("T", bound="TeamDetail")
@@ -41,7 +42,14 @@ class TeamDetail:
         project_count (int | Unset):  Default: 0.
         team_role (None | TeamRoleEnum | Unset): The caller's own role on the team, null when not a member (org admins
             are null too unless they are on it)
+        can_open (bool | Unset): Batch 7: whether the caller may open the team (its page, members, sprints, capacity,
+            settings): the team's members and org owners / admins. Every non-guest org member still sees every team in the
+            list. Default: True.
+        logo_url (None | str | Unset): Batch 7: a link to the team's logo (a 256 px square), valid for 60 minutes; null
+            without one. Never stored.
         members (list[TeamMemberOut] | Unset):
+        leads (list[TeamTagOut] | Unset): Batch 7: the team's leads (labels only)
+        managers (list[TeamTagOut] | Unset): Batch 7: the team's managers (labels only)
     """
 
     team_id: str
@@ -56,7 +64,11 @@ class TeamDetail:
     member_count: int | Unset = 0
     project_count: int | Unset = 0
     team_role: None | TeamRoleEnum | Unset = UNSET
+    can_open: bool | Unset = True
+    logo_url: None | str | Unset = UNSET
     members: list[TeamMemberOut] | Unset = UNSET
+    leads: list[TeamTagOut] | Unset = UNSET
+    managers: list[TeamTagOut] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -64,6 +76,7 @@ class TeamDetail:
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.team_member_out import TeamMemberOut  # noqa: PLC0415
+        from ..models.team_tag_out import TeamTagOut  # noqa: PLC0415
 
         team_id = self.team_id
 
@@ -119,12 +132,34 @@ class TeamDetail:
         else:
             team_role = self.team_role
 
+        can_open = self.can_open
+
+        logo_url: None | str | Unset
+        if isinstance(self.logo_url, Unset):
+            logo_url = UNSET
+        else:
+            logo_url = self.logo_url
+
         members: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.members, Unset):
             members = []
             for members_item_data in self.members:
                 members_item = members_item_data.to_dict()
                 members.append(members_item)
+
+        leads: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.leads, Unset):
+            leads = []
+            for leads_item_data in self.leads:
+                leads_item = leads_item_data.to_dict()
+                leads.append(leads_item)
+
+        managers: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.managers, Unset):
+            managers = []
+            for managers_item_data in self.managers:
+                managers_item = managers_item_data.to_dict()
+                managers.append(managers_item)
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -153,14 +188,23 @@ class TeamDetail:
             field_dict["project_count"] = project_count
         if team_role is not UNSET:
             field_dict["team_role"] = team_role
+        if can_open is not UNSET:
+            field_dict["can_open"] = can_open
+        if logo_url is not UNSET:
+            field_dict["logo_url"] = logo_url
         if members is not UNSET:
             field_dict["members"] = members
+        if leads is not UNSET:
+            field_dict["leads"] = leads
+        if managers is not UNSET:
+            field_dict["managers"] = managers
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.team_member_out import TeamMemberOut  # noqa: PLC0415
+        from ..models.team_tag_out import TeamTagOut  # noqa: PLC0415
 
         d = dict(src_dict)
         team_id = d.pop("team_id")
@@ -253,6 +297,17 @@ class TeamDetail:
 
         team_role = _parse_team_role(d.pop("team_role", UNSET))
 
+        can_open = d.pop("can_open", UNSET)
+
+        def _parse_logo_url(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
+
         _members = d.pop("members", UNSET)
         members: list[TeamMemberOut] | Unset = UNSET
         if _members is not UNSET:
@@ -261,6 +316,24 @@ class TeamDetail:
                 members_item = TeamMemberOut.from_dict(members_item_data)
 
                 members.append(members_item)
+
+        _leads = d.pop("leads", UNSET)
+        leads: list[TeamTagOut] | Unset = UNSET
+        if _leads is not UNSET:
+            leads = []
+            for leads_item_data in _leads:
+                leads_item = TeamTagOut.from_dict(leads_item_data)
+
+                leads.append(leads_item)
+
+        _managers = d.pop("managers", UNSET)
+        managers: list[TeamTagOut] | Unset = UNSET
+        if _managers is not UNSET:
+            managers = []
+            for managers_item_data in _managers:
+                managers_item = TeamTagOut.from_dict(managers_item_data)
+
+                managers.append(managers_item)
 
         team_detail = cls(
             team_id=team_id,
@@ -275,7 +348,11 @@ class TeamDetail:
             member_count=member_count,
             project_count=project_count,
             team_role=team_role,
+            can_open=can_open,
+            logo_url=logo_url,
             members=members,
+            leads=leads,
+            managers=managers,
         )
 
         team_detail.additional_properties = d

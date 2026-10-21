@@ -112,7 +112,9 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Add a subtask link
 
-     Append a subtask to an existing task (`edit` on the parent, `read` on the subtask).
+     Link a task under this one (`edit` on the parent AND on the subtask, batch 4). Batch 4 rules: never
+    the task
+    itself, the same project (422); one parent - a task already under another is a 409; no cycle (422).
 
     Args:
         task_id (str):
@@ -146,7 +148,9 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Add a subtask link
 
-     Append a subtask to an existing task (`edit` on the parent, `read` on the subtask).
+     Link a task under this one (`edit` on the parent AND on the subtask, batch 4). Batch 4 rules: never
+    the task
+    itself, the same project (422); one parent - a task already under another is a 409; no cycle (422).
 
     Args:
         task_id (str):
@@ -175,7 +179,9 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Add a subtask link
 
-     Append a subtask to an existing task (`edit` on the parent, `read` on the subtask).
+     Link a task under this one (`edit` on the parent AND on the subtask, batch 4). Batch 4 rules: never
+    the task
+    itself, the same project (422); one parent - a task already under another is a 409; no cycle (422).
 
     Args:
         task_id (str):
@@ -207,7 +213,9 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Add a subtask link
 
-     Append a subtask to an existing task (`edit` on the parent, `read` on the subtask).
+     Link a task under this one (`edit` on the parent AND on the subtask, batch 4). Batch 4 rules: never
+    the task
+    itself, the same project (422); one parent - a task already under another is a 409; no cycle (422).
 
     Args:
         task_id (str):

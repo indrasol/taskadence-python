@@ -169,7 +169,8 @@ def sync_detailed(
         limit (int | Unset): Page size, default 100; clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type. Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count. Default: 'title'.
         sort_order (str | Unset):  Default: 'asc'.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             task list's flag). Default: False.
@@ -229,7 +230,8 @@ def sync(
         limit (int | Unset): Page size, default 100; clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type. Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count. Default: 'title'.
         sort_order (str | Unset):  Default: 'asc'.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             task list's flag). Default: False.
@@ -284,7 +286,8 @@ async def asyncio_detailed(
         limit (int | Unset): Page size, default 100; clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type. Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count. Default: 'title'.
         sort_order (str | Unset):  Default: 'asc'.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             task list's flag). Default: False.
@@ -342,7 +345,8 @@ async def asyncio(
         limit (int | Unset): Page size, default 100; clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type. Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count. Default: 'title'.
         sort_order (str | Unset):  Default: 'asc'.
         include_inaccessible (bool | Unset): Keep restricted rows with `has_access=false` (the
             task list's flag). Default: False.

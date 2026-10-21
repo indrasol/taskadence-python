@@ -105,7 +105,8 @@ def sync_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Remove a subtask link
 
-     Remove a subtask from an existing task.
+     Unlink a subtask: it is a top-level task again. Batch 4: `edit` on the subtask too (unlinking
+    changes it).
 
     Args:
         task_id (str):
@@ -139,7 +140,8 @@ def sync(
 ) -> Problem | TaskInDB | None:
     """Remove a subtask link
 
-     Remove a subtask from an existing task.
+     Unlink a subtask: it is a top-level task again. Batch 4: `edit` on the subtask too (unlinking
+    changes it).
 
     Args:
         task_id (str):
@@ -168,7 +170,8 @@ async def asyncio_detailed(
 ) -> Response[Problem | TaskInDB]:
     """Remove a subtask link
 
-     Remove a subtask from an existing task.
+     Unlink a subtask: it is a top-level task again. Batch 4: `edit` on the subtask too (unlinking
+    changes it).
 
     Args:
         task_id (str):
@@ -200,7 +203,8 @@ async def asyncio(
 ) -> Problem | TaskInDB | None:
     """Remove a subtask link
 
-     Remove a subtask from an existing task.
+     Unlink a subtask: it is a top-level task again. Batch 4: `edit` on the subtask too (unlinking
+    changes it).
 
     Args:
         task_id (str):

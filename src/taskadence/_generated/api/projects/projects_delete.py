@@ -10,8 +10,8 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.acknowledgement import Acknowledgement
 from ...models.problem import Problem
+from ...models.project_deleted import ProjectDeleted
 from ...types import UNSET, Unset
 from typing import cast
 
@@ -38,9 +38,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Acknowledgement | Problem | None:
+) -> Problem | ProjectDeleted | None:
     if response.status_code == 200:
-        response_200 = Acknowledgement.from_dict(response.json())
+        response_200 = ProjectDeleted.from_dict(response.json())
 
         return response_200
 
@@ -97,7 +97,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Acknowledgement | Problem]:
+) -> Response[Problem | ProjectDeleted]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -111,10 +111,11 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     if_match: str | Unset = UNSET,
-) -> Response[Acknowledgement | Problem]:
+) -> Response[Problem | ProjectDeleted]:
     """Delete (archive) a project
 
-     Delete (archive) a project.
+     Delete the project. N.3: its sub-projects stay and become top-level (the foreign key sets their
+    `parent_project_id` to null); `children_detached` lists the ones the caller can read.
 
     Args:
         project_id (str):
@@ -125,7 +126,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Acknowledgement | Problem]
+        Response[Problem | ProjectDeleted]
     """
 
     kwargs = _get_kwargs(
@@ -145,10 +146,11 @@ def sync(
     *,
     client: AuthenticatedClient,
     if_match: str | Unset = UNSET,
-) -> Acknowledgement | Problem | None:
+) -> Problem | ProjectDeleted | None:
     """Delete (archive) a project
 
-     Delete (archive) a project.
+     Delete the project. N.3: its sub-projects stay and become top-level (the foreign key sets their
+    `parent_project_id` to null); `children_detached` lists the ones the caller can read.
 
     Args:
         project_id (str):
@@ -159,7 +161,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Acknowledgement | Problem
+        Problem | ProjectDeleted
     """
 
     return sync_detailed(
@@ -174,10 +176,11 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     if_match: str | Unset = UNSET,
-) -> Response[Acknowledgement | Problem]:
+) -> Response[Problem | ProjectDeleted]:
     """Delete (archive) a project
 
-     Delete (archive) a project.
+     Delete the project. N.3: its sub-projects stay and become top-level (the foreign key sets their
+    `parent_project_id` to null); `children_detached` lists the ones the caller can read.
 
     Args:
         project_id (str):
@@ -188,7 +191,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Acknowledgement | Problem]
+        Response[Problem | ProjectDeleted]
     """
 
     kwargs = _get_kwargs(
@@ -206,10 +209,11 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     if_match: str | Unset = UNSET,
-) -> Acknowledgement | Problem | None:
+) -> Problem | ProjectDeleted | None:
     """Delete (archive) a project
 
-     Delete (archive) a project.
+     Delete the project. N.3: its sub-projects stay and become top-level (the foreign key sets their
+    `parent_project_id` to null); `children_detached` lists the ones the caller can read.
 
     Args:
         project_id (str):
@@ -220,7 +224,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Acknowledgement | Problem
+        Problem | ProjectDeleted
     """
 
     return (

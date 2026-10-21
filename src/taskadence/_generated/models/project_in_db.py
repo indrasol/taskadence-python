@@ -21,8 +21,11 @@ from typing import cast
 import datetime
 
 if TYPE_CHECKING:
+    from ..models.project_child_out import ProjectChildOut
     from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0
     from ..models.project_lead_out import ProjectLeadOut
+    from ..models.project_manager_out import ProjectManagerOut
+    from ..models.project_ref import ProjectRef
 
 
 T = TypeVar("T", bound="ProjectInDB")
@@ -55,9 +58,19 @@ class ProjectInDB:
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
             organization (422 otherwise). null = none.
+        parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
+            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            parent (422). null = top-level.
         editors_can_add_members (bool | Unset): When true, project editors may add and remove members and change their
             roles. Set by the project owner or an org admin. Default: False.
         leads (list[ProjectLeadOut] | Unset): The project's leads (there can be several); optional, usually empty.
+        managers (list[ProjectManagerOut] | Unset): The project's managers (there can be several; a label, no extra
+            access); optional, usually empty.
+        parent (None | ProjectRef | Unset): The parent project (N.3), or null when the project is top-level or the
+            caller cannot read its parent (`parent_project_id` still names it).
+        children (list[ProjectChildOut] | Unset): The project's active sub-projects the caller can read (N.3), by name.
+        logo_url (None | str | Unset): A link to the project's logo (a 256 px square PNG, JPEG or WebP), valid for 60
+            minutes; fetch the project again for a fresh one. null when the project has no logo.
     """
 
     org_id: str
@@ -80,16 +93,24 @@ class ProjectInDB:
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
     team_id: None | str | Unset = UNSET
+    parent_project_id: None | str | Unset = UNSET
     editors_can_add_members: bool | Unset = False
     leads: list[ProjectLeadOut] | Unset = UNSET
+    managers: list[ProjectManagerOut] | Unset = UNSET
+    parent: None | ProjectRef | Unset = UNSET
+    children: list[ProjectChildOut] | Unset = UNSET
+    logo_url: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.project_child_out import ProjectChildOut  # noqa: PLC0415
         from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
+        from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
+        from ..models.project_ref import ProjectRef  # noqa: PLC0415
 
         org_id = self.org_id
 
@@ -214,6 +235,12 @@ class ProjectInDB:
         else:
             team_id = self.team_id
 
+        parent_project_id: None | str | Unset
+        if isinstance(self.parent_project_id, Unset):
+            parent_project_id = UNSET
+        else:
+            parent_project_id = self.parent_project_id
+
         editors_can_add_members = self.editors_can_add_members
 
         leads: list[dict[str, Any]] | Unset = UNSET
@@ -222,6 +249,34 @@ class ProjectInDB:
             for leads_item_data in self.leads:
                 leads_item = leads_item_data.to_dict()
                 leads.append(leads_item)
+
+        managers: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.managers, Unset):
+            managers = []
+            for managers_item_data in self.managers:
+                managers_item = managers_item_data.to_dict()
+                managers.append(managers_item)
+
+        parent: dict[str, Any] | None | Unset
+        if isinstance(self.parent, Unset):
+            parent = UNSET
+        elif isinstance(self.parent, ProjectRef):
+            parent = self.parent.to_dict()
+        else:
+            parent = self.parent
+
+        children: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.children, Unset):
+            children = []
+            for children_item_data in self.children:
+                children_item = children_item_data.to_dict()
+                children.append(children_item)
+
+        logo_url: None | str | Unset
+        if isinstance(self.logo_url, Unset):
+            logo_url = UNSET
+        else:
+            logo_url = self.logo_url
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -263,17 +318,30 @@ class ProjectInDB:
             field_dict["visibility"] = visibility
         if team_id is not UNSET:
             field_dict["team_id"] = team_id
+        if parent_project_id is not UNSET:
+            field_dict["parent_project_id"] = parent_project_id
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
         if leads is not UNSET:
             field_dict["leads"] = leads
+        if managers is not UNSET:
+            field_dict["managers"] = managers
+        if parent is not UNSET:
+            field_dict["parent"] = parent
+        if children is not UNSET:
+            field_dict["children"] = children
+        if logo_url is not UNSET:
+            field_dict["logo_url"] = logo_url
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.project_child_out import ProjectChildOut  # noqa: PLC0415
         from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
+        from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
+        from ..models.project_ref import ProjectRef  # noqa: PLC0415
 
         d = dict(src_dict)
         org_id = d.pop("org_id")
@@ -509,6 +577,15 @@ class ProjectInDB:
 
         team_id = _parse_team_id(d.pop("team_id", UNSET))
 
+        def _parse_parent_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
+
         editors_can_add_members = d.pop("editors_can_add_members", UNSET)
 
         _leads = d.pop("leads", UNSET)
@@ -519,6 +596,50 @@ class ProjectInDB:
                 leads_item = ProjectLeadOut.from_dict(leads_item_data)
 
                 leads.append(leads_item)
+
+        _managers = d.pop("managers", UNSET)
+        managers: list[ProjectManagerOut] | Unset = UNSET
+        if _managers is not UNSET:
+            managers = []
+            for managers_item_data in _managers:
+                managers_item = ProjectManagerOut.from_dict(managers_item_data)
+
+                managers.append(managers_item)
+
+        def _parse_parent(data: object) -> None | ProjectRef | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                parent_type_0 = ProjectRef.from_dict(data)
+
+                return parent_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | ProjectRef | Unset, data)
+
+        parent = _parse_parent(d.pop("parent", UNSET))
+
+        _children = d.pop("children", UNSET)
+        children: list[ProjectChildOut] | Unset = UNSET
+        if _children is not UNSET:
+            children = []
+            for children_item_data in _children:
+                children_item = ProjectChildOut.from_dict(children_item_data)
+
+                children.append(children_item)
+
+        def _parse_logo_url(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
 
         project_in_db = cls(
             org_id=org_id,
@@ -541,8 +662,13 @@ class ProjectInDB:
             team_members=team_members,
             visibility=visibility,
             team_id=team_id,
+            parent_project_id=parent_project_id,
             editors_can_add_members=editors_can_add_members,
             leads=leads,
+            managers=managers,
+            parent=parent,
+            children=children,
+            logo_url=logo_url,
         )
 
         project_in_db.additional_properties = d

@@ -118,7 +118,7 @@ def sync_detailed(
 ) -> Response[Any | Problem | ProjectInDB]:
     """Read a project
 
-     Read a project.
+     The project, with its leads, managers, logo link and (N.3) its `parent` and readable `children`.
 
     Args:
         project_id (str):
@@ -152,7 +152,7 @@ def sync(
 ) -> Any | Problem | ProjectInDB | None:
     """Read a project
 
-     Read a project.
+     The project, with its leads, managers, logo link and (N.3) its `parent` and readable `children`.
 
     Args:
         project_id (str):
@@ -181,7 +181,7 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | ProjectInDB]:
     """Read a project
 
-     Read a project.
+     The project, with its leads, managers, logo link and (N.3) its `parent` and readable `children`.
 
     Args:
         project_id (str):
@@ -213,7 +213,7 @@ async def asyncio(
 ) -> Any | Problem | ProjectInDB | None:
     """Read a project
 
-     Read a project.
+     The project, with its leads, managers, logo link and (N.3) its `parent` and readable `children`.
 
     Args:
         project_id (str):
