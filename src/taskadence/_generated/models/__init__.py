@@ -80,6 +80,7 @@ from .me_organization import MeOrganization
 from .me_out import MeOut
 from .me_principal import MePrincipal
 from .me_principal_type import MePrincipalType
+from .me_reconnect_organization import MeReconnectOrganization
 from .mention import Mention
 from .mention_in import MentionIn
 from .mfa_enrolment_counts import MfaEnrolmentCounts
@@ -161,18 +162,22 @@ from .problem_mfa_required_for import ProblemMfaRequiredFor
 from .problem_type import ProblemType
 from .project_card import ProjectCard
 from .project_card_metadata_type_0 import ProjectCardMetadataType0
+from .project_child_out import ProjectChildOut
 from .project_create import ProjectCreate
 from .project_create_metadata_type_0 import ProjectCreateMetadataType0
+from .project_deleted import ProjectDeleted
 from .project_goals_out import ProjectGoalsOut
 from .project_in_db import ProjectInDB
 from .project_in_db_metadata_type_0 import ProjectInDBMetadataType0
 from .project_lead_out import ProjectLeadOut
+from .project_manager_out import ProjectManagerOut
 from .project_member_create import ProjectMemberCreate
 from .project_member_in_db import ProjectMemberInDB
 from .project_member_update import ProjectMemberUpdate
 from .project_milestones_group import ProjectMilestonesGroup
 from .project_milestones_out import ProjectMilestonesOut
 from .project_order import ProjectOrder
+from .project_ref import ProjectRef
 from .project_resource_create import ProjectResourceCreate
 from .project_resource_in_db import ProjectResourceInDB
 from .project_resource_update import ProjectResourceUpdate
@@ -224,6 +229,23 @@ from .storage_usage_status import StorageUsageStatus
 from .subtask_link import SubtaskLink
 from .task_attachment_in_db import TaskAttachmentInDB
 from .task_attachment_update import TaskAttachmentUpdate
+from .task_batch_create import TaskBatchCreate
+from .task_batch_create_item import TaskBatchCreateItem
+from .task_batch_create_item_metadata_type_0_item import TaskBatchCreateItemMetadataType0Item
+from .task_batch_create_item_type_data_type_0 import TaskBatchCreateItemTypeDataType0
+from .task_batch_created import TaskBatchCreated
+from .task_batch_defaults import TaskBatchDefaults
+from .task_batch_item_error import TaskBatchItemError
+from .task_batch_item_error_code import TaskBatchItemErrorCode
+from .task_batch_item_result import TaskBatchItemResult
+from .task_batch_set import TaskBatchSet
+from .task_batch_set_metadata_type_0_item import TaskBatchSetMetadataType0Item
+from .task_batch_set_type_data_type_0 import TaskBatchSetTypeDataType0
+from .task_batch_update import TaskBatchUpdate
+from .task_batch_update_item import TaskBatchUpdateItem
+from .task_batch_update_item_metadata_type_0_item import TaskBatchUpdateItemMetadataType0Item
+from .task_batch_update_item_type_data_type_0 import TaskBatchUpdateItemTypeDataType0
+from .task_batch_updated import TaskBatchUpdated
 from .task_card_view import TaskCardView
 from .task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item
 from .task_card_view_type_data_type_0 import TaskCardViewTypeDataType0
@@ -233,6 +255,7 @@ from .task_comment_update import TaskCommentUpdate
 from .task_create import TaskCreate
 from .task_create_metadata_type_0_item import TaskCreateMetadataType0Item
 from .task_create_type_data_type_0 import TaskCreateTypeDataType0
+from .task_dependents_page import TaskDependentsPage
 from .task_history_in_db import TaskHistoryInDB
 from .task_history_in_db_metadata_type_0_item import TaskHistoryInDBMetadataType0Item
 from .task_in_db import TaskInDB
@@ -255,12 +278,14 @@ from .team_create import TeamCreate
 from .team_deleted import TeamDeleted
 from .team_detail import TeamDetail
 from .team_list_page import TeamListPage
+from .team_list_summary import TeamListSummary
 from .team_member_create import TeamMemberCreate
 from .team_member_designation import TeamMemberDesignation
 from .team_member_out import TeamMemberOut
 from .team_member_update import TeamMemberUpdate
 from .team_out import TeamOut
 from .team_role_enum import TeamRoleEnum
+from .team_tag_out import TeamTagOut
 from .team_update import TeamUpdate
 from .token_create import TokenCreate
 from .token_create_kind import TokenCreateKind
@@ -394,6 +419,7 @@ __all__ = (
     "MeOut",
     "MePrincipal",
     "MePrincipalType",
+    "MeReconnectOrganization",
     "MfaEnrolmentCounts",
     "MfaRequirementEnum",
     "MilestoneCreate",
@@ -473,18 +499,22 @@ __all__ = (
     "ProblemType",
     "ProjectCard",
     "ProjectCardMetadataType0",
+    "ProjectChildOut",
     "ProjectCreate",
     "ProjectCreateMetadataType0",
+    "ProjectDeleted",
     "ProjectGoalsOut",
     "ProjectInDB",
     "ProjectInDBMetadataType0",
     "ProjectLeadOut",
+    "ProjectManagerOut",
     "ProjectMemberCreate",
     "ProjectMemberInDB",
     "ProjectMemberUpdate",
     "ProjectMilestonesGroup",
     "ProjectMilestonesOut",
     "ProjectOrder",
+    "ProjectRef",
     "ProjectResourceCreate",
     "ProjectResourceInDB",
     "ProjectResourceUpdate",
@@ -536,6 +566,23 @@ __all__ = (
     "SubtaskLink",
     "TaskAttachmentInDB",
     "TaskAttachmentUpdate",
+    "TaskBatchCreate",
+    "TaskBatchCreated",
+    "TaskBatchCreateItem",
+    "TaskBatchCreateItemMetadataType0Item",
+    "TaskBatchCreateItemTypeDataType0",
+    "TaskBatchDefaults",
+    "TaskBatchItemError",
+    "TaskBatchItemErrorCode",
+    "TaskBatchItemResult",
+    "TaskBatchSet",
+    "TaskBatchSetMetadataType0Item",
+    "TaskBatchSetTypeDataType0",
+    "TaskBatchUpdate",
+    "TaskBatchUpdated",
+    "TaskBatchUpdateItem",
+    "TaskBatchUpdateItemMetadataType0Item",
+    "TaskBatchUpdateItemTypeDataType0",
     "TaskCardView",
     "TaskCardViewMetadataType0Item",
     "TaskCardViewTypeDataType0",
@@ -545,6 +592,7 @@ __all__ = (
     "TaskCreate",
     "TaskCreateMetadataType0Item",
     "TaskCreateTypeDataType0",
+    "TaskDependentsPage",
     "TaskHistoryInDB",
     "TaskHistoryInDBMetadataType0Item",
     "TaskInDB",
@@ -567,12 +615,14 @@ __all__ = (
     "TeamDeleted",
     "TeamDetail",
     "TeamListPage",
+    "TeamListSummary",
     "TeamMemberCreate",
     "TeamMemberDesignation",
     "TeamMemberOut",
     "TeamMemberUpdate",
     "TeamOut",
     "TeamRoleEnum",
+    "TeamTagOut",
     "TeamUpdate",
     "TokenCreate",
     "TokenCreated",

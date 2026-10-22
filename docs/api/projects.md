@@ -61,7 +61,7 @@ Delete (archive) a project.
 - **HTTP:** `DELETE /v1/projects/{project_id}`
 - **operationId:** `projects.delete`
 - **Token scope:** `projects:write`
-- **Returns:** `Acknowledgement`
+- **Returns:** `ProjectDeleted`
 - **Conditional write:** `if_match=obj.etag` → `PreconditionFailedError` (412) when stale.
 
 ## `tm.projects.reorder(body: ProjectOrder | Mapping[str, Any])`

@@ -50,6 +50,24 @@ Unpin a project.
 - **Token scope:** `tasks:write`
 - **Returns:** `Acknowledgement`
 
+## `tm.view_pins.pin_team(team_id: str, org_id: str)`
+
+Pin a team.
+
+- **HTTP:** `PUT /v1/view-pins/teams/{team_id}`
+- **operationId:** `view-pins.pin_team`
+- **Token scope:** `tasks:write`
+- **Returns:** `PinOut`
+
+## `tm.view_pins.unpin_team(team_id: str)`
+
+Unpin a team.
+
+- **HTTP:** `DELETE /v1/view-pins/teams/{team_id}`
+- **operationId:** `view-pins.unpin_team`
+- **Token scope:** `tasks:write`
+- **Returns:** `Acknowledgement`
+
 ## `tm.view_pins.reorder(body: PinOrder | Mapping[str, Any])`
 
 Reorder your pins.

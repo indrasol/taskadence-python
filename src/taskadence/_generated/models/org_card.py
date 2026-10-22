@@ -38,6 +38,9 @@ class OrgCard:
         pending_deletion (bool | Unset): The organization was deleted and can still be restored by an owner until
             `purge_after`; listed to owners only, and unreachable until restored Default: False.
         purge_after (datetime.datetime | None | Unset): When a deleted organization is purged for good (owners only)
+        admin_grants (list[str] | Unset): The owner-only powers you hold in this organization: `manage_sso`,
+            `manage_domain_restriction`, `manage_retention`. An owner holds all three, an admin those an owner granted,
+            anyone else none.
     """
 
     org_id: str
@@ -54,6 +57,7 @@ class OrgCard:
     invitation_id: None | str | Unset = UNSET
     pending_deletion: bool | Unset = False
     purge_after: datetime.datetime | None | Unset = UNSET
+    admin_grants: list[str] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -127,6 +131,10 @@ class OrgCard:
         else:
             purge_after = self.purge_after
 
+        admin_grants: list[str] | Unset = UNSET
+        if not isinstance(self.admin_grants, Unset):
+            admin_grants = self.admin_grants
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -159,6 +167,8 @@ class OrgCard:
             field_dict["pending_deletion"] = pending_deletion
         if purge_after is not UNSET:
             field_dict["purge_after"] = purge_after
+        if admin_grants is not UNSET:
+            field_dict["admin_grants"] = admin_grants
 
         return field_dict
 
@@ -273,6 +283,8 @@ class OrgCard:
 
         purge_after = _parse_purge_after(d.pop("purge_after", UNSET))
 
+        admin_grants = cast(list[str], d.pop("admin_grants", UNSET))
+
         org_card = cls(
             org_id=org_id,
             name=name,
@@ -288,6 +300,7 @@ class OrgCard:
             invitation_id=invitation_id,
             pending_deletion=pending_deletion,
             purge_after=purge_after,
+            admin_grants=admin_grants,
         )
 
         org_card.additional_properties = d

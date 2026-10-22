@@ -169,7 +169,7 @@ def sync_detailed(
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -233,7 +233,7 @@ def sync(
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -292,7 +292,7 @@ async def asyncio_detailed(
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -354,7 +354,7 @@ async def asyncio(
         org_id (str):
         show_all (bool | Unset):  Default: True.
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[search]`,
+            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim

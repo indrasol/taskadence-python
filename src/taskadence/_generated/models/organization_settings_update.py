@@ -53,7 +53,7 @@ class OrganizationSettingsUpdate:
             `admins` (owners and admins) or `all`. Owners only. Turning it on needs your own session signed in with two
             steps (409 `mfa-required` otherwise).
         idle_timeout_minutes (None | OrganizationSettingsUpdateIdleTimeoutMinutesType0 | Unset): S.6: sign people out of
-            the web app after this many minutes without activity - 15, 30, 60 (default), 240 or 480
+            the web app after this many minutes without activity - 15, 30, 60, 240, 480 or 1440 (24 hours, the default)
         restrict_to_verified_domains (bool | None | Unset): S.7: only people with an email at one of the org's verified
             domains get in by themselves; an invite to another domain needs an owner, a join request from one is refused.
             Owners only (default false)

@@ -118,7 +118,9 @@ def sync_detailed(
 ) -> Response[Any | Problem | TeamDetail]:
     """Read a team (with its members)
 
-     The team plus its members. `read`: any non-guest org member, or a guest on the team.
+     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
+    org owners /
+    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
 
     Args:
         team_id (str):
@@ -152,7 +154,9 @@ def sync(
 ) -> Any | Problem | TeamDetail | None:
     """Read a team (with its members)
 
-     The team plus its members. `read`: any non-guest org member, or a guest on the team.
+     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
+    org owners /
+    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
 
     Args:
         team_id (str):
@@ -181,7 +185,9 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | TeamDetail]:
     """Read a team (with its members)
 
-     The team plus its members. `read`: any non-guest org member, or a guest on the team.
+     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
+    org owners /
+    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
 
     Args:
         team_id (str):
@@ -213,7 +219,9 @@ async def asyncio(
 ) -> Any | Problem | TeamDetail | None:
     """Read a team (with its members)
 
-     The team plus its members. `read`: any non-guest org member, or a guest on the team.
+     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
+    org owners /
+    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
 
     Args:
         team_id (str):

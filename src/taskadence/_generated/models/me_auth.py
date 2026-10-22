@@ -36,6 +36,11 @@ class MeAuth:
             for a person) Default: 'personal'.
         token_kind (MeAuthTokenKind | Unset):  Default: 'live'.
         client_id (None | str | Unset): The OAuth app the token was issued to (authorization_code); null otherwise
+        org_ids (list[str] | Unset): The organizations the token names; when `all_orgs`, the ones the person consented
+            to explicitly (often [])
+        all_orgs (bool | Unset): The token reaches every organization its principal is an active member of, resolved per
+            request (one joined later included) Default: False.
+        home_org_id (None | str | Unset): The token's own organization (where it is listed and audited)
     """
 
     token_id: str
@@ -46,6 +51,9 @@ class MeAuth:
     grant_type: MeAuthGrantType | Unset = "personal"
     token_kind: MeAuthTokenKind | Unset = "live"
     client_id: None | str | Unset = UNSET
+    org_ids: list[str] | Unset = UNSET
+    all_orgs: bool | Unset = False
+    home_org_id: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -87,6 +95,18 @@ class MeAuth:
         else:
             client_id = self.client_id
 
+        org_ids: list[str] | Unset = UNSET
+        if not isinstance(self.org_ids, Unset):
+            org_ids = self.org_ids
+
+        all_orgs = self.all_orgs
+
+        home_org_id: None | str | Unset
+        if isinstance(self.home_org_id, Unset):
+            home_org_id = UNSET
+        else:
+            home_org_id = self.home_org_id
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -107,6 +127,12 @@ class MeAuth:
             field_dict["token_kind"] = token_kind
         if client_id is not UNSET:
             field_dict["client_id"] = client_id
+        if org_ids is not UNSET:
+            field_dict["org_ids"] = org_ids
+        if all_orgs is not UNSET:
+            field_dict["all_orgs"] = all_orgs
+        if home_org_id is not UNSET:
+            field_dict["home_org_id"] = home_org_id
 
         return field_dict
 
@@ -170,6 +196,19 @@ class MeAuth:
 
         client_id = _parse_client_id(d.pop("client_id", UNSET))
 
+        org_ids = cast(list[str], d.pop("org_ids", UNSET))
+
+        all_orgs = d.pop("all_orgs", UNSET)
+
+        def _parse_home_org_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        home_org_id = _parse_home_org_id(d.pop("home_org_id", UNSET))
+
         me_auth = cls(
             token_id=token_id,
             scopes=scopes,
@@ -179,6 +218,9 @@ class MeAuth:
             grant_type=grant_type,
             token_kind=token_kind,
             client_id=client_id,
+            org_ids=org_ids,
+            all_orgs=all_orgs,
+            home_org_id=home_org_id,
         )
 
         me_auth.additional_properties = d

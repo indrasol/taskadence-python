@@ -318,13 +318,13 @@ class ProjectsResource:
             self._client._call(_OPS["projects.update"], path=(project_id,), body=body, if_match=if_match),
         )
 
-    def delete(self, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+    def delete(self, project_id: str, *, if_match: str | None = None) -> models.ProjectDeleted:
         """Delete (archive) a project.
 
         `DELETE /v1/projects/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
         """
         return cast(
-            "models.Acknowledgement", self._client._call(_OPS["projects.delete"], path=(project_id,), if_match=if_match)
+            "models.ProjectDeleted", self._client._call(_OPS["projects.delete"], path=(project_id,), if_match=if_match)
         )
 
     def reorder(self, body: models.ProjectOrder | Mapping[str, Any]) -> models.ProjectsReordered:
@@ -360,17 +360,19 @@ class TasksResource:
         *,
         org_id: str | None = None,
         project_id: str | None = None,
+        include_children: bool | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
+        subtasks: str | None = None,
         section_scope: str | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> Page[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
         """
         return cast(
             "Page[models.TaskCardView]",
@@ -379,15 +381,41 @@ class TasksResource:
                 query={
                     "org_id": org_id,
                     "project_id": project_id,
+                    "include_children": include_children,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
+                    "subtasks": subtasks,
                     "section_scope": section_scope,
                 },
                 filter=filter,
             ),
+        )
+
+    def create_batch(
+        self, body: models.TaskBatchCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskBatchCreated:
+        """Create up to 50 tasks (per-item results).
+
+        `POST /v1/tasks/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskBatchCreated",
+            self._client._call(_OPS["tasks.create_batch"], body=body, idempotency_key=idempotency_key),
+        )
+
+    def update_batch(
+        self, body: models.TaskBatchUpdate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskBatchUpdated:
+        """Update up to 100 tasks (per-item results).
+
+        `PATCH /v1/tasks/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskBatchUpdated",
+            self._client._call(_OPS["tasks.update_batch"], body=body, idempotency_key=idempotency_key),
         )
 
     @overload
@@ -433,6 +461,22 @@ class TasksResource:
         """
         return cast(
             "models.Acknowledgement", self._client._call(_OPS["tasks.delete"], path=(task_id,), if_match=if_match)
+        )
+
+    @overload
+    def list_dependents(self, task_id: str, *, if_none_match: None = None) -> models.TaskDependentsPage: ...
+    @overload
+    def list_dependents(self, task_id: str, *, if_none_match: str) -> models.TaskDependentsPage | NotModifiedType: ...
+    def list_dependents(
+        self, task_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskDependentsPage | NotModifiedType:
+        """List the tasks that depend on a task.
+
+        `GET /v1/tasks/{task_id}/dependents` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskDependentsPage | NotModifiedType",
+            self._client._call(_OPS["tasks.list_dependents"], path=(task_id,), if_none_match=if_none_match),
         )
 
     def set_project(self, task_id: str, body: models.TaskProjectSet | Mapping[str, Any]) -> models.TaskInDB:
@@ -483,6 +527,13 @@ class TasksResource:
         `DELETE /v1/tasks/{task_id}/subtasks/{subtask_id}` · scope `tasks:write`
         """
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.remove_subtask"], path=(task_id, subtask_id)))
+
+    def reopen(self, task_id: str) -> models.TaskInDB:
+        """Reopen a completed task.
+
+        `POST /v1/tasks/{task_id}/reopen` · scope `tasks:write`
+        """
+        return cast("models.TaskInDB", self._client._call(_OPS["tasks.reopen"], path=(task_id,)))
 
     def add_dependency(self, task_id: str, body: models.DependencyLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a dependency.
@@ -2953,6 +3004,22 @@ class ViewPinsResource:
         """
         return cast("models.Acknowledgement", self._client._call(_OPS["view-pins.unpin_project"], path=(project_id,)))
 
+    def pin_team(self, team_id: str, *, org_id: str) -> models.PinOut:
+        """Pin a team.
+
+        `PUT /v1/view-pins/teams/{team_id}` · scope `tasks:write`
+        """
+        return cast(
+            "models.PinOut", self._client._call(_OPS["view-pins.pin_team"], path=(team_id,), query={"org_id": org_id})
+        )
+
+    def unpin_team(self, team_id: str) -> models.Acknowledgement:
+        """Unpin a team.
+
+        `DELETE /v1/view-pins/teams/{team_id}` · scope `tasks:write`
+        """
+        return cast("models.Acknowledgement", self._client._call(_OPS["view-pins.unpin_team"], path=(team_id,)))
+
     def reorder(self, body: models.PinOrder | Mapping[str, Any]) -> models.PinListPage:
         """Reorder your pins.
 
@@ -3268,13 +3335,13 @@ class AsyncProjectsResource:
             await self._client._call(_OPS["projects.update"], path=(project_id,), body=body, if_match=if_match),
         )
 
-    async def delete(self, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+    async def delete(self, project_id: str, *, if_match: str | None = None) -> models.ProjectDeleted:
         """Delete (archive) a project.
 
         `DELETE /v1/projects/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
         """
         return cast(
-            "models.Acknowledgement",
+            "models.ProjectDeleted",
             await self._client._call(_OPS["projects.delete"], path=(project_id,), if_match=if_match),
         )
 
@@ -3312,17 +3379,19 @@ class AsyncTasksResource:
         *,
         org_id: str | None = None,
         project_id: str | None = None,
+        include_children: bool | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
+        subtasks: str | None = None,
         section_scope: str | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> AsyncPage[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
         """
         return cast(
             "AsyncPage[models.TaskCardView]",
@@ -3331,15 +3400,41 @@ class AsyncTasksResource:
                 query={
                     "org_id": org_id,
                     "project_id": project_id,
+                    "include_children": include_children,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
+                    "subtasks": subtasks,
                     "section_scope": section_scope,
                 },
                 filter=filter,
             ),
+        )
+
+    async def create_batch(
+        self, body: models.TaskBatchCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskBatchCreated:
+        """Create up to 50 tasks (per-item results).
+
+        `POST /v1/tasks/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskBatchCreated",
+            await self._client._call(_OPS["tasks.create_batch"], body=body, idempotency_key=idempotency_key),
+        )
+
+    async def update_batch(
+        self, body: models.TaskBatchUpdate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskBatchUpdated:
+        """Update up to 100 tasks (per-item results).
+
+        `PATCH /v1/tasks/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskBatchUpdated",
+            await self._client._call(_OPS["tasks.update_batch"], body=body, idempotency_key=idempotency_key),
         )
 
     @overload
@@ -3387,6 +3482,24 @@ class AsyncTasksResource:
         """
         return cast(
             "models.Acknowledgement", await self._client._call(_OPS["tasks.delete"], path=(task_id,), if_match=if_match)
+        )
+
+    @overload
+    async def list_dependents(self, task_id: str, *, if_none_match: None = None) -> models.TaskDependentsPage: ...
+    @overload
+    async def list_dependents(
+        self, task_id: str, *, if_none_match: str
+    ) -> models.TaskDependentsPage | NotModifiedType: ...
+    async def list_dependents(
+        self, task_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskDependentsPage | NotModifiedType:
+        """List the tasks that depend on a task.
+
+        `GET /v1/tasks/{task_id}/dependents` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskDependentsPage | NotModifiedType",
+            await self._client._call(_OPS["tasks.list_dependents"], path=(task_id,), if_none_match=if_none_match),
         )
 
     async def set_project(self, task_id: str, body: models.TaskProjectSet | Mapping[str, Any]) -> models.TaskInDB:
@@ -3443,6 +3556,13 @@ class AsyncTasksResource:
         return cast(
             "models.TaskInDB", await self._client._call(_OPS["tasks.remove_subtask"], path=(task_id, subtask_id))
         )
+
+    async def reopen(self, task_id: str) -> models.TaskInDB:
+        """Reopen a completed task.
+
+        `POST /v1/tasks/{task_id}/reopen` · scope `tasks:write`
+        """
+        return cast("models.TaskInDB", await self._client._call(_OPS["tasks.reopen"], path=(task_id,)))
 
     async def add_dependency(self, task_id: str, body: models.DependencyLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a dependency.
@@ -5992,6 +6112,23 @@ class AsyncViewPinsResource:
             "models.Acknowledgement", await self._client._call(_OPS["view-pins.unpin_project"], path=(project_id,))
         )
 
+    async def pin_team(self, team_id: str, *, org_id: str) -> models.PinOut:
+        """Pin a team.
+
+        `PUT /v1/view-pins/teams/{team_id}` · scope `tasks:write`
+        """
+        return cast(
+            "models.PinOut",
+            await self._client._call(_OPS["view-pins.pin_team"], path=(team_id,), query={"org_id": org_id}),
+        )
+
+    async def unpin_team(self, team_id: str) -> models.Acknowledgement:
+        """Unpin a team.
+
+        `DELETE /v1/view-pins/teams/{team_id}` · scope `tasks:write`
+        """
+        return cast("models.Acknowledgement", await self._client._call(_OPS["view-pins.unpin_team"], path=(team_id,)))
+
     async def reorder(self, body: models.PinOrder | Mapping[str, Any]) -> models.PinListPage:
         """Reorder your pins.
 
@@ -6150,10 +6287,13 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "projects.delete": ("projects", "delete"),
     "tasks.create": ("tasks", "create"),
     "tasks.list": ("tasks", "list"),
+    "tasks.create_batch": ("tasks", "create_batch"),
+    "tasks.update_batch": ("tasks", "update_batch"),
     "tasks.read": ("tasks", "read"),
     "tasks.replace": ("tasks", "replace"),
     "tasks.update": ("tasks", "update"),
     "tasks.delete": ("tasks", "delete"),
+    "tasks.list_dependents": ("tasks", "list_dependents"),
     "tasks.set_project": ("tasks", "set_project"),
     "tasks.review": ("tasks", "review"),
     "tasks.set_sprint": ("tasks", "set_sprint"),
@@ -6161,6 +6301,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "tasks.set_section": ("tasks", "set_section"),
     "tasks.add_subtask": ("tasks", "add_subtask"),
     "tasks.remove_subtask": ("tasks", "remove_subtask"),
+    "tasks.reopen": ("tasks", "reopen"),
     "tasks.add_dependency": ("tasks", "add_dependency"),
     "tasks.remove_dependency": ("tasks", "remove_dependency"),
     "organization-members.list": ("organization_members", "list"),
@@ -6308,6 +6449,8 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "view-pins.list": ("view_pins", "list"),
     "view-pins.pin_project": ("view_pins", "pin_project"),
     "view-pins.unpin_project": ("view_pins", "unpin_project"),
+    "view-pins.pin_team": ("view_pins", "pin_team"),
+    "view-pins.unpin_team": ("view_pins", "unpin_team"),
     "view-pins.reorder": ("view_pins", "reorder"),
 }
 """operationId → (resource attribute, method) — `tests/test_drift.py` checks it covers the spec."""

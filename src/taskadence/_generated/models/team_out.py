@@ -38,6 +38,11 @@ class TeamOut:
         project_count (int | Unset):  Default: 0.
         team_role (None | TeamRoleEnum | Unset): The caller's own role on the team, null when not a member (org admins
             are null too unless they are on it)
+        can_open (bool | Unset): Batch 7: whether the caller may open the team (its page, members, sprints, capacity,
+            settings): the team's members and org owners / admins. Every non-guest org member still sees every team in the
+            list. Default: True.
+        logo_url (None | str | Unset): Batch 7: a link to the team's logo (a 256 px square), valid for 60 minutes; null
+            without one. Never stored.
     """
 
     team_id: str
@@ -52,6 +57,8 @@ class TeamOut:
     member_count: int | Unset = 0
     project_count: int | Unset = 0
     team_role: None | TeamRoleEnum | Unset = UNSET
+    can_open: bool | Unset = True
+    logo_url: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -112,6 +119,14 @@ class TeamOut:
         else:
             team_role = self.team_role
 
+        can_open = self.can_open
+
+        logo_url: None | str | Unset
+        if isinstance(self.logo_url, Unset):
+            logo_url = UNSET
+        else:
+            logo_url = self.logo_url
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -139,6 +154,10 @@ class TeamOut:
             field_dict["project_count"] = project_count
         if team_role is not UNSET:
             field_dict["team_role"] = team_role
+        if can_open is not UNSET:
+            field_dict["can_open"] = can_open
+        if logo_url is not UNSET:
+            field_dict["logo_url"] = logo_url
 
         return field_dict
 
@@ -235,6 +254,17 @@ class TeamOut:
 
         team_role = _parse_team_role(d.pop("team_role", UNSET))
 
+        can_open = d.pop("can_open", UNSET)
+
+        def _parse_logo_url(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
+
         team_out = cls(
             team_id=team_id,
             org_id=org_id,
@@ -248,6 +278,8 @@ class TeamOut:
             member_count=member_count,
             project_count=project_count,
             team_role=team_role,
+            can_open=can_open,
+            logo_url=logo_url,
         )
 
         team_out.additional_properties = d

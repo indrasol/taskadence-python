@@ -20,6 +20,7 @@ def _get_kwargs(
     *,
     org_id: None | str | Unset = UNSET,
     project_id: None | str | Unset = UNSET,
+    include_children: bool | Unset = False,
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     sort_by: str | Unset = "title",
@@ -41,6 +42,12 @@ def _get_kwargs(
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
+    filterparent: list[str] | None | Unset = UNSET,
+    filterblocked: None | str | Unset = UNSET,
+    filterhas_subtasks: None | str | Unset = UNSET,
+    filterblocks: None | str | Unset = UNSET,
+    filtercreated_by: list[str] | None | Unset = UNSET,
+    subtasks: None | str | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -67,6 +74,8 @@ def _get_kwargs(
     else:
         json_project_id = project_id
     params["project_id"] = json_project_id
+
+    params["include_children"] = include_children
 
     params["limit"] = limit
 
@@ -222,6 +231,54 @@ def _get_kwargs(
         json_filterreview = filterreview
     params["filter[review]"] = json_filterreview
 
+    json_filterparent: list[str] | None | Unset
+    if isinstance(filterparent, Unset):
+        json_filterparent = UNSET
+    elif isinstance(filterparent, list):
+        json_filterparent = filterparent
+
+    else:
+        json_filterparent = filterparent
+    params["filter[parent]"] = json_filterparent
+
+    json_filterblocked: None | str | Unset
+    if isinstance(filterblocked, Unset):
+        json_filterblocked = UNSET
+    else:
+        json_filterblocked = filterblocked
+    params["filter[blocked]"] = json_filterblocked
+
+    json_filterhas_subtasks: None | str | Unset
+    if isinstance(filterhas_subtasks, Unset):
+        json_filterhas_subtasks = UNSET
+    else:
+        json_filterhas_subtasks = filterhas_subtasks
+    params["filter[has_subtasks]"] = json_filterhas_subtasks
+
+    json_filterblocks: None | str | Unset
+    if isinstance(filterblocks, Unset):
+        json_filterblocks = UNSET
+    else:
+        json_filterblocks = filterblocks
+    params["filter[blocks]"] = json_filterblocks
+
+    json_filtercreated_by: list[str] | None | Unset
+    if isinstance(filtercreated_by, Unset):
+        json_filtercreated_by = UNSET
+    elif isinstance(filtercreated_by, list):
+        json_filtercreated_by = filtercreated_by
+
+    else:
+        json_filtercreated_by = filtercreated_by
+    params["filter[created_by]"] = json_filtercreated_by
+
+    json_subtasks: None | str | Unset
+    if isinstance(subtasks, Unset):
+        json_subtasks = UNSET
+    else:
+        json_subtasks = subtasks
+    params["subtasks"] = json_subtasks
+
     json_section_scope: None | str | Unset
     if isinstance(section_scope, Unset):
         json_section_scope = UNSET
@@ -343,6 +400,7 @@ def sync_detailed(
     client: AuthenticatedClient,
     org_id: None | str | Unset = UNSET,
     project_id: None | str | Unset = UNSET,
+    include_children: bool | Unset = False,
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     sort_by: str | Unset = "title",
@@ -364,6 +422,12 @@ def sync_detailed(
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
+    filterparent: list[str] | None | Unset = UNSET,
+    filterblocked: None | str | Unset = UNSET,
+    filterhas_subtasks: None | str | Unset = UNSET,
+    filterblocks: None | str | Unset = UNSET,
+    filtercreated_by: list[str] | None | Unset = UNSET,
+    subtasks: None | str | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -425,12 +489,15 @@ def sync_detailed(
             org admins) plus unfiled tasks are listed.
         project_id (None | str | Unset): Project scope; the caller must be able to read the
             project (public, or member, or org admin).
+        include_children (bool | Unset): N.3: with `project_id`, also the tasks of the project's
+            active sub-projects the caller can read (default false: the project's own tasks). Default:
+            False.
         limit (int | Unset): Page size, default 100; silently clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back; `offset` is ignored when it is given.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type (400 otherwise).
-            Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count (400 otherwise). Default: 'title'.
         sort_order (str | Unset): asc or desc (400 otherwise). Default: 'asc'.
         include_inaccessible (bool | Unset): If true, include tasks the current user cannot access
             due to `restricted_to`, marked with has_access=False. If false (default), those tasks are
@@ -460,6 +527,21 @@ def sync_detailed(
             tasks created before this was recorded (mixable).
         filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
             `accepted`, `rejected`, or `none` for tasks never in review (mixable).
+        filterparent (list[str] | None | Unset): Batch 4: the subtasks of these task ids (comma-
+            separated or repeated) - one call for every subtask of a page; implies `subtasks=flat`.
+        filterblocked (None | str | Unset): N.1: `true` → blocked by a live task
+            (`blocked_by_count > 0`: a dependency not completed, archived or deleted); `false` → not
+            blocked.
+        filterhas_subtasks (None | str | Unset): N.1: `true` → has subtasks (`subtask_count > 0`);
+            `false` → has none.
+        filterblocks (None | str | Unset): N.1: `true` → blocks a live task (`blocks_count > 0`);
+            `false` → blocks none.
+        filtercreated_by (list[str] | None | Unset): Who made the task (one OR): `people`,
+            `agents`, a person (user id, username or `me`) or an agent key from `GET
+            /v1/tasks/agents`.
+        subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
+            only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
+            subtasks). Unknown value → 400. See the list grammar.
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -481,6 +563,7 @@ def sync_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         project_id=project_id,
+        include_children=include_children,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -502,6 +585,12 @@ def sync_detailed(
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
+        filterparent=filterparent,
+        filterblocked=filterblocked,
+        filterhas_subtasks=filterhas_subtasks,
+        filterblocks=filterblocks,
+        filtercreated_by=filtercreated_by,
+        subtasks=subtasks,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -522,6 +611,7 @@ def sync(
     client: AuthenticatedClient,
     org_id: None | str | Unset = UNSET,
     project_id: None | str | Unset = UNSET,
+    include_children: bool | Unset = False,
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     sort_by: str | Unset = "title",
@@ -543,6 +633,12 @@ def sync(
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
+    filterparent: list[str] | None | Unset = UNSET,
+    filterblocked: None | str | Unset = UNSET,
+    filterhas_subtasks: None | str | Unset = UNSET,
+    filterblocks: None | str | Unset = UNSET,
+    filtercreated_by: list[str] | None | Unset = UNSET,
+    subtasks: None | str | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -604,12 +700,15 @@ def sync(
             org admins) plus unfiled tasks are listed.
         project_id (None | str | Unset): Project scope; the caller must be able to read the
             project (public, or member, or org admin).
+        include_children (bool | Unset): N.3: with `project_id`, also the tasks of the project's
+            active sub-projects the caller can read (default false: the project's own tasks). Default:
+            False.
         limit (int | Unset): Page size, default 100; silently clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back; `offset` is ignored when it is given.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type (400 otherwise).
-            Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count (400 otherwise). Default: 'title'.
         sort_order (str | Unset): asc or desc (400 otherwise). Default: 'asc'.
         include_inaccessible (bool | Unset): If true, include tasks the current user cannot access
             due to `restricted_to`, marked with has_access=False. If false (default), those tasks are
@@ -639,6 +738,21 @@ def sync(
             tasks created before this was recorded (mixable).
         filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
             `accepted`, `rejected`, or `none` for tasks never in review (mixable).
+        filterparent (list[str] | None | Unset): Batch 4: the subtasks of these task ids (comma-
+            separated or repeated) - one call for every subtask of a page; implies `subtasks=flat`.
+        filterblocked (None | str | Unset): N.1: `true` → blocked by a live task
+            (`blocked_by_count > 0`: a dependency not completed, archived or deleted); `false` → not
+            blocked.
+        filterhas_subtasks (None | str | Unset): N.1: `true` → has subtasks (`subtask_count > 0`);
+            `false` → has none.
+        filterblocks (None | str | Unset): N.1: `true` → blocks a live task (`blocks_count > 0`);
+            `false` → blocks none.
+        filtercreated_by (list[str] | None | Unset): Who made the task (one OR): `people`,
+            `agents`, a person (user id, username or `me`) or an agent key from `GET
+            /v1/tasks/agents`.
+        subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
+            only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
+            subtasks). Unknown value → 400. See the list grammar.
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -661,6 +775,7 @@ def sync(
         client=client,
         org_id=org_id,
         project_id=project_id,
+        include_children=include_children,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -682,6 +797,12 @@ def sync(
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
+        filterparent=filterparent,
+        filterblocked=filterblocked,
+        filterhas_subtasks=filterhas_subtasks,
+        filterblocks=filterblocks,
+        filtercreated_by=filtercreated_by,
+        subtasks=subtasks,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -696,6 +817,7 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     org_id: None | str | Unset = UNSET,
     project_id: None | str | Unset = UNSET,
+    include_children: bool | Unset = False,
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     sort_by: str | Unset = "title",
@@ -717,6 +839,12 @@ async def asyncio_detailed(
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
+    filterparent: list[str] | None | Unset = UNSET,
+    filterblocked: None | str | Unset = UNSET,
+    filterhas_subtasks: None | str | Unset = UNSET,
+    filterblocks: None | str | Unset = UNSET,
+    filtercreated_by: list[str] | None | Unset = UNSET,
+    subtasks: None | str | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -778,12 +906,15 @@ async def asyncio_detailed(
             org admins) plus unfiled tasks are listed.
         project_id (None | str | Unset): Project scope; the caller must be able to read the
             project (public, or member, or org admin).
+        include_children (bool | Unset): N.3: with `project_id`, also the tasks of the project's
+            active sub-projects the caller can read (default false: the project's own tasks). Default:
+            False.
         limit (int | Unset): Page size, default 100; silently clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back; `offset` is ignored when it is given.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type (400 otherwise).
-            Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count (400 otherwise). Default: 'title'.
         sort_order (str | Unset): asc or desc (400 otherwise). Default: 'asc'.
         include_inaccessible (bool | Unset): If true, include tasks the current user cannot access
             due to `restricted_to`, marked with has_access=False. If false (default), those tasks are
@@ -813,6 +944,21 @@ async def asyncio_detailed(
             tasks created before this was recorded (mixable).
         filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
             `accepted`, `rejected`, or `none` for tasks never in review (mixable).
+        filterparent (list[str] | None | Unset): Batch 4: the subtasks of these task ids (comma-
+            separated or repeated) - one call for every subtask of a page; implies `subtasks=flat`.
+        filterblocked (None | str | Unset): N.1: `true` → blocked by a live task
+            (`blocked_by_count > 0`: a dependency not completed, archived or deleted); `false` → not
+            blocked.
+        filterhas_subtasks (None | str | Unset): N.1: `true` → has subtasks (`subtask_count > 0`);
+            `false` → has none.
+        filterblocks (None | str | Unset): N.1: `true` → blocks a live task (`blocks_count > 0`);
+            `false` → blocks none.
+        filtercreated_by (list[str] | None | Unset): Who made the task (one OR): `people`,
+            `agents`, a person (user id, username or `me`) or an agent key from `GET
+            /v1/tasks/agents`.
+        subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
+            only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
+            subtasks). Unknown value → 400. See the list grammar.
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -834,6 +980,7 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         project_id=project_id,
+        include_children=include_children,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -855,6 +1002,12 @@ async def asyncio_detailed(
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
+        filterparent=filterparent,
+        filterblocked=filterblocked,
+        filterhas_subtasks=filterhas_subtasks,
+        filterblocks=filterblocks,
+        filtercreated_by=filtercreated_by,
+        subtasks=subtasks,
         section_scope=section_scope,
         search=search,
         status=status,
@@ -873,6 +1026,7 @@ async def asyncio(
     client: AuthenticatedClient,
     org_id: None | str | Unset = UNSET,
     project_id: None | str | Unset = UNSET,
+    include_children: bool | Unset = False,
     limit: int | Unset = 100,
     cursor: None | str | Unset = UNSET,
     sort_by: str | Unset = "title",
@@ -894,6 +1048,12 @@ async def asyncio(
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
+    filterparent: list[str] | None | Unset = UNSET,
+    filterblocked: None | str | Unset = UNSET,
+    filterhas_subtasks: None | str | Unset = UNSET,
+    filterblocks: None | str | Unset = UNSET,
+    filtercreated_by: list[str] | None | Unset = UNSET,
+    subtasks: None | str | Unset = UNSET,
     section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
@@ -955,12 +1115,15 @@ async def asyncio(
             org admins) plus unfiled tasks are listed.
         project_id (None | str | Unset): Project scope; the caller must be able to read the
             project (public, or member, or org admin).
+        include_children (bool | Unset): N.3: with `project_id`, also the tasks of the project's
+            active sub-projects the caller can read (default false: the project's own tasks). Default:
+            False.
         limit (int | Unset): Page size, default 100; silently clamped to 1000. Default: 100.
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back; `offset` is ignored when it is given.
         sort_by (str | Unset): One of: task_id, title, status, priority, due_date, start_date,
-            created_at, assignee, project_id, priority_rank, status_rank, task_type (400 otherwise).
-            Default: 'title'.
+            created_at, assignee, project_id, priority_rank, status_rank, task_type, blocked_by_count,
+            subtask_count (400 otherwise). Default: 'title'.
         sort_order (str | Unset): asc or desc (400 otherwise). Default: 'asc'.
         include_inaccessible (bool | Unset): If true, include tasks the current user cannot access
             due to `restricted_to`, marked with has_access=False. If false (default), those tasks are
@@ -990,6 +1153,21 @@ async def asyncio(
             tasks created before this was recorded (mixable).
         filterreview (list[str] | None | Unset): Review state: one or more of `pending`,
             `accepted`, `rejected`, or `none` for tasks never in review (mixable).
+        filterparent (list[str] | None | Unset): Batch 4: the subtasks of these task ids (comma-
+            separated or repeated) - one call for every subtask of a page; implies `subtasks=flat`.
+        filterblocked (None | str | Unset): N.1: `true` → blocked by a live task
+            (`blocked_by_count > 0`: a dependency not completed, archived or deleted); `false` → not
+            blocked.
+        filterhas_subtasks (None | str | Unset): N.1: `true` → has subtasks (`subtask_count > 0`);
+            `false` → has none.
+        filterblocks (None | str | Unset): N.1: `true` → blocks a live task (`blocks_count > 0`);
+            `false` → blocks none.
+        filtercreated_by (list[str] | None | Unset): Who made the task (one OR): `people`,
+            `agents`, a person (user id, username or `me`) or an agent key from `GET
+            /v1/tasks/agents`.
+        subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
+            only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
+            subtasks). Unknown value → 400. See the list grammar.
         section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
             task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
@@ -1013,6 +1191,7 @@ async def asyncio(
             client=client,
             org_id=org_id,
             project_id=project_id,
+            include_children=include_children,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,
@@ -1034,6 +1213,12 @@ async def asyncio(
             filtertask_type=filtertask_type,
             filtercreated_via=filtercreated_via,
             filterreview=filterreview,
+            filterparent=filterparent,
+            filterblocked=filterblocked,
+            filterhas_subtasks=filterhas_subtasks,
+            filterblocks=filterblocks,
+            filtercreated_by=filtercreated_by,
+            subtasks=subtasks,
             section_scope=section_scope,
             search=search,
             status=status,

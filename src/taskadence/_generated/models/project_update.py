@@ -46,6 +46,7 @@ class ProjectUpdate:
         visibility (None | ProjectVisibilityEnum | Unset):
         editors_can_add_members (bool | None | Unset):
         team_id (None | str | Unset):
+        parent_project_id (None | str | Unset):
         owner_designation (None | str | Unset):
         team_member_designations (list[TeamMemberDesignation] | None | Unset):
     """
@@ -63,6 +64,7 @@ class ProjectUpdate:
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
     editors_can_add_members: bool | None | Unset = UNSET
     team_id: None | str | Unset = UNSET
+    parent_project_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -166,6 +168,12 @@ class ProjectUpdate:
         else:
             team_id = self.team_id
 
+        parent_project_id: None | str | Unset
+        if isinstance(self.parent_project_id, Unset):
+            parent_project_id = UNSET
+        else:
+            parent_project_id = self.parent_project_id
+
         owner_designation: None | str | Unset
         if isinstance(self.owner_designation, Unset):
             owner_designation = UNSET
@@ -213,6 +221,8 @@ class ProjectUpdate:
             field_dict["editors_can_add_members"] = editors_can_add_members
         if team_id is not UNSET:
             field_dict["team_id"] = team_id
+        if parent_project_id is not UNSET:
+            field_dict["parent_project_id"] = parent_project_id
         if owner_designation is not UNSET:
             field_dict["owner_designation"] = owner_designation
         if team_member_designations is not UNSET:
@@ -400,6 +410,15 @@ class ProjectUpdate:
 
         team_id = _parse_team_id(d.pop("team_id", UNSET))
 
+        def _parse_parent_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
+
         def _parse_owner_designation(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -447,6 +466,7 @@ class ProjectUpdate:
             visibility=visibility,
             editors_can_add_members=editors_can_add_members,
             team_id=team_id,
+            parent_project_id=parent_project_id,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,
         )

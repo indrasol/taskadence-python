@@ -2,7 +2,7 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-OrganizationSettingsUpdateIdleTimeoutMinutesType0 = Literal[15, 30, 60, 240, 480]
+OrganizationSettingsUpdateIdleTimeoutMinutesType0 = Literal[15, 30, 60, 240, 480, 1440]
 
 ORGANIZATION_SETTINGS_UPDATE_IDLE_TIMEOUT_MINUTES_TYPE_0_VALUES: set[
     OrganizationSettingsUpdateIdleTimeoutMinutesType0
@@ -12,6 +12,7 @@ ORGANIZATION_SETTINGS_UPDATE_IDLE_TIMEOUT_MINUTES_TYPE_0_VALUES: set[
     60,
     240,
     480,
+    1440,
 }
 
 

@@ -36,6 +36,8 @@ class ConnectedApp:
         logo_url (None | str | Unset):
         homepage_url (None | str | Unset):
         org_name (None | str | Unset):
+        all_orgs (bool | Unset): N.2: connected for all of the person's organizations (`org_id` is then the connection's
+            home organization) Default: False.
         created_at (datetime.datetime | None | Unset): Connected on
         last_used_at (datetime.datetime | None | Unset): Last token issued or refreshed
     """
@@ -48,6 +50,7 @@ class ConnectedApp:
     logo_url: None | str | Unset = UNSET
     homepage_url: None | str | Unset = UNSET
     org_name: None | str | Unset = UNSET
+    all_orgs: bool | Unset = False
     created_at: datetime.datetime | None | Unset = UNSET
     last_used_at: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -88,6 +91,8 @@ class ConnectedApp:
         else:
             org_name = self.org_name
 
+        all_orgs = self.all_orgs
+
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
             created_at = UNSET
@@ -122,6 +127,8 @@ class ConnectedApp:
             field_dict["homepage_url"] = homepage_url
         if org_name is not UNSET:
             field_dict["org_name"] = org_name
+        if all_orgs is not UNSET:
+            field_dict["all_orgs"] = all_orgs
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
         if last_used_at is not UNSET:
@@ -176,6 +183,8 @@ class ConnectedApp:
 
         org_name = _parse_org_name(d.pop("org_name", UNSET))
 
+        all_orgs = d.pop("all_orgs", UNSET)
+
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
                 return data
@@ -219,6 +228,7 @@ class ConnectedApp:
             logo_url=logo_url,
             homepage_url=homepage_url,
             org_name=org_name,
+            all_orgs=all_orgs,
             created_at=created_at,
             last_used_at=last_used_at,
         )

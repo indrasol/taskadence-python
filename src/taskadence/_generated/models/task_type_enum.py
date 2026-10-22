@@ -2,9 +2,10 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-TaskTypeEnum = Literal["bug", "task"]
+TaskTypeEnum = Literal["access", "bug", "task"]
 
 TASK_TYPE_ENUM_VALUES: set[TaskTypeEnum] = {
+    "access",
     "bug",
     "task",
 }
