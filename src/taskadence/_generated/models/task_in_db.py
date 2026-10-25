@@ -93,8 +93,12 @@ class TaskInDB:
         has_edit_access (bool | None | Unset): True unless the task is restricted and the caller is neither listed
             creator/assignee nor an org admin
         can_delete (bool | None | Unset): Whether the caller may delete this task (exactly what `DELETE
-            /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor,
+            /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or member,
             its creator, its assignee, or the person behind the access token that created it. Response only.
+        subscriber_ids (list[str] | None | Unset): The user ids subscribed to this task: they get its assignment,
+            comment and status emails. Set on single-task reads. Response only.
+        is_subscribed (bool | None | Unset): Whether the caller is subscribed to this task. Set on single-task reads.
+            Response only.
         parent_task_id (None | str | Unset): The task this one is a subtask of (one parent at most); null for a top-
             level task. Linked through POST /tasks/{id}/subtasks. Response only. Example: T123456.
         parent_title (None | str | Unset): The parent's title, for a subtask; null for a top-level task or a parent the
@@ -148,6 +152,8 @@ class TaskInDB:
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
     can_delete: bool | None | Unset = UNSET
+    subscriber_ids: list[str] | None | Unset = UNSET
+    is_subscribed: bool | None | Unset = UNSET
     parent_task_id: None | str | Unset = UNSET
     parent_title: None | str | Unset = UNSET
     subtasks_done: int | Unset = 0
@@ -408,6 +414,21 @@ class TaskInDB:
         else:
             can_delete = self.can_delete
 
+        subscriber_ids: list[str] | None | Unset
+        if isinstance(self.subscriber_ids, Unset):
+            subscriber_ids = UNSET
+        elif isinstance(self.subscriber_ids, list):
+            subscriber_ids = self.subscriber_ids
+
+        else:
+            subscriber_ids = self.subscriber_ids
+
+        is_subscribed: bool | None | Unset
+        if isinstance(self.is_subscribed, Unset):
+            is_subscribed = UNSET
+        else:
+            is_subscribed = self.is_subscribed
+
         parent_task_id: None | str | Unset
         if isinstance(self.parent_task_id, Unset):
             parent_task_id = UNSET
@@ -506,6 +527,10 @@ class TaskInDB:
             field_dict["has_edit_access"] = has_edit_access
         if can_delete is not UNSET:
             field_dict["can_delete"] = can_delete
+        if subscriber_ids is not UNSET:
+            field_dict["subscriber_ids"] = subscriber_ids
+        if is_subscribed is not UNSET:
+            field_dict["is_subscribed"] = is_subscribed
         if parent_task_id is not UNSET:
             field_dict["parent_task_id"] = parent_task_id
         if parent_title is not UNSET:
@@ -962,6 +987,32 @@ class TaskInDB:
 
         can_delete = _parse_can_delete(d.pop("can_delete", UNSET))
 
+        def _parse_subscriber_ids(data: object) -> list[str] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                subscriber_ids_type_0 = cast(list[str], data)
+
+                return subscriber_ids_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[str] | None | Unset, data)
+
+        subscriber_ids = _parse_subscriber_ids(d.pop("subscriber_ids", UNSET))
+
+        def _parse_is_subscribed(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_subscribed = _parse_is_subscribed(d.pop("is_subscribed", UNSET))
+
         def _parse_parent_task_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -1029,6 +1080,8 @@ class TaskInDB:
             has_access=has_access,
             has_edit_access=has_edit_access,
             can_delete=can_delete,
+            subscriber_ids=subscriber_ids,
+            is_subscribed=is_subscribed,
             parent_task_id=parent_task_id,
             parent_title=parent_title,
             subtasks_done=subtasks_done,

@@ -32,7 +32,7 @@ class ProjectMemberUpdate:
             role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
                 omitted. Prefer `project_role`. Example: owner.
             project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
-                omitted. Example: editor.
+                omitted. Example: member.
             is_active (bool | None | Unset): Whether the member is active. Omit to leave it unchanged. Example: True.
     """
 

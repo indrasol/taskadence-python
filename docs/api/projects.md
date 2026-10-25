@@ -14,7 +14,7 @@ Create a project.
 - **Returns:** `ProjectCard`
 - **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
 
-## `tm.projects.list(org_id: str, show_all: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+## `tm.projects.list(org_id: str, show_all: bool | None = None, scope: str | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
 
 List an organization's projects you can read.
 

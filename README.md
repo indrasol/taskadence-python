@@ -183,7 +183,7 @@ is the full answer, for the lists that carry totals beside `data`.
 
 ### Sub-projects
 
-A project can sit under a parent project, one level deep. Filing one needs the owner or editor role on the parent;
+A project can sit under a parent project, one level deep. Filing one needs the owner or member role on the parent;
 the sub-project keeps its own members and visibility (nothing is inherited from the parent).
 
 ```python
@@ -202,6 +202,53 @@ tm.projects.update(child.project_id, {"parent_project_id": None})          # top
 
 Deleting a parent keeps its sub-projects: they become top-level (`tm.projects.delete(...)` returns
 `children_detached`).
+
+### Project members and roles
+
+A project role is `owner`, `member` or `viewer`. The organization's owners and admins are owners of every project
+without being added: a member list shows them with `source` `org_owner` or `org_admin` and `removable=False`, and a
+project read lists them in `implicit_members`.
+
+```python
+from taskadence import Taskadence
+
+tm = Taskadence()
+org_id = tm.me().organizations[0].org_id
+
+result = tm.projects.members.add_many("P31304", [
+    {"user_id": "6f1c0d2e-5b7a-4c3e-9a10-2b8f4d6e7a91", "project_role": "member"},
+    {"user_id": "0b9e4c1a-7d2f-4e88-b6a3-5c1d9f0e2a47", "project_role": "viewer"},
+])                                                              # up to 50 people, all or nothing
+print(len(result.added), "added;", [s.user_id for s in result.skipped], "were already in")
+
+project = tm.projects.read("P31304")
+print([m.username for m in project.implicit_members])          # org owners and admins
+tm.projects.update("P31304", {"members_can_add_people": True})  # members may add and remove people too
+mine = tm.projects.list(org_id, scope="mine")                   # the projects you are in ("all" is the default)
+```
+
+Needs `projects:write`. `tm.projects.members.add_many` is also `tm.project_members.create_batch`; people already in
+the project come back in `skipped` (`reason` `already_member`) and are left as they are.
+
+### Task subscribers
+
+A task's subscribers get its assignment, comment and status emails. Its creator and assignee are subscribed
+automatically; a single-task read says who is (`subscriber_ids`) and whether you are (`is_subscribed`).
+
+```python
+from taskadence import Taskadence
+
+tm = Taskadence()
+
+subs = tm.tasks.subscribers("T123456")
+print([s.username for s in subs.subscribers], subs.is_subscribed)
+tm.tasks.set_subscribers("T123456", [*subs.subscriber_ids, "6f1c0d2e-5b7a-4c3e-9a10-2b8f4d6e7a91"])   # the FULL list
+tm.tasks.subscribe("T123456")      # yourself
+tm.tasks.unsubscribe("T123456")
+```
+
+Reads need `tasks:read`, changes `tasks:write`. `set_subscribers` replaces the whole list (up to 100; whoever is left
+out is unsubscribed), and each new person must be able to see the task.
 
 ### Sprints, capacity and workload
 

@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.project_member_in_db_source import check_project_member_in_db_source
+from ..models.project_member_in_db_source import ProjectMemberInDBSource
 from ..models.project_role_enum import check_project_role_enum
 from ..models.project_role_enum import ProjectRoleEnum
 from ..types import UNSET, Unset
@@ -36,7 +38,7 @@ class ProjectMemberInDB:
             role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
                 omitted. Prefer `project_role`. Example: owner.
             project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
-                omitted. Example: editor.
+                omitted. Example: member.
             created_by (None | str | Unset): Who created the membership (username)
             updated_by (None | str | Unset): Who last updated the membership (username)
             is_active (bool | None | Unset): Is the member active? Default: True. Example: True.
@@ -44,6 +46,11 @@ class ProjectMemberInDB:
             updated_at (datetime.datetime | None | Unset): Last update timestamp
             deleted_at (datetime.datetime | None | Unset): When the member was deleted
             delete_reason (None | str | Unset): Reason for deletion
+            source (ProjectMemberInDBSource | Unset): `member`: added to the project. `org_owner` / `org_admin`: an owner of
+                every project of the organization through their org role (`project_role` owner; not added, so not removable
+                here) Default: 'member'.
+            removable (bool | Unset): False for an org owner or admin shown through their org role: nothing to remove
+                Default: True.
     """
 
     project_id: str
@@ -60,6 +67,8 @@ class ProjectMemberInDB:
     updated_at: datetime.datetime | None | Unset = UNSET
     deleted_at: datetime.datetime | None | Unset = UNSET
     delete_reason: None | str | Unset = UNSET
+    source: ProjectMemberInDBSource | Unset = "member"
+    removable: bool | Unset = True
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -150,6 +159,12 @@ class ProjectMemberInDB:
         else:
             delete_reason = self.delete_reason
 
+        source: str | Unset = UNSET
+        if not isinstance(self.source, Unset):
+            source = self.source
+
+        removable = self.removable
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -182,6 +197,10 @@ class ProjectMemberInDB:
             field_dict["deleted_at"] = deleted_at
         if delete_reason is not UNSET:
             field_dict["delete_reason"] = delete_reason
+        if source is not UNSET:
+            field_dict["source"] = source
+        if removable is not UNSET:
+            field_dict["removable"] = removable
 
         return field_dict
 
@@ -332,6 +351,15 @@ class ProjectMemberInDB:
 
         delete_reason = _parse_delete_reason(d.pop("delete_reason", UNSET))
 
+        _source = d.pop("source", UNSET)
+        source: ProjectMemberInDBSource | Unset
+        if isinstance(_source, Unset):
+            source = UNSET
+        else:
+            source = check_project_member_in_db_source(_source)
+
+        removable = d.pop("removable", UNSET)
+
         project_member_in_db = cls(
             project_id=project_id,
             user_id=user_id,
@@ -347,6 +375,8 @@ class ProjectMemberInDB:
             updated_at=updated_at,
             deleted_at=deleted_at,
             delete_reason=delete_reason,
+            source=source,
+            removable=removable,
         )
 
         project_member_in_db.additional_properties = d

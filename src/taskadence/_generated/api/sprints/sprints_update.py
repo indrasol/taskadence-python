@@ -115,7 +115,7 @@ def sync_detailed(
      A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
     (`active` / `completed`), `position`, or `project_id` to move it.
 
-    - **Who:** the project's owners and editors, or an org owner / admin; a move needs that in the
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
     target project too.
     - Completing a sprint records who and when and does nothing to its tasks.
     - **Moving:** only a sprint that holds no task moves to another project of the organization (409
@@ -157,7 +157,7 @@ def sync(
      A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
     (`active` / `completed`), `position`, or `project_id` to move it.
 
-    - **Who:** the project's owners and editors, or an org owner / admin; a move needs that in the
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
     target project too.
     - Completing a sprint records who and when and does nothing to its tasks.
     - **Moving:** only a sprint that holds no task moves to another project of the organization (409
@@ -194,7 +194,7 @@ async def asyncio_detailed(
      A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
     (`active` / `completed`), `position`, or `project_id` to move it.
 
-    - **Who:** the project's owners and editors, or an org owner / admin; a move needs that in the
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
     target project too.
     - Completing a sprint records who and when and does nothing to its tasks.
     - **Moving:** only a sprint that holds no task moves to another project of the organization (409
@@ -234,7 +234,7 @@ async def asyncio(
      A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
     (`active` / `completed`), `position`, or `project_id` to move it.
 
-    - **Who:** the project's owners and editors, or an org owner / admin; a move needs that in the
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
     target project too.
     - Completing a sprint records who and when and does nothing to its tasks.
     - **Moving:** only a sprint that holds no task moves to another project of the organization (409

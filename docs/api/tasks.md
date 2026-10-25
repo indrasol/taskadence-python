@@ -103,6 +103,7 @@ Move a task to another project (or unfile it).
 - **operationId:** `tasks.set_project`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
+- **Also:** `tm.tasks.move` (same call).
 
 ## `tm.tasks.review(task_id: str, body: TaskReviewDecision | Mapping[str, Any])`
 
@@ -175,3 +176,41 @@ Remove a dependency.
 - **operationId:** `tasks.remove_dependency`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
+
+## `tm.tasks.list_subscribers(task_id: str, if_none_match: str | None = None)`
+
+List a task's subscribers.
+
+- **HTTP:** `GET /v1/tasks/{task_id}/subscribers`
+- **operationId:** `tasks.list_subscribers`
+- **Token scope:** `tasks:read`
+- **Returns:** `TaskSubscribers`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Also:** `tm.tasks.subscribers` (same call).
+
+## `tm.tasks.set_subscribers(task_id: str, user_ids: Sequence[str])`
+
+Set a task's subscribers.
+
+- **HTTP:** `PUT /v1/tasks/{task_id}/subscribers`
+- **operationId:** `tasks.set_subscribers`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`
+
+## `tm.tasks.subscribe(task_id: str)`
+
+Subscribe yourself to a task.
+
+- **HTTP:** `POST /v1/tasks/{task_id}/subscribers/me`
+- **operationId:** `tasks.subscribe`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`
+
+## `tm.tasks.unsubscribe(task_id: str)`
+
+Unsubscribe yourself from a task.
+
+- **HTTP:** `DELETE /v1/tasks/{task_id}/subscribers/me`
+- **operationId:** `tasks.unsubscribe`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`

@@ -2,10 +2,10 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-ProjectRoleEnum = Literal["editor", "owner", "viewer"]
+ProjectRoleEnum = Literal["member", "owner", "viewer"]
 
 PROJECT_ROLE_ENUM_VALUES: set[ProjectRoleEnum] = {
-    "editor",
+    "member",
     "owner",
     "viewer",
 }

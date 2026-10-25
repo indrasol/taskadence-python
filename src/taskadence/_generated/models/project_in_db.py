@@ -22,6 +22,7 @@ import datetime
 
 if TYPE_CHECKING:
     from ..models.project_child_out import ProjectChildOut
+    from ..models.project_implicit_member import ProjectImplicitMember
     from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0
     from ..models.project_lead_out import ProjectLeadOut
     from ..models.project_manager_out import ProjectManagerOut
@@ -58,15 +59,19 @@ class ProjectInDB:
         visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
-            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a
             parent (422). null = top-level.
         position (int | Unset): The project's place in the organization's drag order (Planning's tree, the Projects
             page). Lists sort by position, then name. Default: 0.
-        editors_can_add_members (bool | Unset): When true, project editors may add and remove members and change their
-            roles. Set by the project owner or an org admin. Default: False.
+        members_can_add_people (bool | Unset): "Members can add people": when true, the project's members may add and
+            remove people and change their roles. Set by the project owner or an org admin. Default: False.
+        editors_can_add_members (bool | Unset): Deprecated: the old name of `members_can_add_people` (same value), kept
+            until the next release. Default: False.
         leads (list[ProjectLeadOut] | Unset): The project's leads (there can be several); optional, usually empty.
         managers (list[ProjectManagerOut] | Unset): The project's managers (there can be several; a label, no extra
             access); optional, usually empty.
+        implicit_members (list[ProjectImplicitMember] | Unset): Release 10: the organization's owners and admins -
+            owners of this project through their org role (not added, not removable here). Set on the single project read
         parent (None | ProjectRef | Unset): The parent project (N.3), or null when the project is top-level or the
             caller cannot read its parent (`parent_project_id` still names it).
         children (list[ProjectChildOut] | Unset): The project's active sub-projects the caller can read (N.3), by name.
@@ -95,9 +100,11 @@ class ProjectInDB:
     visibility: None | ProjectVisibilityEnum | Unset = "public"
     parent_project_id: None | str | Unset = UNSET
     position: int | Unset = 0
+    members_can_add_people: bool | Unset = False
     editors_can_add_members: bool | Unset = False
     leads: list[ProjectLeadOut] | Unset = UNSET
     managers: list[ProjectManagerOut] | Unset = UNSET
+    implicit_members: list[ProjectImplicitMember] | Unset = UNSET
     parent: None | ProjectRef | Unset = UNSET
     children: list[ProjectChildOut] | Unset = UNSET
     logo_url: None | str | Unset = UNSET
@@ -108,6 +115,7 @@ class ProjectInDB:
 
     def to_dict(self) -> dict[str, Any]:
         from ..models.project_child_out import ProjectChildOut  # noqa: PLC0415
+        from ..models.project_implicit_member import ProjectImplicitMember  # noqa: PLC0415
         from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
         from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
@@ -238,6 +246,8 @@ class ProjectInDB:
 
         position = self.position
 
+        members_can_add_people = self.members_can_add_people
+
         editors_can_add_members = self.editors_can_add_members
 
         leads: list[dict[str, Any]] | Unset = UNSET
@@ -253,6 +263,13 @@ class ProjectInDB:
             for managers_item_data in self.managers:
                 managers_item = managers_item_data.to_dict()
                 managers.append(managers_item)
+
+        implicit_members: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.implicit_members, Unset):
+            implicit_members = []
+            for implicit_members_item_data in self.implicit_members:
+                implicit_members_item = implicit_members_item_data.to_dict()
+                implicit_members.append(implicit_members_item)
 
         parent: dict[str, Any] | None | Unset
         if isinstance(self.parent, Unset):
@@ -317,12 +334,16 @@ class ProjectInDB:
             field_dict["parent_project_id"] = parent_project_id
         if position is not UNSET:
             field_dict["position"] = position
+        if members_can_add_people is not UNSET:
+            field_dict["members_can_add_people"] = members_can_add_people
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
         if leads is not UNSET:
             field_dict["leads"] = leads
         if managers is not UNSET:
             field_dict["managers"] = managers
+        if implicit_members is not UNSET:
+            field_dict["implicit_members"] = implicit_members
         if parent is not UNSET:
             field_dict["parent"] = parent
         if children is not UNSET:
@@ -335,6 +356,7 @@ class ProjectInDB:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.project_child_out import ProjectChildOut  # noqa: PLC0415
+        from ..models.project_implicit_member import ProjectImplicitMember  # noqa: PLC0415
         from ..models.project_in_db_metadata_type_0 import ProjectInDBMetadataType0  # noqa: PLC0415
         from ..models.project_lead_out import ProjectLeadOut  # noqa: PLC0415
         from ..models.project_manager_out import ProjectManagerOut  # noqa: PLC0415
@@ -576,6 +598,8 @@ class ProjectInDB:
 
         position = d.pop("position", UNSET)
 
+        members_can_add_people = d.pop("members_can_add_people", UNSET)
+
         editors_can_add_members = d.pop("editors_can_add_members", UNSET)
 
         _leads = d.pop("leads", UNSET)
@@ -595,6 +619,15 @@ class ProjectInDB:
                 managers_item = ProjectManagerOut.from_dict(managers_item_data)
 
                 managers.append(managers_item)
+
+        _implicit_members = d.pop("implicit_members", UNSET)
+        implicit_members: list[ProjectImplicitMember] | Unset = UNSET
+        if _implicit_members is not UNSET:
+            implicit_members = []
+            for implicit_members_item_data in _implicit_members:
+                implicit_members_item = ProjectImplicitMember.from_dict(implicit_members_item_data)
+
+                implicit_members.append(implicit_members_item)
 
         def _parse_parent(data: object) -> None | ProjectRef | Unset:
             if data is None:
@@ -653,9 +686,11 @@ class ProjectInDB:
             visibility=visibility,
             parent_project_id=parent_project_id,
             position=position,
+            members_can_add_people=members_can_add_people,
             editors_can_add_members=editors_can_add_members,
             leads=leads,
             managers=managers,
+            implicit_members=implicit_members,
             parent=parent,
             children=children,
             logo_url=logo_url,

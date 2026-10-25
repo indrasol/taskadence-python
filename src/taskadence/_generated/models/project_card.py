@@ -56,7 +56,7 @@ class ProjectCard:
         visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
-            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a
             parent (422). null = top-level.
         created_at (datetime.datetime | None | Unset): Timestamp when the project was created
         updated_at (datetime.datetime | None | Unset): When the project was last changed.

@@ -91,7 +91,7 @@ class TaskCardView:
         has_edit_access (bool | None | Unset): True for task creator, project owner, or organization owner Default:
             False.
         can_delete (bool | Unset): Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}`
-            decides): the caller may edit it and is an org owner or admin, a project owner or editor, its creator, its
+            decides): the caller may edit it and is an org owner or admin, a project owner or member, its creator, its
             assignee, or the person behind the access token that created it. Response only. Default: False.
         parent_task_id (None | str | Unset): The task this one is a subtask of (one parent at most); null for a top-
             level task. Linked through POST /tasks/{id}/subtasks. Response only. Example: T123456.

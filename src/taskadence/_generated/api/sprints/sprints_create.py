@@ -114,7 +114,7 @@ def sync_detailed(
 
      Create a sprint in the project.
 
-    - **Who:** the project's owners and editors, or an org owner / admin.
+    - **Who:** the project's owners and members, or an org owner / admin.
     - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
     the weeks.
     - `position` omitted places it after the project's last sprint.
@@ -154,7 +154,7 @@ def sync(
 
      Create a sprint in the project.
 
-    - **Who:** the project's owners and editors, or an org owner / admin.
+    - **Who:** the project's owners and members, or an org owner / admin.
     - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
     the weeks.
     - `position` omitted places it after the project's last sprint.
@@ -189,7 +189,7 @@ async def asyncio_detailed(
 
      Create a sprint in the project.
 
-    - **Who:** the project's owners and editors, or an org owner / admin.
+    - **Who:** the project's owners and members, or an org owner / admin.
     - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
     the weeks.
     - `position` omitted places it after the project's last sprint.
@@ -227,7 +227,7 @@ async def asyncio(
 
      Create a sprint in the project.
 
-    - **Who:** the project's owners and editors, or an org owner / admin.
+    - **Who:** the project's owners and members, or an org owner / admin.
     - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
     the weeks.
     - `position` omitted places it after the project's last sprint.

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasKadence API",
-    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:email-in-other-account` | The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`). |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The account has used its free storage (shared by its organizations) and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where the account owner adds a card) are in the body. Reads, downloads and deletes still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:email-in-other-account` | The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`). |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
     "version": "2026-10-24"
   },
   "paths": {
@@ -1086,6 +1086,28 @@
             }
           },
           {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "all",
+                    "mine"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`mine`: the projects you are in - every project for an org owner or admin (their org role makes them an owner of each); `all` (default): every project you can read. Same as `show_all=false` / `true`",
+              "title": "Scope"
+            },
+            "description": "`mine`: the projects you are in - every project for an org owner or admin (their org role makes them an owner of each); `all` (default): every project you can read. Same as `show_all=false` / `true`"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -1462,6 +1484,7 @@
                   "parent_project_id": "string",
                   "project_id": "string",
                   "position": 0,
+                  "members_can_add_people": false,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -1477,6 +1500,15 @@
                       "username": "string",
                       "assigned_by": "string",
                       "assigned_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "implicit_members": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "project_role": "owner",
+                      "source": "string",
+                      "removable": false
                     }
                   ],
                   "created_at": "2026-09-25T12:00:00Z",
@@ -1728,6 +1760,7 @@
                   "string"
                 ],
                 "visibility": "public",
+                "members_can_add_people": false,
                 "editors_can_add_members": false,
                 "position": 0,
                 "parent_project_id": "string",
@@ -1773,6 +1806,7 @@
                   "parent_project_id": "string",
                   "project_id": "string",
                   "position": 0,
+                  "members_can_add_people": false,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -1788,6 +1822,15 @@
                       "username": "string",
                       "assigned_by": "string",
                       "assigned_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "implicit_members": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "project_role": "owner",
+                      "source": "string",
+                      "removable": false
                     }
                   ],
                   "created_at": "2026-09-25T12:00:00Z",
@@ -2036,6 +2079,7 @@
                   "string"
                 ],
                 "visibility": "public",
+                "members_can_add_people": false,
                 "editors_can_add_members": false,
                 "position": 0,
                 "parent_project_id": "string",
@@ -2081,6 +2125,7 @@
                   "parent_project_id": "string",
                   "project_id": "string",
                   "position": 0,
+                  "members_can_add_people": false,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -2096,6 +2141,15 @@
                       "username": "string",
                       "assigned_by": "string",
                       "assigned_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "implicit_members": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "project_role": "owner",
+                      "source": "string",
+                      "removable": false
                     }
                   ],
                   "created_at": "2026-09-25T12:00:00Z",
@@ -2516,6 +2570,260 @@
         ]
       }
     },
+    "/v1/projects/{project_id}/members/batch": {
+      "post": {
+        "tags": [
+          "project-members"
+        ],
+        "summary": "Add several members to a project",
+        "description": "Add up to 50 people to the project, each with their own role, all or nothing.\n\n- **Who:** whoever may manage the project's members, as for one (`POST /v1/project-members`).\n- **Each person** must be in the project's organization (a guest too); one who is not is a 422 and nobody is added.\n- **Already in the project:** listed in `skipped`, not an error.\n- One `project.member_added` audit row per person.",
+        "operationId": "project-members.create_batch",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectMembersBatchAdd"
+              },
+              "example": {
+                "members": [
+                  {
+                    "user_id": "string",
+                    "project_role": "owner"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMembersBatchAdded"
+                },
+                "example": {
+                  "added": [
+                    {
+                      "project_id": "project-1234",
+                      "user_id": "b3c1e2d4-1234-5678-9abc-def012345678",
+                      "username": "john_doe",
+                      "designation": "Senior Software Engineer",
+                      "designation_id": "DG0001",
+                      "role": "owner",
+                      "project_role": "member",
+                      "created_by": "string",
+                      "updated_by": "string",
+                      "is_active": true,
+                      "created_at": "2026-09-25T12:00:00Z",
+                      "updated_at": "2026-09-25T12:00:00Z",
+                      "deleted_at": "2026-09-25T12:00:00Z",
+                      "delete_reason": "string",
+                      "source": "member",
+                      "removable": true
+                    }
+                  ],
+                  "skipped": [
+                    {
+                      "user_id": "string",
+                      "reason": "already_member"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "projects:write"
+        ]
+      }
+    },
     "/v1/tasks": {
       "post": {
         "tags": [
@@ -2630,6 +2938,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -3854,6 +4166,10 @@
                         "has_access": false,
                         "has_edit_access": false,
                         "can_delete": false,
+                        "subscriber_ids": [
+                          "string"
+                        ],
+                        "is_subscribed": false,
                         "parent_task_id": "T123456",
                         "parent_title": "string",
                         "subtasks_done": 0,
@@ -4227,6 +4543,10 @@
                         "has_access": false,
                         "has_edit_access": false,
                         "can_delete": false,
+                        "subscriber_ids": [
+                          "string"
+                        ],
+                        "is_subscribed": false,
                         "parent_task_id": "T123456",
                         "parent_title": "string",
                         "subtasks_done": 0,
@@ -4528,6 +4848,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -4726,7 +5050,7 @@
           "tasks"
         ],
         "summary": "Update a task (PUT; partial)",
-        "description": "**Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for older clients.\n\nRequires edit access to the task: a project owner or editor, an org admin, or the assignee - on a restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires permission to restrict the task.",
+        "description": "**Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for older clients.\n\nRequires edit access to the task: a project owner or member, an org admin, or the assignee - on a restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires permission to restrict the task.",
         "operationId": "tasks.replace",
         "parameters": [
           {
@@ -4853,6 +5177,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -5048,7 +5376,7 @@
           "tasks"
         ],
         "summary": "Update a task (JSON merge-patch)",
-        "description": "Requires edit access to the task: a project owner or editor, an org admin, or the assignee - on a restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires permission to restrict the task.",
+        "description": "Requires edit access to the task: a project owner or member, an org admin, or the assignee - on a restricted task, its creator, its assignee or an org admin. Setting `restricted_to` also requires permission to restrict the task.",
         "operationId": "tasks.update",
         "parameters": [
           {
@@ -5175,6 +5503,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -5961,6 +6293,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -6243,6 +6579,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -6525,6 +6865,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -6807,6 +7151,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -7089,6 +7437,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -7367,6 +7719,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -7636,6 +7992,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -7918,6 +8278,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -8196,6 +8560,10 @@
                   "has_access": false,
                   "has_edit_access": false,
                   "can_delete": false,
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false,
                   "parent_task_id": "T123456",
                   "parent_title": "string",
                   "subtasks_done": 0,
@@ -8204,6 +8572,925 @@
                   "blocks_count": 0,
                   "subtask_count": 0,
                   "subtask_done_count": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}/subscribers": {
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "List a task's subscribers",
+        "description": "Who follows the task: they get its assignment, comment and status-change emails (except for their own changes).",
+        "operationId": "tasks.list_subscribers",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSubscribers"
+                },
+                "example": {
+                  "task_id": "T600616",
+                  "subscribers": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "display_name": "string",
+                      "added_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:read"
+        ]
+      },
+      "put": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Set a task's subscribers",
+        "description": "The full list, for whoever may edit the task. Each person added must be able to see the task (on a restricted\ntask: be in its list), else 422 naming them; a guest may change only their own subscription (403 here).",
+        "operationId": "tasks.set_subscribers",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskSubscribersSet"
+              },
+              "example": {
+                "user_ids": [
+                  "6f1c0d2e-5b7a-4c3e-9a10-2b8f4d6e7a91"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSubscribers"
+                },
+                "example": {
+                  "task_id": "T600616",
+                  "subscribers": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "display_name": "string",
+                      "added_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      }
+    },
+    "/v1/tasks/{task_id}/subscribers/me": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Subscribe yourself to a task",
+        "description": "Subscribe yourself (anyone who can see the task). Doing it twice is harmless.",
+        "operationId": "tasks.subscribe",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSubscribers"
+                },
+                "example": {
+                  "task_id": "T600616",
+                  "subscribers": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "display_name": "string",
+                      "added_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Unsubscribe yourself from a task",
+        "description": "Unsubscribe yourself (the creator and the assignee too: they stop getting the task's emails, except being\nassigned again).",
+        "operationId": "tasks.unsubscribe",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSubscribers"
+                },
+                "example": {
+                  "task_id": "T600616",
+                  "subscribers": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "display_name": "string",
+                      "added_by": "string",
+                      "created_at": "2026-09-25T12:00:00Z"
+                    }
+                  ],
+                  "subscriber_ids": [
+                    "string"
+                  ],
+                  "is_subscribed": false
                 }
               }
             }
@@ -13429,7 +14716,7 @@
                 "designation": "Senior Software Engineer",
                 "designation_id": "DG0001",
                 "role": "owner",
-                "project_role": "editor",
+                "project_role": "member",
                 "created_by": "string",
                 "updated_by": "string",
                 "is_active": true,
@@ -13456,14 +14743,16 @@
                   "designation": "Senior Software Engineer",
                   "designation_id": "DG0001",
                   "role": "owner",
-                  "project_role": "editor",
+                  "project_role": "member",
                   "created_by": "string",
                   "updated_by": "string",
                   "is_active": true,
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
-                  "delete_reason": "string"
+                  "delete_reason": "string",
+                  "source": "member",
+                  "removable": true
                 }
               }
             }
@@ -13791,14 +15080,16 @@
                       "designation": "Senior Software Engineer",
                       "designation_id": "DG0001",
                       "role": "owner",
-                      "project_role": "editor",
+                      "project_role": "member",
                       "created_by": "string",
                       "updated_by": "string",
                       "is_active": true,
                       "created_at": "2026-09-25T12:00:00Z",
                       "updated_at": "2026-09-25T12:00:00Z",
                       "deleted_at": "2026-09-25T12:00:00Z",
-                      "delete_reason": "string"
+                      "delete_reason": "string",
+                      "source": "member",
+                      "removable": true
                     }
                   ],
                   "next_cursor": "string"
@@ -14039,14 +15330,16 @@
                   "designation": "Senior Software Engineer",
                   "designation_id": "DG0001",
                   "role": "owner",
-                  "project_role": "editor",
+                  "project_role": "member",
                   "created_by": "string",
                   "updated_by": "string",
                   "is_active": true,
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
-                  "delete_reason": "string"
+                  "delete_reason": "string",
+                  "source": "member",
+                  "removable": true
                 }
               }
             }
@@ -14278,7 +15571,7 @@
                 "designation": "Senior Software Engineer",
                 "designation_id": "DG0001",
                 "role": "owner",
-                "project_role": "editor",
+                "project_role": "member",
                 "is_active": true
               }
             }
@@ -14299,14 +15592,16 @@
                   "designation": "Senior Software Engineer",
                   "designation_id": "DG0001",
                   "role": "owner",
-                  "project_role": "editor",
+                  "project_role": "member",
                   "created_by": "string",
                   "updated_by": "string",
                   "is_active": true,
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
-                  "delete_reason": "string"
+                  "delete_reason": "string",
+                  "source": "member",
+                  "removable": true
                 }
               }
             }
@@ -14536,7 +15831,7 @@
                 "designation": "Senior Software Engineer",
                 "designation_id": "DG0001",
                 "role": "owner",
-                "project_role": "editor",
+                "project_role": "member",
                 "is_active": true
               }
             }
@@ -14557,14 +15852,16 @@
                   "designation": "Senior Software Engineer",
                   "designation_id": "DG0001",
                   "role": "owner",
-                  "project_role": "editor",
+                  "project_role": "member",
                   "created_by": "string",
                   "updated_by": "string",
                   "is_active": true,
                   "created_at": "2026-09-25T12:00:00Z",
                   "updated_at": "2026-09-25T12:00:00Z",
                   "deleted_at": "2026-09-25T12:00:00Z",
-                  "delete_reason": "string"
+                  "delete_reason": "string",
+                  "source": "member",
+                  "removable": true
                 }
               }
             }
@@ -16651,7 +17948,7 @@
           "task-attachments"
         ],
         "summary": "Upload an attachment to a task (multipart)",
-        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the organization has used its included storage and has no payment method on file, the answer is 402\n`storage-limit-reached`.\n\n**Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
+        "description": "Upload a file to storage and create an attachment row.\nEnforces per-task limit. S.10: the file passes `upload_guard` first (type from its bytes, size cap, name cleaned);\na refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.\n\nB.3: when the account has used its free storage (shared by all its organizations) and no card keeps it going, the\nanswer is 402 `storage-limit-reached`.\n\n**Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log, m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read from the file's bytes, and the extension must match it. Executables, scripts, HTML, SVG, XML and macro-enabled Office files are refused. Refusals: 413 `upload-too-large`, 415 `upload-type-not-allowed` / `upload-type-mismatch`, 422 `upload-rejected` (the malware scan).",
         "operationId": "task-attachments.create",
         "requestBody": {
           "required": true,
@@ -21734,6 +23031,7 @@
                   "restrict_to_verified_domains": false,
                   "deleted_item_retention_days": 30,
                   "attachment_retention_days": 30,
+                  "only_admins_create_projects": false,
                   "mfa_not_enrolled": {
                     "admins": 0,
                     "all": 0
@@ -21974,7 +23272,8 @@
                 "idle_timeout_minutes": 15,
                 "restrict_to_verified_domains": false,
                 "deleted_item_retention_days": 1,
-                "attachment_retention_days": 0
+                "attachment_retention_days": 0,
+                "only_admins_create_projects": false
               }
             }
           }
@@ -22001,6 +23300,7 @@
                   "restrict_to_verified_domains": false,
                   "deleted_item_retention_days": 30,
                   "attachment_retention_days": 30,
+                  "only_admins_create_projects": false,
                   "mfa_not_enrolled": {
                     "admins": 0,
                     "all": 0
@@ -31247,7 +32547,7 @@
           "sprints"
         ],
         "summary": "Create a sprint in a project",
-        "description": "Create a sprint in the project.\n\n- **Who:** the project's owners and editors, or an org owner / admin.\n- Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives the weeks.\n- `position` omitted places it after the project's last sprint.\n- 409 on a name already used by a live sprint of the project (case-insensitive).",
+        "description": "Create a sprint in the project.\n\n- **Who:** the project's owners and members, or an org owner / admin.\n- Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives the weeks.\n- `position` omitted places it after the project's last sprint.\n- 409 on a name already used by a live sprint of the project (case-insensitive).",
         "operationId": "sprints.create",
         "requestBody": {
           "required": true,
@@ -32051,7 +33351,7 @@
           "sprints"
         ],
         "summary": "Update a sprint (name, dates, status, position, project)",
-        "description": "A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status` (`active` / `completed`), `position`, or `project_id` to move it.\n\n- **Who:** the project's owners and editors, or an org owner / admin; a move needs that in the target project too.\n- Completing a sprint records who and when and does nothing to its tasks.\n- **Moving:** only a sprint that holds no task moves to another project of the organization (409 `sprint-not-empty` otherwise).\n- **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.",
+        "description": "A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status` (`active` / `completed`), `position`, or `project_id` to move it.\n\n- **Who:** the project's owners and members, or an org owner / admin; a move needs that in the target project too.\n- Completing a sprint records who and when and does nothing to its tasks.\n- **Moving:** only a sprint that holds no task moves to another project of the organization (409 `sprint-not-empty` otherwise).\n- **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.",
         "operationId": "sprints.update",
         "parameters": [
           {
@@ -37909,7 +39209,7 @@
           "milestones"
         ],
         "summary": "Update / close a milestone (PUT; partial)",
-        "description": "**Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for older clients.\n\nA partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
+        "description": "**Use PATCH** (JSON merge-patch, the documented verb). PUT is the same partial update, kept for older clients.\n\nA partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
         "operationId": "milestones.replace",
         "parameters": [
           {
@@ -38164,7 +39464,7 @@
           "milestones"
         ],
         "summary": "Update / close a milestone (JSON merge-patch)",
-        "description": "A partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
+        "description": "A partial update: fields you leave out are unchanged.\n\n- **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone (anything else is a 403).\n- `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them. Neither touches its tasks.\n- **Errors:** 409 on a title already live in the project, 422 on a null `target_date` or an owner who cannot read the project.",
         "operationId": "milestones.update",
         "parameters": [
           {
@@ -41321,7 +42621,7 @@
           "views"
         ],
         "summary": "Save a view of the task list or the projects list (`resource`)",
-        "description": "Save a view.\n\n- `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.\n- `query` is checked by that list's own rules: an unknown key or value is the same 400 the list gives.\n- Scopes: `user` (anyone in the organization) or `project` (project owners and editors; task views only).\n- A name is unique among a scope's views of the same resource (409 otherwise).",
+        "description": "Save a view.\n\n- `resource` picks the list: `task` (default) stores `GET /v1/tasks` parameters; `project` stores `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.\n- `query` is checked by that list's own rules: an unknown key or value is the same 400 the list gives.\n- Scopes: `user` (anyone in the organization) or `project` (project owners and members; task views only).\n- A name is unique among a scope's views of the same resource (409 otherwise).",
         "operationId": "views.create",
         "requestBody": {
           "required": true,
@@ -51838,6 +53138,12 @@
             "description": "S.13: days a deleted attachment's file is kept in storage before it is removed",
             "default": 30
           },
+          "only_admins_create_projects": {
+            "type": "boolean",
+            "title": "Only Admins Create Projects",
+            "description": "Release 10: only org owners and admins create projects",
+            "default": false
+          },
           "mfa_not_enrolled": {
             "anyOf": [
               {
@@ -52054,6 +53360,18 @@
             ],
             "title": "Attachment Retention Days",
             "description": "S.13: days a deleted attachment's file is kept before it is removed from storage (default 30; 0 = at the next purge run). Owners only"
+          },
+          "only_admins_create_projects": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Only Admins Create Projects",
+            "description": "Release 10: only org owners and admins create projects (default false: any member who is not a guest)"
           }
         },
         "additionalProperties": false,
@@ -53007,7 +54325,7 @@
               }
             ],
             "title": "Parent Project Id",
-            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
+            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
           },
           "project_id": {
             "type": "string",
@@ -53382,7 +54700,7 @@
               }
             ],
             "title": "Parent Project Id",
-            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
+            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
           },
           "owner_designation": {
             "anyOf": [
@@ -53493,6 +54811,49 @@
         ],
         "title": "ProjectGoalsOut",
         "description": "`GET /v1/projects/{project_id}/goals`: the project's live goals by position, plus project-level sums that count only the tasks filed under its goals."
+      },
+      "ProjectImplicitMember": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "project_role": {
+            "type": "string",
+            "title": "Project Role",
+            "description": "Always owner",
+            "default": "owner"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "org_owner | org_admin"
+          },
+          "removable": {
+            "type": "boolean",
+            "title": "Removable",
+            "description": "Always false: their access is their org role",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "source"
+        ],
+        "title": "ProjectImplicitMember",
+        "description": "Release 10 (ROLES.md): an org owner / admin, an owner of every project of the organization without being added."
       },
       "ProjectInDB": {
         "properties": {
@@ -53691,7 +55052,7 @@
               }
             ],
             "title": "Parent Project Id",
-            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
+            "description": "The parent project (N.3): a top-level project of the same organization on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a parent (422). null = top-level."
           },
           "project_id": {
             "type": "string",
@@ -53703,11 +55064,18 @@
             "description": "The project's place in the organization's drag order (Planning's tree, the Projects page). Lists sort by position, then name.",
             "default": 0
           },
+          "members_can_add_people": {
+            "type": "boolean",
+            "title": "Members Can Add People",
+            "description": "\"Members can add people\": when true, the project's members may add and remove people and change their roles. Set by the project owner or an org admin.",
+            "default": false
+          },
           "editors_can_add_members": {
             "type": "boolean",
             "title": "Editors Can Add Members",
-            "description": "When true, project editors may add and remove members and change their roles. Set by the project owner or an org admin.",
-            "default": false
+            "description": "Deprecated: the old name of `members_can_add_people` (same value), kept until the next release.",
+            "default": false,
+            "deprecated": true
           },
           "leads": {
             "items": {
@@ -53724,6 +55092,14 @@
             "type": "array",
             "title": "Managers",
             "description": "The project's managers (there can be several; a label, no extra access); optional, usually empty."
+          },
+          "implicit_members": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectImplicitMember"
+            },
+            "type": "array",
+            "title": "Implicit Members",
+            "description": "Release 10: the organization's owners and admins - owners of this project through their org role (not added, not removable here). Set on the single project read"
           },
           "created_at": {
             "anyOf": [
@@ -53901,6 +55277,28 @@
         "title": "ProjectManagerOut",
         "description": "One manager of a project: who, who set them, and when. A label only - it grants no extra access."
       },
+      "ProjectMemberBatchItem": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "User Id",
+            "description": "The person (a user id): a member or guest of the project's organization"
+          },
+          "project_role": {
+            "$ref": "#/components/schemas/ProjectRoleEnum",
+            "description": "owner, member or viewer (`editor` is accepted as member for one release)"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "user_id",
+          "project_role"
+        ],
+        "title": "ProjectMemberBatchItem",
+        "description": "Part of `ProjectMembersBatchAdd`."
+      },
       "ProjectMemberCreate": {
         "properties": {
           "project_id": {
@@ -53983,7 +55381,7 @@
               }
             ],
             "description": "The member's role on the project; derived from `role` when omitted.",
-            "example": "editor"
+            "example": "member"
           },
           "created_by": {
             "anyOf": [
@@ -54163,7 +55561,7 @@
               }
             ],
             "description": "The member's role on the project; derived from `role` when omitted.",
-            "example": "editor"
+            "example": "member"
           },
           "created_by": {
             "anyOf": [
@@ -54253,6 +55651,23 @@
             ],
             "title": "Delete Reason",
             "description": "Reason for deletion"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "member",
+              "org_owner",
+              "org_admin"
+            ],
+            "title": "Source",
+            "description": "`member`: added to the project. `org_owner` / `org_admin`: an owner of every project of the organization through their org role (`project_role` owner; not added, so not removable here)",
+            "default": "member"
+          },
+          "removable": {
+            "type": "boolean",
+            "title": "Removable",
+            "description": "False for an org owner or admin shown through their org role: nothing to remove",
+            "default": true
           }
         },
         "type": "object",
@@ -54262,6 +55677,27 @@
         ],
         "title": "ProjectMemberInDB",
         "description": "Returned by `project-members.create`, `project-members.read`, `project-members.replace` and `project-members.update`."
+      },
+      "ProjectMemberSkipped": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "reason": {
+            "type": "string",
+            "const": "already_member",
+            "title": "Reason",
+            "description": "Why the person was not added"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "reason"
+        ],
+        "title": "ProjectMemberSkipped",
+        "description": "Part of `ProjectMembersBatchAdded`."
       },
       "ProjectMemberUpdate": {
         "properties": {
@@ -54317,7 +55753,7 @@
               }
             ],
             "description": "The member's role on the project; derived from `role` when omitted.",
-            "example": "editor"
+            "example": "member"
           },
           "is_active": {
             "anyOf": [
@@ -54337,6 +55773,52 @@
         "type": "object",
         "title": "ProjectMemberUpdate",
         "description": "The body of a project-member update. Every field is optional and omitted fields are left unchanged; `user_id` and `project_id` come from the path and need not be repeated."
+      },
+      "ProjectMembersBatchAdd": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberBatchItem"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Members"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "members"
+        ],
+        "title": "ProjectMembersBatchAdd",
+        "description": "Release 10 step 8: add several people to a project at once, each with their own role (up to 50)."
+      },
+      "ProjectMembersBatchAdded": {
+        "properties": {
+          "added": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberInDB"
+            },
+            "type": "array",
+            "title": "Added",
+            "description": "The memberships created, in the order asked"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberSkipped"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "description": "People already in the project (left as they are)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "added"
+        ],
+        "title": "ProjectMembersBatchAdded",
+        "description": "Returned by `project-members.create_batch`."
       },
       "ProjectMilestonesGroup": {
         "properties": {
@@ -54857,11 +56339,11 @@
         "type": "string",
         "enum": [
           "owner",
-          "editor",
+          "member",
           "viewer"
         ],
         "title": "ProjectRoleEnum",
-        "description": "A member's role on a project: `owner`, `editor` or `viewer`."
+        "description": "A member's role on a project: `owner`, `member` or `viewer` (`editor`, the old name of `member`, is accepted on input until the next release)."
       },
       "ProjectStatsInDB": {
         "properties": {
@@ -55084,6 +56566,18 @@
               }
             ]
           },
+          "members_can_add_people": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Members Can Add People",
+            "description": "\"Members can add people\": the project's members may add and remove people. The project owner or an org admin only."
+          },
           "editors_can_add_members": {
             "anyOf": [
               {
@@ -55093,7 +56587,9 @@
                 "type": "null"
               }
             ],
-            "title": "Editors Can Add Members"
+            "title": "Editors Can Add Members",
+            "description": "Deprecated: the old name of `members_can_add_people`.",
+            "deprecated": true
           },
           "position": {
             "anyOf": [
@@ -55693,7 +57189,7 @@
           "role": {
             "type": "string",
             "title": "Role",
-            "description": "`owner`, `editor` or `viewer`"
+            "description": "`owner`, `member` or `viewer`"
           }
         },
         "type": "object",
@@ -58875,7 +60371,7 @@
           "can_delete": {
             "type": "boolean",
             "title": "Can Delete",
-            "description": "Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor, its creator, its assignee, or the person behind the access token that created it. Response only.",
+            "description": "Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or member, its creator, its assignee, or the person behind the access token that created it. Response only.",
             "default": false
           },
           "parent_task_id": {
@@ -60202,7 +61698,34 @@
               }
             ],
             "title": "Can Delete",
-            "description": "Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor, its creator, its assignee, or the person behind the access token that created it. Response only."
+            "description": "Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or member, its creator, its assignee, or the person behind the access token that created it. Response only."
+          },
+          "subscriber_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscriber Ids",
+            "description": "The user ids subscribed to this task: they get its assignment, comment and status emails. Set on single-task reads. Response only."
+          },
+          "is_subscribed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Subscribed",
+            "description": "Whether the caller is subscribed to this task. Set on single-task reads. Response only."
           },
           "parent_task_id": {
             "anyOf": [
@@ -60404,6 +61927,134 @@
         ],
         "title": "TaskStatusEnum",
         "description": "A task's status. `backlog` comes first wherever statuses are ordered (filters, grouping and the `status` sort); otherwise it is an ordinary status, accepted everywhere."
+      },
+      "TaskSubscriber": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "The subscriber (`users.id`)."
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username",
+            "description": "Their username."
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name",
+            "description": "The name people know them by, when set."
+          },
+          "added_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By",
+            "description": "Who subscribed them (`users.id`); null for the automatic creator / assignee subscription."
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "When they were subscribed."
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "TaskSubscriber",
+        "description": "Part of `TaskSubscribers`."
+      },
+      "TaskSubscribers": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id",
+            "example": "T600616"
+          },
+          "subscribers": {
+            "items": {
+              "$ref": "#/components/schemas/TaskSubscriber"
+            },
+            "type": "array",
+            "title": "Subscribers",
+            "description": "Oldest first."
+          },
+          "subscriber_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Subscriber Ids",
+            "description": "The same people, as user ids."
+          },
+          "is_subscribed": {
+            "type": "boolean",
+            "title": "Is Subscribed",
+            "description": "Whether the caller is one of them."
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "subscribers",
+          "subscriber_ids",
+          "is_subscribed"
+        ],
+        "title": "TaskSubscribers",
+        "description": "Returned by `tasks.list_subscribers`, `tasks.set_subscribers`, `tasks.subscribe` and `tasks.unsubscribe`."
+      },
+      "TaskSubscribersSet": {
+        "properties": {
+          "user_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "User Ids",
+            "description": "Up to 100 user ids.",
+            "examples": [
+              [
+                "6f1c0d2e-5b7a-4c3e-9a10-2b8f4d6e7a91"
+              ]
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "user_ids"
+        ],
+        "title": "TaskSubscribersSet",
+        "description": "The FULL list (`PUT`): whoever is left out is unsubscribed. Each new person must be able to see the task."
       },
       "TaskTypeEnum": {
         "type": "string",
@@ -73022,7 +74673,7 @@
       "statuses": [
         402
       ],
-      "description": "The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work."
+      "description": "The account has used its free storage (shared by its organizations) and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where the account owner adds a card) are in the body. Reads, downloads and deletes still work."
     },
     {
       "type": "urn:taskadence:problem:sprint-project-mismatch",

@@ -44,7 +44,9 @@ class ProjectUpdate:
         owner (None | str | Unset):
         members (list[str] | None | Unset):
         visibility (None | ProjectVisibilityEnum | Unset):
-        editors_can_add_members (bool | None | Unset):
+        members_can_add_people (bool | None | Unset): "Members can add people": the project's members may add and remove
+            people. The project owner or an org admin only.
+        editors_can_add_members (bool | None | Unset): Deprecated: the old name of `members_can_add_people`.
         position (int | None | Unset): The project's place in the organization's drag order; an org owner / admin only
             (403 otherwise)
         parent_project_id (None | str | Unset):
@@ -63,6 +65,7 @@ class ProjectUpdate:
     owner: None | str | Unset = UNSET
     members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
+    members_can_add_people: bool | None | Unset = UNSET
     editors_can_add_members: bool | None | Unset = UNSET
     position: int | None | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
@@ -157,6 +160,12 @@ class ProjectUpdate:
         else:
             visibility = self.visibility
 
+        members_can_add_people: bool | None | Unset
+        if isinstance(self.members_can_add_people, Unset):
+            members_can_add_people = UNSET
+        else:
+            members_can_add_people = self.members_can_add_people
+
         editors_can_add_members: bool | None | Unset
         if isinstance(self.editors_can_add_members, Unset):
             editors_can_add_members = UNSET
@@ -218,6 +227,8 @@ class ProjectUpdate:
             field_dict["members"] = members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
+        if members_can_add_people is not UNSET:
+            field_dict["members_can_add_people"] = members_can_add_people
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
         if position is not UNSET:
@@ -393,6 +404,15 @@ class ProjectUpdate:
 
         visibility = _parse_visibility(d.pop("visibility", UNSET))
 
+        def _parse_members_can_add_people(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        members_can_add_people = _parse_members_can_add_people(d.pop("members_can_add_people", UNSET))
+
         def _parse_editors_can_add_members(data: object) -> bool | None | Unset:
             if data is None:
                 return data
@@ -465,6 +485,7 @@ class ProjectUpdate:
             owner=owner,
             members=members,
             visibility=visibility,
+            members_can_add_people=members_can_add_people,
             editors_can_add_members=editors_can_add_members,
             position=position,
             parent_project_id=parent_project_id,

@@ -184,13 +184,19 @@ from .project_create import ProjectCreate
 from .project_create_metadata_type_0 import ProjectCreateMetadataType0
 from .project_deleted import ProjectDeleted
 from .project_goals_out import ProjectGoalsOut
+from .project_implicit_member import ProjectImplicitMember
 from .project_in_db import ProjectInDB
 from .project_in_db_metadata_type_0 import ProjectInDBMetadataType0
 from .project_lead_out import ProjectLeadOut
 from .project_manager_out import ProjectManagerOut
+from .project_member_batch_item import ProjectMemberBatchItem
 from .project_member_create import ProjectMemberCreate
 from .project_member_in_db import ProjectMemberInDB
+from .project_member_in_db_source import ProjectMemberInDBSource
+from .project_member_skipped import ProjectMemberSkipped
 from .project_member_update import ProjectMemberUpdate
+from .project_members_batch_add import ProjectMembersBatchAdd
+from .project_members_batch_added import ProjectMembersBatchAdded
 from .project_milestones_group import ProjectMilestonesGroup
 from .project_milestones_out import ProjectMilestonesOut
 from .project_order import ProjectOrder
@@ -204,6 +210,7 @@ from .project_status_enum import ProjectStatusEnum
 from .project_update import ProjectUpdate
 from .project_update_metadata_type_0 import ProjectUpdateMetadataType0
 from .project_visibility_enum import ProjectVisibilityEnum
+from .projects_list_scope_type_0 import ProjectsListScopeType0
 from .projects_reordered import ProjectsReordered
 from .protected_resource_metadata import ProtectedResourceMetadata
 from .registration_error_body import RegistrationErrorBody
@@ -278,6 +285,9 @@ from .task_review_decision import TaskReviewDecision
 from .task_review_decision_decision import TaskReviewDecisionDecision
 from .task_sprint_set import TaskSprintSet
 from .task_status_enum import TaskStatusEnum
+from .task_subscriber import TaskSubscriber
+from .task_subscribers import TaskSubscribers
+from .task_subscribers_set import TaskSubscribersSet
 from .task_type_enum import TaskTypeEnum
 from .task_update import TaskUpdate
 from .task_update_metadata_type_0_item import TaskUpdateMetadataType0Item
@@ -522,12 +532,18 @@ __all__ = (
     "ProjectCreateMetadataType0",
     "ProjectDeleted",
     "ProjectGoalsOut",
+    "ProjectImplicitMember",
     "ProjectInDB",
     "ProjectInDBMetadataType0",
     "ProjectLeadOut",
     "ProjectManagerOut",
+    "ProjectMemberBatchItem",
     "ProjectMemberCreate",
     "ProjectMemberInDB",
+    "ProjectMemberInDBSource",
+    "ProjectMembersBatchAdd",
+    "ProjectMembersBatchAdded",
+    "ProjectMemberSkipped",
     "ProjectMemberUpdate",
     "ProjectMilestonesGroup",
     "ProjectMilestonesOut",
@@ -537,6 +553,7 @@ __all__ = (
     "ProjectResourceInDB",
     "ProjectResourceUpdate",
     "ProjectRoleEnum",
+    "ProjectsListScopeType0",
     "ProjectsReordered",
     "ProjectStatsInDB",
     "ProjectStatusEnum",
@@ -616,6 +633,9 @@ __all__ = (
     "TaskReviewDecisionDecision",
     "TaskSprintSet",
     "TaskStatusEnum",
+    "TaskSubscriber",
+    "TaskSubscribers",
+    "TaskSubscribersSet",
     "TaskTypeEnum",
     "TaskUpdate",
     "TaskUpdateMetadataType0Item",

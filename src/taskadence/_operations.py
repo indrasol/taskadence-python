@@ -76,6 +76,7 @@ from ._generated.api.organizations import organizations_storage_files as _organi
 from ._generated.api.organizations import organizations_storage_projects as _organizations_storage_projects
 from ._generated.api.organizations import organizations_update_settings as _organizations_update_settings
 from ._generated.api.project_members import project_members_create as _project_members_create
+from ._generated.api.project_members import project_members_create_batch as _project_members_create_batch
 from ._generated.api.project_members import project_members_delete as _project_members_delete
 from ._generated.api.project_members import project_members_list as _project_members_list
 from ._generated.api.project_members import project_members_read as _project_members_read
@@ -126,6 +127,7 @@ from ._generated.api.tasks import tasks_create_batch as _tasks_create_batch
 from ._generated.api.tasks import tasks_delete as _tasks_delete
 from ._generated.api.tasks import tasks_list as _tasks_list
 from ._generated.api.tasks import tasks_list_dependents as _tasks_list_dependents
+from ._generated.api.tasks import tasks_list_subscribers as _tasks_list_subscribers
 from ._generated.api.tasks import tasks_read as _tasks_read
 from ._generated.api.tasks import tasks_remove_dependency as _tasks_remove_dependency
 from ._generated.api.tasks import tasks_remove_subtask as _tasks_remove_subtask
@@ -135,6 +137,9 @@ from ._generated.api.tasks import tasks_review as _tasks_review
 from ._generated.api.tasks import tasks_set_milestone as _tasks_set_milestone
 from ._generated.api.tasks import tasks_set_project as _tasks_set_project
 from ._generated.api.tasks import tasks_set_sprint as _tasks_set_sprint
+from ._generated.api.tasks import tasks_set_subscribers as _tasks_set_subscribers
+from ._generated.api.tasks import tasks_subscribe as _tasks_subscribe
+from ._generated.api.tasks import tasks_unsubscribe as _tasks_unsubscribe
 from ._generated.api.tasks import tasks_update as _tasks_update
 from ._generated.api.tasks import tasks_update_batch as _tasks_update_batch
 from ._generated.api.tokens import tokens_create as _tokens_create
@@ -247,7 +252,7 @@ OPERATIONS: dict[str, Operation] = {
         method="GET",
         path="/v1/projects/{org_id}",
         path_params=("org_id",),
-        query=("show_all", "limit", "cursor", "sort_by", "sort_order"),
+        query=("show_all", "scope", "limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_projects_list._parse_response,
         item=ProjectCard.from_dict,
@@ -295,6 +300,16 @@ OPERATIONS: dict[str, Operation] = {
         parse=_projects_delete._parse_response,
         scopes=("projects:write",),
         summary="Delete (archive) a project",
+    ),
+    "project-members.create_batch": Operation(
+        op_id="project-members.create_batch",
+        method="POST",
+        path="/v1/projects/{project_id}/members/batch",
+        path_params=("project_id",),
+        body="json",
+        parse=_project_members_create_batch._parse_response,
+        scopes=("projects:write",),
+        summary="Add several members to a project",
     ),
     "tasks.create": Operation(
         op_id="tasks.create",
@@ -507,6 +522,44 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_remove_dependency._parse_response,
         scopes=("tasks:write",),
         summary="Remove a dependency",
+    ),
+    "tasks.list_subscribers": Operation(
+        op_id="tasks.list_subscribers",
+        method="GET",
+        path="/v1/tasks/{task_id}/subscribers",
+        path_params=("task_id",),
+        if_none_match=True,
+        parse=_tasks_list_subscribers._parse_response,
+        scopes=("tasks:read",),
+        summary="List a task's subscribers",
+    ),
+    "tasks.set_subscribers": Operation(
+        op_id="tasks.set_subscribers",
+        method="PUT",
+        path="/v1/tasks/{task_id}/subscribers",
+        path_params=("task_id",),
+        body="json",
+        parse=_tasks_set_subscribers._parse_response,
+        scopes=("tasks:write",),
+        summary="Set a task's subscribers",
+    ),
+    "tasks.subscribe": Operation(
+        op_id="tasks.subscribe",
+        method="POST",
+        path="/v1/tasks/{task_id}/subscribers/me",
+        path_params=("task_id",),
+        parse=_tasks_subscribe._parse_response,
+        scopes=("tasks:write",),
+        summary="Subscribe yourself to a task",
+    ),
+    "tasks.unsubscribe": Operation(
+        op_id="tasks.unsubscribe",
+        method="DELETE",
+        path="/v1/tasks/{task_id}/subscribers/me",
+        path_params=("task_id",),
+        parse=_tasks_unsubscribe._parse_response,
+        scopes=("tasks:write",),
+        summary="Unsubscribe yourself from a task",
     ),
     "organization-members.list": Operation(
         op_id="organization-members.list",

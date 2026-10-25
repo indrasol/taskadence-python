@@ -139,6 +139,14 @@ class _Request:
 # ---------------------------------------------------------------------------
 
 
+def _list_body(name: str, items: Sequence[Any]) -> dict[str, list[Any]]:
+    """`{name: [...]}` for an operation whose body is one array (`scripts/generate.py` LIST_BODIES). A bare string or
+    mapping is refused: `set_subscribers(task_id, "U1")` would otherwise send one subscriber per character."""
+    if isinstance(items, (str, bytes, Mapping)):
+        raise TypeError(f"{name} must be a list, not {type(items).__name__}")
+    return {name: list(items)}
+
+
 def _json_default(value: Any) -> Any:
     if hasattr(value, "to_dict"):
         return value.to_dict()

@@ -132,9 +132,9 @@ def sync_detailed(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
-    B.3: when the organization has used its included storage and has no payment method on file, the
-    answer is 402
-    `storage-limit-reached`.
+    B.3: when the account has used its free storage (shared by all its organizations) and no card keeps
+    it going, the
+    answer is 402 `storage-limit-reached`.
 
     **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
     m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
@@ -177,9 +177,9 @@ def sync(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
-    B.3: when the organization has used its included storage and has no payment method on file, the
-    answer is 402
-    `storage-limit-reached`.
+    B.3: when the account has used its free storage (shared by all its organizations) and no card keeps
+    it going, the
+    answer is 402 `storage-limit-reached`.
 
     **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
     m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
@@ -217,9 +217,9 @@ async def asyncio_detailed(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
-    B.3: when the organization has used its included storage and has no payment method on file, the
-    answer is 402
-    `storage-limit-reached`.
+    B.3: when the account has used its free storage (shared by all its organizations) and no card keeps
+    it going, the
+    answer is 402 `storage-limit-reached`.
 
     **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
     m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read
@@ -260,9 +260,9 @@ async def asyncio(
     name cleaned);
     a refusal is a 413 / 415 / 422 problem and an `upload.rejected` event on the task.
 
-    B.3: when the organization has used its included storage and has no payment method on file, the
-    answer is 402
-    `storage-limit-reached`.
+    B.3: when the account has used its free storage (shared by all its organizations) and no card keeps
+    it going, the
+    answer is 402 `storage-limit-reached`.
 
     **Upload limits:** up to 100 MB (100,000,000 bytes). Allowed: csv, docx, gif, heic, jpg, json, log,
     m4a, md, mov, mp3, mp4, ods, odt, pdf, png, pptx, txt, wav, webm, webp, xlsx, zip. The type is read

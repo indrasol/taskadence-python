@@ -23,7 +23,7 @@ class ReviewProject:
 
     Attributes:
         project_id (str):
-        role (str): `owner`, `editor` or `viewer`
+        role (str): `owner`, `member` or `viewer`
         name (None | str | Unset):
     """
 

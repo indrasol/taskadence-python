@@ -10,10 +10,10 @@ entries below were pre-releases with no compatibility promise.
 ## [2.0.0] - 2026-10-24
 
 Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
-to an account (one per email) that shares one storage pool. Re-generated from the API contract at `taskadence-api`
-`b403694` (branch `feature/ia-redesign`); the API version is now `2026-10-24` (was `2026-09-25`), so every request sends
-`TasKadence-Version: 2026-10-24`. A major version because methods, models and fields are removed (the 1.0 promise: a
-breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
+to an account (one per email) that shares one storage pool, and the project roles are owner, member and viewer.
+Re-generated from the API contract at `taskadence-api` `e124d44` (branch `feature/ia-redesign`); the API version is
+now `2026-10-24` (was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because
+methods, models and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
 answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
 change only their shared version.
 
@@ -37,6 +37,8 @@ change only their shared version.
 - **Webhooks:** `team.created`, `team.updated`, `team.deleted`, `team.member_added`, `team.member_removed`,
   `team.member_role_changed`, `team.leads_changed`, `team.managers_changed`, `project.team_linked`,
   `project.team_unlinked`.
+- **Project role `editor`:** `ProjectRoleEnum` is `owner | member | viewer` (was `owner | editor | viewer`); see
+  Changed.
 - The `teams:read` / `teams:write` scopes are retired by the API (a token that carries them keeps working; the scope
   is ignored). The SDK had no scope helper naming them.
 
@@ -56,6 +58,18 @@ change only their shared version.
   `account_quota_bytes`, `account_percent` and `exempt_message`; `included_bytes`, `overage_bytes` and `status` are
   the account's, and `percent` is the organization's share of the account's free storage.
 - `tm storage` (the CLI) prints the account's totals and the exempt message.
+- **Project roles are `owner`, `member` and `viewer`.** `editor` is now `member` (`ProjectMemberCreate`,
+  `ProjectMemberUpdate`, `ProjectMemberInDB`, `ReviewProject.role`); the SDK sends `member`. For one release the API
+  still accepts `editor` on input and always answers `member`, so a 1.x caller that sends `editor` keeps working.
+- `ProjectInDB.members_can_add_people` (set with `ProjectUpdate`, by the project owner or an org admin): when true,
+  the project's members may add and remove people and change their roles. `editors_can_add_members` is its
+  deprecated old name (the same value, still answered; the API drops it in the next release).
+- **Org owners and admins are owners of every project** of their organization without being added. Project member
+  lists include them: `ProjectMemberInDB.source` is `member` (added to the project), `org_owner` or `org_admin`, and
+  `removable` is False for the last two.
+- **Ids grow past 6 digits.** The API widens a prefix's ids by itself as they fill up (`T1234567`, up to 12 digits).
+  The SDK never checked an id's shape; it now has tests that ids of 6 to 12 digits pass through paths, models and
+  webhook events unchanged. Do not assume six digits in your own code.
 
 ### Added
 - `tm.projects.sprints(project_id)`: a project's sprints (the same call as `tm.sprints.list`).
@@ -92,6 +106,27 @@ change only their shared version.
   instead (or None), `.changelog` links the docs changelog, and the message ends with that link. A 410 is never
   retried.
 - Not in the SDK: support tickets (internal routes) and the MCP tool `contact_support`.
+- **Batch members.** `tm.projects.members.add_many(project_id, [{"user_id", "project_role"}, ...])` (also
+  `tm.project_members.create_batch`; `POST /v1/projects/{project_id}/members/batch`, scope `projects:write`): up to 50
+  people, each with their own role, all or nothing. Returns `ProjectMembersBatchAdded`: `added` (the
+  `ProjectMemberInDB` rows, in the order asked) and `skipped` (`ProjectMemberSkipped`: `user_id`, `reason`
+  `already_member`). Models `ProjectMembersBatchAdd`, `ProjectMemberBatchItem`.
+- **Task subscribers** get a task's assignment, comment and status emails (its creator and assignee are subscribed
+  automatically). `tm.tasks.subscribers(task_id)` (also `list_subscribers`; scope `tasks:read`),
+  `tm.tasks.set_subscribers(task_id, user_ids)` (the FULL list, up to 100), `tm.tasks.subscribe(task_id)` and
+  `tm.tasks.unsubscribe(task_id)` (yourself; `tasks:write`); each returns `TaskSubscribers` (`subscribers`
+  (`TaskSubscriber`), `subscriber_ids`, `is_subscribed`). `TaskInDB.subscriber_ids` and `is_subscribed` are set on
+  single-task reads.
+- `ProjectInDB.implicit_members` (`ProjectImplicitMember`: `user_id`, `username`, `project_role` owner, `source`
+  `org_owner` / `org_admin`, `removable` False): the organization's owners and admins, on the single-project read.
+- `tm.projects.list(org_id, scope="all" | "mine")`: `mine` is the projects you are in (every project for an org owner
+  or admin), `all` (the default) every project you can read; the same as `show_all=False` / `True`.
+- `OrganizationSettingsOut.only_admins_create_projects` (and on `OrganizationSettingsUpdate`): when true, only org
+  owners and admins create projects.
+- The generator: a body that is one array is taken as that array (`set_subscribers(task_id, user_ids)`,
+  `add_many(project_id, members)`; a bare string or mapping is a `TypeError`), and a resource can carry a nested
+  namespace (`tm.projects.members`).
+- The README has Project members and roles and Task subscribers sections.
 - `ProjectUpdate.position`: a project's place in the organization's order (owners and admins); `ProjectInDB.position`
   (the single-project read, `tm.projects.read`). `ProjectCard.position` is unchanged.
 - Sub-projects (N.3, not released before): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry
@@ -113,6 +148,8 @@ change only their shared version.
 - `tm.sprints.update(team_id, sprint_id, body)` → `tm.sprints.update(sprint_id, body)`; the same for `delete`.
 - `team_members=` on a project → `members=`; `storage.billing_exempt` → `storage.exempt_message is not None`.
 - `except NotFoundError` around a removed route → `except RemovedInRelease10Error` (a 410 now, not a 404).
+- `project_role="editor"` → `"member"` (and compare answers against `"member"`); `editors_can_add_members` →
+  `members_can_add_people`.
 
 ## [1.0.0] - 2026-10-08
 

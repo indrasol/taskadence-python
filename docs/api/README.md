@@ -9,11 +9,11 @@ Every operation is `tm.<resource>.<method>(…)` on `Taskadence` (and `await` on
 | [`tm.health`](health.md) | 1 | Liveness. |
 | [`tm.organizations`](organizations.md) | 8 | Organizations you belong to, and their settings. |
 | [`tm.projects`](projects.md) | 7 | Projects: create, read, update, delete, reorder. |
-| [`tm.tasks`](tasks.md) | 18 | Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links. |
+| [`tm.project_members`](project-members.md) | 7 | The members of a project and their roles. |
+| [`tm.tasks`](tasks.md) | 22 | Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links. |
 | [`tm.organization_members`](organization-members.md) | 5 | The members of an organization and their roles. |
 | [`tm.organization_invites`](organization-invites.md) | 7 | Invitations into an organization. |
 | [`tm.designations`](designations.md) | 7 | Job designations (global and per-organization). |
-| [`tm.project_members`](project-members.md) | 6 | The members of a project and their roles. |
 | [`tm.project_resources`](project-resources.md) | 6 | Links and files attached to a project. |
 | [`tm.task_attachments`](task-attachments.md) | 5 | Files attached to a task. |
 | [`tm.uploads`](uploads.md) | 2 | Direct uploads: ask for a URL, PUT the file straight to storage, then finish. The standard way to upload a file, and the only one that is practical at 100 MB. The multipart routes under `task-attachments` and `project-resources` still work for clients that cannot PUT. |
