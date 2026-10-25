@@ -4,8 +4,8 @@
 [![Node.js 20 or later](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/indrasol/taskadence-python/blob/main/LICENSE)
 
-[TasKadence](https://taskadence.com) is task and project management for teams. `@taskadence/mcp` lets an AI assistant
-(Claude Desktop, Claude Code, Cursor, VS Code and others) read and update your TasKadence tasks, projects and teams,
+[TasKadence](https://taskadence.com) is task and project management. `@taskadence/mcp` lets an AI assistant
+(Claude Desktop, Claude Code, Cursor, VS Code and others) read and update your TasKadence tasks, projects and sprints,
 through the Model Context Protocol (MCP).
 
 **Do I need this, or the URL?** If your assistant can add an MCP server by URL (often called a remote server or a
@@ -16,7 +16,8 @@ a local program (a "stdio" server), or when you want it to use a token you creat
 Its twin on PyPI, `uvx taskadence-mcp`, does exactly the same with Python; pick whichever runtime you have.
 
 > **Stable since 1.0.** Versions follow [semantic versioning](https://semver.org/) and the API's
-> [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within `1.x`.
+> [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within a major version.
+> 2.0 is the version it shares with the `taskadence` SDK; this package itself has no breaking change.
 
 **Documentation:** [docs.taskadence.com](https://docs.taskadence.com/mcp/) ·
 **Source:** [GitHub](https://github.com/indrasol/taskadence-python) · **Issues:** [GitHub issues](https://github.com/indrasol/taskadence-python/issues)
@@ -31,9 +32,9 @@ A token is a password for programs: the assistant uses it to act for you in one 
 
 1. In TasKadence, open **Developers** in the sidebar, stay on the **Tokens** tab and click **Create token**.
 2. Give it a name you will recognise later (for example "Claude Desktop").
-3. Under **Scopes**, tick what the assistant may do. For an assistant that only looks: **Read** on the **Tasks**,
-   **Projects** and **Teams** rows. To let it create and change things too: **Write** on those rows (Write includes
-   Read). The scopes decide which tools the assistant sees.
+3. Under **Scopes**, tick what the assistant may do. For an assistant that only looks: **Read** on the **Tasks** and
+   **Projects** rows. To let it create and change things too: **Write** on those rows (Write includes Read). The
+   scopes decide which tools the assistant sees.
 4. Click **Create token** and copy it (it starts with `tkd_live_`). **It is shown once.**
 
 Shortcut: **Developers > MCP** in TasKadence writes the configuration for your client, with a new token already in it.

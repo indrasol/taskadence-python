@@ -7,20 +7,78 @@ entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
-Re-generated from the API contract at `taskadence-api` `9b7e748` (branch `feat/sub-projects`, API version `2026-09-25`,
-unchanged). Additive only: no operation, schema or webhook removed.
+## [2.0.0] - 2026-10-24
+
+Release 10: sprints belong to projects, and teams, sections and test sprints have left TasKadence. Re-generated from
+the API contract at `taskadence-api` `7aa25c4` (branch `feature/ia-redesign`); the API version is now `2026-10-24`
+(was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because methods, models
+and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes
+in the same release, so 1.x calls to them now answer 404. `taskadence-mcp` and `@taskadence/mcp` have no generated
+code and change only their shared version.
+
+### Removed
+- **Teams:** `tm.teams` (`list`, `create`, `read` / `get`, `update`, `replace`, `delete`, `list_tasks`, `add_member`,
+  `update_member`, `replace_member`, `remove_member`) and the models `TeamCreate`, `TeamUpdate`, `TeamOut`,
+  `TeamDetail`, `TeamDeleted`, `TeamListPage`, `TeamListSummary`, `TeamMemberCreate`, `TeamMemberUpdate`,
+  `TeamMemberOut`, `TeamRoleEnum`, `TeamTagOut`. `tm.view_pins.pin_team` / `unpin_team`.
+- **Sections:** `tm.sections` (`list`, `create`, `update`, `delete`, `reorder`), `tm.tasks.set_section`, and the
+  models `SectionCreate`, `SectionUpdate`, `SectionOut`, `PageSectionOut`, `SectionReorder`, `SectionScopeEnum`,
+  `SectionsForScopes`, `ScopeRef`, `TaskSectionOut`, `TaskSectionSet`.
+- **Test sprints:** the `tracker_id` and `bug_id` fields (the `bug` task type stays; list bugs with
+  `filter={"task_type": "bug"}`).
+- **Fields:** `team_id` on `TaskInDB`, `TaskCreate`, `TaskUpdate`, `TaskCardView`, the `TaskBatch*` models,
+  `ProjectInDB`, `ProjectCard`, `ProjectCreate`, `ProjectUpdate` and `SprintOut`; `section_id` (and
+  `TaskCardView.section_position`) on the task models; `AvailabilityRange.team_id` (now `org_id`) and
+  `AvailabilityMember.team_role` (now `org_role`); `PinOut.logo_url`.
+- **Task list:** the `team` filter key (`filter={"team": ...}` raises `ValueError`) and the `section_scope` argument.
+- **Webhooks:** `team.created`, `team.updated`, `team.deleted`, `team.member_added`, `team.member_removed`,
+  `team.member_role_changed`, `team.leads_changed`, `team.managers_changed`, `project.team_linked`,
+  `project.team_unlinked`.
+- The `teams:read` / `teams:write` scopes are retired by the API (a token that carries them keeps working; the scope
+  is ignored). The SDK had no scope helper naming them.
+
+### Changed
+- **Sprints belong to a project.** `tm.sprints.list(project_id)` and `tm.sprints.create(project_id, body)` (were
+  `team_id`); `tm.sprints.update(sprint_id, body)` is now a PATCH (JSON merge-patch) and `tm.sprints.delete(sprint_id)`
+  takes the sprint id alone (both were `(team_id, sprint_id, ...)`). `SprintOut` has `project_id` and `position`;
+  `SprintCreate` takes `position`; `SprintUpdate` takes `position` (reorder) and `project_id` (move an empty sprint;
+  one holding tasks is a 409 `ConflictError`).
+- **Capacity is organization-wide.** `tm.availability.range` / `create` / `update` / `delete` take `org_id` (were
+  `team_id`): `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE .../availability/{entry_id}`.
+- `tm.tasks.set_sprint(task_id, {"sprint_id": ...})` accepts only a sprint of the task's own project.
 
 ### Added
-- Sub-projects (N.3): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry `parent_project_id`;
-  `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children` (`ProjectChildOut`);
-  `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes `include_children`.
-  Webhooks `project.parent_changed` and `project.children_detached`. Example in the README.
-- From the batch branch since the previous pin: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`,
-  `tm.tasks.reopen`, `tm.view_pins.pin_team` / `unpin_team`, and their models; webhooks `member.admin_grants_changed`,
-  `project.managers_changed`, `project.team_linked`, `project.team_unlinked`, `team.leads_changed`,
-  `team.managers_changed`.
+- `tm.projects.sprints(project_id)`: a project's sprints (the same call as `tm.sprints.list`).
+- `tm.sprints.list_org(org_id=...)`: every sprint you can read in an organization, for Planning (`GET /v1/sprints`).
+- `tm.sprints.read(sprint_id)` (also `get`).
+- `tm.organizations.availability(org_id, from_=, to=)` (the same call as `tm.availability.range`) and
+  `tm.me.set_availability(body)` (`PUT /v1/me/availability`, also `tm.availability.mark_mine`; model
+  `MyAvailabilitySet`).
+- `tm.organizations.workload(org_id, project_id=None)` (also `tm.workload.read`): open work per person, heaviest first.
+  Models `WorkloadOut` (`people`, `totals`, `mean`, `as_of`, `truncated`), `WorkloadPerson` (`open_`, `in_progress`,
+  `blocked`, `not_started`, `overdue`, `due_this_week`, `heavy`, `top`), `WorkloadCounts` and `WorkloadTask`.
+  `open` is a Python builtin, so the generated attribute is `open_` (the JSON key stays `open`).
+- `SprintProjectMismatchError` (also importable as `SprintProjectMismatch`), a `ConflictError`: the 409
+  `urn:taskadence:problem:sprint-project-mismatch` when a task is filed in a sprint of another project.
+  `errors[0]` names both projects.
+- `ProjectUpdate.position`: a project's place in the organization's order (owners and admins). `ProjectCard.position`
+  is unchanged.
+- Sub-projects (N.3, not released before): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry
+  `parent_project_id`; `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children`
+  (`ProjectChildOut`); `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes
+  `include_children`. Webhooks `project.parent_changed` and `project.children_detached`.
+- Also not released before: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`, `tm.tasks.reopen`,
+  and their models; webhooks `member.admin_grants_changed` and `project.managers_changed`.
 - `ProblemType` includes `urn:taskadence:problem:database-unavailable` (503: the database did not answer after
-  retries, nothing was applied; retry after `Retry-After` seconds).
+  retries, nothing was applied; retry after `Retry-After` seconds), `sprint-project-mismatch` and `sprint-not-empty`.
+- The quickstart (`examples/quickstart.py`) creates a project and a sprint, files its task in the sprint, and deletes
+  them at the end; the README has a Sprints, capacity and workload section.
+
+### Migrating from 1.x
+- `tm.teams.*`, `tm.sections.*`: no replacement; group tasks with the list's `sort_by` / filters instead.
+- `tm.sprints.list(team_id)` → `tm.projects.sprints(project_id)`, or `tm.sprints.list_org(org_id=...)` for all.
+- `tm.availability.range(team_id, ...)` → `tm.organizations.availability(org_id, ...)`.
+- `tm.sprints.update(team_id, sprint_id, body)` → `tm.sprints.update(sprint_id, body)`; the same for `delete`.
 
 ## [1.0.0] - 2026-10-08
 

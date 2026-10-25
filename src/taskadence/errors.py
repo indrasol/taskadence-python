@@ -12,7 +12,8 @@
         ├── ForbiddenError (403)          ├── InsufficientScopeError  (.required_scope)
         │                                 └── TestTokenReadOnlyError
         ├── NotFoundError (404)
-        ├── ConflictError (409)           └── IdempotencyKeyInFlightError
+        ├── ConflictError (409)           ├── IdempotencyKeyInFlightError
+        │                                 └── SprintProjectMismatchError  a task joins only a sprint of its project
         ├── PreconditionFailedError (412)
         ├── UnprocessableEntityError (422) ├── ValidationError, IdempotencyKeyReusedError, UrlRefusedError
         │                                 └── InvalidValueError   422 invalid-parameter: also an InvalidParameterError
@@ -204,6 +205,15 @@ class IdempotencyKeyInFlightError(ConflictError):
     """The first request with this `Idempotency-Key` has not finished; retry shortly."""
 
 
+class SprintProjectMismatchError(ConflictError):
+    """A task joins only a sprint of its own project (`tm.tasks.set_sprint`, or a task create / update with a
+    `sprint_id`): the sprint belongs to another project, or the task has none. `errors[0]` names both projects."""
+
+
+SprintProjectMismatch = SprintProjectMismatchError
+"""The name the release 10 notes use; the same class."""
+
+
 class UrlRefusedError(UnprocessableEntityError):
     """A webhook URL the API refuses (not https, credentials, or a private / loopback / metadata address)."""
 
@@ -258,6 +268,7 @@ BY_TYPE: dict[str, type[TaskadenceError]] = {
     URN + "test-token-read-only": TestTokenReadOnlyError,
     URN + "token-policy": TokenPolicyError,
     URN + "url-refused": UrlRefusedError,
+    URN + "sprint-project-mismatch": SprintProjectMismatchError,
 }
 
 BY_STATUS: dict[int, type[TaskadenceError]] = {
