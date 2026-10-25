@@ -19,17 +19,17 @@ T = TypeVar("T", bound="AvailabilityMember")
 
 @_attrs_define
 class AvailabilityMember:
-    """A team member in an availability response - who the entries belong to.
+    """An active member of the organization in an availability response - who the entries belong to.
 
     Attributes:
         user_id (str):
-        team_role (str):
         username (None | str | Unset):
+        org_role (str | Unset): owner · admin · member · guest Default: ''.
     """
 
     user_id: str
-    team_role: str
     username: None | str | Unset = UNSET
+    org_role: str | Unset = ""
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -38,24 +38,25 @@ class AvailabilityMember:
     def to_dict(self) -> dict[str, Any]:
         user_id = self.user_id
 
-        team_role = self.team_role
-
         username: None | str | Unset
         if isinstance(self.username, Unset):
             username = UNSET
         else:
             username = self.username
 
+        org_role = self.org_role
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "user_id": user_id,
-                "team_role": team_role,
             }
         )
         if username is not UNSET:
             field_dict["username"] = username
+        if org_role is not UNSET:
+            field_dict["org_role"] = org_role
 
         return field_dict
 
@@ -63,8 +64,6 @@ class AvailabilityMember:
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         user_id = d.pop("user_id")
-
-        team_role = d.pop("team_role")
 
         def _parse_username(data: object) -> None | str | Unset:
             if data is None:
@@ -75,10 +74,12 @@ class AvailabilityMember:
 
         username = _parse_username(d.pop("username", UNSET))
 
+        org_role = d.pop("org_role", UNSET)
+
         availability_member = cls(
             user_id=user_id,
-            team_role=team_role,
             username=username,
+            org_role=org_role,
         )
 
         availability_member.additional_properties = d

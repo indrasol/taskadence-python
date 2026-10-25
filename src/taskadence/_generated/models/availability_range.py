@@ -23,17 +23,18 @@ T = TypeVar("T", bound="AvailabilityRange")
 
 @_attrs_define
 class AvailabilityRange:
-    """The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in one response.
+    """The organization's active members and every unavailability entry of theirs that intersects `[from, to]`, in one
+    response.
 
-    Attributes:
-        team_id (str):
-        from_ (datetime.date):
-        to (datetime.date):
-        members (list[AvailabilityMember]):
-        entries (list[AvailabilityEntry]):
+        Attributes:
+            org_id (str):
+            from_ (datetime.date):
+            to (datetime.date):
+            members (list[AvailabilityMember]):
+            entries (list[AvailabilityEntry]):
     """
 
-    team_id: str
+    org_id: str
     from_: datetime.date
     to: datetime.date
     members: list[AvailabilityMember]
@@ -47,7 +48,7 @@ class AvailabilityRange:
         from ..models.availability_entry import AvailabilityEntry  # noqa: PLC0415
         from ..models.availability_member import AvailabilityMember  # noqa: PLC0415
 
-        team_id = self.team_id
+        org_id = self.org_id
 
         from_ = self.from_.isoformat()
 
@@ -67,7 +68,7 @@ class AvailabilityRange:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "team_id": team_id,
+                "org_id": org_id,
                 "from": from_,
                 "to": to,
                 "members": members,
@@ -83,7 +84,7 @@ class AvailabilityRange:
         from ..models.availability_member import AvailabilityMember  # noqa: PLC0415
 
         d = dict(src_dict)
-        team_id = d.pop("team_id")
+        org_id = d.pop("org_id")
 
         from_ = datetime.date.fromisoformat(d.pop("from"))
 
@@ -104,7 +105,7 @@ class AvailabilityRange:
             entries.append(entries_item)
 
         availability_range = cls(
-            team_id=team_id,
+            org_id=org_id,
             from_=from_,
             to=to,
             members=members,

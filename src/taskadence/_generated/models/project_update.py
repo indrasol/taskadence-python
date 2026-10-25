@@ -45,7 +45,8 @@ class ProjectUpdate:
         team_members (list[str] | None | Unset):
         visibility (None | ProjectVisibilityEnum | Unset):
         editors_can_add_members (bool | None | Unset):
-        team_id (None | str | Unset):
+        position (int | None | Unset): The project's place in the organization's drag order; an org owner / admin only
+            (403 otherwise)
         parent_project_id (None | str | Unset):
         owner_designation (None | str | Unset):
         team_member_designations (list[TeamMemberDesignation] | None | Unset):
@@ -63,7 +64,7 @@ class ProjectUpdate:
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
     editors_can_add_members: bool | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
+    position: int | None | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
@@ -162,11 +163,11 @@ class ProjectUpdate:
         else:
             editors_can_add_members = self.editors_can_add_members
 
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
+        position: int | None | Unset
+        if isinstance(self.position, Unset):
+            position = UNSET
         else:
-            team_id = self.team_id
+            position = self.position
 
         parent_project_id: None | str | Unset
         if isinstance(self.parent_project_id, Unset):
@@ -219,8 +220,8 @@ class ProjectUpdate:
             field_dict["visibility"] = visibility
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
+        if position is not UNSET:
+            field_dict["position"] = position
         if parent_project_id is not UNSET:
             field_dict["parent_project_id"] = parent_project_id
         if owner_designation is not UNSET:
@@ -401,14 +402,14 @@ class ProjectUpdate:
 
         editors_can_add_members = _parse_editors_can_add_members(d.pop("editors_can_add_members", UNSET))
 
-        def _parse_team_id(data: object) -> None | str | Unset:
+        def _parse_position(data: object) -> int | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(None | str | Unset, data)
+            return cast(int | None | Unset, data)
 
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
+        position = _parse_position(d.pop("position", UNSET))
 
         def _parse_parent_project_id(data: object) -> None | str | Unset:
             if data is None:
@@ -465,7 +466,7 @@ class ProjectUpdate:
             team_members=team_members,
             visibility=visibility,
             editors_can_add_members=editors_can_add_members,
-            team_id=team_id,
+            position=position,
             parent_project_id=parent_project_id,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,

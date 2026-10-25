@@ -6,12 +6,12 @@ snapshot of the public contract the TasKadence API serves at `/openapi.public.js
 
 | | |
 |---|---|
-| Backend repo | `indrasol/taskadence-api`, branch `feat/sub-projects` (cut from `batch/2026-10-post-release8`; NOT yet on `main`) |
-| Backend commit | `9b7e748` - N.3 sub-projects (MCP commit on top of the API commit `c93c5ad`): `parent_project_id` on the project models, `ProjectCard.child_count`, `ProjectInDB.parent` / `children`, `ProjectDeleted`, `include_children` on `GET /v1/tasks`, webhooks `project.parent_changed` / `project.children_detached`. Against the previous pin (`5069093`) it also carries the batch branch's additions: 6 operations (task batch create / update, task dependents, reopen, team view pins) and their schemas, 6 more webhooks, `TaskTypeEnum` + `access`. Nothing removed |
-| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-21, from the feature worktree with **placeholder** production settings (`env -i`; no `.env.production` read: only `BASE_API_URL`, a random `WEBHOOK_SECRET_KEK_TM` and a random `ACCESS_CONNECTOR_KEK_TM`). `servers` unchanged |
-| `info.version` | `2026-09-25` |
-| Size | 118 paths · 182 operations (176 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 246 component schemas · 100 `webhooks` (99 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
-| SHA-256 | `99bf7b459d0b6618798844b152d4e383c03e47a6ceb073ea63b7543be03488cd` |
+| Backend repo | `indrasol/taskadence-api`, branch `feature/ia-redesign` (release 10, cut from `dev`; NOT yet on `main`) |
+| Backend commit | `7aa25c4` - release 10: sprints belong to projects; teams, sections and test sprints removed. Against the previous pin (`9b7e748`): 19 operations removed (`teams.*` 11, `sections.*` 5, `tasks.set_section`, `view-pins.pin_team` / `unpin_team`), 4 added (`sprints.list_org`, `sprints.read`, `availability.mark_mine`, `workload.read`), 8 moved (`sprints.*` from `/v1/teams/{team_id}/sprints` to `/v1/projects/{project_id}/sprints` and `/v1/sprints/{sprint_id}`, `sprints.update` PUT → PATCH; `availability.*` from `/v1/teams/{team_id}` to `/v1/organizations/{org_id}`); 22 schemas removed, 5 added; `team_id` / `section_id` / `tracker_id` / `bug_id` fields removed; `position` on sprints and `ProjectUpdate`; 10 `team.*` / `project.team_*` webhooks removed; problem type `sprint-project-mismatch` |
+| Served by | `app.main:app` via `TestClient` (`ENV=production`, `ALLOWED_HOSTS_TM=testserver`, `BASE_API_URL` = the production API), 2026-10-24, from a detached worktree of `7aa25c4` with **placeholder** production settings (`env -i`; no `.env.production` read: only `BASE_API_URL`, a random `WEBHOOK_SECRET_KEK_TM` and a random `ACCESS_CONNECTOR_KEK_TM`). `servers` unchanged |
+| `info.version` | `2026-10-24` (was `2026-09-25`) |
+| Size | 111 paths · 167 operations (161 SDK methods: the 6 `x-kind: oauth` protocol operations are not generated) · 229 component schemas · 90 `webhooks` (89 events + `webhook.test`) · `x-problem-types`, `x-scope-descriptions`, `x-limits` (the docs site's tables) |
+| SHA-256 | `a16c6df00c8b0d17666299addc9c1d410ee3cc156165247e31643448cbbf5700` |
 
 `servers` in the snapshot come from the backend's `BASE_API_URL` / `BASE_API_DEV_URL` settings of the environment that
 served it. From 4.6b it is served with **production settings**: `servers` is the production API alone (no localhost).

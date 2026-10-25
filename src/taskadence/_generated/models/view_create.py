@@ -32,9 +32,8 @@ class ViewCreate:
     Attributes:
         org_id (str):
         name (str): Unique among the scope's active views of the same resource (case-insensitive) - 409 otherwise
-        scope_type (ViewScopeEnum | Unset): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
-        scope_id (None | str | Unset): team_id for `team`, project_id for `project`; ignored for `user` (always the
-            caller).
+        scope_type (ViewScopeEnum | Unset): One of `user`, `project`. Used by `PinOut` and 3 more.
+        scope_id (None | str | Unset): project_id for `project`; ignored for `user` (always the caller).
         resource (ViewResourceEnum | Unset): One of `task`, `project`. Used by `PinOut` and 3 more.
         query (ViewCreateQuery | Unset): The resource's list parameters, exactly as its list route accepts them (`GET
             /v1/tasks` for `task`; `GET /v1/projects/{org_id}`, with `show_all`, for `project`); unknown key or bad value →

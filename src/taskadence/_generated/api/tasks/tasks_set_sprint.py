@@ -110,21 +110,21 @@ def sync_detailed(
     client: AuthenticatedClient,
     body: TaskSprintSet,
 ) -> Response[Problem | TaskInDB]:
-    """File a task in a team sprint (or none)
+    """File a task in a sprint of its project (or none)
 
-     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
-    do this, without needing any right over the sprint itself.
+     File the task into a sprint (`sprint_id: null` takes it out). Anyone who may edit the task may do
+    this, without needing any right over the sprint itself.
 
-    The sprint must belong to a team the task is reachable from: the task is in one of the team's
-    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
-    one is a 422 whose message says why.
+    The sprint must belong to the task's own project. An unknown sprint is a 404; a sprint of another
+    project - or any sprint for a task with no project - is a 409 `sprint-project-mismatch` naming both
+    projects. Moving a task to another project takes it out of its sprint.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
     Args:
         task_id (str):
-        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
-            file the task into, or `null` to take it out.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the sprint (of the
+            task's own project) to file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -152,21 +152,21 @@ def sync(
     client: AuthenticatedClient,
     body: TaskSprintSet,
 ) -> Problem | TaskInDB | None:
-    """File a task in a team sprint (or none)
+    """File a task in a sprint of its project (or none)
 
-     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
-    do this, without needing any right over the sprint itself.
+     File the task into a sprint (`sprint_id: null` takes it out). Anyone who may edit the task may do
+    this, without needing any right over the sprint itself.
 
-    The sprint must belong to a team the task is reachable from: the task is in one of the team's
-    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
-    one is a 422 whose message says why.
+    The sprint must belong to the task's own project. An unknown sprint is a 404; a sprint of another
+    project - or any sprint for a task with no project - is a 409 `sprint-project-mismatch` naming both
+    projects. Moving a task to another project takes it out of its sprint.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
     Args:
         task_id (str):
-        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
-            file the task into, or `null` to take it out.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the sprint (of the
+            task's own project) to file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -189,21 +189,21 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     body: TaskSprintSet,
 ) -> Response[Problem | TaskInDB]:
-    """File a task in a team sprint (or none)
+    """File a task in a sprint of its project (or none)
 
-     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
-    do this, without needing any right over the sprint itself.
+     File the task into a sprint (`sprint_id: null` takes it out). Anyone who may edit the task may do
+    this, without needing any right over the sprint itself.
 
-    The sprint must belong to a team the task is reachable from: the task is in one of the team's
-    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
-    one is a 422 whose message says why.
+    The sprint must belong to the task's own project. An unknown sprint is a 404; a sprint of another
+    project - or any sprint for a task with no project - is a 409 `sprint-project-mismatch` naming both
+    projects. Moving a task to another project takes it out of its sprint.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
     Args:
         task_id (str):
-        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
-            file the task into, or `null` to take it out.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the sprint (of the
+            task's own project) to file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -229,21 +229,21 @@ async def asyncio(
     client: AuthenticatedClient,
     body: TaskSprintSet,
 ) -> Problem | TaskInDB | None:
-    """File a task in a team sprint (or none)
+    """File a task in a sprint of its project (or none)
 
-     File the task into a team sprint (`sprint_id: null` takes it out). Anyone who may edit the task may
-    do this, without needing any right over the sprint itself.
+     File the task into a sprint (`sprint_id: null` takes it out). Anyone who may edit the task may do
+    this, without needing any right over the sprint itself.
 
-    The sprint must belong to a team the task is reachable from: the task is in one of the team's
-    projects, or it is filed under that team with no project. An unknown sprint is a 404; an unreachable
-    one is a 422 whose message says why.
+    The sprint must belong to the task's own project. An unknown sprint is a 404; a sprint of another
+    project - or any sprint for a task with no project - is a 409 `sprint-project-mismatch` naming both
+    projects. Moving a task to another project takes it out of its sprint.
 
     Taking a task out clears `sprint_id` and deletes nothing.
 
     Args:
         task_id (str):
-        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to
-            file the task into, or `null` to take it out.
+        body (TaskSprintSet): The body of `PUT /v1/tasks/{task_id}/sprint`: the sprint (of the
+            task's own project) to file the task into, or `null` to take it out.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -20,7 +20,7 @@ T = TypeVar("T", bound="AvailabilityEntry")
 
 @_attrs_define
 class AvailabilityEntry:
-    """Returned by `availability.create` and `availability.update`.
+    """Returned by `availability.create`, `availability.mark_mine` and `availability.update`.
 
     Attributes:
         entry_id (str):

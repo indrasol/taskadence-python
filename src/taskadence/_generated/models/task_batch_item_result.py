@@ -32,8 +32,8 @@ class TaskBatchItemResult:
         task_id (None | str | Unset): The task (update; on create, the new task's id)
         task (None | TaskInDB | Unset): The task as written, when `ok`
         error (None | TaskBatchItemError | Unset): Why the item failed, when not `ok`
-        warning (None | str | Unset): Create: the task exists, but a follow-up did not happen (its section, its subtask
-            link); says which
+        warning (None | str | Unset): Create: the task exists, but a follow-up did not happen (its subtask link); says
+            which
     """
 
     index: int

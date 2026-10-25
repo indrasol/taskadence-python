@@ -129,9 +129,8 @@ def sync_detailed(
 
     - the body's shape, and `ref` / `parent_ref` (unique refs; a parent is an EARLIER item in the same
     project);
-    - the project exists in the organization; the team, sprint, milestone and goal pass `POST
-    /v1/tasks`'s rules;
-    - a section belongs to the task's project, its team or your own list, and you may read it;
+    - the project exists in the organization; the sprint, milestone and goal pass `POST /v1/tasks`'s
+    rules;
     - an existing `parent_task_id` is a task you may edit, in the same project.
 
     **Then created in order, each on `POST /v1/tasks`'s rules:**
@@ -143,8 +142,7 @@ def sync_detailed(
     - `parent_ref` links the task under an earlier item the way `POST /v1/tasks/{task_id}/subtasks`
     does; when that
       parent failed, the item fails with `parent_failed`;
-    - a task created whose section or subtask link could not be written is `ok` with a `warning` saying
-    so.
+    - a task created whose subtask link could not be written is `ok` with a `warning` saying so.
 
     Assignment emails: one per assignee, listing their tasks. `Idempotency-Key` replays the first answer
     for 24 h. Rate
@@ -196,9 +194,8 @@ def sync(
 
     - the body's shape, and `ref` / `parent_ref` (unique refs; a parent is an EARLIER item in the same
     project);
-    - the project exists in the organization; the team, sprint, milestone and goal pass `POST
-    /v1/tasks`'s rules;
-    - a section belongs to the task's project, its team or your own list, and you may read it;
+    - the project exists in the organization; the sprint, milestone and goal pass `POST /v1/tasks`'s
+    rules;
     - an existing `parent_task_id` is a task you may edit, in the same project.
 
     **Then created in order, each on `POST /v1/tasks`'s rules:**
@@ -210,8 +207,7 @@ def sync(
     - `parent_ref` links the task under an earlier item the way `POST /v1/tasks/{task_id}/subtasks`
     does; when that
       parent failed, the item fails with `parent_failed`;
-    - a task created whose section or subtask link could not be written is `ok` with a `warning` saying
-    so.
+    - a task created whose subtask link could not be written is `ok` with a `warning` saying so.
 
     Assignment emails: one per assignee, listing their tasks. `Idempotency-Key` replays the first answer
     for 24 h. Rate
@@ -258,9 +254,8 @@ async def asyncio_detailed(
 
     - the body's shape, and `ref` / `parent_ref` (unique refs; a parent is an EARLIER item in the same
     project);
-    - the project exists in the organization; the team, sprint, milestone and goal pass `POST
-    /v1/tasks`'s rules;
-    - a section belongs to the task's project, its team or your own list, and you may read it;
+    - the project exists in the organization; the sprint, milestone and goal pass `POST /v1/tasks`'s
+    rules;
     - an existing `parent_task_id` is a task you may edit, in the same project.
 
     **Then created in order, each on `POST /v1/tasks`'s rules:**
@@ -272,8 +267,7 @@ async def asyncio_detailed(
     - `parent_ref` links the task under an earlier item the way `POST /v1/tasks/{task_id}/subtasks`
     does; when that
       parent failed, the item fails with `parent_failed`;
-    - a task created whose section or subtask link could not be written is `ok` with a `warning` saying
-    so.
+    - a task created whose subtask link could not be written is `ok` with a `warning` saying so.
 
     Assignment emails: one per assignee, listing their tasks. `Idempotency-Key` replays the first answer
     for 24 h. Rate
@@ -323,9 +317,8 @@ async def asyncio(
 
     - the body's shape, and `ref` / `parent_ref` (unique refs; a parent is an EARLIER item in the same
     project);
-    - the project exists in the organization; the team, sprint, milestone and goal pass `POST
-    /v1/tasks`'s rules;
-    - a section belongs to the task's project, its team or your own list, and you may read it;
+    - the project exists in the organization; the sprint, milestone and goal pass `POST /v1/tasks`'s
+    rules;
     - an existing `parent_task_id` is a task you may edit, in the same project.
 
     **Then created in order, each on `POST /v1/tasks`'s rules:**
@@ -337,8 +330,7 @@ async def asyncio(
     - `parent_ref` links the task under an earlier item the way `POST /v1/tasks/{task_id}/subtasks`
     does; when that
       parent failed, the item fails with `parent_failed`;
-    - a task created whose section or subtask link could not be written is `ok` with a `warning` saying
-    so.
+    - a task created whose subtask link could not be written is `ok` with a `warning` saying so.
 
     Assignment emails: one per assignee, listing their tasks. `Idempotency-Key` replays the first answer
     for 24 h. Rate

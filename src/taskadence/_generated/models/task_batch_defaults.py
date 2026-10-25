@@ -30,12 +30,9 @@ class TaskBatchDefaults:
 
     Attributes:
         project_id (None | str | Unset): Project to file the tasks in Example: P31304.
-        section_id (None | str | Unset): A section to place them in (a section of their project, of their team, or of
-            your own list)
-        sprint_id (None | str | Unset): A team sprint (the single create's rule: reachable from the sprint's team)
+        sprint_id (None | str | Unset): A sprint of their project (the single create's rule)
         milestone_id (None | str | Unset): A milestone of their project
         goal_id (None | str | Unset): A goal of their project
-        team_id (None | str | Unset): A team of the organization
         assignee (None | str | Unset): Assignee username
         priority (None | PriorityEnum | Unset):
         status (None | TaskStatusEnum | Unset):
@@ -46,11 +43,9 @@ class TaskBatchDefaults:
     """
 
     project_id: None | str | Unset = UNSET
-    section_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     assignee: None | str | Unset = UNSET
     priority: None | PriorityEnum | Unset = UNSET
     status: None | TaskStatusEnum | Unset = UNSET
@@ -69,12 +64,6 @@ class TaskBatchDefaults:
         else:
             project_id = self.project_id
 
-        section_id: None | str | Unset
-        if isinstance(self.section_id, Unset):
-            section_id = UNSET
-        else:
-            section_id = self.section_id
-
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
             sprint_id = UNSET
@@ -92,12 +81,6 @@ class TaskBatchDefaults:
             goal_id = UNSET
         else:
             goal_id = self.goal_id
-
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
 
         assignee: None | str | Unset
         if isinstance(self.assignee, Unset):
@@ -159,16 +142,12 @@ class TaskBatchDefaults:
         field_dict.update({})
         if project_id is not UNSET:
             field_dict["project_id"] = project_id
-        if section_id is not UNSET:
-            field_dict["section_id"] = section_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
             field_dict["milestone_id"] = milestone_id
         if goal_id is not UNSET:
             field_dict["goal_id"] = goal_id
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if assignee is not UNSET:
             field_dict["assignee"] = assignee
         if priority is not UNSET:
@@ -199,15 +178,6 @@ class TaskBatchDefaults:
 
         project_id = _parse_project_id(d.pop("project_id", UNSET))
 
-        def _parse_section_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        section_id = _parse_section_id(d.pop("section_id", UNSET))
-
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -234,15 +204,6 @@ class TaskBatchDefaults:
             return cast(None | str | Unset, data)
 
         goal_id = _parse_goal_id(d.pop("goal_id", UNSET))
-
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
 
         def _parse_assignee(data: object) -> None | str | Unset:
             if data is None:
@@ -357,11 +318,9 @@ class TaskBatchDefaults:
 
         task_batch_defaults = cls(
             project_id=project_id,
-            section_id=section_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
-            team_id=team_id,
             assignee=assignee,
             priority=priority,
             status=status,

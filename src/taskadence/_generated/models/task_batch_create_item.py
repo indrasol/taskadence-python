@@ -30,7 +30,7 @@ T = TypeVar("T", bound="TaskBatchCreateItem")
 
 @_attrs_define
 class TaskBatchCreateItem:
-    """One new task: `POST /v1/tasks`'s body without `org_id` (the batch's), plus `ref`, `section_id` and a parent.
+    """One new task: `POST /v1/tasks`'s body without `org_id` (the batch's), plus `ref` and a parent.
 
     Attributes:
         title (str): Task title Example: Implement Login.
@@ -50,7 +50,7 @@ class TaskBatchCreateItem:
 
             - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
             `actual_result`, `recommendation`.
-            - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+            - **Read-only:** `legacy_bug_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
             - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
             the key).
         metadata (list[TaskBatchCreateItemMetadataType0Item] | None | Unset): Additional metadata Example: [{'field':
@@ -59,15 +59,11 @@ class TaskBatchCreateItem:
         updated_by (None | str | Unset): Who last updated the task
         is_subtask (bool | Unset): Is Sub Task (default false; a subtask is linked through POST /tasks/{id}/subtasks)
             Default: False.
-        bug_id (None | str | Unset): Bug ID (text) Example: B1234.
-        tracker_id (None | str | Unset): On create, for a bug only: the test tracker to file it under. Refused (422) for
-            a task that is not a bug or a tracker of another project. Example: TR1234.
         restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
             Responses also carry `restricted_to_user_ids`.
-        team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
-            team's intake. null = none.
-        sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
-            task is reachable from the sprint's team. null = none. Example: SP12345.
+        sprint_id (None | str | Unset): The sprint this task is filed into. One per task, a sprint of the task's own
+            project (409 `sprint-project-mismatch` otherwise); moving the task to another project clears it. null = none.
+            Example: SP12345.
         milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
             `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
             Example: MS12345.
@@ -76,7 +72,6 @@ class TaskBatchCreateItem:
             G12345.
         ref (None | str | Unset): Your label for this item, echoed in its result; what `parent_ref` points at Example:
             launch-1.
-        section_id (None | str | Unset): A section to place it in (overrides `defaults.section_id`)
         parent_ref (None | str | Unset): Make it a subtask of an EARLIER item of this batch (that item's `ref`)
         parent_task_id (None | str | Unset): Make it a subtask of an existing task (you need edit on both, as for POST
             /v1/tasks/{task_id}/subtasks) Example: T123456.
@@ -99,15 +94,11 @@ class TaskBatchCreateItem:
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     is_subtask: bool | Unset = False
-    bug_id: None | str | Unset = UNSET
-    tracker_id: None | str | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
     ref: None | str | Unset = UNSET
-    section_id: None | str | Unset = UNSET
     parent_ref: None | str | Unset = UNSET
     parent_task_id: None | str | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -239,18 +230,6 @@ class TaskBatchCreateItem:
 
         is_subtask = self.is_subtask
 
-        bug_id: None | str | Unset
-        if isinstance(self.bug_id, Unset):
-            bug_id = UNSET
-        else:
-            bug_id = self.bug_id
-
-        tracker_id: None | str | Unset
-        if isinstance(self.tracker_id, Unset):
-            tracker_id = UNSET
-        else:
-            tracker_id = self.tracker_id
-
         restricted_to: list[str] | None | Unset
         if isinstance(self.restricted_to, Unset):
             restricted_to = UNSET
@@ -259,12 +238,6 @@ class TaskBatchCreateItem:
 
         else:
             restricted_to = self.restricted_to
-
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
 
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
@@ -289,12 +262,6 @@ class TaskBatchCreateItem:
             ref = UNSET
         else:
             ref = self.ref
-
-        section_id: None | str | Unset
-        if isinstance(self.section_id, Unset):
-            section_id = UNSET
-        else:
-            section_id = self.section_id
 
         parent_ref: None | str | Unset
         if isinstance(self.parent_ref, Unset):
@@ -347,14 +314,8 @@ class TaskBatchCreateItem:
             field_dict["updated_by"] = updated_by
         if is_subtask is not UNSET:
             field_dict["is_subtask"] = is_subtask
-        if bug_id is not UNSET:
-            field_dict["bug_id"] = bug_id
-        if tracker_id is not UNSET:
-            field_dict["tracker_id"] = tracker_id
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
@@ -363,8 +324,6 @@ class TaskBatchCreateItem:
             field_dict["goal_id"] = goal_id
         if ref is not UNSET:
             field_dict["ref"] = ref
-        if section_id is not UNSET:
-            field_dict["section_id"] = section_id
         if parent_ref is not UNSET:
             field_dict["parent_ref"] = parent_ref
         if parent_task_id is not UNSET:
@@ -602,24 +561,6 @@ class TaskBatchCreateItem:
 
         is_subtask = d.pop("is_subtask", UNSET)
 
-        def _parse_bug_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        bug_id = _parse_bug_id(d.pop("bug_id", UNSET))
-
-        def _parse_tracker_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        tracker_id = _parse_tracker_id(d.pop("tracker_id", UNSET))
-
         def _parse_restricted_to(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -636,15 +577,6 @@ class TaskBatchCreateItem:
             return cast(list[str] | None | Unset, data)
 
         restricted_to = _parse_restricted_to(d.pop("restricted_to", UNSET))
-
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
 
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
@@ -682,15 +614,6 @@ class TaskBatchCreateItem:
 
         ref = _parse_ref(d.pop("ref", UNSET))
 
-        def _parse_section_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        section_id = _parse_section_id(d.pop("section_id", UNSET))
-
         def _parse_parent_ref(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -727,15 +650,11 @@ class TaskBatchCreateItem:
             created_by=created_by,
             updated_by=updated_by,
             is_subtask=is_subtask,
-            bug_id=bug_id,
-            tracker_id=tracker_id,
             restricted_to=restricted_to,
-            team_id=team_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
             ref=ref,
-            section_id=section_id,
             parent_ref=parent_ref,
             parent_task_id=parent_task_id,
         )

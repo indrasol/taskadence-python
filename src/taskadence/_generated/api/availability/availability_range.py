@@ -17,7 +17,7 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    org_id: str,
     *,
     from_: None | str | Unset = UNSET,
     to: None | str | Unset = UNSET,
@@ -47,8 +47,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/teams/{team_id}/availability".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/organizations/{org_id}/availability".format(
+            org_id=quote(str(org_id), safe=""),
         ),
         "params": params,
     }
@@ -132,21 +132,21 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     from_: None | str | Unset = UNSET,
     to: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | AvailabilityRange | Problem]:
-    """A team's availability over a date range
+    """Everyone's availability over a date range
 
-     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
-    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
-    inverted window, or one longer than 93 days.
+     Every active member of the organization and every unavailability entry of theirs that intersects
+    `[from, to]`, in one response. Any member may read it; a guest receives only their own entries. 400
+    for a missing, malformed or inverted window, or one longer than 93 days.
 
     Args:
-        team_id (str):
+        org_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
         to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
@@ -161,7 +161,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         from_=from_,
         to=to,
         if_none_match=if_none_match,
@@ -175,21 +175,21 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     from_: None | str | Unset = UNSET,
     to: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | AvailabilityRange | Problem | None:
-    """A team's availability over a date range
+    """Everyone's availability over a date range
 
-     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
-    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
-    inverted window, or one longer than 93 days.
+     Every active member of the organization and every unavailability entry of theirs that intersects
+    `[from, to]`, in one response. Any member may read it; a guest receives only their own entries. 400
+    for a missing, malformed or inverted window, or one longer than 93 days.
 
     Args:
-        team_id (str):
+        org_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
         to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
@@ -204,7 +204,7 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        org_id=org_id,
         client=client,
         from_=from_,
         to=to,
@@ -213,21 +213,21 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     from_: None | str | Unset = UNSET,
     to: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | AvailabilityRange | Problem]:
-    """A team's availability over a date range
+    """Everyone's availability over a date range
 
-     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
-    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
-    inverted window, or one longer than 93 days.
+     Every active member of the organization and every unavailability entry of theirs that intersects
+    `[from, to]`, in one response. Any member may read it; a guest receives only their own entries. 400
+    for a missing, malformed or inverted window, or one longer than 93 days.
 
     Args:
-        team_id (str):
+        org_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
         to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
@@ -242,7 +242,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         from_=from_,
         to=to,
         if_none_match=if_none_match,
@@ -254,21 +254,21 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     from_: None | str | Unset = UNSET,
     to: None | str | Unset = UNSET,
     if_none_match: str | Unset = UNSET,
 ) -> Any | AvailabilityRange | Problem | None:
-    """A team's availability over a date range
+    """Everyone's availability over a date range
 
-     The team's active members and every unavailability entry of theirs that intersects `[from, to]`, in
-    one response. A guest on the team receives only their own entries. 400 for a missing, malformed or
-    inverted window, or one longer than 93 days.
+     Every active member of the organization and every unavailability entry of theirs that intersects
+    `[from, to]`, in one response. Any member may read it; a guest receives only their own entries. 400
+    for a missing, malformed or inverted window, or one longer than 93 days.
 
     Args:
-        team_id (str):
+        org_id (str):
         from_ (None | str | Unset): First day of the window, YYYY-MM-DD
         to (None | str | Unset): Last day of the window (inclusive), YYYY-MM-DD - at most 93 days
             after `from`
@@ -284,7 +284,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            org_id=org_id,
             client=client,
             from_=from_,
             to=to,

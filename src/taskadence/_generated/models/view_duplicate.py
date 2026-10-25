@@ -24,7 +24,7 @@ class ViewDuplicate:
     """The request body of `views.duplicate`.
 
     Attributes:
-        scope_type (ViewScopeEnum | Unset): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
+        scope_type (ViewScopeEnum | Unset): One of `user`, `project`. Used by `PinOut` and 3 more.
         scope_id (None | str | Unset):
         name (None | str | Unset): Defaults to '<name> (copy)'
     """

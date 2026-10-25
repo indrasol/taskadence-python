@@ -161,9 +161,9 @@ def sync_detailed(
     `project` view.
 
     - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
-    with **your** visibility: a team view opened by a guest returns the guest's rows.
+    with **your** visibility: a project view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by`, `section_scope` or `show_all` here is a 400.
+    `group_by` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -211,9 +211,9 @@ def sync(
     `project` view.
 
     - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
-    with **your** visibility: a team view opened by a guest returns the guest's rows.
+    with **your** visibility: a project view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by`, `section_scope` or `show_all` here is a 400.
+    `group_by` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -256,9 +256,9 @@ async def asyncio_detailed(
     `project` view.
 
     - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
-    with **your** visibility: a team view opened by a guest returns the guest's rows.
+    with **your** visibility: a project view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by`, `section_scope` or `show_all` here is a 400.
+    `group_by` or `show_all` here is a 400.
 
     Args:
         view_id (str):
@@ -304,9 +304,9 @@ async def asyncio(
     `project` view.
 
     - The view's stored `query` runs like its list (`GET /v1/tasks` or `GET /v1/projects/{org_id}`),
-    with **your** visibility: a team view opened by a guest returns the guest's rows.
+    with **your** visibility: a project view opened by a guest returns the guest's rows.
     - Only `limit`, `cursor` and `include_inaccessible` are accepted; any `filter[...]`, `sort_by`,
-    `group_by`, `section_scope` or `show_all` here is a 400.
+    `group_by` or `show_all` here is a 400.
 
     Args:
         view_id (str):

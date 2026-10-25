@@ -54,8 +54,6 @@ class ProjectCard:
         team_members (list[str] | None | Unset): List of user names to add as members
         visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
-        team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
-            organization (422 otherwise). null = none.
         parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
             on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
             parent (422). null = top-level.
@@ -95,7 +93,6 @@ class ProjectCard:
     owner: None | str | Unset = UNSET
     team_members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
-    team_id: None | str | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
@@ -221,12 +218,6 @@ class ProjectCard:
         else:
             visibility = self.visibility
 
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
-
         parent_project_id: None | str | Unset
         if isinstance(self.parent_project_id, Unset):
             parent_project_id = UNSET
@@ -323,8 +314,6 @@ class ProjectCard:
             field_dict["team_members"] = team_members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if parent_project_id is not UNSET:
             field_dict["parent_project_id"] = parent_project_id
         if created_at is not UNSET:
@@ -540,15 +529,6 @@ class ProjectCard:
 
         visibility = _parse_visibility(d.pop("visibility", UNSET))
 
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
-
         def _parse_parent_project_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -661,7 +641,6 @@ class ProjectCard:
             owner=owner,
             team_members=team_members,
             visibility=visibility,
-            team_id=team_id,
             parent_project_id=parent_project_id,
             created_at=created_at,
             updated_at=updated_at,

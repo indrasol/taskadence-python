@@ -119,7 +119,7 @@ def sync_detailed(
 
      Change up to 100 tasks in one request. `set` is written to every task and each task's own fields
     override it:
-    the fields of `PATCH /v1/tasks/{task_id}`, plus `section_id`.
+    the fields of `PATCH /v1/tasks/{task_id}`.
 
     The answer is per item: `{results: [{index, task_id, ok, task | error}], updated, failed}`, status
     200 even when
@@ -128,15 +128,11 @@ def sync_detailed(
     Each item is `PATCH /v1/tasks/{task_id}`:
 
     - `edit` on the task, or that item fails with `forbidden` (or `not_found`) and the rest go on;
-    - `restricted_to` needs `restrict`; team, sprint, milestone and goal follow the single update's
-    rules;
+    - `restricted_to` needs `restrict`; sprint, milestone and goal follow the single update's rules;
     - a project change goes through `POST /v1/tasks/{task_id}/project`'s move;
-    - one history entry, the `task.updated` event and its webhooks per task;
-    - `section_id` places the task in that section; take a task out of one with `PUT
-    /v1/tasks/{task_id}/section`.
+    - one history entry, the `task.updated` event and its webhooks per task.
 
-    A task named twice, or `section_id: null`, is a 422 and nothing is changed. Assignment emails: one
-    per new
+    A task named twice is a 422 and nothing is changed. Assignment emails: one per new
     assignee. `Idempotency-Key` replays the first answer for 24 h. Rate limit: one request plus one unit
     per task.
 
@@ -174,7 +170,7 @@ def sync(
 
      Change up to 100 tasks in one request. `set` is written to every task and each task's own fields
     override it:
-    the fields of `PATCH /v1/tasks/{task_id}`, plus `section_id`.
+    the fields of `PATCH /v1/tasks/{task_id}`.
 
     The answer is per item: `{results: [{index, task_id, ok, task | error}], updated, failed}`, status
     200 even when
@@ -183,15 +179,11 @@ def sync(
     Each item is `PATCH /v1/tasks/{task_id}`:
 
     - `edit` on the task, or that item fails with `forbidden` (or `not_found`) and the rest go on;
-    - `restricted_to` needs `restrict`; team, sprint, milestone and goal follow the single update's
-    rules;
+    - `restricted_to` needs `restrict`; sprint, milestone and goal follow the single update's rules;
     - a project change goes through `POST /v1/tasks/{task_id}/project`'s move;
-    - one history entry, the `task.updated` event and its webhooks per task;
-    - `section_id` places the task in that section; take a task out of one with `PUT
-    /v1/tasks/{task_id}/section`.
+    - one history entry, the `task.updated` event and its webhooks per task.
 
-    A task named twice, or `section_id: null`, is a 422 and nothing is changed. Assignment emails: one
-    per new
+    A task named twice is a 422 and nothing is changed. Assignment emails: one per new
     assignee. `Idempotency-Key` replays the first answer for 24 h. Rate limit: one request plus one unit
     per task.
 
@@ -224,7 +216,7 @@ async def asyncio_detailed(
 
      Change up to 100 tasks in one request. `set` is written to every task and each task's own fields
     override it:
-    the fields of `PATCH /v1/tasks/{task_id}`, plus `section_id`.
+    the fields of `PATCH /v1/tasks/{task_id}`.
 
     The answer is per item: `{results: [{index, task_id, ok, task | error}], updated, failed}`, status
     200 even when
@@ -233,15 +225,11 @@ async def asyncio_detailed(
     Each item is `PATCH /v1/tasks/{task_id}`:
 
     - `edit` on the task, or that item fails with `forbidden` (or `not_found`) and the rest go on;
-    - `restricted_to` needs `restrict`; team, sprint, milestone and goal follow the single update's
-    rules;
+    - `restricted_to` needs `restrict`; sprint, milestone and goal follow the single update's rules;
     - a project change goes through `POST /v1/tasks/{task_id}/project`'s move;
-    - one history entry, the `task.updated` event and its webhooks per task;
-    - `section_id` places the task in that section; take a task out of one with `PUT
-    /v1/tasks/{task_id}/section`.
+    - one history entry, the `task.updated` event and its webhooks per task.
 
-    A task named twice, or `section_id: null`, is a 422 and nothing is changed. Assignment emails: one
-    per new
+    A task named twice is a 422 and nothing is changed. Assignment emails: one per new
     assignee. `Idempotency-Key` replays the first answer for 24 h. Rate limit: one request plus one unit
     per task.
 
@@ -277,7 +265,7 @@ async def asyncio(
 
      Change up to 100 tasks in one request. `set` is written to every task and each task's own fields
     override it:
-    the fields of `PATCH /v1/tasks/{task_id}`, plus `section_id`.
+    the fields of `PATCH /v1/tasks/{task_id}`.
 
     The answer is per item: `{results: [{index, task_id, ok, task | error}], updated, failed}`, status
     200 even when
@@ -286,15 +274,11 @@ async def asyncio(
     Each item is `PATCH /v1/tasks/{task_id}`:
 
     - `edit` on the task, or that item fails with `forbidden` (or `not_found`) and the rest go on;
-    - `restricted_to` needs `restrict`; team, sprint, milestone and goal follow the single update's
-    rules;
+    - `restricted_to` needs `restrict`; sprint, milestone and goal follow the single update's rules;
     - a project change goes through `POST /v1/tasks/{task_id}/project`'s move;
-    - one history entry, the `task.updated` event and its webhooks per task;
-    - `section_id` places the task in that section; take a task out of one with `PUT
-    /v1/tasks/{task_id}/section`.
+    - one history entry, the `task.updated` event and its webhooks per task.
 
-    A task named twice, or `section_id: null`, is a 422 and nothing is changed. Assignment emails: one
-    per new
+    A task named twice is a 422 and nothing is changed. Assignment emails: one per new
     assignee. `Idempotency-Key` replays the first answer for 24 h. Rate limit: one request plus one unit
     per task.
 

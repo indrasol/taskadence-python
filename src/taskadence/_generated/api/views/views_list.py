@@ -167,13 +167,13 @@ def sync_detailed(
 ) -> Response[Any | Problem | ViewListPage]:
     """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
-    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
-    paginated as `{data, next_cursor}`.
+     Every saved view you can read: personal first, then project. Each carries `resource` (the list it
+    queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as
+    `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
+        scope (None | str | Unset): `user` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -223,13 +223,13 @@ def sync(
 ) -> Any | Problem | ViewListPage | None:
     """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
-    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
-    paginated as `{data, next_cursor}`.
+     Every saved view you can read: personal first, then project. Each carries `resource` (the list it
+    queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as
+    `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
+        scope (None | str | Unset): `user` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -274,13 +274,13 @@ async def asyncio_detailed(
 ) -> Response[Any | Problem | ViewListPage]:
     """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
-    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
-    paginated as `{data, next_cursor}`.
+     Every saved view you can read: personal first, then project. Each carries `resource` (the list it
+    queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as
+    `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
+        scope (None | str | Unset): `user` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
@@ -328,13 +328,13 @@ async def asyncio(
 ) -> Any | Problem | ViewListPage | None:
     """Saved views you can read (filter by `resource`: task or project)
 
-     Every saved view you can read: personal first, then team, then project. Each carries `resource` (the
-    list it queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it),
-    paginated as `{data, next_cursor}`.
+     Every saved view you can read: personal first, then project. Each carries `resource` (the list it
+    queries), `can_edit` (whether you may change it) and `pinned` (whether you pinned it), paginated as
+    `{data, next_cursor}`.
 
     Args:
         org_id (str): Organization scope; the caller must be a member (a guest included).
-        scope (None | str | Unset): `user` | `team` | `project` - only that scope's views.
+        scope (None | str | Unset): `user` | `project` - only that scope's views.
         resource (None | str | Unset): `task` or `project`: only views of that list. Omit it for
             both.
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.

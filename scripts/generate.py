@@ -50,6 +50,13 @@ LEAKED = {"is_registration", "authorization"}
 SKIPPED_KINDS = {"oauth"}
 # Friendlier names on top of the operationId verbs (the verbs stay; these are aliases).
 ALIASES = {"tasks": {"move": "set_project"}}
+# Release 10: an operation reachable from the resource a caller thinks in, too (the operationId's method stays).
+# `tm.projects.sprints(project_id)` is `tm.sprints.list(project_id)`, and so on; generated as full methods.
+CROSS_ALIASES = {
+    "projects": {"sprints": "sprints.list"},
+    "organizations": {"availability": "availability.range", "workload": "workload.read"},
+    "me": {"set_availability": "availability.mark_mine"},
+}
 
 
 def bin_(name: str) -> str:
@@ -548,6 +555,12 @@ class Facade:
                 for alias, target in ALIASES.get(resource, {}).items():
                     if target in verbs:
                         out += [f"    {alias} = {target}", f'    """Alias of `{target}`."""', ""]
+                by_id = {o.op_id: o for o in self.ops}
+                for alias, op_id in CROSS_ALIASES.get(resource, {}).items():
+                    if alias in verbs:
+                        sys.exit(f"CROSS_ALIASES: {resource}.{alias} clashes with an operation")
+                    if op_id in by_id:
+                        out += self.emit_method(by_id[op_id], alias, is_async)
                 if resource == "me":
                     out += ["    __call__ = read", '    """`tm.me()` is `tm.me.read()`."""', ""]
                 out += [""]
@@ -628,6 +641,10 @@ class Facade:
                     )
                 if op.if_none_match:
                     lines.append("- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.")
+                pairs = [(r, a) for r, m in CROSS_ALIASES.items() for a, o in m.items() if o == op.op_id]
+                also = [f"`tm.{py_name(r)}.{a}`" for r, a in pairs]
+                if also:
+                    lines.append("- **Also:** " + ", ".join(also) + " (same call).")
                 lines.append("")
             pages[f"{resource}.md"] = "\n".join(lines).rstrip() + "\n"
         pages["README.md"] = "\n".join(index) + "\n"

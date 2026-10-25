@@ -11,7 +11,7 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models.problem import Problem
-from ...models.team_list_page import TeamListPage
+from ...models.sprint_list_page import SprintListPage
 from ...types import UNSET, Unset
 from typing import cast
 
@@ -19,10 +19,9 @@ from typing import cast
 def _get_kwargs(
     *,
     org_id: str,
-    search: None | str | Unset = UNSET,
-    limit: int | Unset = 50,
+    limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
-    sort_by: None | str | Unset = "name",
+    sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
@@ -33,13 +32,6 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["org_id"] = org_id
-
-    json_search: None | str | Unset
-    if isinstance(search, Unset):
-        json_search = UNSET
-    else:
-        json_search = search
-    params["search"] = json_search
 
     params["limit"] = limit
 
@@ -63,7 +55,7 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/teams",
+        "url": "/v1/sprints",
         "params": params,
     }
 
@@ -73,9 +65,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | Problem | TeamListPage | None:
+) -> Any | Problem | SprintListPage | None:
     if response.status_code == 200:
-        response_200 = TeamListPage.from_dict(response.json())
+        response_200 = SprintListPage.from_dict(response.json())
 
         return response_200
 
@@ -136,7 +128,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | Problem | TeamListPage]:
+) -> Response[Any | Problem | SprintListPage]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -149,25 +141,29 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    search: None | str | Unset = UNSET,
-    limit: int | Unset = 50,
+    limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
-    sort_by: None | str | Unset = "name",
+    sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TeamListPage]:
-    """List an organization's teams
+) -> Response[Any | Problem | SprintListPage]:
+    """Every sprint you can read in an organization (Planning)
 
-     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
-    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
+     Every live sprint of the projects you can read in the organization, paginated as `{data,
+    next_cursor}`.
+
+    - Ordered by project, then position, then start date: group by `project_id` for a company-wide plan.
+    - `filter[project]` and `filter[status]` narrow it.
+    - A guest sees only the sprints of their projects.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
-            it is on).
-        search (None | str | Unset): Case-insensitive substring of the team name.
-        limit (int | Unset): Page size; default 50, capped at 1000. Default: 50.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' sprints).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[project]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: name. Default: `name`. Default: 'name'.
+        sort_by (None | str | Unset): One of: project_id, position, start_date, end_date, name,
+            created_at. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -176,12 +172,11 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TeamListPage]
+        Response[Any | Problem | SprintListPage]
     """
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        search=search,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -200,25 +195,29 @@ def sync(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    search: None | str | Unset = UNSET,
-    limit: int | Unset = 50,
+    limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
-    sort_by: None | str | Unset = "name",
+    sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TeamListPage | None:
-    """List an organization's teams
+) -> Any | Problem | SprintListPage | None:
+    """Every sprint you can read in an organization (Planning)
 
-     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
-    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
+     Every live sprint of the projects you can read in the organization, paginated as `{data,
+    next_cursor}`.
+
+    - Ordered by project, then position, then start date: group by `project_id` for a company-wide plan.
+    - `filter[project]` and `filter[status]` narrow it.
+    - A guest sees only the sprints of their projects.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
-            it is on).
-        search (None | str | Unset): Case-insensitive substring of the team name.
-        limit (int | Unset): Page size; default 50, capped at 1000. Default: 50.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' sprints).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[project]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: name. Default: `name`. Default: 'name'.
+        sort_by (None | str | Unset): One of: project_id, position, start_date, end_date, name,
+            created_at. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -227,13 +226,12 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TeamListPage
+        Any | Problem | SprintListPage
     """
 
     return sync_detailed(
         client=client,
         org_id=org_id,
-        search=search,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -246,25 +244,29 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    search: None | str | Unset = UNSET,
-    limit: int | Unset = 50,
+    limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
-    sort_by: None | str | Unset = "name",
+    sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TeamListPage]:
-    """List an organization's teams
+) -> Response[Any | Problem | SprintListPage]:
+    """Every sprint you can read in an organization (Planning)
 
-     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
-    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
+     Every live sprint of the projects you can read in the organization, paginated as `{data,
+    next_cursor}`.
+
+    - Ordered by project, then position, then start date: group by `project_id` for a company-wide plan.
+    - `filter[project]` and `filter[status]` narrow it.
+    - A guest sees only the sprints of their projects.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
-            it is on).
-        search (None | str | Unset): Case-insensitive substring of the team name.
-        limit (int | Unset): Page size; default 50, capped at 1000. Default: 50.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' sprints).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[project]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: name. Default: `name`. Default: 'name'.
+        sort_by (None | str | Unset): One of: project_id, position, start_date, end_date, name,
+            created_at. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -273,12 +275,11 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TeamListPage]
+        Response[Any | Problem | SprintListPage]
     """
 
     kwargs = _get_kwargs(
         org_id=org_id,
-        search=search,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -295,25 +296,29 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     org_id: str,
-    search: None | str | Unset = UNSET,
-    limit: int | Unset = 50,
+    limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
-    sort_by: None | str | Unset = "name",
+    sort_by: None | str | Unset = UNSET,
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TeamListPage | None:
-    """List an organization's teams
+) -> Any | Problem | SprintListPage | None:
+    """Every sprint you can read in an organization (Planning)
 
-     The teams you can read, each with `member_count`, `project_count` and your own `team_role` (null
-    when you are not on the team). Paginated as `{data, next_cursor, total}`, ordered by name.
+     Every live sprint of the projects you can read in the organization, paginated as `{data,
+    next_cursor}`.
+
+    - Ordered by project, then position, then start date: group by `project_id` for a company-wide plan.
+    - `filter[project]` and `filter[status]` narrow it.
+    - A guest sees only the sprints of their projects.
 
     Args:
-        org_id (str): Organization scope; the caller must be a member (a guest sees only the teams
-            it is on).
-        search (None | str | Unset): Case-insensitive substring of the team name.
-        limit (int | Unset): Page size; default 50, capped at 1000. Default: 50.
+        org_id (str): Organization scope; the caller must be a member (a guest sees only its
+            projects' sprints).
+        limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[project]`,
+            `filter[status]` (comma-separated values are OR-ed). Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: name. Default: `name`. Default: 'name'.
+        sort_by (None | str | Unset): One of: project_id, position, start_date, end_date, name,
+            created_at. Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -322,14 +327,13 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TeamListPage
+        Any | Problem | SprintListPage
     """
 
     return (
         await asyncio_detailed(
             client=client,
             org_id=org_id,
-            search=search,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

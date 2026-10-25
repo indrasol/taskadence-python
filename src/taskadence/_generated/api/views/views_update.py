@@ -117,8 +117,8 @@ def sync_detailed(
 ) -> Response[Problem | ViewOut]:
     """Update a saved view
 
-     Rename, re-query or re-display. `edit`: the owner (personal), the team owner /
-    org admin (team), a project owner / editor / org admin (project). `resource` is
+     Rename, re-query or re-display. `edit`: the owner (personal), a project owner /
+    editor / org admin (project). `resource` is
     read-only: a different value is a 400.
 
     Args:
@@ -156,8 +156,8 @@ def sync(
 ) -> Problem | ViewOut | None:
     """Update a saved view
 
-     Rename, re-query or re-display. `edit`: the owner (personal), the team owner /
-    org admin (team), a project owner / editor / org admin (project). `resource` is
+     Rename, re-query or re-display. `edit`: the owner (personal), a project owner /
+    editor / org admin (project). `resource` is
     read-only: a different value is a 400.
 
     Args:
@@ -190,8 +190,8 @@ async def asyncio_detailed(
 ) -> Response[Problem | ViewOut]:
     """Update a saved view
 
-     Rename, re-query or re-display. `edit`: the owner (personal), the team owner /
-    org admin (team), a project owner / editor / org admin (project). `resource` is
+     Rename, re-query or re-display. `edit`: the owner (personal), a project owner /
+    editor / org admin (project). `resource` is
     read-only: a different value is a 400.
 
     Args:
@@ -227,8 +227,8 @@ async def asyncio(
 ) -> Problem | ViewOut | None:
     """Update a saved view
 
-     Rename, re-query or re-display. `edit`: the owner (personal), the team owner /
-    org admin (team), a project owner / editor / org admin (project). `resource` is
+     Rename, re-query or re-display. `edit`: the owner (personal), a project owner /
+    editor / org admin (project). `resource` is
     read-only: a different value is a 400.
 
     Args:

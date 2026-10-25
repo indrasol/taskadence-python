@@ -30,47 +30,43 @@ T = TypeVar("T", bound="TaskBatchSet")
 
 @_attrs_define
 class TaskBatchSet:
-    """Values written to every task of the batch (a per-task field overrides). The single PATCH's fields, plus
-    `section_id`.
+    """Values written to every task of the batch (a per-task field overrides). The single PATCH's fields.
 
-        Attributes:
-            project_id (None | str | Unset): Project ID (text) Example: project-1234.
-            sub_tasks (list[str] | None | Unset): List of sub-task IDs Example: ['task-5678'].
-            dependencies (list[str] | None | Unset): List of dependency task IDs Example: ['task-4321'].
-            title (None | str | Unset): Task title. Omit to leave it; an explicit blank is refused (422). Example: Implement
-                Login.
-            description (None | str | Unset): Task description Example: Implement OAuth2 login flow..
-            status (None | TaskStatusEnum | Unset): Task status Example: in_progress.
-            assignee (None | str | Unset): Assignee user name
-            start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
-            due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
-            priority (None | PriorityEnum | Unset): Task priority Example: high.
-            task_type (None | TaskTypeEnum | Unset): The kind of task: `task` or `bug`. A label, not a permission. Example:
-                task.
-            tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
-            type_data (None | TaskBatchSetTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
+    Attributes:
+        project_id (None | str | Unset): Project ID (text) Example: project-1234.
+        sub_tasks (list[str] | None | Unset): List of sub-task IDs Example: ['task-5678'].
+        dependencies (list[str] | None | Unset): List of dependency task IDs Example: ['task-4321'].
+        title (None | str | Unset): Task title. Omit to leave it; an explicit blank is refused (422). Example: Implement
+            Login.
+        description (None | str | Unset): Task description Example: Implement OAuth2 login flow..
+        status (None | TaskStatusEnum | Unset): Task status Example: in_progress.
+        assignee (None | str | Unset): Assignee user name
+        start_date (datetime.date | None | Unset): Start date Example: 2024-07-31.
+        due_date (datetime.date | None | Unset): Due date Example: 2024-08-01.
+        priority (None | PriorityEnum | Unset): Task priority Example: high.
+        task_type (None | TaskTypeEnum | Unset): The kind of task: `task` or `bug`. A label, not a permission. Example:
+            task.
+        tags (list[str] | None | Unset): List of tags Example: ['backend', 'auth'].
+        type_data (None | TaskBatchSetTypeDataType0 | Unset): Extra fields for the task's type. For a bug:
 
-                - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
-                `actual_result`, `recommendation`.
-                - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
-                - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
-                the key).
-            metadata (list[TaskBatchSetMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
-                'new': 'in_progress', 'old': 'not_started'}].
-            restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
-                Setting it needs `restrict` on the task.
-            team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
-                team's intake. null = none.
-            sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
-                task is reachable from the sprint's team. null = none. Example: SP12345.
-            milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
-                `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
-                Example: MS12345.
-            goal_id (None | str | Unset): The project goal this task is filed under. One per task; refused (422) unless it
-                is a live goal of the task's own project. Moving the task to another project clears it. null = none. Example:
-                G12345.
-            section_id (None | str | Unset): A section to place them in (a section of their project, their team, or your own
-                list)
+            - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
+            `actual_result`, `recommendation`.
+            - **Read-only:** `legacy_bug_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+            - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
+            the key).
+        metadata (list[TaskBatchSetMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
+            'new': 'in_progress', 'old': 'not_started'}].
+        restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
+            Setting it needs `restrict` on the task.
+        sprint_id (None | str | Unset): The sprint this task is filed into. One per task, a sprint of the task's own
+            project (409 `sprint-project-mismatch` otherwise); moving the task to another project clears it. null = none.
+            Example: SP12345.
+        milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
+            `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
+            Example: MS12345.
+        goal_id (None | str | Unset): The project goal this task is filed under. One per task; refused (422) unless it
+            is a live goal of the task's own project. Moving the task to another project clears it. null = none. Example:
+            G12345.
     """
 
     project_id: None | str | Unset = UNSET
@@ -88,11 +84,9 @@ class TaskBatchSet:
     type_data: None | TaskBatchSetTypeDataType0 | Unset = UNSET
     metadata: list[TaskBatchSetMetadataType0Item] | None | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
-    section_id: None | str | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -221,12 +215,6 @@ class TaskBatchSet:
         else:
             restricted_to = self.restricted_to
 
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
-
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
             sprint_id = UNSET
@@ -244,12 +232,6 @@ class TaskBatchSet:
             goal_id = UNSET
         else:
             goal_id = self.goal_id
-
-        section_id: None | str | Unset
-        if isinstance(self.section_id, Unset):
-            section_id = UNSET
-        else:
-            section_id = self.section_id
 
         field_dict: dict[str, Any] = {}
 
@@ -284,16 +266,12 @@ class TaskBatchSet:
             field_dict["metadata"] = metadata
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
             field_dict["milestone_id"] = milestone_id
         if goal_id is not UNSET:
             field_dict["goal_id"] = goal_id
-        if section_id is not UNSET:
-            field_dict["section_id"] = section_id
 
         return field_dict
 
@@ -532,15 +510,6 @@ class TaskBatchSet:
 
         restricted_to = _parse_restricted_to(d.pop("restricted_to", UNSET))
 
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
-
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -568,15 +537,6 @@ class TaskBatchSet:
 
         goal_id = _parse_goal_id(d.pop("goal_id", UNSET))
 
-        def _parse_section_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        section_id = _parse_section_id(d.pop("section_id", UNSET))
-
         task_batch_set = cls(
             project_id=project_id,
             sub_tasks=sub_tasks,
@@ -593,11 +553,9 @@ class TaskBatchSet:
             type_data=type_data,
             metadata=metadata,
             restricted_to=restricted_to,
-            team_id=team_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
-            section_id=section_id,
         )
 
         return task_batch_set

@@ -33,7 +33,7 @@ class ViewOut:
     Attributes:
         view_id (str):
         org_id (str):
-        scope_type (ViewScopeEnum): One of `user`, `team`, `project`. Used by `PinOut` and 3 more.
+        scope_type (ViewScopeEnum): One of `user`, `project`. Used by `PinOut` and 3 more.
         scope_id (str):
         name (str):
         resource (ViewResourceEnum | Unset): One of `task`, `project`. Used by `PinOut` and 3 more.

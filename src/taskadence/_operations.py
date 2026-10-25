@@ -11,6 +11,7 @@ from ._generated.api.audit import audit_export_json as _audit_export_json
 from ._generated.api.audit import audit_list as _audit_list
 from ._generated.api.availability import availability_create as _availability_create
 from ._generated.api.availability import availability_delete as _availability_delete
+from ._generated.api.availability import availability_mark_mine as _availability_mark_mine
 from ._generated.api.availability import availability_range as _availability_range
 from ._generated.api.availability import availability_update as _availability_update
 from ._generated.api.connected_apps import connected_apps_delete as _connected_apps_delete
@@ -92,11 +93,6 @@ from ._generated.api.projects import projects_reorder as _projects_reorder
 from ._generated.api.projects import projects_replace as _projects_replace
 from ._generated.api.projects import projects_update as _projects_update
 from ._generated.api.releases import releases_whats_new as _releases_whats_new
-from ._generated.api.sections import sections_create as _sections_create
-from ._generated.api.sections import sections_delete as _sections_delete
-from ._generated.api.sections import sections_list as _sections_list
-from ._generated.api.sections import sections_reorder as _sections_reorder
-from ._generated.api.sections import sections_update as _sections_update
 from ._generated.api.service_accounts import service_accounts_create as _service_accounts_create
 from ._generated.api.service_accounts import service_accounts_delete as _service_accounts_delete
 from ._generated.api.service_accounts import service_accounts_list as _service_accounts_list
@@ -104,6 +100,8 @@ from ._generated.api.service_accounts import service_accounts_update as _service
 from ._generated.api.sprints import sprints_create as _sprints_create
 from ._generated.api.sprints import sprints_delete as _sprints_delete
 from ._generated.api.sprints import sprints_list as _sprints_list
+from ._generated.api.sprints import sprints_list_org as _sprints_list_org
+from ._generated.api.sprints import sprints_read as _sprints_read
 from ._generated.api.sprints import sprints_update as _sprints_update
 from ._generated.api.task_attachments import task_attachments_create as _task_attachments_create
 from ._generated.api.task_attachments import task_attachments_delete as _task_attachments_delete
@@ -133,21 +131,9 @@ from ._generated.api.tasks import tasks_replace as _tasks_replace
 from ._generated.api.tasks import tasks_review as _tasks_review
 from ._generated.api.tasks import tasks_set_milestone as _tasks_set_milestone
 from ._generated.api.tasks import tasks_set_project as _tasks_set_project
-from ._generated.api.tasks import tasks_set_section as _tasks_set_section
 from ._generated.api.tasks import tasks_set_sprint as _tasks_set_sprint
 from ._generated.api.tasks import tasks_update as _tasks_update
 from ._generated.api.tasks import tasks_update_batch as _tasks_update_batch
-from ._generated.api.teams import teams_add_member as _teams_add_member
-from ._generated.api.teams import teams_create as _teams_create
-from ._generated.api.teams import teams_delete as _teams_delete
-from ._generated.api.teams import teams_list as _teams_list
-from ._generated.api.teams import teams_list_tasks as _teams_list_tasks
-from ._generated.api.teams import teams_read as _teams_read
-from ._generated.api.teams import teams_remove_member as _teams_remove_member
-from ._generated.api.teams import teams_replace as _teams_replace
-from ._generated.api.teams import teams_replace_member as _teams_replace_member
-from ._generated.api.teams import teams_update as _teams_update
-from ._generated.api.teams import teams_update_member as _teams_update_member
 from ._generated.api.tokens import tokens_create as _tokens_create
 from ._generated.api.tokens import tokens_delete as _tokens_delete
 from ._generated.api.tokens import tokens_list as _tokens_list
@@ -158,11 +144,9 @@ from ._generated.api.uploads import uploads_complete as _uploads_complete
 from ._generated.api.uploads import uploads_create as _uploads_create
 from ._generated.api.view_pins import view_pins_list as _view_pins_list
 from ._generated.api.view_pins import view_pins_pin_project as _view_pins_pin_project
-from ._generated.api.view_pins import view_pins_pin_team as _view_pins_pin_team
 from ._generated.api.view_pins import view_pins_pin_view as _view_pins_pin_view
 from ._generated.api.view_pins import view_pins_reorder as _view_pins_reorder
 from ._generated.api.view_pins import view_pins_unpin_project as _view_pins_unpin_project
-from ._generated.api.view_pins import view_pins_unpin_team as _view_pins_unpin_team
 from ._generated.api.view_pins import view_pins_unpin_view as _view_pins_unpin_view
 from ._generated.api.views import views_create as _views_create
 from ._generated.api.views import views_delete as _views_delete
@@ -182,6 +166,7 @@ from ._generated.api.webhooks import webhooks_replay as _webhooks_replay
 from ._generated.api.webhooks import webhooks_rotate_secret as _webhooks_rotate_secret
 from ._generated.api.webhooks import webhooks_test as _webhooks_test
 from ._generated.api.webhooks import webhooks_update as _webhooks_update
+from ._generated.api.workload import workload_read as _workload_read
 from ._generated.models import (
     AuditPageDataItem,
     ConnectedApp,
@@ -197,21 +182,19 @@ from ._generated.models import (
     ProjectCard,
     ProjectMemberInDB,
     ProjectResourceInDB,
-    SectionOut,
     ServiceAccountOut,
     SprintOut,
     TaskAttachmentInDB,
     TaskCardView,
     TaskCommentInDB,
     TaskHistoryInDB,
-    TeamOut,
     TokenOut,
     ViewOut,
     WebhookEventType,
     WebhookOut,
 )
 
-API_VERSION = "2026-09-25"
+API_VERSION = "2026-10-24"
 """The API date of the spec this SDK was generated from (`info.version`)."""
 DEFAULT_BASE_URL = "https://api.taskadence.com"
 """The spec's first server — the base URL when neither `base_url=` nor TASKADENCE_API_URL is given."""
@@ -334,7 +317,6 @@ OPERATIONS: dict[str, Operation] = {
             "sort_order",
             "include_inaccessible",
             "subtasks",
-            "section_scope",
         ),
         filters=(
             "status",
@@ -349,7 +331,6 @@ OPERATIONS: dict[str, Operation] = {
             "overdue",
             "search",
             "search_fields",
-            "team",
             "task_type",
             "created_via",
             "review",
@@ -465,7 +446,7 @@ OPERATIONS: dict[str, Operation] = {
         body="json",
         parse=_tasks_set_sprint._parse_response,
         scopes=("tasks:write",),
-        summary="File a task in a team sprint (or none)",
+        summary="File a task in a sprint of its project (or none)",
     ),
     "tasks.set_milestone": Operation(
         op_id="tasks.set_milestone",
@@ -476,16 +457,6 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_set_milestone._parse_response,
         scopes=("tasks:write",),
         summary="Attach a task to a milestone of its project (or none)",
-    ),
-    "tasks.set_section": Operation(
-        op_id="tasks.set_section",
-        method="PUT",
-        path="/v1/tasks/{task_id}/section",
-        path_params=("task_id",),
-        body="json",
-        parse=_tasks_set_section._parse_response,
-        scopes=("tasks:write",),
-        summary="Place a task in a section",
     ),
     "tasks.add_subtask": Operation(
         op_id="tasks.add_subtask",
@@ -1395,249 +1366,128 @@ OPERATIONS: dict[str, Operation] = {
         parse=_releases_whats_new._parse_response,
         summary="What's new - recent release notes",
     ),
-    "sections.list": Operation(
-        op_id="sections.list",
-        method="GET",
-        path="/v1/sections",
-        query=("org_id", "scope_type", "scope_id", "scope_ids", "limit", "cursor", "sort_by", "sort_order"),
-        is_list=True,
-        parse=_sections_list._parse_response,
-        item=SectionOut.from_dict,
-        scopes=("tasks:read",),
-        summary="List a scope's sections (or several scopes')",
-    ),
-    "sections.create": Operation(
-        op_id="sections.create",
-        method="POST",
-        path="/v1/sections",
-        body="json",
-        parse=_sections_create._parse_response,
-        scopes=("tasks:write",),
-        summary="Create a section",
-    ),
-    "sections.reorder": Operation(
-        op_id="sections.reorder",
-        method="POST",
-        path="/v1/sections/reorder",
-        body="json",
-        parse=_sections_reorder._parse_response,
-        scopes=("tasks:write",),
-        summary="Reorder a scope's sections",
-    ),
-    "sections.update": Operation(
-        op_id="sections.update",
-        method="PATCH",
-        path="/v1/sections/{section_id}",
-        path_params=("section_id",),
-        body="json",
-        parse=_sections_update._parse_response,
-        scopes=("tasks:write",),
-        summary="Rename a section",
-    ),
-    "sections.delete": Operation(
-        op_id="sections.delete",
-        method="DELETE",
-        path="/v1/sections/{section_id}",
-        path_params=("section_id",),
-        parse=_sections_delete._parse_response,
-        scopes=("tasks:write",),
-        summary="Delete a section",
-    ),
-    "teams.create": Operation(
-        op_id="teams.create",
-        method="POST",
-        path="/v1/teams",
-        body="json",
-        parse=_teams_create._parse_response,
-        scopes=("teams:write",),
-        summary="Create a team",
-    ),
-    "teams.list": Operation(
-        op_id="teams.list",
-        method="GET",
-        path="/v1/teams",
-        query=("org_id", "search", "limit", "cursor", "sort_by", "sort_order"),
-        is_list=True,
-        parse=_teams_list._parse_response,
-        item=TeamOut.from_dict,
-        scopes=("teams:read",),
-        summary="List an organization's teams",
-    ),
-    "teams.read": Operation(
-        op_id="teams.read",
-        method="GET",
-        path="/v1/teams/{team_id}",
-        path_params=("team_id",),
-        if_none_match=True,
-        parse=_teams_read._parse_response,
-        scopes=("teams:read",),
-        summary="Read a team (with its members)",
-    ),
-    "teams.replace": Operation(
-        op_id="teams.replace",
-        method="PUT",
-        path="/v1/teams/{team_id}",
-        path_params=("team_id",),
-        body="json",
-        if_match=True,
-        parse=_teams_replace._parse_response,
-        scopes=("teams:write",),
-        summary="Update a team (PUT; partial)",
-    ),
-    "teams.update": Operation(
-        op_id="teams.update",
-        method="PATCH",
-        path="/v1/teams/{team_id}",
-        path_params=("team_id",),
-        body="json",
-        if_match=True,
-        parse=_teams_update._parse_response,
-        scopes=("teams:write",),
-        summary="Update a team (JSON merge-patch)",
-    ),
-    "teams.delete": Operation(
-        op_id="teams.delete",
-        method="DELETE",
-        path="/v1/teams/{team_id}",
-        path_params=("team_id",),
-        query=("detach", "reason"),
-        if_match=True,
-        parse=_teams_delete._parse_response,
-        scopes=("teams:write",),
-        summary="Delete a team",
-    ),
-    "teams.add_member": Operation(
-        op_id="teams.add_member",
-        method="POST",
-        path="/v1/teams/{team_id}/members",
-        path_params=("team_id",),
-        body="json",
-        parse=_teams_add_member._parse_response,
-        scopes=("teams:write",),
-        summary="Add a member to a team",
-    ),
-    "teams.replace_member": Operation(
-        op_id="teams.replace_member",
-        method="PUT",
-        path="/v1/teams/{team_id}/members/{user_id}",
-        path_params=("team_id", "user_id"),
-        body="json",
-        parse=_teams_replace_member._parse_response,
-        scopes=("teams:write",),
-        summary="Change a team member's role (PUT)",
-    ),
-    "teams.update_member": Operation(
-        op_id="teams.update_member",
-        method="PATCH",
-        path="/v1/teams/{team_id}/members/{user_id}",
-        path_params=("team_id", "user_id"),
-        body="json",
-        parse=_teams_update_member._parse_response,
-        scopes=("teams:write",),
-        summary="Change a team member's role",
-    ),
-    "teams.remove_member": Operation(
-        op_id="teams.remove_member",
-        method="DELETE",
-        path="/v1/teams/{team_id}/members/{user_id}",
-        path_params=("team_id", "user_id"),
-        parse=_teams_remove_member._parse_response,
-        scopes=("teams:write",),
-        summary="Remove a team member",
-    ),
-    "teams.list_tasks": Operation(
-        op_id="teams.list_tasks",
-        method="GET",
-        path="/v1/teams/{team_id}/intake",
-        path_params=("team_id",),
-        query=("limit", "cursor", "sort_by", "sort_order", "include_inaccessible", "section_scope"),
-        is_list=True,
-        parse=_teams_list_tasks._parse_response,
-        item=TaskCardView.from_dict,
-        scopes=("teams:read",),
-        summary="A team's unfiled tasks (the team List's read; task-list envelope)",
-    ),
     "sprints.list": Operation(
         op_id="sprints.list",
         method="GET",
-        path="/v1/teams/{team_id}/sprints",
-        path_params=("team_id",),
+        path="/v1/projects/{project_id}/sprints",
+        path_params=("project_id",),
         query=("limit", "cursor", "sort_by", "sort_order"),
         is_list=True,
         parse=_sprints_list._parse_response,
         item=SprintOut.from_dict,
-        scopes=("teams:read",),
-        summary="List a team's sprints",
+        scopes=("projects:read",),
+        summary="List a project's sprints",
     ),
     "sprints.create": Operation(
         op_id="sprints.create",
         method="POST",
-        path="/v1/teams/{team_id}/sprints",
-        path_params=("team_id",),
+        path="/v1/projects/{project_id}/sprints",
+        path_params=("project_id",),
         body="json",
         parse=_sprints_create._parse_response,
-        scopes=("teams:write",),
-        summary="Create a sprint",
+        scopes=("projects:write",),
+        summary="Create a sprint in a project",
+    ),
+    "sprints.list_org": Operation(
+        op_id="sprints.list_org",
+        method="GET",
+        path="/v1/sprints",
+        query=("org_id", "limit", "cursor", "sort_by", "sort_order"),
+        is_list=True,
+        parse=_sprints_list_org._parse_response,
+        item=SprintOut.from_dict,
+        scopes=("projects:read",),
+        summary="Every sprint you can read in an organization (Planning)",
+    ),
+    "sprints.read": Operation(
+        op_id="sprints.read",
+        method="GET",
+        path="/v1/sprints/{sprint_id}",
+        path_params=("sprint_id",),
+        if_none_match=True,
+        parse=_sprints_read._parse_response,
+        scopes=("projects:read",),
+        summary="Read a sprint",
     ),
     "sprints.update": Operation(
         op_id="sprints.update",
-        method="PUT",
-        path="/v1/teams/{team_id}/sprints/{sprint_id}",
-        path_params=("team_id", "sprint_id"),
+        method="PATCH",
+        path="/v1/sprints/{sprint_id}",
+        path_params=("sprint_id",),
         body="json",
         parse=_sprints_update._parse_response,
-        scopes=("teams:write",),
-        summary="Update a sprint",
+        scopes=("projects:write",),
+        summary="Update a sprint (name, dates, status, position, project)",
     ),
     "sprints.delete": Operation(
         op_id="sprints.delete",
         method="DELETE",
-        path="/v1/teams/{team_id}/sprints/{sprint_id}",
-        path_params=("team_id", "sprint_id"),
+        path="/v1/sprints/{sprint_id}",
+        path_params=("sprint_id",),
         query=("reason",),
         parse=_sprints_delete._parse_response,
-        scopes=("teams:write",),
+        scopes=("projects:write",),
         summary="Delete a sprint (its tasks are unfiled)",
     ),
     "availability.range": Operation(
         op_id="availability.range",
         method="GET",
-        path="/v1/teams/{team_id}/availability",
-        path_params=("team_id",),
+        path="/v1/organizations/{org_id}/availability",
+        path_params=("org_id",),
         query=("from", "to"),
         if_none_match=True,
         parse=_availability_range._parse_response,
-        scopes=("teams:read",),
-        summary="A team's availability over a date range",
+        scopes=("members:read",),
+        summary="Everyone's availability over a date range",
     ),
     "availability.create": Operation(
         op_id="availability.create",
         method="POST",
-        path="/v1/teams/{team_id}/availability",
-        path_params=("team_id",),
+        path="/v1/organizations/{org_id}/availability",
+        path_params=("org_id",),
         body="json",
         parse=_availability_create._parse_response,
-        scopes=("teams:write",),
-        summary="Mark someone unavailable",
+        scopes=("org:write",),
+        summary="Mark someone unavailable (yourself, or anyone as an admin)",
     ),
     "availability.update": Operation(
         op_id="availability.update",
         method="PUT",
-        path="/v1/teams/{team_id}/availability/{entry_id}",
-        path_params=("team_id", "entry_id"),
+        path="/v1/organizations/{org_id}/availability/{entry_id}",
+        path_params=("org_id", "entry_id"),
         body="json",
         parse=_availability_update._parse_response,
-        scopes=("teams:write",),
+        scopes=("org:write",),
         summary="Change an unavailability entry",
     ),
     "availability.delete": Operation(
         op_id="availability.delete",
         method="DELETE",
-        path="/v1/teams/{team_id}/availability/{entry_id}",
-        path_params=("team_id", "entry_id"),
+        path="/v1/organizations/{org_id}/availability/{entry_id}",
+        path_params=("org_id", "entry_id"),
         parse=_availability_delete._parse_response,
-        scopes=("teams:write",),
+        scopes=("org:write",),
         summary="Remove an unavailability entry",
+    ),
+    "availability.mark_mine": Operation(
+        op_id="availability.mark_mine",
+        method="PUT",
+        path="/v1/me/availability",
+        body="json",
+        parse=_availability_mark_mine._parse_response,
+        scopes=("org:write",),
+        summary="Mark your own days unavailable",
+    ),
+    "workload.read": Operation(
+        op_id="workload.read",
+        method="GET",
+        path="/v1/organizations/{org_id}/workload",
+        path_params=("org_id",),
+        query=("project_id",),
+        if_none_match=True,
+        parse=_workload_read._parse_response,
+        scopes=("tasks:read",),
+        summary="Open work per person (who is heavy, who has capacity)",
     ),
     "goals.org": Operation(
         op_id="goals.org",
@@ -2032,25 +1882,6 @@ OPERATIONS: dict[str, Operation] = {
         parse=_view_pins_unpin_project._parse_response,
         scopes=("tasks:write",),
         summary="Unpin a project",
-    ),
-    "view-pins.pin_team": Operation(
-        op_id="view-pins.pin_team",
-        method="PUT",
-        path="/v1/view-pins/teams/{team_id}",
-        path_params=("team_id",),
-        query=("org_id",),
-        parse=_view_pins_pin_team._parse_response,
-        scopes=("tasks:write",),
-        summary="Pin a team",
-    ),
-    "view-pins.unpin_team": Operation(
-        op_id="view-pins.unpin_team",
-        method="DELETE",
-        path="/v1/view-pins/teams/{team_id}",
-        path_params=("team_id",),
-        parse=_view_pins_unpin_team._parse_response,
-        scopes=("tasks:write",),
-        summary="Unpin a team",
     ),
     "view-pins.reorder": Operation(
         op_id="view-pins.reorder",

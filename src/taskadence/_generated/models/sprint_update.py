@@ -32,6 +32,9 @@ class SprintUpdate:
             `end_date` is a 422.
         status (None | str | Unset): One of: active, completed. Completing a sprint does NOTHING to its tasks - they
             keep it and it reads as past.
+        position (int | None | Unset): Drag order among the project's sprints (Planning)
+        project_id (None | str | Unset): Move the sprint to another project of the organization (you need edit rights in
+            both). Only an EMPTY sprint moves: one that holds tasks is a 409 `sprint_not_empty`.
     """
 
     name: None | str | Unset = UNSET
@@ -41,6 +44,8 @@ class SprintUpdate:
     end_date: datetime.date | None | Unset = UNSET
     duration_weeks: int | None | Unset = UNSET
     status: None | str | Unset = UNSET
+    position: int | None | Unset = UNSET
+    project_id: None | str | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -92,6 +97,18 @@ class SprintUpdate:
         else:
             status = self.status
 
+        position: int | None | Unset
+        if isinstance(self.position, Unset):
+            position = UNSET
+        else:
+            position = self.position
+
+        project_id: None | str | Unset
+        if isinstance(self.project_id, Unset):
+            project_id = UNSET
+        else:
+            project_id = self.project_id
+
         field_dict: dict[str, Any] = {}
 
         field_dict.update({})
@@ -109,6 +126,10 @@ class SprintUpdate:
             field_dict["duration_weeks"] = duration_weeks
         if status is not UNSET:
             field_dict["status"] = status
+        if position is not UNSET:
+            field_dict["position"] = position
+        if project_id is not UNSET:
+            field_dict["project_id"] = project_id
 
         return field_dict
 
@@ -195,6 +216,24 @@ class SprintUpdate:
 
         status = _parse_status(d.pop("status", UNSET))
 
+        def _parse_position(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        position = _parse_position(d.pop("position", UNSET))
+
+        def _parse_project_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        project_id = _parse_project_id(d.pop("project_id", UNSET))
+
         sprint_update = cls(
             name=name,
             description=description,
@@ -203,6 +242,8 @@ class SprintUpdate:
             end_date=end_date,
             duration_weeks=duration_weeks,
             status=status,
+            position=position,
+            project_id=project_id,
         )
 
         return sprint_update

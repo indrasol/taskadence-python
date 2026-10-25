@@ -29,8 +29,7 @@ class TokenCreate:
         org_id (str): The organization the token belongs to (a token is org-bound)
         name (str): What the token is for
         scopes (list[str]): Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`,
-            `teams:read`, `teams:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`,
-            `admin`.
+            `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.
 
             `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.
         kind (TokenCreateKind | Unset): `live` (tkd_live_…) or `test` (tkd_test_…: authenticates and reads, never

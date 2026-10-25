@@ -11,13 +11,13 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models.problem import Problem
-from ...models.team_detail import TeamDetail
+from ...models.sprint_out import SprintOut
 from ...types import UNSET, Unset
 from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    sprint_id: str,
     *,
     if_none_match: str | Unset = UNSET,
 ) -> dict[str, Any]:
@@ -27,8 +27,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/teams/{team_id}".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/sprints/{sprint_id}".format(
+            sprint_id=quote(str(sprint_id), safe=""),
         ),
     }
 
@@ -38,9 +38,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | Problem | TeamDetail | None:
+) -> Any | Problem | SprintOut | None:
     if response.status_code == 200:
-        response_200 = TeamDetail.from_dict(response.json())
+        response_200 = SprintOut.from_dict(response.json())
 
         return response_200
 
@@ -101,7 +101,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | Problem | TeamDetail]:
+) -> Response[Any | Problem | SprintOut]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -111,19 +111,18 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    sprint_id: str,
     *,
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TeamDetail]:
-    """Read a team (with its members)
+) -> Response[Any | Problem | SprintOut]:
+    """Read a sprint
 
-     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
-    org owners /
-    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
+     One sprint with its task counts. You need to be able to read its project (403 otherwise; 404 for an
+    unknown sprint).
 
     Args:
-        team_id (str):
+        sprint_id (str):
         if_none_match (str | Unset):
 
     Raises:
@@ -131,11 +130,11 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TeamDetail]
+        Response[Any | Problem | SprintOut]
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        sprint_id=sprint_id,
         if_none_match=if_none_match,
     )
 
@@ -147,19 +146,18 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    sprint_id: str,
     *,
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TeamDetail | None:
-    """Read a team (with its members)
+) -> Any | Problem | SprintOut | None:
+    """Read a sprint
 
-     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
-    org owners /
-    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
+     One sprint with its task counts. You need to be able to read its project (403 otherwise; 404 for an
+    unknown sprint).
 
     Args:
-        team_id (str):
+        sprint_id (str):
         if_none_match (str | Unset):
 
     Raises:
@@ -167,30 +165,29 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TeamDetail
+        Any | Problem | SprintOut
     """
 
     return sync_detailed(
-        team_id=team_id,
+        sprint_id=sprint_id,
         client=client,
         if_none_match=if_none_match,
     ).parsed
 
 
 async def asyncio_detailed(
-    team_id: str,
+    sprint_id: str,
     *,
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
-) -> Response[Any | Problem | TeamDetail]:
-    """Read a team (with its members)
+) -> Response[Any | Problem | SprintOut]:
+    """Read a sprint
 
-     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
-    org owners /
-    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
+     One sprint with its task counts. You need to be able to read its project (403 otherwise; 404 for an
+    unknown sprint).
 
     Args:
-        team_id (str):
+        sprint_id (str):
         if_none_match (str | Unset):
 
     Raises:
@@ -198,11 +195,11 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | Problem | TeamDetail]
+        Response[Any | Problem | SprintOut]
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        sprint_id=sprint_id,
         if_none_match=if_none_match,
     )
 
@@ -212,19 +209,18 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    sprint_id: str,
     *,
     client: AuthenticatedClient,
     if_none_match: str | Unset = UNSET,
-) -> Any | Problem | TeamDetail | None:
-    """Read a team (with its members)
+) -> Any | Problem | SprintOut | None:
+    """Read a sprint
 
-     The team plus its members, leads and managers. `read`: the team's members (a guest on it too) and
-    org owners /
-    admins (batch 7: members-only; another org member gets 403 "Only members of this team can open it").
+     One sprint with its task counts. You need to be able to read its project (403 otherwise; 404 for an
+    unknown sprint).
 
     Args:
-        team_id (str):
+        sprint_id (str):
         if_none_match (str | Unset):
 
     Raises:
@@ -232,12 +228,12 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | Problem | TeamDetail
+        Any | Problem | SprintOut
     """
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            sprint_id=sprint_id,
             client=client,
             if_none_match=if_none_match,
         )

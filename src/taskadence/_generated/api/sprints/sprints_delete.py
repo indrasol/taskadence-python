@@ -17,7 +17,6 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
     sprint_id: str,
     *,
     reason: None | str | Unset = UNSET,
@@ -36,8 +35,7 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
-        "url": "/v1/teams/{team_id}/sprints/{sprint_id}".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/sprints/{sprint_id}".format(
             sprint_id=quote(str(sprint_id), safe=""),
         ),
         "params": params,
@@ -117,7 +115,6 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
@@ -125,11 +122,10 @@ def sync_detailed(
 ) -> Response[Problem | SprintDeleted]:
     """Delete a sprint (its tasks are unfiled)
 
-     SOFT delete, and the tasks it held are UNFILED (`sprint_id` → null). No task is
-    deleted, ever; the response says how many were unfiled so the client can say so too.
+     Delete the sprint. Its tasks are taken out of it (`sprint_id` becomes null), never deleted;
+    `unfiled_tasks` says how many.
 
     Args:
-        team_id (str):
         sprint_id (str):
         reason (None | str | Unset):
 
@@ -142,7 +138,6 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
         sprint_id=sprint_id,
         reason=reason,
     )
@@ -155,7 +150,6 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
@@ -163,11 +157,10 @@ def sync(
 ) -> Problem | SprintDeleted | None:
     """Delete a sprint (its tasks are unfiled)
 
-     SOFT delete, and the tasks it held are UNFILED (`sprint_id` → null). No task is
-    deleted, ever; the response says how many were unfiled so the client can say so too.
+     Delete the sprint. Its tasks are taken out of it (`sprint_id` becomes null), never deleted;
+    `unfiled_tasks` says how many.
 
     Args:
-        team_id (str):
         sprint_id (str):
         reason (None | str | Unset):
 
@@ -180,7 +173,6 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
         sprint_id=sprint_id,
         client=client,
         reason=reason,
@@ -188,7 +180,6 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
@@ -196,11 +187,10 @@ async def asyncio_detailed(
 ) -> Response[Problem | SprintDeleted]:
     """Delete a sprint (its tasks are unfiled)
 
-     SOFT delete, and the tasks it held are UNFILED (`sprint_id` → null). No task is
-    deleted, ever; the response says how many were unfiled so the client can say so too.
+     Delete the sprint. Its tasks are taken out of it (`sprint_id` becomes null), never deleted;
+    `unfiled_tasks` says how many.
 
     Args:
-        team_id (str):
         sprint_id (str):
         reason (None | str | Unset):
 
@@ -213,7 +203,6 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
         sprint_id=sprint_id,
         reason=reason,
     )
@@ -224,7 +213,6 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
@@ -232,11 +220,10 @@ async def asyncio(
 ) -> Problem | SprintDeleted | None:
     """Delete a sprint (its tasks are unfiled)
 
-     SOFT delete, and the tasks it held are UNFILED (`sprint_id` → null). No task is
-    deleted, ever; the response says how many were unfiled so the client can say so too.
+     Delete the sprint. Its tasks are taken out of it (`sprint_id` becomes null), never deleted;
+    `unfiled_tasks` says how many.
 
     Args:
-        team_id (str):
         sprint_id (str):
         reason (None | str | Unset):
 
@@ -250,7 +237,6 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
             sprint_id=sprint_id,
             client=client,
             reason=reason,

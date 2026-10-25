@@ -16,14 +16,14 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    org_id: str,
     entry_id: str,
 ) -> dict[str, Any]:
 
     _kwargs: dict[str, Any] = {
         "method": "delete",
-        "url": "/v1/teams/{team_id}/availability/{entry_id}".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/organizations/{org_id}/availability/{entry_id}".format(
+            org_id=quote(str(org_id), safe=""),
             entry_id=quote(str(entry_id), safe=""),
         ),
     }
@@ -102,17 +102,17 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
 ) -> Response[AvailabilityDeleted | Problem]:
     """Remove an unavailability entry
 
-     HARD delete (a mark, not a record); the `availability.deleted` event keeps what it was.
+     Remove an entry (the same who-may rule as creating it). The audit log keeps what it was.
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
 
     Raises:
@@ -124,7 +124,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
     )
 
@@ -136,17 +136,17 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
 ) -> AvailabilityDeleted | Problem | None:
     """Remove an unavailability entry
 
-     HARD delete (a mark, not a record); the `availability.deleted` event keeps what it was.
+     Remove an entry (the same who-may rule as creating it). The audit log keeps what it was.
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
 
     Raises:
@@ -158,24 +158,24 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
         client=client,
     ).parsed
 
 
 async def asyncio_detailed(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
 ) -> Response[AvailabilityDeleted | Problem]:
     """Remove an unavailability entry
 
-     HARD delete (a mark, not a record); the `availability.deleted` event keeps what it was.
+     Remove an entry (the same who-may rule as creating it). The audit log keeps what it was.
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
 
     Raises:
@@ -187,7 +187,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
     )
 
@@ -197,17 +197,17 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
 ) -> AvailabilityDeleted | Problem | None:
     """Remove an unavailability entry
 
-     HARD delete (a mark, not a record); the `availability.deleted` event keeps what it was.
+     Remove an entry (the same who-may rule as creating it). The audit log keeps what it was.
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
 
     Raises:
@@ -220,7 +220,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            org_id=org_id,
             entry_id=entry_id,
             client=client,
         )

@@ -38,7 +38,6 @@ def _get_kwargs(
     filteroverdue: None | str | Unset = UNSET,
     filtersearch: None | str | Unset = UNSET,
     filtersearch_fields: None | str | Unset = UNSET,
-    filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
@@ -48,7 +47,6 @@ def _get_kwargs(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
-    section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -191,16 +189,6 @@ def _get_kwargs(
         json_filtersearch_fields = filtersearch_fields
     params["filter[search_fields]"] = json_filtersearch_fields
 
-    json_filterteam: list[str] | None | Unset
-    if isinstance(filterteam, Unset):
-        json_filterteam = UNSET
-    elif isinstance(filterteam, list):
-        json_filterteam = filterteam
-
-    else:
-        json_filterteam = filterteam
-    params["filter[team]"] = json_filterteam
-
     json_filtertask_type: list[str] | None | Unset
     if isinstance(filtertask_type, Unset):
         json_filtertask_type = UNSET
@@ -278,13 +266,6 @@ def _get_kwargs(
     else:
         json_subtasks = subtasks
     params["subtasks"] = json_subtasks
-
-    json_section_scope: None | str | Unset
-    if isinstance(section_scope, Unset):
-        json_section_scope = UNSET
-    else:
-        json_section_scope = section_scope
-    params["section_scope"] = json_section_scope
 
     json_search: None | str | Unset
     if isinstance(search, Unset):
@@ -418,7 +399,6 @@ def sync_detailed(
     filteroverdue: None | str | Unset = UNSET,
     filtersearch: None | str | Unset = UNSET,
     filtersearch_fields: None | str | Unset = UNSET,
-    filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
@@ -428,7 +408,6 @@ def sync_detailed(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
-    section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -477,12 +456,6 @@ def sync_detailed(
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
     in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
-    **Sections**
-    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
-    for that scope (`null` when the task is in no section there).
-    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
-    task with neither is unsectioned. `own` works on this operation only.
-
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
             Membership is checked; only projects the caller may read (public, member-of, or all for
@@ -518,8 +491,6 @@ def sync_detailed(
             task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
         filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
             only.
-        filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (the two can be mixed).
         filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
             or repeated; any other value (including `goal` and `agent`) is a 400.
         filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
@@ -542,8 +513,6 @@ def sync_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
-            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -581,7 +550,6 @@ def sync_detailed(
         filteroverdue=filteroverdue,
         filtersearch=filtersearch,
         filtersearch_fields=filtersearch_fields,
-        filterteam=filterteam,
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
@@ -591,7 +559,6 @@ def sync_detailed(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
-        section_scope=section_scope,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -629,7 +596,6 @@ def sync(
     filteroverdue: None | str | Unset = UNSET,
     filtersearch: None | str | Unset = UNSET,
     filtersearch_fields: None | str | Unset = UNSET,
-    filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
@@ -639,7 +605,6 @@ def sync(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
-    section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -688,12 +653,6 @@ def sync(
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
     in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
-    **Sections**
-    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
-    for that scope (`null` when the task is in no section there).
-    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
-    task with neither is unsectioned. `own` works on this operation only.
-
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
             Membership is checked; only projects the caller may read (public, member-of, or all for
@@ -729,8 +688,6 @@ def sync(
             task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
         filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
             only.
-        filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (the two can be mixed).
         filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
             or repeated; any other value (including `goal` and `agent`) is a 400.
         filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
@@ -753,8 +710,6 @@ def sync(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
-            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -793,7 +748,6 @@ def sync(
         filteroverdue=filteroverdue,
         filtersearch=filtersearch,
         filtersearch_fields=filtersearch_fields,
-        filterteam=filterteam,
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
@@ -803,7 +757,6 @@ def sync(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
-        section_scope=section_scope,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -835,7 +788,6 @@ async def asyncio_detailed(
     filteroverdue: None | str | Unset = UNSET,
     filtersearch: None | str | Unset = UNSET,
     filtersearch_fields: None | str | Unset = UNSET,
-    filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
@@ -845,7 +797,6 @@ async def asyncio_detailed(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
-    section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -894,12 +845,6 @@ async def asyncio_detailed(
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
     in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
-    **Sections**
-    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
-    for that scope (`null` when the task is in no section there).
-    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
-    task with neither is unsectioned. `own` works on this operation only.
-
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
             Membership is checked; only projects the caller may read (public, member-of, or all for
@@ -935,8 +880,6 @@ async def asyncio_detailed(
             task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
         filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
             only.
-        filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (the two can be mixed).
         filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
             or repeated; any other value (including `goal` and `agent`) is a 400.
         filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
@@ -959,8 +902,6 @@ async def asyncio_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
-            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -998,7 +939,6 @@ async def asyncio_detailed(
         filteroverdue=filteroverdue,
         filtersearch=filtersearch,
         filtersearch_fields=filtersearch_fields,
-        filterteam=filterteam,
         filtertask_type=filtertask_type,
         filtercreated_via=filtercreated_via,
         filterreview=filterreview,
@@ -1008,7 +948,6 @@ async def asyncio_detailed(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
-        section_scope=section_scope,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -1044,7 +983,6 @@ async def asyncio(
     filteroverdue: None | str | Unset = UNSET,
     filtersearch: None | str | Unset = UNSET,
     filtersearch_fields: None | str | Unset = UNSET,
-    filterteam: list[str] | None | Unset = UNSET,
     filtertask_type: list[str] | None | Unset = UNSET,
     filtercreated_via: list[str] | None | Unset = UNSET,
     filterreview: list[str] | None | Unset = UNSET,
@@ -1054,7 +992,6 @@ async def asyncio(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
-    section_scope: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -1103,12 +1040,6 @@ async def asyncio(
     - `priority` sorts by rank: critical > high > medium > low > none. `status` too: backlog >
     in_progress > not_started > blocked > completed. `task_type`: task, bug.
 
-    **Sections**
-    - `section_scope=user:me`, `project:<id>` or `team:<id>` adds `section_id` and `section_position`
-    for that scope (`null` when the task is in no section there).
-    - `section_scope=own` uses each task's own home: its project, or its team when it has no project; a
-    task with neither is unsectioned. `own` works on this operation only.
-
     Args:
         org_id (None | str | Unset): Organization scope; required unless project_id is given.
             Membership is checked; only projects the caller may read (public, member-of, or all for
@@ -1144,8 +1075,6 @@ async def asyncio(
             task id or any tag; `%`, `_`, `*`, `,` and `(` are matched literally.
         filtersearch_fields (None | str | Unset): `all` (default) or `title` to match the title
             only.
-        filterteam (list[str] | None | Unset): Team ids, or `__none__` for tasks without a team
-            (the two can be mixed).
         filtertask_type (list[str] | None | Unset): One or more of `task`, `bug`, comma-separated
             or repeated; any other value (including `goal` and `agent`) is a 400.
         filtercreated_via (list[str] | None | Unset): Which kind of client created the task: one
@@ -1168,8 +1097,6 @@ async def asyncio(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        section_scope (None | str | Unset): `user:me`, `project:<id>`, `team:<id>`, or `own` (each
-            task at its own project's or team's scope). An unknown scope is a 400.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -1209,7 +1136,6 @@ async def asyncio(
             filteroverdue=filteroverdue,
             filtersearch=filtersearch,
             filtersearch_fields=filtersearch_fields,
-            filterteam=filterteam,
             filtertask_type=filtertask_type,
             filtercreated_via=filtercreated_via,
             filterreview=filterreview,
@@ -1219,7 +1145,6 @@ async def asyncio(
             filterblocks=filterblocks,
             filtercreated_by=filtercreated_by,
             subtasks=subtasks,
-            section_scope=section_scope,
             search=search,
             status=status,
             unfiled=unfiled,
