@@ -42,7 +42,7 @@ class ProjectUpdate:
         end_date (datetime.date | None | Unset):
         is_active (bool | None | Unset):
         owner (None | str | Unset):
-        team_members (list[str] | None | Unset):
+        members (list[str] | None | Unset):
         visibility (None | ProjectVisibilityEnum | Unset):
         editors_can_add_members (bool | None | Unset):
         position (int | None | Unset): The project's place in the organization's drag order; an org owner / admin only
@@ -61,7 +61,7 @@ class ProjectUpdate:
     end_date: datetime.date | None | Unset = UNSET
     is_active: bool | None | Unset = UNSET
     owner: None | str | Unset = UNSET
-    team_members: list[str] | None | Unset = UNSET
+    members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
     editors_can_add_members: bool | None | Unset = UNSET
     position: int | None | Unset = UNSET
@@ -140,14 +140,14 @@ class ProjectUpdate:
         else:
             owner = self.owner
 
-        team_members: list[str] | None | Unset
-        if isinstance(self.team_members, Unset):
-            team_members = UNSET
-        elif isinstance(self.team_members, list):
-            team_members = self.team_members
+        members: list[str] | None | Unset
+        if isinstance(self.members, Unset):
+            members = UNSET
+        elif isinstance(self.members, list):
+            members = self.members
 
         else:
-            team_members = self.team_members
+            members = self.members
 
         visibility: None | str | Unset
         if isinstance(self.visibility, Unset):
@@ -214,8 +214,8 @@ class ProjectUpdate:
             field_dict["is_active"] = is_active
         if owner is not UNSET:
             field_dict["owner"] = owner
-        if team_members is not UNSET:
-            field_dict["team_members"] = team_members
+        if members is not UNSET:
+            field_dict["members"] = members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
         if editors_can_add_members is not UNSET:
@@ -359,7 +359,7 @@ class ProjectUpdate:
 
         owner = _parse_owner(d.pop("owner", UNSET))
 
-        def _parse_team_members(data: object) -> list[str] | None | Unset:
+        def _parse_members(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -367,14 +367,14 @@ class ProjectUpdate:
             try:
                 if not isinstance(data, list):
                     raise TypeError()
-                team_members_type_0 = cast(list[str], data)
+                members_type_0 = cast(list[str], data)
 
-                return team_members_type_0
+                return members_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             return cast(list[str] | None | Unset, data)
 
-        team_members = _parse_team_members(d.pop("team_members", UNSET))
+        members = _parse_members(d.pop("members", UNSET))
 
         def _parse_visibility(data: object) -> None | ProjectVisibilityEnum | Unset:
             if data is None:
@@ -463,7 +463,7 @@ class ProjectUpdate:
             end_date=end_date,
             is_active=is_active,
             owner=owner,
-            team_members=team_members,
+            members=members,
             visibility=visibility,
             editors_can_add_members=editors_can_add_members,
             position=position,

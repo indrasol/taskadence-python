@@ -9,12 +9,13 @@ entries below were pre-releases with no compatibility promise.
 
 ## [2.0.0] - 2026-10-24
 
-Release 10: sprints belong to projects, and teams, sections and test sprints have left TasKadence. Re-generated from
-the API contract at `taskadence-api` `7aa25c4` (branch `feature/ia-redesign`); the API version is now `2026-10-24`
-(was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because methods, models
-and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes
-in the same release, so 1.x calls to them now answer 404. `taskadence-mcp` and `@taskadence/mcp` have no generated
-code and change only their shared version.
+Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
+to an account (one per email) that shares one storage pool. Re-generated from the API contract at `taskadence-api`
+`b403694` (branch `feature/ia-redesign`); the API version is now `2026-10-24` (was `2026-09-25`), so every request sends
+`TasKadence-Version: 2026-10-24`. A major version because methods, models and fields are removed (the 1.0 promise: a
+breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
+answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
+change only their shared version.
 
 ### Removed
 - **Teams:** `tm.teams` (`list`, `create`, `read` / `get`, `update`, `replace`, `delete`, `list_tasks`, `add_member`,
@@ -31,6 +32,8 @@ code and change only their shared version.
   `TaskCardView.section_position`) on the task models; `AvailabilityRange.team_id` (now `org_id`) and
   `AvailabilityMember.team_role` (now `org_role`); `PinOut.logo_url`.
 - **Task list:** the `team` filter key (`filter={"team": ...}` raises `ValueError`) and the `section_scope` argument.
+- **Storage:** `StorageUsage.billing_exempt` (`tm.organizations.storage`): read `exempt_message` instead. The
+  per-organization billing routes are gone (410); billing is the account owner's, in the web app, and not in the SDK.
 - **Webhooks:** `team.created`, `team.updated`, `team.deleted`, `team.member_added`, `team.member_removed`,
   `team.member_role_changed`, `team.leads_changed`, `team.managers_changed`, `project.team_linked`,
   `project.team_unlinked`.
@@ -46,6 +49,13 @@ code and change only their shared version.
 - **Capacity is organization-wide.** `tm.availability.range` / `create` / `update` / `delete` take `org_id` (were
   `team_id`): `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE .../availability/{entry_id}`.
 - `tm.tasks.set_sprint(task_id, {"sprint_id": ...})` accepts only a sprint of the task's own project.
+- **Projects say `members`.** `ProjectCreate`, `ProjectUpdate`, `ProjectInDB` and `ProjectCard` have `members` (was
+  `team_members`; on a read, the members' user ids), and `ProjectStatsInDB.members` counts them. The SDK sends only
+  `members` (the API still accepts `team_members` for one release).
+- **Storage is the account's.** `tm.organizations.storage(org_id)` gains `account_id`, `account_used_bytes`,
+  `account_quota_bytes`, `account_percent` and `exempt_message`; `included_bytes`, `overage_bytes` and `status` are
+  the account's, and `percent` is the organization's share of the account's free storage.
+- `tm storage` (the CLI) prints the account's totals and the exempt message.
 
 ### Added
 - `tm.projects.sprints(project_id)`: a project's sprints (the same call as `tm.sprints.list`).
@@ -61,8 +71,29 @@ code and change only their shared version.
 - `SprintProjectMismatchError` (also importable as `SprintProjectMismatch`), a `ConflictError`: the 409
   `urn:taskadence:problem:sprint-project-mismatch` when a task is filed in a sprint of another project.
   `errors[0]` names both projects.
-- `ProjectUpdate.position`: a project's place in the organization's order (owners and admins). `ProjectCard.position`
-  is unchanged.
+- **The account (read-only, scope `account:read`).** `tm.account.get()` (also `read`; `GET /v1/account`): the
+  account's organizations with their member counts and storage, the caller's `my_role`, `owner`, `can_create_orgs`,
+  the storage pool and `billing.exempt_message` (set only for an exempt account; there is no exempt flag).
+  `tm.account.people()` (`GET /v1/account/people`, account owners and admins): everyone in the account with their
+  role in each organization. `tm.storage.get()` (also `tm.account.storage()`; `GET /v1/storage`): the account's
+  `bytes_used`, `quota_bytes`, `available_bytes`, `overage_bytes`, `percent`, `status` (`ok` · `warning` · `blocked` ·
+  `metered` · `exempt`), `payment_method_on_file` and the per-organization `orgs`. Models `AccountOut`, `AccountOrg`,
+  `AccountOwner`, `AccountBillingBrief`, `AccountPeople`, `AccountPerson`, `PersonOrg`, `AccountStorage`,
+  `AccountStorageOrg`. Writes on `/v1/account*` and billing are the web app's (session only) and not in the SDK.
+- `tm.me()` / `tm.me.get()` has `account` (`MeAccount`: `account_id`, `name`, `role`; None for a principal without
+  one).
+- `WorkloadPerson.active_sprint` (`WorkloadSprint`: `sprint_id`, `name`, `done`, `total`): the person's current
+  sprint (active, today inside its dates; the one ending soonest when several), or None.
+- `EmailInOtherAccountError` (also `EmailInOtherAccount`), a `ConflictError`: the 409
+  `urn:taskadence:problem:email-in-other-account` when an invitee's email already belongs to another account
+  (`errors[0]["code"]` is `email_in_other_account`).
+- `GoneError` (410) and `RemovedInRelease10Error` (also `RemovedInRelease10`): the 410
+  `urn:taskadence:problem:removed-in-release-10` of a route release 10 removed; `.successor` names what to call
+  instead (or None), `.changelog` links the docs changelog, and the message ends with that link. A 410 is never
+  retried.
+- Not in the SDK: support tickets (internal routes) and the MCP tool `contact_support`.
+- `ProjectUpdate.position`: a project's place in the organization's order (owners and admins); `ProjectInDB.position`
+  (the single-project read, `tm.projects.read`). `ProjectCard.position` is unchanged.
 - Sub-projects (N.3, not released before): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry
   `parent_project_id`; `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children`
   (`ProjectChildOut`); `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes
@@ -70,7 +101,8 @@ code and change only their shared version.
 - Also not released before: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`, `tm.tasks.reopen`,
   and their models; webhooks `member.admin_grants_changed` and `project.managers_changed`.
 - `ProblemType` includes `urn:taskadence:problem:database-unavailable` (503: the database did not answer after
-  retries, nothing was applied; retry after `Retry-After` seconds), `sprint-project-mismatch` and `sprint-not-empty`.
+  retries, nothing was applied; retry after `Retry-After` seconds), `sprint-project-mismatch`, `sprint-not-empty`,
+  `email-in-other-account` and `removed-in-release-10`.
 - The quickstart (`examples/quickstart.py`) creates a project and a sprint, files its task in the sprint, and deletes
   them at the end; the README has a Sprints, capacity and workload section.
 
@@ -79,6 +111,8 @@ code and change only their shared version.
 - `tm.sprints.list(team_id)` → `tm.projects.sprints(project_id)`, or `tm.sprints.list_org(org_id=...)` for all.
 - `tm.availability.range(team_id, ...)` → `tm.organizations.availability(org_id, ...)`.
 - `tm.sprints.update(team_id, sprint_id, body)` → `tm.sprints.update(sprint_id, body)`; the same for `delete`.
+- `team_members=` on a project → `members=`; `storage.billing_exempt` → `storage.exempt_message is not None`.
+- `except NotFoundError` around a removed route → `except RemovedInRelease10Error` (a 410 now, not a 404).
 
 ## [1.0.0] - 2026-10-08
 

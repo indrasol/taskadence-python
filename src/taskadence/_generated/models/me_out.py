@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
+    from ..models.me_account import MeAccount
     from ..models.me_auth import MeAuth
     from ..models.me_organization import MeOrganization
     from ..models.me_principal import MePrincipal
@@ -34,6 +35,7 @@ class MeOut:
 
     Attributes:
         principal (MePrincipal): Part of `MeOut`.
+        account (MeAccount | None | Unset): Release 10: the caller's account (null for a principal with none)
         organizations (list[MeOrganization] | Unset): Active memberships, by name (a token: only the organizations it
             reaches)
         auth (MeAuth | None | Unset): The access token behind this request; absent for a session token.
@@ -46,6 +48,7 @@ class MeOut:
     """
 
     principal: MePrincipal
+    account: MeAccount | None | Unset = UNSET
     organizations: list[MeOrganization] | Unset = UNSET
     auth: MeAuth | None | Unset = UNSET
     organizations_needing_reconnect: list[MeReconnectOrganization] | None | Unset = UNSET
@@ -56,12 +59,21 @@ class MeOut:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.me_account import MeAccount  # noqa: PLC0415
         from ..models.me_auth import MeAuth  # noqa: PLC0415
         from ..models.me_organization import MeOrganization  # noqa: PLC0415
         from ..models.me_principal import MePrincipal  # noqa: PLC0415
         from ..models.me_reconnect_organization import MeReconnectOrganization  # noqa: PLC0415
 
         principal = self.principal.to_dict()
+
+        account: dict[str, Any] | None | Unset
+        if isinstance(self.account, Unset):
+            account = UNSET
+        elif isinstance(self.account, MeAccount):
+            account = self.account.to_dict()
+        else:
+            account = self.account
 
         organizations: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.organizations, Unset):
@@ -103,6 +115,8 @@ class MeOut:
                 "principal": principal,
             }
         )
+        if account is not UNSET:
+            field_dict["account"] = account
         if organizations is not UNSET:
             field_dict["organizations"] = organizations
         if auth is not UNSET:
@@ -116,6 +130,7 @@ class MeOut:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.me_account import MeAccount  # noqa: PLC0415
         from ..models.me_auth import MeAuth  # noqa: PLC0415
         from ..models.me_organization import MeOrganization  # noqa: PLC0415
         from ..models.me_principal import MePrincipal  # noqa: PLC0415
@@ -123,6 +138,23 @@ class MeOut:
 
         d = dict(src_dict)
         principal = MePrincipal.from_dict(d.pop("principal"))
+
+        def _parse_account(data: object) -> MeAccount | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                account_type_0 = MeAccount.from_dict(data)
+
+                return account_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(MeAccount | None | Unset, data)
+
+        account = _parse_account(d.pop("account", UNSET))
 
         _organizations = d.pop("organizations", UNSET)
         organizations: list[MeOrganization] | Unset = UNSET
@@ -187,6 +219,7 @@ class MeOut:
 
         me_out = cls(
             principal=principal,
+            account=account,
             organizations=organizations,
             auth=auth,
             organizations_needing_reconnect=organizations_needing_reconnect,

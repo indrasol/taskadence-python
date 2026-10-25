@@ -51,7 +51,8 @@ class ProjectCard:
         is_active (bool | None | Unset): Is the project active? Default: True. Example: True.
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
-        team_members (list[str] | None | Unset): List of user names to add as members
+        members (list[str] | None | Unset): The project's members: user ids (or usernames) to add on create; the
+            members' user ids on a read
         visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
         parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
@@ -91,7 +92,7 @@ class ProjectCard:
     is_active: bool | None | Unset = True
     delete_reason: None | str | Unset = UNSET
     owner: None | str | Unset = UNSET
-    team_members: list[str] | None | Unset = UNSET
+    members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
     parent_project_id: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
@@ -201,14 +202,14 @@ class ProjectCard:
         else:
             owner = self.owner
 
-        team_members: list[str] | None | Unset
-        if isinstance(self.team_members, Unset):
-            team_members = UNSET
-        elif isinstance(self.team_members, list):
-            team_members = self.team_members
+        members: list[str] | None | Unset
+        if isinstance(self.members, Unset):
+            members = UNSET
+        elif isinstance(self.members, list):
+            members = self.members
 
         else:
-            team_members = self.team_members
+            members = self.members
 
         visibility: None | str | Unset
         if isinstance(self.visibility, Unset):
@@ -310,8 +311,8 @@ class ProjectCard:
             field_dict["delete_reason"] = delete_reason
         if owner is not UNSET:
             field_dict["owner"] = owner
-        if team_members is not UNSET:
-            field_dict["team_members"] = team_members
+        if members is not UNSET:
+            field_dict["members"] = members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
         if parent_project_id is not UNSET:
@@ -495,7 +496,7 @@ class ProjectCard:
 
         owner = _parse_owner(d.pop("owner", UNSET))
 
-        def _parse_team_members(data: object) -> list[str] | None | Unset:
+        def _parse_members(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -503,14 +504,14 @@ class ProjectCard:
             try:
                 if not isinstance(data, list):
                     raise TypeError()
-                team_members_type_0 = cast(list[str], data)
+                members_type_0 = cast(list[str], data)
 
-                return team_members_type_0
+                return members_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             return cast(list[str] | None | Unset, data)
 
-        team_members = _parse_team_members(d.pop("team_members", UNSET))
+        members = _parse_members(d.pop("members", UNSET))
 
         def _parse_visibility(data: object) -> None | ProjectVisibilityEnum | Unset:
             if data is None:
@@ -639,7 +640,7 @@ class ProjectCard:
             is_active=is_active,
             delete_reason=delete_reason,
             owner=owner,
-            team_members=team_members,
+            members=members,
             visibility=visibility,
             parent_project_id=parent_project_id,
             created_at=created_at,

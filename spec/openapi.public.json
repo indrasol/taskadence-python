@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasKadence API",
-    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and has no payment method on file, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner or admin adds one) are in the body. Reading, downloading and deleting files still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:email-in-other-account` | The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`). |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
     "version": "2026-10-24"
   },
   "paths": {
@@ -788,7 +788,7 @@
                 "is_active": true,
                 "delete_reason": "string",
                 "owner": "string",
-                "team_members": [
+                "members": [
                   "string"
                 ],
                 "visibility": "public",
@@ -829,7 +829,7 @@
                   "is_active": true,
                   "delete_reason": "string",
                   "owner": "string",
-                  "team_members": [
+                  "members": [
                     "string"
                   ],
                   "visibility": "public",
@@ -1182,7 +1182,7 @@
                       "is_active": true,
                       "delete_reason": "string",
                       "owner": "string",
-                      "team_members": [
+                      "members": [
                         "string"
                       ],
                       "visibility": "public",
@@ -1455,12 +1455,13 @@
                   "is_active": true,
                   "delete_reason": "string",
                   "owner": "string",
-                  "team_members": [
+                  "members": [
                     "string"
                   ],
                   "visibility": "public",
                   "parent_project_id": "string",
                   "project_id": "string",
+                  "position": 0,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -1723,7 +1724,7 @@
                 "end_date": "2026-09-25",
                 "is_active": false,
                 "owner": "string",
-                "team_members": [
+                "members": [
                   "string"
                 ],
                 "visibility": "public",
@@ -1765,12 +1766,13 @@
                   "is_active": true,
                   "delete_reason": "string",
                   "owner": "string",
-                  "team_members": [
+                  "members": [
                     "string"
                   ],
                   "visibility": "public",
                   "parent_project_id": "string",
                   "project_id": "string",
+                  "position": 0,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -2030,7 +2032,7 @@
                 "end_date": "2026-09-25",
                 "is_active": false,
                 "owner": "string",
-                "team_members": [
+                "members": [
                   "string"
                 ],
                 "visibility": "public",
@@ -2072,12 +2074,13 @@
                   "is_active": true,
                   "delete_reason": "string",
                   "owner": "string",
-                  "team_members": [
+                  "members": [
                     "string"
                   ],
                   "visibility": "public",
                   "parent_project_id": "string",
                   "project_id": "string",
+                  "position": 0,
                   "editors_can_add_members": false,
                   "leads": [
                     {
@@ -20771,7 +20774,7 @@
                   "tasks_total": 25,
                   "tasks_completed": 15,
                   "progress_percent": 60.0,
-                  "team_members": 5,
+                  "members": 5,
                   "days_left": 30,
                   "duration_days": 120,
                   "bugs_total": 5
@@ -20957,6 +20960,725 @@
         ],
         "x-scopes": [
           "projects:read"
+        ]
+      }
+    },
+    "/v1/account": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "The caller's account: its organizations, the caller's account role and the storage pool",
+        "description": "The caller's account: its name, the caller's account role, the owner, its organizations (with members and\nstorage each), the shared storage pool and `billing.exempt_message` (only while the account is exempt).",
+        "operationId": "account.read",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountOut"
+                },
+                "example": {
+                  "account_id": "string",
+                  "name": "string",
+                  "my_role": "owner",
+                  "owner": {
+                    "user_id": "string",
+                    "username": "string",
+                    "email": "string"
+                  },
+                  "billing": {
+                    "exempt_message": "string"
+                  },
+                  "can_create_orgs": false,
+                  "orgs": [
+                    {
+                      "org_id": "string",
+                      "name": "string",
+                      "my_role": "owner",
+                      "member_count": 0,
+                      "bytes_used": 0
+                    }
+                  ],
+                  "storage": {
+                    "account_id": "string",
+                    "bytes_used": 0,
+                    "file_count": 0,
+                    "quota_bytes": 0,
+                    "available_bytes": 0,
+                    "overage_bytes": 0,
+                    "percent": 0.0,
+                    "status": "ok",
+                    "payment_method_on_file": false,
+                    "orgs": [
+                      {
+                        "org_id": "string",
+                        "name": "string",
+                        "bytes_used": 0,
+                        "file_count": 0,
+                        "percent_of_quota": 0.0,
+                        "deleted": false
+                      }
+                    ]
+                  },
+                  "created_at": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "account:read"
+        ],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ]
+      }
+    },
+    "/v1/account/people": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Everyone in the account with their role in each organization (account owner / admin)",
+        "description": "Everyone in the account (people and service accounts) with their role in each of its organizations; a person of\nanother account who is still in one of them is listed with `other_account: true`. The account owner / admins only.",
+        "operationId": "account.people",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountPeople"
+                },
+                "example": {
+                  "account_id": "string",
+                  "people": [
+                    {
+                      "user_id": "string",
+                      "username": "string",
+                      "email": "string",
+                      "kind": "user",
+                      "account_role": "owner",
+                      "other_account": false,
+                      "orgs": [
+                        {
+                          "org_id": "string",
+                          "name": "string",
+                          "role": "owner"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "account:read"
+        ],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ]
+      }
+    },
+    "/v1/storage": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "The account's storage pool: totals and the per-organization breakdown",
+        "description": "The account's storage pool: bytes used by every organization of the account against its 10 GB of free storage,\nthe status the upload check uses (a card on file keeps uploads going past it), and the per-organization breakdown.",
+        "operationId": "account.storage",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountStorage"
+                },
+                "example": {
+                  "account_id": "string",
+                  "bytes_used": 0,
+                  "file_count": 0,
+                  "quota_bytes": 0,
+                  "available_bytes": 0,
+                  "overage_bytes": 0,
+                  "percent": 0.0,
+                  "status": "ok",
+                  "payment_method_on_file": false,
+                  "orgs": [
+                    {
+                      "org_id": "string",
+                      "name": "string",
+                      "bytes_used": 0,
+                      "file_count": 0,
+                      "percent_of_quota": 0.0,
+                      "deleted": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "account:read"
+        ],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
         ]
       }
     },
@@ -22821,7 +23543,11 @@
                   "percent": 0.0,
                   "status": "ok",
                   "payment_method_on_file": false,
-                  "billing_exempt": false,
+                  "account_id": "string",
+                  "account_used_bytes": 0,
+                  "account_quota_bytes": 0,
+                  "account_percent": 0.0,
+                  "exempt_message": "string",
                   "breakdown": {
                     "by_kind": {
                       "task": 0,
@@ -33080,7 +33806,13 @@
                           "due_date": "2026-09-25",
                           "status": "string"
                         }
-                      ]
+                      ],
+                      "active_sprint": {
+                        "sprint_id": "string",
+                        "name": "string",
+                        "done": 0,
+                        "total": 0
+                      }
                     }
                   ],
                   "totals": {
@@ -39170,10 +39902,10 @@
                   "type": "null"
                 }
               ],
-              "description": "task | project | organization | member | invite | team | designation | section | settings",
+              "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook",
               "title": "Resource Type"
             },
-            "description": "task | project | organization | member | invite | team | designation | section | settings"
+            "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook"
           },
           {
             "name": "resource_id",
@@ -39539,10 +40271,10 @@
                   "type": "null"
                 }
               ],
-              "description": "task | project | organization | member | invite | team | designation | section | settings",
+              "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook",
               "title": "Resource Type"
             },
-            "description": "task | project | organization | member | invite | team | designation | section | settings"
+            "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook"
           },
           {
             "name": "resource_id",
@@ -39902,10 +40634,10 @@
                   "type": "null"
                 }
               ],
-              "description": "task | project | organization | member | invite | team | designation | section | settings",
+              "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook",
               "title": "Resource Type"
             },
-            "description": "task | project | organization | member | invite | team | designation | section | settings"
+            "description": "billing | designation | goal | invite | mcp_tool | member | milestone | oauth_client | oauth_grant | organization | project | service_account | settings | sprint | storage | task | token | webhook"
           },
           {
             "name": "resource_id",
@@ -43905,7 +44637,9 @@
                         "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached",
                         "urn:taskadence:problem:sprint-project-mismatch",
-                        "urn:taskadence:problem:sprint-not-empty"
+                        "urn:taskadence:problem:sprint-not-empty",
+                        "urn:taskadence:problem:email-in-other-account",
+                        "urn:taskadence:problem:removed-in-release-10"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -44097,7 +44831,7 @@
                       }
                     ],
                     "title": "Scope",
-                    "description": "Space-separated, within: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`. Omitted \u2192 `tasks:read tasks:write projects:read members:read`",
+                    "description": "Space-separated, within: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `account:read`, `account:write`, `admin`. Omitted \u2192 `tasks:read tasks:write projects:read members:read`",
                     "examples": [
                       "tasks:read tasks:write"
                     ]
@@ -44231,7 +44965,9 @@
                         "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached",
                         "urn:taskadence:problem:sprint-project-mismatch",
-                        "urn:taskadence:problem:sprint-not-empty"
+                        "urn:taskadence:problem:sprint-not-empty",
+                        "urn:taskadence:problem:email-in-other-account",
+                        "urn:taskadence:problem:removed-in-release-10"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -44352,7 +45088,9 @@
                         "urn:taskadence:problem:sso-required",
                         "urn:taskadence:problem:storage-limit-reached",
                         "urn:taskadence:problem:sprint-project-mismatch",
-                        "urn:taskadence:problem:sprint-not-empty"
+                        "urn:taskadence:problem:sprint-not-empty",
+                        "urn:taskadence:problem:email-in-other-account",
+                        "urn:taskadence:problem:removed-in-release-10"
                       ],
                       "description": "`about:blank` or a `urn:taskadence:problem:*` identifier"
                     },
@@ -44585,6 +45323,408 @@
         ],
         "title": "AccessReview",
         "description": "Returned by `organizations.access_review`."
+      },
+      "AccountBillingBrief": {
+        "properties": {
+          "exempt_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exempt Message",
+            "description": "Set only for an account that is exempt from billing: \"Your account is exempt from billing. No charge for this account.\""
+          }
+        },
+        "type": "object",
+        "title": "AccountBillingBrief",
+        "description": "Part of `AccountOut`."
+      },
+      "AccountOrg": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "my_role": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "owner",
+                  "admin",
+                  "member",
+                  "guest"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Role",
+            "description": "The caller's role in it; null when they are not a member"
+          },
+          "member_count": {
+            "type": "integer",
+            "title": "Member Count",
+            "default": 0
+          },
+          "bytes_used": {
+            "type": "integer",
+            "title": "Bytes Used",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id"
+        ],
+        "title": "AccountOrg",
+        "description": "Part of `AccountOut`."
+      },
+      "AccountOut": {
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "title": "Account Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "my_role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "admin",
+              "member"
+            ],
+            "title": "My Role",
+            "description": "The caller's account role: owner \u00b7 admin \u00b7 member"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AccountOwner"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "billing": {
+            "$ref": "#/components/schemas/AccountBillingBrief",
+            "description": "What the account is told about billing (the account owner manages it in the web app's Settings > Account)"
+          },
+          "can_create_orgs": {
+            "type": "boolean",
+            "title": "Can Create Orgs",
+            "description": "The account owner and account admins create organizations (no cap)"
+          },
+          "orgs": {
+            "items": {
+              "$ref": "#/components/schemas/AccountOrg"
+            },
+            "type": "array",
+            "title": "Orgs",
+            "description": "The account's organizations (an account member who is not an owner / admin sees the ones they are in)"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/AccountStorage"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id",
+          "name",
+          "my_role",
+          "can_create_orgs",
+          "storage"
+        ],
+        "title": "AccountOut",
+        "description": "Returned by `account.read`."
+      },
+      "AccountOwner": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "AccountOwner",
+        "description": "Part of `AccountOut`."
+      },
+      "AccountPeople": {
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "title": "Account Id"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/AccountPerson"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id",
+          "people"
+        ],
+        "title": "AccountPeople",
+        "description": "Returned by `account.people`."
+      },
+      "AccountPerson": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "user",
+              "service_account"
+            ],
+            "title": "Kind",
+            "default": "user"
+          },
+          "account_role": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "owner",
+                  "admin",
+                  "member"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Role",
+            "description": "Null for a person of another account who is still in one of these organizations (from before one email meant one account)"
+          },
+          "other_account": {
+            "type": "boolean",
+            "title": "Other Account",
+            "description": "The person belongs to another account",
+            "default": false
+          },
+          "orgs": {
+            "items": {
+              "$ref": "#/components/schemas/PersonOrg"
+            },
+            "type": "array",
+            "title": "Orgs",
+            "description": "Their active memberships in this account's organizations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "AccountPerson",
+        "description": "Part of `AccountPeople`."
+      },
+      "AccountStorage": {
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "title": "Account Id"
+          },
+          "bytes_used": {
+            "type": "integer",
+            "title": "Bytes Used",
+            "description": "Bytes of every organization of the account (1 GB = 10^9 bytes)"
+          },
+          "file_count": {
+            "type": "integer",
+            "title": "File Count"
+          },
+          "quota_bytes": {
+            "type": "integer",
+            "title": "Quota Bytes",
+            "description": "The free storage every organization of the account shares (10 GB, decimal, unless the account was granted more)"
+          },
+          "available_bytes": {
+            "type": "integer",
+            "title": "Available Bytes",
+            "description": "Free storage left: max(0, quota_bytes - bytes_used)"
+          },
+          "overage_bytes": {
+            "type": "integer",
+            "title": "Overage Bytes",
+            "description": "max(0, bytes_used - quota_bytes): what is billed per GB-month with a card on file",
+            "default": 0
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent",
+            "description": "bytes_used / quota_bytes, in percent, one decimal"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warning",
+              "blocked",
+              "metered",
+              "exempt"
+            ],
+            "title": "Status",
+            "description": "ok; warning (80 % or more); blocked (full, no card on file: new uploads answer 402); metered (full, a card on file: uploads continue, billed per GB-month at month end); exempt (full, an account exempt from billing: never blocked or billed)"
+          },
+          "payment_method_on_file": {
+            "type": "boolean",
+            "title": "Payment Method On File",
+            "description": "The account owner has a card on file that uploads past the free storage can be billed to",
+            "default": false
+          },
+          "orgs": {
+            "items": {
+              "$ref": "#/components/schemas/AccountStorageOrg"
+            },
+            "type": "array",
+            "title": "Orgs",
+            "description": "Per organization, largest first (an account member who is not an account owner / admin sees the organizations they are in)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id",
+          "bytes_used",
+          "file_count",
+          "quota_bytes",
+          "available_bytes",
+          "percent",
+          "status"
+        ],
+        "title": "AccountStorage",
+        "description": "Returned by `account.storage`."
+      },
+      "AccountStorageOrg": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "bytes_used": {
+            "type": "integer",
+            "title": "Bytes Used"
+          },
+          "file_count": {
+            "type": "integer",
+            "title": "File Count",
+            "default": 0
+          },
+          "percent_of_quota": {
+            "type": "number",
+            "title": "Percent Of Quota",
+            "description": "This organization's share of the account's quota, in percent"
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "Deleted",
+            "description": "Pending deletion: its files count until they are purged",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id",
+          "bytes_used",
+          "percent_of_quota"
+        ],
+        "title": "AccountStorageOrg",
+        "description": "Part of `AccountStorage`."
       },
       "Acknowledgement": {
         "properties": {
@@ -47332,6 +48472,42 @@
         "title": "McpStdio",
         "description": "Part of `McpClientsOut`."
       },
+      "MeAccount": {
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "title": "Account Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "admin",
+              "member"
+            ],
+            "title": "Role",
+            "description": "Account role: owner \u00b7 admin \u00b7 member",
+            "default": "member"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id"
+        ],
+        "title": "MeAccount",
+        "description": "Release 10: the one account the person belongs to (one email = one account)."
+      },
       "MeAuth": {
         "properties": {
           "kind": {
@@ -47491,6 +48667,17 @@
         "properties": {
           "principal": {
             "$ref": "#/components/schemas/MePrincipal"
+          },
+          "account": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MeAccount"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Release 10: the caller's account (null for a principal with none)"
           },
           "organizations": {
             "items": {
@@ -48636,7 +49823,7 @@
             "type": "array",
             "minItems": 1,
             "title": "Allowed Scopes",
-            "description": "The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.",
+            "description": "The scopes the app may ask for: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `account:read`, `account:write`, `admin`.",
             "examples": [
               [
                 "tasks:write",
@@ -50642,7 +51829,7 @@
           "deleted_item_retention_days": {
             "type": "integer",
             "title": "Deleted Item Retention Days",
-            "description": "S.13: days a deleted task, project, goal, milestone, sprint, team or test run stays restorable before it is purged",
+            "description": "S.13: days a deleted task, project, goal, milestone or sprint stays restorable before it is purged",
             "default": 30
           },
           "attachment_retention_days": {
@@ -50852,7 +52039,7 @@
               }
             ],
             "title": "Deleted Item Retention Days",
-            "description": "S.13: days a deleted task, project, goal, milestone, sprint, team or test run stays restorable before it is purged (default 30). Owners only"
+            "description": "S.13: days a deleted task, project, goal, milestone or sprint stays restorable before it is purged (default 30). Owners only"
           },
           "attachment_retention_days": {
             "anyOf": [
@@ -51425,6 +52612,42 @@
         "title": "Page[WebhookOut]",
         "description": "Returned by `webhooks.list`."
       },
+      "PersonOrg": {
+        "properties": {
+          "org_id": {
+            "type": "string",
+            "title": "Org Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "admin",
+              "member",
+              "guest"
+            ],
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "org_id",
+          "role"
+        ],
+        "title": "PersonOrg",
+        "description": "Part of `AccountPerson`."
+      },
       "PinListPage": {
         "properties": {
           "data": {
@@ -51746,7 +52969,7 @@
             "title": "Owner",
             "description": "User name of the project owner"
           },
-          "team_members": {
+          "members": {
             "anyOf": [
               {
                 "items": {
@@ -51758,8 +52981,8 @@
                 "type": "null"
               }
             ],
-            "title": "Team Members",
-            "description": "List of user names to add as members"
+            "title": "Members",
+            "description": "The project's members: user ids (or usernames) to add on create; the members' user ids on a read"
           },
           "visibility": {
             "anyOf": [
@@ -52120,7 +53343,7 @@
             "title": "Owner",
             "description": "User name of the project owner"
           },
-          "team_members": {
+          "members": {
             "anyOf": [
               {
                 "items": {
@@ -52132,8 +53355,8 @@
                 "type": "null"
               }
             ],
-            "title": "Team Members",
-            "description": "List of user names to add as members"
+            "title": "Members",
+            "description": "The project's members: user ids (or usernames) to add on create; the members' user ids on a read"
           },
           "visibility": {
             "anyOf": [
@@ -52430,7 +53653,7 @@
             "title": "Owner",
             "description": "User name of the project owner"
           },
-          "team_members": {
+          "members": {
             "anyOf": [
               {
                 "items": {
@@ -52442,8 +53665,8 @@
                 "type": "null"
               }
             ],
-            "title": "Team Members",
-            "description": "List of user names to add as members"
+            "title": "Members",
+            "description": "The project's members: user ids (or usernames) to add on create; the members' user ids on a read"
           },
           "visibility": {
             "anyOf": [
@@ -52473,6 +53696,12 @@
           "project_id": {
             "type": "string",
             "title": "Project Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "The project's place in the organization's drag order (Planning's tree, the Projects page). Lists sort by position, then name.",
+            "default": 0
           },
           "editors_can_add_members": {
             "type": "boolean",
@@ -53660,9 +54889,9 @@
             "description": "Project completion percentage, 0\u2013100.",
             "example": 60.0
           },
-          "team_members": {
+          "members": {
             "type": "integer",
-            "title": "Team Members",
+            "title": "Members",
             "description": "Number of members in the project",
             "example": 5
           },
@@ -53705,7 +54934,7 @@
           "tasks_total",
           "tasks_completed",
           "progress_percent",
-          "team_members",
+          "members",
           "days_left"
         ],
         "title": "ProjectStatsInDB",
@@ -53831,7 +55060,7 @@
             ],
             "title": "Owner"
           },
-          "team_members": {
+          "members": {
             "anyOf": [
               {
                 "items": {
@@ -53843,7 +55072,7 @@
                 "type": "null"
               }
             ],
-            "title": "Team Members"
+            "title": "Members"
           },
           "visibility": {
             "anyOf": [
@@ -55504,17 +56733,17 @@
           "included_bytes": {
             "type": "integer",
             "title": "Included Bytes",
-            "description": "Storage included before overage, in bytes (decimal). The plan's value is 10^10 (10 GB); an organization may have its own."
+            "description": "The free storage of the organization's ACCOUNT, which all its organizations share, in bytes (decimal). The plan's value is 10^10 (10 GB); an account may be granted more."
           },
           "overage_bytes": {
             "type": "integer",
             "title": "Overage Bytes",
-            "description": "max(0, bytes_used - included_bytes)"
+            "description": "The account's: max(0, account_used_bytes - included_bytes)"
           },
           "percent": {
             "type": "number",
             "title": "Percent",
-            "description": "bytes_used / included_bytes, in percent, one decimal"
+            "description": "This organization's bytes_used / included_bytes, in percent, one decimal (its share of the account's free storage)"
           },
           "status": {
             "type": "string",
@@ -55526,16 +56755,51 @@
               "exempt"
             ],
             "title": "Status",
-            "description": "ok; warning (80 % or more); blocked (full, no payment method: new uploads answer 402); metered (full, a payment method on file: billed per GB-month at month end); exempt (full, an internal organization that is never billed or blocked)"
+            "description": "The account's: ok; warning (80 % or more); blocked (full, no card on file: new uploads answer 402); metered (full, a card on file: billed per GB-month at month end); exempt (full, an account exempt from billing: never billed or blocked)"
           },
           "payment_method_on_file": {
             "type": "boolean",
-            "title": "Payment Method On File"
+            "title": "Payment Method On File",
+            "description": "The account owner has a card on file (uploads continue past the free storage)"
           },
-          "billing_exempt": {
-            "type": "boolean",
-            "title": "Billing Exempt",
-            "description": "An internal organization: metered and shown, never billed or blocked"
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Id",
+            "description": "The account the organization belongs to"
+          },
+          "account_used_bytes": {
+            "type": "integer",
+            "title": "Account Used Bytes",
+            "description": "Bytes of every organization of the account"
+          },
+          "account_quota_bytes": {
+            "type": "integer",
+            "title": "Account Quota Bytes",
+            "description": "The account's free storage (same as included_bytes)"
+          },
+          "account_percent": {
+            "type": "number",
+            "title": "Account Percent",
+            "description": "account_used_bytes / account_quota_bytes, in percent, one decimal"
+          },
+          "exempt_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exempt Message",
+            "description": "Set only while the account is exempt from billing: \"Your account is exempt from billing. No charge for this account.\""
           },
           "breakdown": {
             "$ref": "#/components/schemas/StorageBreakdown"
@@ -55571,7 +56835,7 @@
           "manage_url": {
             "type": "string",
             "title": "Manage Url",
-            "description": "The Storage and billing page in the web app"
+            "description": "The account's Storage page in the web app"
           }
         },
         "type": "object",
@@ -55584,7 +56848,9 @@
           "percent",
           "status",
           "payment_method_on_file",
-          "billing_exempt",
+          "account_used_bytes",
+          "account_quota_bytes",
+          "account_percent",
           "breakdown",
           "manage_url"
         ],
@@ -59432,7 +60698,7 @@
             "type": "string",
             "maxLength": 1000,
             "title": "Id",
-            "description": "Team member user ID"
+            "description": "The member's user ID"
           },
           "designation": {
             "anyOf": [
@@ -59445,7 +60711,7 @@
               }
             ],
             "title": "Designation",
-            "description": "Team member designation"
+            "description": "Accepted and ignored (the member shows their live org designation)"
           }
         },
         "additionalProperties": false,
@@ -59492,7 +60758,7 @@
             "type": "array",
             "minItems": 1,
             "title": "Scopes",
-            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `admin`.\n\n`admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.",
+            "description": "Namespaced scopes: `tasks:read`, `tasks:write`, `projects:read`, `projects:write`, `members:read`, `org:read`, `org:write`, `webhooks:read`, `webhooks:write`, `account:read`, `account:write`, `admin`.\n\n`admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.",
             "examples": [
               [
                 "tasks:write",
@@ -61577,11 +62843,59 @@
             "type": "array",
             "title": "Top",
             "description": "The first 3 open tasks by due date (undated last)"
+          },
+          "active_sprint": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkloadSprint"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The current sprint (active, today inside its dates) holding the person's tasks, the one ending soonest when several do; null when none"
           }
         },
         "type": "object",
         "title": "WorkloadPerson",
         "description": "Part of `WorkloadOut`."
+      },
+      "WorkloadSprint": {
+        "properties": {
+          "sprint_id": {
+            "type": "string",
+            "title": "Sprint Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done",
+            "description": "The person's completed tasks in the sprint",
+            "default": 0
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "The person's tasks in the sprint (every status; subtasks are not counted)",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "sprint_id"
+        ],
+        "title": "WorkloadSprint",
+        "description": "The person's current sprint (the People view's \"this sprint\") and their share of it."
       },
       "WorkloadTask": {
         "properties": {
@@ -61685,7 +62999,9 @@
               "urn:taskadence:problem:sso-required",
               "urn:taskadence:problem:storage-limit-reached",
               "urn:taskadence:problem:sprint-project-mismatch",
-              "urn:taskadence:problem:sprint-not-empty"
+              "urn:taskadence:problem:sprint-not-empty",
+              "urn:taskadence:problem:email-in-other-account",
+              "urn:taskadence:problem:removed-in-release-10"
             ]
           },
           "title": {
@@ -61991,7 +63307,7 @@
         "description": "What changed: the audit row's scrubbed diff - never a whole resource, never a secret.",
         "properties": {
           "resource_type": {
-            "description": "`task`, `project`, `member`, `invite`, `organization`, `team`, `webhook`, \u2026",
+            "description": "`task`, `project`, `sprint`, `member`, `invite`, `organization`, `webhook`, \u2026",
             "examples": [
               "task"
             ],
@@ -62064,7 +63380,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "tkd_live_\u2026 / tkd_test_\u2026",
-        "description": "A TasKadence access token: `Authorization: Bearer tkd_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tkd_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history and saved views, and the organization's workload. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals, milestones and sprints. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals, milestones and sprints (implies projects:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active), the designation catalog and who is away (availability). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations and people's availability; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `admin` | Every scope, including the audit log. |"
+        "description": "A TasKadence access token: `Authorization: Bearer tkd_live_\u2026`.\n\n- **Minting:** `POST /v1/tokens` (or Developers \u2192 Tokens in the app). The token is shown once.\n- **Reach:** one organization, optionally limited to some of its projects.\n- **Scopes:** each operation's `x-scopes` names the one it needs. `admin` implies every scope; `<ns>:write` implies `<ns>:read`; `org:read` implies `members:read`.\n- **Test tokens:** `tkd_test_\u2026` tokens authenticate and read, but never write.\n- **Rate limit:** 600 requests a minute per token (60 for a test token). Every response carries `X-RateLimit-*`; over the limit is a 429 with `Retry-After`.\n- **Internal operations** refuse every token (403 `insufficient-scope` with `required: null`).\n\n| Scope | Grants |\n|---|---|\n| `tasks:read` | Read tasks, their comments, attachments, history and saved views, and the organization's workload. |\n| `tasks:write` | Create, update and delete tasks, comments, attachments and saved views (implies tasks:read). |\n| `projects:read` | Read projects, their members, resources, statistics, goals, milestones and sprints. |\n| `projects:write` | Create, update and delete projects, their members, resources, goals, milestones and sprints (implies projects:read). |\n| `members:read` | Read the organization's profile, its members (role, designation, active), the designation catalog and who is away (availability). |\n| `org:read` | Read the organization, its settings, members, invites, designations, access tokens and access review (implies members:read). |\n| `org:write` | Change the organization's settings, members, invites and designations and people's availability; mint, rotate and revoke access tokens and service accounts (implies org:read). |\n| `webhooks:read` | Read the organization's webhooks and their delivery logs (owner / admin, or a service account). |\n| `webhooks:write` | Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read). |\n| `account:read` | Read your account: its organizations, its people and their per-organization roles (account owner / admin), and the shared storage pool. |\n| `account:write` | Reserved for account changes (implies account:read). Today they are made from a signed-in session only. |\n| `admin` | Every scope, including the audit log. |"
       },
       "oauth2": {
         "type": "oauth2",
@@ -62084,6 +63400,8 @@
               "org:write": "Change the organization's settings, members, invites and designations and people's availability; mint, rotate and revoke access tokens and service accounts (implies org:read).",
               "webhooks:read": "Read the organization's webhooks and their delivery logs (owner / admin, or a service account).",
               "webhooks:write": "Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read).",
+              "account:read": "Read your account: its organizations, its people and their per-organization roles (account owner / admin), and the shared storage pool.",
+              "account:write": "Reserved for account changes (implies account:read). Today they are made from a signed-in session only.",
               "admin": "Every scope, including the audit log."
             }
           }
@@ -71492,6 +72810,10 @@
       "description": "Open work per person: who is heavy, who has capacity."
     },
     {
+      "name": "account",
+      "description": "Your account: one per email, any number of organizations, one shared storage pool."
+    },
+    {
       "name": "views",
       "description": "Saved views and the tasks they show."
     },
@@ -71715,6 +73037,20 @@
         409
       ],
       "description": "A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`)."
+    },
+    {
+      "type": "urn:taskadence:problem:email-in-other-account",
+      "statuses": [
+        409
+      ],
+      "description": "The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`)."
+    },
+    {
+      "type": "urn:taskadence:problem:removed-in-release-10",
+      "statuses": [
+        410
+      ],
+      "description": "The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry."
     }
   ],
   "x-scope-descriptions": [
@@ -71753,6 +73089,14 @@
     {
       "scope": "webhooks:write",
       "description": "Create, change, pause, test, rotate and delete webhooks and replay deliveries (implies webhooks:read)."
+    },
+    {
+      "scope": "account:read",
+      "description": "Read your account: its organizations, its people and their per-organization roles (account owner / admin), and the shared storage pool."
+    },
+    {
+      "scope": "account:write",
+      "description": "Reserved for account changes (implies account:read). Today they are made from a signed-in session only."
     },
     {
       "scope": "admin",

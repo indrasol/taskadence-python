@@ -242,7 +242,46 @@ Needs `projects:write` and `tasks:write` (and `org:write` to mark days away). `t
 {"position": 0})` reorders a project's sprints and `{"project_id": ...}` moves an empty sprint to another project
 (one that holds tasks is a 409 `ConflictError`); `tm.projects.update(project_id, {"position": 2})` places a project
 in the organization's order (owners and admins). Deleting a sprint unfiles its tasks. `tm.organizations.availability` and `tm.organizations.workload` are also `tm.availability.range`
-and `tm.workload.read`.
+and `tm.workload.read`. Each workload row's `active_sprint` is the person's current sprint (`sprint_id`, `name`,
+`done`, `total`), or `None`.
+
+### Account and storage
+
+An account holds your organizations and their people; one email belongs to one account, and every organization of
+the account shares one storage pool. The SDK reads it (a token with `account:read`); changes are made in the web app.
+
+```python
+from taskadence import EmailInOtherAccountError, Taskadence
+
+tm = Taskadence()
+print(tm.me().account)                                  # MeAccount(account_id, name, role), or None
+
+account = tm.account.get()
+print(account.name, account.my_role, [(o.name, o.member_count) for o in account.orgs])
+if account.billing.exempt_message:
+    print(account.billing.exempt_message)
+
+pool = tm.storage.get()                                 # also tm.account.storage()
+print(pool.bytes_used, "of", pool.quota_bytes, pool.status, "card on file" if pool.payment_method_on_file else "")
+for org in pool.orgs:
+    print(" ", org.name, org.bytes_used, f"{org.percent_of_quota}%")
+
+org_storage = tm.organizations.storage(account.orgs[0].org_id)   # one org, with the account's totals
+print(org_storage.account_used_bytes, org_storage.account_quota_bytes, org_storage.account_percent)
+
+try:
+    tm.organization_invites.create({"org_id": account.orgs[0].org_id, "email": "someone@example.com"})
+except EmailInOtherAccountError as exc:                 # 409: that email already belongs to another account
+    print(exc.detail)
+```
+
+`tm.account.people()` lists everyone in the account with their role in each organization (account owners and admins
+only). `status` is `ok`, `warning` (80 % or more), `blocked` (full, no card on file: new uploads answer 402),
+`metered` (full, a card on file: billed per GB-month) or `exempt`.
+
+**Not in the SDK:** billing (the card, invoices: the account owner manages them in the web app; the old
+per-organization billing routes answer 410), changes to the account, support tickets, and the MCP tool
+`contact_support`.
 
 ### Errors
 
@@ -271,7 +310,7 @@ and `.errors`:
 | 400 | `BadRequestError` · `InvalidParameterError` · `IdempotencyKeyInvalidError` |
 | 401 | `AuthenticationError` · `TokenInvalidError` · `TokenExpiredError` · `TokenRevokedError` |
 | 403 | `ForbiddenError` · `InsufficientScopeError` · `TestTokenReadOnlyError` · `TokenPolicyError` (also 422) |
-| 404 · 409 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`) · `PreconditionFailedError` |
+| 404 · 409 · 410 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`, `EmailInOtherAccountError`) · `GoneError` (`RemovedInRelease10Error`: `.successor`, `.changelog`) · `PreconditionFailedError` |
 | 422 | `UnprocessableEntityError` · `ValidationError` (`InvalidValueError`) · `IdempotencyKeyReusedError` · `UrlRefusedError` |
 | 429 · 5xx | `RateLimitedError` (`.retry_after`) · `InternalError` |
 | none | `APIConnectionError` / `APITimeoutError` (no answer from the server) · `ResponseValidationError` (an answer this SDK version cannot read: upgrade) |
@@ -435,7 +474,8 @@ SDK waits and tries again, when trying again is safe.
 It retries up to `max_retries` times (default 3) on 429 (waiting as long as `Retry-After` says), 502, 503, 504 and
 connection failures, waiting a little longer each time (exponential backoff with jitter). Safe means: GET, HEAD,
 DELETE and PUT; PATCH only with `if_match`; POST only with an `Idempotency-Key`. A `Retry-After` longer than
-`max_retry_after` seconds (default 60) is not waited out: the `RateLimitedError` is raised at once.
+`max_retry_after` seconds (default 60) is not waited out: the `RateLimitedError` is raised at once. A 410
+(`RemovedInRelease10Error`, a route release 10 removed) is never retried.
 
 ### Idempotent creates
 

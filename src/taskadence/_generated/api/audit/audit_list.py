@@ -211,8 +211,9 @@ def sync_detailed(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back.
         org_id (str): The organization whose log to read (owner / admin only)
-        resource_type (None | str | Unset): task | project | organization | member | invite | team
-            | designation | section | settings
+        resource_type (None | str | Unset): billing | designation | goal | invite | mcp_tool |
+            member | milestone | oauth_client | oauth_grant | organization | project | service_account
+            | settings | sprint | storage | task | token | webhook
         resource_id (None | str | Unset): One resource's trail (with resource_type)
         project_id (None | str | Unset): One project's events: every event recorded against this
             project.
@@ -277,8 +278,9 @@ def sync(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back.
         org_id (str): The organization whose log to read (owner / admin only)
-        resource_type (None | str | Unset): task | project | organization | member | invite | team
-            | designation | section | settings
+        resource_type (None | str | Unset): billing | designation | goal | invite | mcp_tool |
+            member | milestone | oauth_client | oauth_grant | organization | project | service_account
+            | settings | sprint | storage | task | token | webhook
         resource_id (None | str | Unset): One resource's trail (with resource_type)
         project_id (None | str | Unset): One project's events: every event recorded against this
             project.
@@ -338,8 +340,9 @@ async def asyncio_detailed(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back.
         org_id (str): The organization whose log to read (owner / admin only)
-        resource_type (None | str | Unset): task | project | organization | member | invite | team
-            | designation | section | settings
+        resource_type (None | str | Unset): billing | designation | goal | invite | mcp_tool |
+            member | milestone | oauth_client | oauth_grant | organization | project | service_account
+            | settings | sprint | storage | task | token | webhook
         resource_id (None | str | Unset): One resource's trail (with resource_type)
         project_id (None | str | Unset): One project's events: every event recorded against this
             project.
@@ -402,8 +405,9 @@ async def asyncio(
         cursor (None | str | Unset): Opaque token from the previous page's `next_cursor`. Only
             ever echo it back.
         org_id (str): The organization whose log to read (owner / admin only)
-        resource_type (None | str | Unset): task | project | organization | member | invite | team
-            | designation | section | settings
+        resource_type (None | str | Unset): billing | designation | goal | invite | mcp_tool |
+            member | milestone | oauth_client | oauth_grant | organization | project | service_account
+            | settings | sprint | storage | task | token | webhook
         resource_id (None | str | Unset): One resource's trail (with resource_type)
         project_id (None | str | Unset): One project's events: every event recorded against this
             project.

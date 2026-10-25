@@ -1550,6 +1550,57 @@ class ProjectStatsResource:
     """Alias of `read`."""
 
 
+class AccountResource:
+    """Your account: one per email, any number of organizations, one shared storage pool."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
+    @overload
+    def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
+    def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
+        """The caller's account: its organizations, the caller's account role and the storage pool.
+
+        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountOut | NotModifiedType", self._client._call(_OPS["account.read"], if_none_match=if_none_match)
+        )
+
+    @overload
+    def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
+    @overload
+    def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
+    def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
+        """Everyone in the account with their role in each organization (account owner / admin).
+
+        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountPeople | NotModifiedType",
+            self._client._call(_OPS["account.people"], if_none_match=if_none_match),
+        )
+
+    @overload
+    def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
 class ServiceAccountsResource:
     """Non-human organization members that hold access tokens. They cannot sign in."""
 
@@ -2918,6 +2969,27 @@ class ViewPinsResource:
         `PUT /v1/view-pins/order` · scope `tasks:write`
         """
         return cast("models.PinListPage", self._client._call(_OPS["view-pins.reorder"], body=body))
+
+
+class StorageResource:
+    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
 
 
 class AsyncHealthResource:
@@ -4492,6 +4564,58 @@ class AsyncProjectStatsResource:
     """Alias of `read`."""
 
 
+class AsyncAccountResource:
+    """Your account: one per email, any number of organizations, one shared storage pool."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
+    @overload
+    async def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
+    async def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
+        """The caller's account: its organizations, the caller's account role and the storage pool.
+
+        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountOut | NotModifiedType",
+            await self._client._call(_OPS["account.read"], if_none_match=if_none_match),
+        )
+
+    @overload
+    async def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
+    @overload
+    async def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
+    async def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
+        """Everyone in the account with their role in each organization (account owner / admin).
+
+        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountPeople | NotModifiedType",
+            await self._client._call(_OPS["account.people"], if_none_match=if_none_match),
+        )
+
+    @overload
+    async def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    async def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    async def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
 class AsyncServiceAccountsResource:
     """Non-human organization members that hold access tokens. They cannot sign in."""
 
@@ -5907,6 +6031,27 @@ class AsyncViewPinsResource:
         return cast("models.PinListPage", await self._client._call(_OPS["view-pins.reorder"], body=body))
 
 
+class AsyncStorageResource:
+    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    async def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    async def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
+
+
 class SyncResources:
     """Every resource namespace, attached to a client."""
 
@@ -5924,6 +6069,7 @@ class SyncResources:
     task_comments: TaskCommentsResource
     task_history: TaskHistoryResource
     project_stats: ProjectStatsResource
+    account: AccountResource
     service_accounts: ServiceAccountsResource
     tokens: TokensResource
     webhooks: WebhooksResource
@@ -5940,6 +6086,7 @@ class SyncResources:
     audit: AuditResource
     views: ViewsResource
     view_pins: ViewPinsResource
+    storage: StorageResource
 
     def _attach(self, core: SyncCore) -> None:
         self.health = HealthResource(core)
@@ -5956,6 +6103,7 @@ class SyncResources:
         self.task_comments = TaskCommentsResource(core)
         self.task_history = TaskHistoryResource(core)
         self.project_stats = ProjectStatsResource(core)
+        self.account = AccountResource(core)
         self.service_accounts = ServiceAccountsResource(core)
         self.tokens = TokensResource(core)
         self.webhooks = WebhooksResource(core)
@@ -5972,6 +6120,7 @@ class SyncResources:
         self.audit = AuditResource(core)
         self.views = ViewsResource(core)
         self.view_pins = ViewPinsResource(core)
+        self.storage = StorageResource(core)
 
 
 class AsyncResources:
@@ -5991,6 +6140,7 @@ class AsyncResources:
     task_comments: AsyncTaskCommentsResource
     task_history: AsyncTaskHistoryResource
     project_stats: AsyncProjectStatsResource
+    account: AsyncAccountResource
     service_accounts: AsyncServiceAccountsResource
     tokens: AsyncTokensResource
     webhooks: AsyncWebhooksResource
@@ -6007,6 +6157,7 @@ class AsyncResources:
     audit: AsyncAuditResource
     views: AsyncViewsResource
     view_pins: AsyncViewPinsResource
+    storage: AsyncStorageResource
 
     def _attach(self, core: AsyncCore) -> None:
         self.health = AsyncHealthResource(core)
@@ -6023,6 +6174,7 @@ class AsyncResources:
         self.task_comments = AsyncTaskCommentsResource(core)
         self.task_history = AsyncTaskHistoryResource(core)
         self.project_stats = AsyncProjectStatsResource(core)
+        self.account = AsyncAccountResource(core)
         self.service_accounts = AsyncServiceAccountsResource(core)
         self.tokens = AsyncTokensResource(core)
         self.webhooks = AsyncWebhooksResource(core)
@@ -6039,6 +6191,7 @@ class AsyncResources:
         self.audit = AsyncAuditResource(core)
         self.views = AsyncViewsResource(core)
         self.view_pins = AsyncViewPinsResource(core)
+        self.storage = AsyncStorageResource(core)
 
 
 RESOURCE_METHODS: dict[str, tuple[str, str]] = {
@@ -6116,6 +6269,9 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "task-history.list": ("task_history", "list"),
     "task-history.read": ("task_history", "read"),
     "project-stats.read": ("project_stats", "read"),
+    "account.read": ("account", "read"),
+    "account.people": ("account", "people"),
+    "account.storage": ("account", "storage"),
     "organizations.settings": ("organizations", "settings"),
     "organizations.update_settings": ("organizations", "update_settings"),
     "service-accounts.create": ("service_accounts", "create"),

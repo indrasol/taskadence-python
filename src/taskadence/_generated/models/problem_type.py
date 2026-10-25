@@ -5,6 +5,7 @@ from typing import Literal
 ProblemType = Literal[
     "about:blank",
     "urn:taskadence:problem:database-unavailable",
+    "urn:taskadence:problem:email-in-other-account",
     "urn:taskadence:problem:email-unverified",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",
@@ -15,6 +16,7 @@ ProblemType = Literal[
     "urn:taskadence:problem:mfa-required",
     "urn:taskadence:problem:precondition-failed",
     "urn:taskadence:problem:rate-limit",
+    "urn:taskadence:problem:removed-in-release-10",
     "urn:taskadence:problem:sprint-not-empty",
     "urn:taskadence:problem:sprint-project-mismatch",
     "urn:taskadence:problem:sso-required",
@@ -35,6 +37,7 @@ ProblemType = Literal[
 PROBLEM_TYPE_VALUES: set[ProblemType] = {
     "about:blank",
     "urn:taskadence:problem:database-unavailable",
+    "urn:taskadence:problem:email-in-other-account",
     "urn:taskadence:problem:email-unverified",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",
@@ -45,6 +48,7 @@ PROBLEM_TYPE_VALUES: set[ProblemType] = {
     "urn:taskadence:problem:mfa-required",
     "urn:taskadence:problem:precondition-failed",
     "urn:taskadence:problem:rate-limit",
+    "urn:taskadence:problem:removed-in-release-10",
     "urn:taskadence:problem:sprint-not-empty",
     "urn:taskadence:problem:sprint-project-mismatch",
     "urn:taskadence:problem:sso-required",

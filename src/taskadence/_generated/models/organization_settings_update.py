@@ -57,8 +57,8 @@ class OrganizationSettingsUpdate:
         restrict_to_verified_domains (bool | None | Unset): S.7: only people with an email at one of the org's verified
             domains get in by themselves; an invite to another domain needs an owner, a join request from one is refused.
             Owners only (default false)
-        deleted_item_retention_days (int | None | Unset): S.13: days a deleted task, project, goal, milestone, sprint,
-            team or test run stays restorable before it is purged (default 30). Owners only
+        deleted_item_retention_days (int | None | Unset): S.13: days a deleted task, project, goal, milestone or sprint
+            stays restorable before it is purged (default 30). Owners only
         attachment_retention_days (int | None | Unset): S.13: days a deleted attachment's file is kept before it is
             removed from storage (default 30; 0 = at the next purge run). Owners only
     """

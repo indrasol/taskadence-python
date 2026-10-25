@@ -56,7 +56,10 @@ CROSS_ALIASES = {
     "projects": {"sprints": "sprints.list"},
     "organizations": {"availability": "availability.range", "workload": "workload.read"},
     "me": {"set_availability": "availability.mark_mine"},
+    "storage": {"get": "account.storage"},
 }
+# Release 10: a namespace that exists only for its CROSS_ALIASES (no operationId of its own), with its docstring.
+ALIAS_NAMESPACES = {"storage": "The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."}
 
 
 def bin_(name: str) -> str:
@@ -534,11 +537,11 @@ class Facade:
             "",
             "",
         ]
-        grouped = self.resources()
+        grouped = self.resources() | {name: [] for name in ALIAS_NAMESPACES if name not in self.resources()}
         for is_async in (False, True):
             for resource, ops in grouped.items():
                 cls = ("Async" if is_async else "") + pascal(resource) + "Resource"
-                text = self.tag_text.get(resource, "").replace('"""', "'''")
+                text = self.tag_text.get(resource, ALIAS_NAMESPACES.get(resource, "")).replace('"""', "'''")
                 out += [
                     f"class {cls}:",
                     f'    """{text}"""',

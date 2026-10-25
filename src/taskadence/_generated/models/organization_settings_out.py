@@ -61,8 +61,8 @@ class OrganizationSettingsOut:
             240, 480 or 1440) Default: 1440.
         restrict_to_verified_domains (bool | Unset): S.7: only people with an email at a verified domain get in by
             themselves (invites to other domains need an owner) Default: False.
-        deleted_item_retention_days (int | Unset): S.13: days a deleted task, project, goal, milestone, sprint, team or
-            test run stays restorable before it is purged Default: 30.
+        deleted_item_retention_days (int | Unset): S.13: days a deleted task, project, goal, milestone or sprint stays
+            restorable before it is purged Default: 30.
         attachment_retention_days (int | Unset): S.13: days a deleted attachment's file is kept in storage before it is
             removed Default: 30.
         mfa_not_enrolled (MfaEnrolmentCounts | None | Unset): For owners and admins: how many members each policy value

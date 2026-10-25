@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
+    from ..models.workload_sprint import WorkloadSprint
     from ..models.workload_task import WorkloadTask
 
 
@@ -37,6 +38,8 @@ class WorkloadPerson:
         heavy (bool | Unset): True when the person has 5 or more open tasks and at least one and a half times the mean
             of the rows. Default: False.
         top (list[WorkloadTask] | Unset): The first 3 open tasks by due date (undated last)
+        active_sprint (None | Unset | WorkloadSprint): The current sprint (active, today inside its dates) holding the
+            person's tasks, the one ending soonest when several do; null when none
     """
 
     open_: int | Unset = 0
@@ -49,12 +52,14 @@ class WorkloadPerson:
     username: None | str | Unset = UNSET
     heavy: bool | Unset = False
     top: list[WorkloadTask] | Unset = UNSET
+    active_sprint: None | Unset | WorkloadSprint = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.workload_sprint import WorkloadSprint  # noqa: PLC0415
         from ..models.workload_task import WorkloadTask  # noqa: PLC0415
 
         open_ = self.open_
@@ -90,6 +95,14 @@ class WorkloadPerson:
                 top_item = top_item_data.to_dict()
                 top.append(top_item)
 
+        active_sprint: dict[str, Any] | None | Unset
+        if isinstance(self.active_sprint, Unset):
+            active_sprint = UNSET
+        elif isinstance(self.active_sprint, WorkloadSprint):
+            active_sprint = self.active_sprint.to_dict()
+        else:
+            active_sprint = self.active_sprint
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
@@ -113,11 +126,14 @@ class WorkloadPerson:
             field_dict["heavy"] = heavy
         if top is not UNSET:
             field_dict["top"] = top
+        if active_sprint is not UNSET:
+            field_dict["active_sprint"] = active_sprint
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.workload_sprint import WorkloadSprint  # noqa: PLC0415
         from ..models.workload_task import WorkloadTask  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -162,6 +178,23 @@ class WorkloadPerson:
 
                 top.append(top_item)
 
+        def _parse_active_sprint(data: object) -> None | Unset | WorkloadSprint:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                active_sprint_type_0 = WorkloadSprint.from_dict(data)
+
+                return active_sprint_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | Unset | WorkloadSprint, data)
+
+        active_sprint = _parse_active_sprint(d.pop("active_sprint", UNSET))
+
         workload_person = cls(
             open_=open_,
             in_progress=in_progress,
@@ -173,6 +206,7 @@ class WorkloadPerson:
             username=username,
             heavy=heavy,
             top=top,
+            active_sprint=active_sprint,
         )
 
         workload_person.additional_properties = d

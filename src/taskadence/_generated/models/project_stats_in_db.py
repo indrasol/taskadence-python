@@ -26,7 +26,7 @@ class ProjectStatsInDB:
         tasks_total (int): Total number of tasks in the project Example: 25.
         tasks_completed (int): Number of completed tasks Example: 15.
         progress_percent (float): Project completion percentage, 0–100. Example: 60.0.
-        team_members (int): Number of members in the project Example: 5.
+        members (int): Number of members in the project Example: 5.
         days_left (int): Days remaining until end_date Example: 30.
         duration_days (int | None | Unset): Project duration in days Example: 120.
         bugs_total (int | None | Unset): Total number of bugs in the project Example: 5.
@@ -36,7 +36,7 @@ class ProjectStatsInDB:
     tasks_total: int
     tasks_completed: int
     progress_percent: float
-    team_members: int
+    members: int
     days_left: int
     duration_days: int | None | Unset = UNSET
     bugs_total: int | None | Unset = UNSET
@@ -54,7 +54,7 @@ class ProjectStatsInDB:
 
         progress_percent = self.progress_percent
 
-        team_members = self.team_members
+        members = self.members
 
         days_left = self.days_left
 
@@ -78,7 +78,7 @@ class ProjectStatsInDB:
                 "tasks_total": tasks_total,
                 "tasks_completed": tasks_completed,
                 "progress_percent": progress_percent,
-                "team_members": team_members,
+                "members": members,
                 "days_left": days_left,
             }
         )
@@ -100,7 +100,7 @@ class ProjectStatsInDB:
 
         progress_percent = d.pop("progress_percent")
 
-        team_members = d.pop("team_members")
+        members = d.pop("members")
 
         days_left = d.pop("days_left")
 
@@ -127,7 +127,7 @@ class ProjectStatsInDB:
             tasks_total=tasks_total,
             tasks_completed=tasks_completed,
             progress_percent=progress_percent,
-            team_members=team_members,
+            members=members,
             days_left=days_left,
             duration_days=duration_days,
             bugs_total=bugs_total,

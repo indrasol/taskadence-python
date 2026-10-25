@@ -6,6 +6,9 @@
 from __future__ import annotations
 
 from ._core import Operation
+from ._generated.api.account import account_people as _account_people
+from ._generated.api.account import account_read as _account_read
+from ._generated.api.account import account_storage as _account_storage
 from ._generated.api.audit import audit_export as _audit_export
 from ._generated.api.audit import audit_export_json as _audit_export_json
 from ._generated.api.audit import audit_list as _audit_list
@@ -1007,6 +1010,33 @@ OPERATIONS: dict[str, Operation] = {
         parse=_project_stats_read._parse_response,
         scopes=("projects:read",),
         summary="A project's task statistics",
+    ),
+    "account.read": Operation(
+        op_id="account.read",
+        method="GET",
+        path="/v1/account",
+        if_none_match=True,
+        parse=_account_read._parse_response,
+        scopes=("account:read",),
+        summary="The caller's account: its organizations, the caller's account role and the storage pool",
+    ),
+    "account.people": Operation(
+        op_id="account.people",
+        method="GET",
+        path="/v1/account/people",
+        if_none_match=True,
+        parse=_account_people._parse_response,
+        scopes=("account:read",),
+        summary="Everyone in the account with their role in each organization (account owner / admin)",
+    ),
+    "account.storage": Operation(
+        op_id="account.storage",
+        method="GET",
+        path="/v1/storage",
+        if_none_match=True,
+        parse=_account_storage._parse_response,
+        scopes=("account:read",),
+        summary="The account's storage pool: totals and the per-organization breakdown",
     ),
     "organizations.settings": Operation(
         op_id="organizations.settings",

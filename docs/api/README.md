@@ -20,6 +20,7 @@ Every operation is `tm.<resource>.<method>(…)` on `Taskadence` (and `await` on
 | [`tm.task_comments`](task-comments.md) | 6 | Comments on a task (threaded). |
 | [`tm.task_history`](task-history.md) | 2 | A task's change history. |
 | [`tm.project_stats`](project-stats.md) | 1 | A project's task statistics. |
+| [`tm.account`](account.md) | 3 | Your account: one per email, any number of organizations, one shared storage pool. |
 | [`tm.service_accounts`](service-accounts.md) | 4 | Non-human organization members that hold access tokens. They cannot sign in. |
 | [`tm.tokens`](tokens.md) | 6 | TasKadence access tokens (`tkd_live_…` / `tkd_test_…`): mint, list, rename, revoke, rotate. |
 | [`tm.webhooks`](webhooks.md) | 11 | Signed HTTP callbacks for audit events: subscriptions, the signing secret (shown once, rotated with a 24 h grace), test sends, the delivery log and replay. Standard-Webhooks signatures; at-least-once with retries. |
