@@ -43089,7 +43089,7 @@
           "views"
         ],
         "summary": "Update a saved view",
-        "description": "Rename, re-query or re-display. `edit`: the owner (personal), a project owner /\neditor / org admin (project). `resource` is\nread-only: a different value is a 400.",
+        "description": "Rename, re-query or re-display. `edit`: the owner (personal), a project owner /\nmember / org admin (project). `resource` is\nread-only: a different value is a 400.",
         "operationId": "views.update",
         "parameters": [
           {
@@ -69408,7 +69408,7 @@
     "project.delegation_changed": {
       "post": {
         "summary": "project.delegation_changed",
-        "description": "Whether a project's editors may add members changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it - the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "description": "Whether a project's members may add people changed.\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it - the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
         "operationId": "webhook.project.delegation_changed",
         "tags": [
           "webhooks"

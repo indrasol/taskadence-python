@@ -11,7 +11,7 @@ entries below were pre-releases with no compatibility promise.
 
 Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
 to an account (one per email) that shares one storage pool, and the project roles are owner, member and viewer.
-Re-generated from the API contract at `taskadence-api` `e124d44` (branch `feature/ia-redesign`); the API version is
+Re-generated from the API contract at `taskadence-api` `d178ad7` (branch `feature/ia-redesign`); the API version is
 now `2026-10-24` (was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because
 methods, models and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
 answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
