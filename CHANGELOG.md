@@ -11,7 +11,7 @@ entries below were pre-releases with no compatibility promise.
 
 Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
 to an account (one per email) that shares one storage pool, and the project roles are owner, member and viewer.
-Re-generated from the API contract at `taskadence-api` `d178ad7` (branch `feature/ia-redesign`); the API version is
+Re-generated from the API contract at `taskadence-api` `37ea9d8` (branch `feature/ia-redesign`); the API version is
 now `2026-10-24` (was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because
 methods, models and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
 answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
@@ -127,6 +127,12 @@ change only their shared version.
   `add_many(project_id, members)`; a bare string or mapping is a `TypeError`), and a resource can carry a nested
   namespace (`tm.projects.members`).
 - The README has Project members and roles and Task subscribers sections.
+- **Always review agent tasks.** `ProjectInDB.agent_task_review_always` (set with `ProjectUpdate`; default False):
+  when true, every task an agent creates in the project waits for a person's review, whatever the organization's
+  setting (it can only make review stricter). `ProjectInDB.agent_task_review_effective` (read-only, not on
+  `ProjectUpdate`; model `AgentTaskReviewEffectiveEnum`): `always`, `private_project` (the org default, private
+  project) or `never`, the stricter of the org's `agent_task_review` and the project's flag. Webhook
+  `project.agent_review_changed`.
 - `ProjectUpdate.position`: a project's place in the organization's order (owners and admins); `ProjectInDB.position`
   (the single-project read, `tm.projects.read`). `ProjectCard.position` is unchanged.
 - Sub-projects (N.3, not released before): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry

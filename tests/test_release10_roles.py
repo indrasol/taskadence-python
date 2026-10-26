@@ -71,6 +71,57 @@ def test_members_can_add_people_is_sent_on_an_update(tm: Taskadence, api: respx.
     assert json.loads(route.calls.last.request.content) == {"members_can_add_people": True}
 
 
+# ---------------------------------------------------------------------------
+# always review agent tasks (API 37ea9d8)
+# ---------------------------------------------------------------------------
+
+
+def test_agent_task_review_effective_is_always_private_project_or_never() -> None:
+    assert set(get_args(models.AgentTaskReviewEffectiveEnum)) == {"always", "private_project", "never"}
+    assert SPEC["components"]["schemas"]["AgentTaskReviewEffectiveEnum"]["enum"] == [
+        "always",
+        "private_project",
+        "never",
+    ]
+
+
+@pytest.mark.parametrize(("always", "effective"), [(False, "never"), (False, "private_project"), (True, "always")])
+def test_a_project_says_whether_agent_tasks_wait_for_review(
+    tm: Taskadence, api: respx.MockRouter, always: bool, effective: str
+) -> None:
+    body = example("projects.read") | {
+        "project_id": "P1",
+        "agent_task_review_always": always,
+        "agent_task_review_effective": effective,
+    }
+    api.get("/v1/projects/detail/P1").respond(json=body)
+    got = tm.projects.read("P1")
+    assert (got.agent_task_review_always, got.agent_task_review_effective) == (always, effective)
+
+
+def test_agent_task_review_always_is_settable_and_effective_is_read_only(tm: Taskadence, api: respx.MockRouter) -> None:
+    route = api.patch("/v1/projects/P1").respond(json=example("projects.update"))
+    tm.projects.update("P1", models.ProjectUpdate(agent_task_review_always=True))
+    assert json.loads(route.calls.last.request.content) == {"agent_task_review_always": True}
+    update = SPEC["components"]["schemas"]["ProjectUpdate"]["properties"]
+    assert "agent_task_review_always" in update and "agent_task_review_effective" not in update
+    with pytest.raises(TypeError):
+        models.ProjectUpdate(agent_task_review_effective="always")  # type: ignore[call-arg]
+
+
+def test_a_project_agent_review_changed_webhook_parses() -> None:
+    assert "project.agent_review_changed" in SPEC["webhooks"]
+    body = json.loads(BODY) | {"type": "project.agent_review_changed"}
+    body["data"] = {
+        "resource_type": "project",
+        "resource_id": "P96441",
+        "before": {"agent_task_review_always": False},
+        "after": {"agent_task_review_always": True},
+    }
+    event = webhooks.parse(body)
+    assert (event.type_, event.data.resource_id) == ("project.agent_review_changed", "P96441")
+
+
 @pytest.mark.parametrize("scope", ["all", "mine"])
 def test_projects_list_takes_a_scope(tm: Taskadence, api: respx.MockRouter, scope: str) -> None:
     page = example("projects.list") | {"next_cursor": None}

@@ -1486,6 +1486,8 @@
                   "position": 0,
                   "members_can_add_people": false,
                   "editors_can_add_members": false,
+                  "agent_task_review_always": false,
+                  "agent_task_review_effective": "never",
                   "leads": [
                     {
                       "user_id": "string",
@@ -1764,6 +1766,7 @@
                 "editors_can_add_members": false,
                 "position": 0,
                 "parent_project_id": "string",
+                "agent_task_review_always": false,
                 "owner_designation": "string",
                 "team_member_designations": [
                   {
@@ -1808,6 +1811,8 @@
                   "position": 0,
                   "members_can_add_people": false,
                   "editors_can_add_members": false,
+                  "agent_task_review_always": false,
+                  "agent_task_review_effective": "never",
                   "leads": [
                     {
                       "user_id": "string",
@@ -2083,6 +2088,7 @@
                 "editors_can_add_members": false,
                 "position": 0,
                 "parent_project_id": "string",
+                "agent_task_review_always": false,
                 "owner_designation": "string",
                 "team_member_designations": [
                   {
@@ -2127,6 +2133,8 @@
                   "position": 0,
                   "members_can_add_people": false,
                   "editors_can_add_members": false,
+                  "agent_task_review_always": false,
+                  "agent_task_review_effective": "never",
                   "leads": [
                     {
                       "user_id": "string",
@@ -47044,6 +47052,16 @@
           "ok": true
         }
       },
+      "AgentTaskReviewEffectiveEnum": {
+        "type": "string",
+        "enum": [
+          "always",
+          "private_project",
+          "never"
+        ],
+        "title": "AgentTaskReviewEffectiveEnum",
+        "description": "`ProjectInDB.agent_task_review_effective` (release 10): the stricter of the org's `agent_task_review` and the\nproject's `agent_task_review_always`."
+      },
       "AgentTaskReviewEnum": {
         "type": "string",
         "enum": [
@@ -55077,6 +55095,24 @@
             "default": false,
             "deprecated": true
           },
+          "agent_task_review_always": {
+            "type": "boolean",
+            "title": "Agent Task Review Always",
+            "description": "Hold every task an agent creates in this project for a person's review, whatever the organization's setting. Can only make review stricter.",
+            "default": false
+          },
+          "agent_task_review_effective": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentTaskReviewEffectiveEnum"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Read-only: which tasks an agent creates here wait for a person's review, the stricter of the organization's setting and `agent_task_review_always`: `always`, `private_project` (the org default, private project) or `never`.",
+            "example": "never"
+          },
           "leads": {
             "items": {
               "$ref": "#/components/schemas/ProjectLeadOut"
@@ -56615,6 +56651,18 @@
               }
             ],
             "title": "Parent Project Id"
+          },
+          "agent_task_review_always": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Task Review Always",
+            "description": "Hold every task an agent creates in this project for a person's review, whatever the organization's setting. Can only make review stricter."
           },
           "owner_designation": {
             "anyOf": [
@@ -69179,6 +69227,110 @@
                 "data": {
                   "resource_type": "organization",
                   "resource_id": "O123456",
+                  "before": {
+                    "name": "Before"
+                  },
+                  "after": {
+                    "name": "After"
+                  }
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received - any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone - TasKadence disables the webhook and stops sending"
+          }
+        }
+      }
+    },
+    "project.agent_review_changed": {
+      "post": {
+        "summary": "project.agent_review_changed",
+        "description": "Whether a project holds every task an agent creates for a person's review changed (`agent_task_review_always`).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it - the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.project.agent_review_changed",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id - equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-Taskadence-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies TasKadence's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "project.agent_review_changed",
+                "api_version": "2026-10-24",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O123456",
+                "project_id": "P30104",
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "project",
+                  "resource_id": "P30104",
                   "before": {
                     "name": "Before"
                   },

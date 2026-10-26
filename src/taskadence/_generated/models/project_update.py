@@ -50,6 +50,8 @@ class ProjectUpdate:
         position (int | None | Unset): The project's place in the organization's drag order; an org owner / admin only
             (403 otherwise)
         parent_project_id (None | str | Unset):
+        agent_task_review_always (bool | None | Unset): Hold every task an agent creates in this project for a person's
+            review, whatever the organization's setting. Can only make review stricter.
         owner_designation (None | str | Unset):
         team_member_designations (list[TeamMemberDesignation] | None | Unset):
     """
@@ -69,6 +71,7 @@ class ProjectUpdate:
     editors_can_add_members: bool | None | Unset = UNSET
     position: int | None | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
+    agent_task_review_always: bool | None | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -184,6 +187,12 @@ class ProjectUpdate:
         else:
             parent_project_id = self.parent_project_id
 
+        agent_task_review_always: bool | None | Unset
+        if isinstance(self.agent_task_review_always, Unset):
+            agent_task_review_always = UNSET
+        else:
+            agent_task_review_always = self.agent_task_review_always
+
         owner_designation: None | str | Unset
         if isinstance(self.owner_designation, Unset):
             owner_designation = UNSET
@@ -235,6 +244,8 @@ class ProjectUpdate:
             field_dict["position"] = position
         if parent_project_id is not UNSET:
             field_dict["parent_project_id"] = parent_project_id
+        if agent_task_review_always is not UNSET:
+            field_dict["agent_task_review_always"] = agent_task_review_always
         if owner_designation is not UNSET:
             field_dict["owner_designation"] = owner_designation
         if team_member_designations is not UNSET:
@@ -440,6 +451,15 @@ class ProjectUpdate:
 
         parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
 
+        def _parse_agent_task_review_always(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        agent_task_review_always = _parse_agent_task_review_always(d.pop("agent_task_review_always", UNSET))
+
         def _parse_owner_designation(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -489,6 +509,7 @@ class ProjectUpdate:
             editors_can_add_members=editors_can_add_members,
             position=position,
             parent_project_id=parent_project_id,
+            agent_task_review_always=agent_task_review_always,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,
         )

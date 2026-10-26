@@ -10,6 +10,8 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.agent_task_review_effective_enum import AgentTaskReviewEffectiveEnum
+from ..models.agent_task_review_effective_enum import check_agent_task_review_effective_enum
 from ..models.priority_enum import check_priority_enum
 from ..models.priority_enum import PriorityEnum
 from ..models.project_status_enum import check_project_status_enum
@@ -67,6 +69,12 @@ class ProjectInDB:
             remove people and change their roles. Set by the project owner or an org admin. Default: False.
         editors_can_add_members (bool | Unset): Deprecated: the old name of `members_can_add_people` (same value), kept
             until the next release. Default: False.
+        agent_task_review_always (bool | Unset): Hold every task an agent creates in this project for a person's review,
+            whatever the organization's setting. Can only make review stricter. Default: False.
+        agent_task_review_effective (AgentTaskReviewEffectiveEnum | None | Unset): Read-only: which tasks an agent
+            creates here wait for a person's review, the stricter of the organization's setting and
+            `agent_task_review_always`: `always`, `private_project` (the org default, private project) or `never`. Example:
+            never.
         leads (list[ProjectLeadOut] | Unset): The project's leads (there can be several); optional, usually empty.
         managers (list[ProjectManagerOut] | Unset): The project's managers (there can be several; a label, no extra
             access); optional, usually empty.
@@ -102,6 +110,8 @@ class ProjectInDB:
     position: int | Unset = 0
     members_can_add_people: bool | Unset = False
     editors_can_add_members: bool | Unset = False
+    agent_task_review_always: bool | Unset = False
+    agent_task_review_effective: AgentTaskReviewEffectiveEnum | None | Unset = UNSET
     leads: list[ProjectLeadOut] | Unset = UNSET
     managers: list[ProjectManagerOut] | Unset = UNSET
     implicit_members: list[ProjectImplicitMember] | Unset = UNSET
@@ -250,6 +260,16 @@ class ProjectInDB:
 
         editors_can_add_members = self.editors_can_add_members
 
+        agent_task_review_always = self.agent_task_review_always
+
+        agent_task_review_effective: None | str | Unset
+        if isinstance(self.agent_task_review_effective, Unset):
+            agent_task_review_effective = UNSET
+        elif isinstance(self.agent_task_review_effective, str):
+            agent_task_review_effective = self.agent_task_review_effective
+        else:
+            agent_task_review_effective = self.agent_task_review_effective
+
         leads: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.leads, Unset):
             leads = []
@@ -338,6 +358,10 @@ class ProjectInDB:
             field_dict["members_can_add_people"] = members_can_add_people
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
+        if agent_task_review_always is not UNSET:
+            field_dict["agent_task_review_always"] = agent_task_review_always
+        if agent_task_review_effective is not UNSET:
+            field_dict["agent_task_review_effective"] = agent_task_review_effective
         if leads is not UNSET:
             field_dict["leads"] = leads
         if managers is not UNSET:
@@ -602,6 +626,25 @@ class ProjectInDB:
 
         editors_can_add_members = d.pop("editors_can_add_members", UNSET)
 
+        agent_task_review_always = d.pop("agent_task_review_always", UNSET)
+
+        def _parse_agent_task_review_effective(data: object) -> AgentTaskReviewEffectiveEnum | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                agent_task_review_effective_type_0 = check_agent_task_review_effective_enum(data)
+
+                return agent_task_review_effective_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(AgentTaskReviewEffectiveEnum | None | Unset, data)
+
+        agent_task_review_effective = _parse_agent_task_review_effective(d.pop("agent_task_review_effective", UNSET))
+
         _leads = d.pop("leads", UNSET)
         leads: list[ProjectLeadOut] | Unset = UNSET
         if _leads is not UNSET:
@@ -688,6 +731,8 @@ class ProjectInDB:
             position=position,
             members_can_add_people=members_can_add_people,
             editors_can_add_members=editors_can_add_members,
+            agent_task_review_always=agent_task_review_always,
+            agent_task_review_effective=agent_task_review_effective,
             leads=leads,
             managers=managers,
             implicit_members=implicit_members,
