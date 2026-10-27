@@ -1,42 +1,53 @@
 # `tm.availability`
 
-Who on a team is unavailable, and when.
+Who in the organization is unavailable, and when.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
-## `tm.availability.range(team_id: str, from_: str | None = None, to: str | None = None, if_none_match: str | None = None)`
+## `tm.availability.range(org_id: str, from_: str | None = None, to: str | None = None, if_none_match: str | None = None)`
 
-A team's availability over a date range.
+Everyone's availability over a date range.
 
-- **HTTP:** `GET /v1/teams/{team_id}/availability`
+- **HTTP:** `GET /v1/organizations/{org_id}/availability`
 - **operationId:** `availability.range`
-- **Token scope:** `teams:read`
+- **Token scope:** `members:read`
 - **Returns:** `AvailabilityRange`
 - **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Also:** `tm.organizations.availability` (same call).
 
-## `tm.availability.create(team_id: str, body: AvailabilityCreate | Mapping[str, Any])`
+## `tm.availability.create(org_id: str, body: AvailabilityCreate | Mapping[str, Any])`
 
-Mark someone unavailable.
+Mark someone unavailable (yourself, or anyone as an admin).
 
-- **HTTP:** `POST /v1/teams/{team_id}/availability`
+- **HTTP:** `POST /v1/organizations/{org_id}/availability`
 - **operationId:** `availability.create`
-- **Token scope:** `teams:write`
+- **Token scope:** `org:write`
 - **Returns:** `AvailabilityEntry`
 
-## `tm.availability.update(team_id: str, entry_id: str, body: AvailabilityUpdate | Mapping[str, Any])`
+## `tm.availability.update(org_id: str, entry_id: str, body: AvailabilityUpdate | Mapping[str, Any])`
 
 Change an unavailability entry.
 
-- **HTTP:** `PUT /v1/teams/{team_id}/availability/{entry_id}`
+- **HTTP:** `PUT /v1/organizations/{org_id}/availability/{entry_id}`
 - **operationId:** `availability.update`
-- **Token scope:** `teams:write`
+- **Token scope:** `org:write`
 - **Returns:** `AvailabilityEntry`
 
-## `tm.availability.delete(team_id: str, entry_id: str)`
+## `tm.availability.delete(org_id: str, entry_id: str)`
 
 Remove an unavailability entry.
 
-- **HTTP:** `DELETE /v1/teams/{team_id}/availability/{entry_id}`
+- **HTTP:** `DELETE /v1/organizations/{org_id}/availability/{entry_id}`
 - **operationId:** `availability.delete`
-- **Token scope:** `teams:write`
+- **Token scope:** `org:write`
 - **Returns:** `AvailabilityDeleted`
+
+## `tm.availability.mark_mine(body: MyAvailabilitySet | Mapping[str, Any])`
+
+Mark your own days unavailable.
+
+- **HTTP:** `PUT /v1/me/availability`
+- **operationId:** `availability.mark_mine`
+- **Token scope:** `org:write`
+- **Returns:** `AvailabilityEntry`
+- **Also:** `tm.me.set_availability` (same call).

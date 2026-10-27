@@ -205,6 +205,20 @@ def test_is_inline_and_project_name_go_direct(tm: Taskadence, fake: Fake) -> Non
     assert fake.named("legacy") == []
 
 
+def test_a_comment_file_goes_direct_with_its_purpose(tm: Taskadence, fake: Fake) -> None:
+    tm.task_attachments.create(task_id="T1", file=("plan.pdf", b"%PDF"), purpose="comment")
+    assert body(fake.named("create")[0][3])["purpose"] == "comment"
+    tm.task_attachments.create(task_id="T1", file=("plan.pdf", b"%PDF"))
+    assert "purpose" not in body(fake.named("create")[1][3])
+
+
+def test_a_comment_file_keeps_its_purpose_on_the_multipart_fallback(tm: Taskadence, fake: Fake) -> None:
+    fake.answers["create"] = [ROUTER_404]
+    tm.task_attachments.create(task_id="T1", file=("plan.pdf", b"%PDF"), purpose="comment")
+    raw = fake.named("legacy")[0][3]
+    assert b'name="purpose"' in raw and b"comment" in raw
+
+
 @pytest.mark.parametrize(
     "answer",
     [

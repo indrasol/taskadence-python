@@ -9,7 +9,7 @@ import builtins
 from collections.abc import Mapping, Sequence
 from typing import Any, cast, overload
 
-from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto
+from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto, _list_body
 from ._generated import models
 from ._operations import OPERATIONS as _OPS
 from ._uploads import UploadProgress
@@ -232,12 +232,78 @@ class OrganizationsResource:
     get = read
     """Alias of `read`."""
 
+    @overload
+    def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
+    ) -> models.AvailabilityRange: ...
+    @overload
+    def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
+    ) -> models.AvailabilityRange | NotModifiedType: ...
+    def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
+    ) -> models.AvailabilityRange | NotModifiedType:
+        """Everyone's availability over a date range.
+
+        `GET /v1/organizations/{org_id}/availability` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AvailabilityRange | NotModifiedType",
+            self._client._call(
+                _OPS["availability.range"], path=(org_id,), query={"from": from_, "to": to}, if_none_match=if_none_match
+            ),
+        )
+
+    @overload
+    def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: None = None
+    ) -> models.WorkloadOut: ...
+    @overload
+    def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str
+    ) -> models.WorkloadOut | NotModifiedType: ...
+    def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str | None = None
+    ) -> models.WorkloadOut | NotModifiedType:
+        """Open work per person (who is heavy, who has capacity).
+
+        `GET /v1/organizations/{org_id}/workload` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.WorkloadOut | NotModifiedType",
+            self._client._call(
+                _OPS["workload.read"], path=(org_id,), query={"project_id": project_id}, if_none_match=if_none_match
+            ),
+        )
+
+
+class ProjectsMembersResource:
+    """A project's members: `tm.projects.members.add_many(project_id, [...])`."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def add_many(
+        self, project_id: str, members: Sequence[models.ProjectMemberBatchItem | Mapping[str, Any]]
+    ) -> models.ProjectMembersBatchAdded:
+        """Add several members to a project.
+
+        `POST /v1/projects/{project_id}/members/batch` · scope `projects:write`
+        """
+        return cast(
+            "models.ProjectMembersBatchAdded",
+            self._client._call(
+                _OPS["project-members.create_batch"], path=(project_id,), body=_list_body("members", members)
+            ),
+        )
+
 
 class ProjectsResource:
     """Projects: create, read, update, delete, reorder."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
+        self.members = ProjectsMembersResource(client)
 
     def create(
         self, body: models.ProjectCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -256,6 +322,7 @@ class ProjectsResource:
         org_id: str,
         *,
         show_all: bool | None = None,
+        scope: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -272,6 +339,7 @@ class ProjectsResource:
                 path=(org_id,),
                 query={
                     "show_all": show_all,
+                    "scope": scope,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -337,12 +405,214 @@ class ProjectsResource:
     get = read
     """Alias of `read`."""
 
+    def sprints(
+        self,
+        project_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.SprintOut]:
+        """List a project's sprints.
+
+        `GET /v1/projects/{project_id}/sprints` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.SprintOut]",
+            self._client._call(
+                _OPS["sprints.list"],
+                path=(project_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+
+class ProjectMembersResource:
+    """The members of a project and their roles."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def create_batch(
+        self, project_id: str, members: Sequence[models.ProjectMemberBatchItem | Mapping[str, Any]]
+    ) -> models.ProjectMembersBatchAdded:
+        """Add several members to a project.
+
+        `POST /v1/projects/{project_id}/members/batch` · scope `projects:write`
+        """
+        return cast(
+            "models.ProjectMembersBatchAdded",
+            self._client._call(
+                _OPS["project-members.create_batch"], path=(project_id,), body=_list_body("members", members)
+            ),
+        )
+
+    def create(self, body: models.ProjectMemberCreate | Mapping[str, Any]) -> models.ProjectMemberInDB:
+        """Add a member to a project.
+
+        `POST /v1/project-members` · scope `projects:write`
+        """
+        return cast("models.ProjectMemberInDB", self._client._call(_OPS["project-members.create"], body=body))
+
+    def list(
+        self,
+        *,
+        project_id: str | None = None,
+        search: str | None = None,
+        role: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ProjectMemberInDB]:
+        """List a project's members.
+
+        `GET /v1/project-members` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ProjectMemberInDB]",
+            self._client._call(
+                _OPS["project-members.list"],
+                query={
+                    "project_id": project_id,
+                    "search": search,
+                    "role": role,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    @overload
+    def read(self, user_id: str, project_id: str, *, if_none_match: None = None) -> models.ProjectMemberInDB: ...
+    @overload
+    def read(
+        self, user_id: str, project_id: str, *, if_none_match: str
+    ) -> models.ProjectMemberInDB | NotModifiedType: ...
+    def read(
+        self, user_id: str, project_id: str, *, if_none_match: str | None = None
+    ) -> models.ProjectMemberInDB | NotModifiedType:
+        """Read one project member.
+
+        `GET /v1/project-members/{user_id}/{project_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.ProjectMemberInDB | NotModifiedType",
+            self._client._call(_OPS["project-members.read"], path=(user_id, project_id), if_none_match=if_none_match),
+        )
+
+    def replace(
+        self,
+        user_id: str,
+        project_id: str,
+        body: models.ProjectMemberUpdate | Mapping[str, Any],
+        *,
+        if_match: str | None = None,
+    ) -> models.ProjectMemberInDB:
+        """Change a project member's role (PUT).
+
+        `PUT /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.ProjectMemberInDB",
+            self._client._call(
+                _OPS["project-members.replace"], path=(user_id, project_id), body=body, if_match=if_match
+            ),
+        )
+
+    def update(
+        self,
+        user_id: str,
+        project_id: str,
+        body: models.ProjectMemberUpdate | Mapping[str, Any],
+        *,
+        if_match: str | None = None,
+    ) -> models.ProjectMemberInDB:
+        """Change a project member's role.
+
+        `PATCH /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.ProjectMemberInDB",
+            self._client._call(
+                _OPS["project-members.update"], path=(user_id, project_id), body=body, if_match=if_match
+            ),
+        )
+
+    def delete(self, user_id: str, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Remove a project member.
+
+        `DELETE /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            self._client._call(_OPS["project-members.delete"], path=(user_id, project_id), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class TasksCommentsResource:
+    """A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and `.reactions(...)`."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def react(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def unreact(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ReactionPerson]",
+            self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
 
 class TasksResource:
     """Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
+        self.comments = TasksCommentsResource(client)
 
     def create(
         self, body: models.TaskCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -367,12 +637,12 @@ class TasksResource:
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
         subtasks: str | None = None,
-        section_scope: str | None = None,
+        include: str | Sequence[str] | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> Page[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
         """
         return cast(
             "Page[models.TaskCardView]",
@@ -388,7 +658,7 @@ class TasksResource:
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
                     "subtasks": subtasks,
-                    "section_scope": section_scope,
+                    "include": include,
                 },
                 filter=filter,
             ),
@@ -494,7 +764,7 @@ class TasksResource:
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.review"], path=(task_id,), body=body))
 
     def set_sprint(self, task_id: str, body: models.TaskSprintSet | Mapping[str, Any]) -> models.TaskInDB:
-        """File a task in a team sprint (or none).
+        """File a task in a sprint of its project (or none).
 
         `PUT /v1/tasks/{task_id}/sprint` · scope `tasks:write`
         """
@@ -506,13 +776,6 @@ class TasksResource:
         `PUT /v1/tasks/{task_id}/milestone` · scope `tasks:write`
         """
         return cast("models.TaskInDB", self._client._call(_OPS["tasks.set_milestone"], path=(task_id,), body=body))
-
-    def set_section(self, task_id: str, body: models.TaskSectionSet | Mapping[str, Any]) -> models.TaskSectionOut:
-        """Place a task in a section.
-
-        `PUT /v1/tasks/{task_id}/section` · scope `tasks:write`
-        """
-        return cast("models.TaskSectionOut", self._client._call(_OPS["tasks.set_section"], path=(task_id,), body=body))
 
     def add_subtask(self, task_id: str, body: models.SubtaskLink | Mapping[str, Any]) -> models.TaskInDB:
         """Add a subtask link.
@@ -551,11 +814,197 @@ class TasksResource:
             "models.TaskInDB", self._client._call(_OPS["tasks.remove_dependency"], path=(task_id, dependency_id))
         )
 
+    @overload
+    def list_subscribers(self, task_id: str, *, if_none_match: None = None) -> models.TaskSubscribers: ...
+    @overload
+    def list_subscribers(self, task_id: str, *, if_none_match: str) -> models.TaskSubscribers | NotModifiedType: ...
+    def list_subscribers(
+        self, task_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskSubscribers | NotModifiedType:
+        """List a task's subscribers.
+
+        `GET /v1/tasks/{task_id}/subscribers` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskSubscribers | NotModifiedType",
+            self._client._call(_OPS["tasks.list_subscribers"], path=(task_id,), if_none_match=if_none_match),
+        )
+
+    def set_subscribers(self, task_id: str, user_ids: Sequence[str]) -> models.TaskSubscribers:
+        """Set a task's subscribers.
+
+        `PUT /v1/tasks/{task_id}/subscribers` · scope `tasks:write`
+        """
+        return cast(
+            "models.TaskSubscribers",
+            self._client._call(_OPS["tasks.set_subscribers"], path=(task_id,), body=_list_body("user_ids", user_ids)),
+        )
+
+    def subscribe(self, task_id: str) -> models.TaskSubscribers:
+        """Subscribe yourself to a task.
+
+        `POST /v1/tasks/{task_id}/subscribers/me` · scope `tasks:write`
+        """
+        return cast("models.TaskSubscribers", self._client._call(_OPS["tasks.subscribe"], path=(task_id,)))
+
+    def unsubscribe(self, task_id: str) -> models.TaskSubscribers:
+        """Unsubscribe yourself from a task.
+
+        `DELETE /v1/tasks/{task_id}/subscribers/me` · scope `tasks:write`
+        """
+        return cast("models.TaskSubscribers", self._client._call(_OPS["tasks.unsubscribe"], path=(task_id,)))
+
     get = read
     """Alias of `read`."""
 
     move = set_project
     """Alias of `set_project`."""
+
+    subscribers = list_subscribers
+    """Alias of `list_subscribers`."""
+
+
+class TaskCommentsResource:
+    """Comments on a task (threaded)."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def add_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def remove_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def list_reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ReactionPerson]",
+            self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    def create(
+        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Comment on a task.
+
+        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    def list(
+        self,
+        *,
+        task_id: str,
+        search: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.TaskCommentInDB]:
+        """List a task's comments (threaded).
+
+        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.TaskCommentInDB]",
+            self._client._call(
+                _OPS["task-comments.list"],
+                query={
+                    "task_id": task_id,
+                    "search": search,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    def reply(
+        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Reply to a comment.
+
+        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
+    @overload
+    def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
+    def read(self, comment_id: str, *, if_none_match: str | None = None) -> models.TaskCommentInDB | NotModifiedType:
+        """Read a comment.
+
+        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskCommentInDB | NotModifiedType",
+            self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
+        )
+
+    def update(
+        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
+    ) -> models.TaskCommentInDB:
+        """Edit your comment.
+
+        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
+        )
+
+    def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Delete a comment.
+
+        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class OrganizationMembersResource:
@@ -926,120 +1375,6 @@ class DesignationsResource:
     """Alias of `read`."""
 
 
-class ProjectMembersResource:
-    """The members of a project and their roles."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def create(self, body: models.ProjectMemberCreate | Mapping[str, Any]) -> models.ProjectMemberInDB:
-        """Add a member to a project.
-
-        `POST /v1/project-members` · scope `projects:write`
-        """
-        return cast("models.ProjectMemberInDB", self._client._call(_OPS["project-members.create"], body=body))
-
-    def list(
-        self,
-        *,
-        project_id: str | None = None,
-        search: str | None = None,
-        role: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.ProjectMemberInDB]:
-        """List a project's members.
-
-        `GET /v1/project-members` · scope `projects:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.ProjectMemberInDB]",
-            self._client._call(
-                _OPS["project-members.list"],
-                query={
-                    "project_id": project_id,
-                    "search": search,
-                    "role": role,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    @overload
-    def read(self, user_id: str, project_id: str, *, if_none_match: None = None) -> models.ProjectMemberInDB: ...
-    @overload
-    def read(
-        self, user_id: str, project_id: str, *, if_none_match: str
-    ) -> models.ProjectMemberInDB | NotModifiedType: ...
-    def read(
-        self, user_id: str, project_id: str, *, if_none_match: str | None = None
-    ) -> models.ProjectMemberInDB | NotModifiedType:
-        """Read one project member.
-
-        `GET /v1/project-members/{user_id}/{project_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.ProjectMemberInDB | NotModifiedType",
-            self._client._call(_OPS["project-members.read"], path=(user_id, project_id), if_none_match=if_none_match),
-        )
-
-    def replace(
-        self,
-        user_id: str,
-        project_id: str,
-        body: models.ProjectMemberUpdate | Mapping[str, Any],
-        *,
-        if_match: str | None = None,
-    ) -> models.ProjectMemberInDB:
-        """Change a project member's role (PUT).
-
-        `PUT /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.ProjectMemberInDB",
-            self._client._call(
-                _OPS["project-members.replace"], path=(user_id, project_id), body=body, if_match=if_match
-            ),
-        )
-
-    def update(
-        self,
-        user_id: str,
-        project_id: str,
-        body: models.ProjectMemberUpdate | Mapping[str, Any],
-        *,
-        if_match: str | None = None,
-    ) -> models.ProjectMemberInDB:
-        """Change a project member's role.
-
-        `PATCH /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.ProjectMemberInDB",
-            self._client._call(
-                _OPS["project-members.update"], path=(user_id, project_id), body=body, if_match=if_match
-            ),
-        )
-
-    def delete(self, user_id: str, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Remove a project member.
-
-        `DELETE /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            self._client._call(_OPS["project-members.delete"], path=(user_id, project_id), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class ProjectResourcesResource:
     """Links and files attached to a project."""
 
@@ -1191,6 +1526,7 @@ class TaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        purpose: str | None = None,
         progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
@@ -1206,6 +1542,7 @@ class TaskAttachmentsResource:
                     "project_id": project_id,
                     "title": title,
                     "is_inline": is_inline,
+                    "purpose": purpose,
                     "file": file,
                 },
                 progress=progress,
@@ -1317,105 +1654,6 @@ class UploadsResource:
         )
 
 
-class TaskCommentsResource:
-    """Comments on a task (threaded)."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def create(
-        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Comment on a task.
-
-        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
-        )
-
-    def list(
-        self,
-        *,
-        task_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.TaskCommentInDB]:
-        """List a task's comments (threaded).
-
-        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.TaskCommentInDB]",
-            self._client._call(
-                _OPS["task-comments.list"],
-                query={
-                    "task_id": task_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    def reply(
-        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Reply to a comment.
-
-        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
-        )
-
-    @overload
-    def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
-    @overload
-    def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
-    def read(self, comment_id: str, *, if_none_match: str | None = None) -> models.TaskCommentInDB | NotModifiedType:
-        """Read a comment.
-
-        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TaskCommentInDB | NotModifiedType",
-            self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
-        )
-
-    def update(
-        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TaskCommentInDB:
-        """Edit your comment.
-
-        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
-        )
-
-    def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Delete a comment.
-
-        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class TaskHistoryResource:
     """A task's change history."""
 
@@ -1487,6 +1725,57 @@ class ProjectStatsResource:
         return cast(
             "models.ProjectStatsInDB | NotModifiedType",
             self._client._call(_OPS["project-stats.read"], path=(project_id,), if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AccountResource:
+    """Your account: one per email, any number of organizations, one shared storage pool."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
+    @overload
+    def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
+    def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
+        """The caller's account: its organizations, the caller's account role and the storage pool.
+
+        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountOut | NotModifiedType", self._client._call(_OPS["account.read"], if_none_match=if_none_match)
+        )
+
+    @overload
+    def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
+    @overload
+    def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
+    def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
+        """Everyone in the account with their role in each organization (account owner / admin).
+
+        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountPeople | NotModifiedType",
+            self._client._call(_OPS["account.people"], if_none_match=if_none_match),
+        )
+
+    @overload
+    def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
         )
 
     get = read
@@ -1962,353 +2251,197 @@ class ReleasesResource:
         )
 
 
-class SectionsResource:
-    """Sections of a project, a team or a person's own list."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def list(
-        self,
-        *,
-        org_id: str,
-        scope_type: str,
-        scope_id: str | None = None,
-        scope_ids: Sequence[str] | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.SectionOut] | Page[models.SectionOut]:
-        """List a scope's sections (or several scopes').
-
-        `GET /v1/sections` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.SectionOut] | Page[models.SectionOut]",
-            self._client._call(
-                _OPS["sections.list"],
-                query={
-                    "org_id": org_id,
-                    "scope_type": scope_type,
-                    "scope_id": scope_id,
-                    "scope_ids": scope_ids,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    def create(self, body: models.SectionCreate | Mapping[str, Any]) -> models.SectionOut:
-        """Create a section.
-
-        `POST /v1/sections` · scope `tasks:write`
-        """
-        return cast("models.SectionOut", self._client._call(_OPS["sections.create"], body=body))
-
-    def reorder(self, body: models.SectionReorder | Mapping[str, Any]) -> builtins.list[models.SectionOut]:
-        """Reorder a scope's sections.
-
-        `POST /v1/sections/reorder` · scope `tasks:write`
-        """
-        return cast("builtins.list[models.SectionOut]", self._client._call(_OPS["sections.reorder"], body=body))
-
-    def update(self, section_id: str, body: models.SectionUpdate | Mapping[str, Any]) -> models.SectionOut:
-        """Rename a section.
-
-        `PATCH /v1/sections/{section_id}` · scope `tasks:write`
-        """
-        return cast("models.SectionOut", self._client._call(_OPS["sections.update"], path=(section_id,), body=body))
-
-    def delete(self, section_id: str) -> models.Acknowledgement:
-        """Delete a section.
-
-        `DELETE /v1/sections/{section_id}` · scope `tasks:write`
-        """
-        return cast("models.Acknowledgement", self._client._call(_OPS["sections.delete"], path=(section_id,)))
-
-
-class TeamsResource:
-    """Teams, their members and their task list."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def create(self, body: models.TeamCreate | Mapping[str, Any]) -> models.TeamDetail:
-        """Create a team.
-
-        `POST /v1/teams` · scope `teams:write`
-        """
-        return cast("models.TeamDetail", self._client._call(_OPS["teams.create"], body=body))
-
-    def list(
-        self,
-        *,
-        org_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.TeamOut]:
-        """List an organization's teams.
-
-        `GET /v1/teams` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.TeamOut]",
-            self._client._call(
-                _OPS["teams.list"],
-                query={
-                    "org_id": org_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    @overload
-    def read(self, team_id: str, *, if_none_match: None = None) -> models.TeamDetail: ...
-    @overload
-    def read(self, team_id: str, *, if_none_match: str) -> models.TeamDetail | NotModifiedType: ...
-    def read(self, team_id: str, *, if_none_match: str | None = None) -> models.TeamDetail | NotModifiedType:
-        """Read a team (with its members).
-
-        `GET /v1/teams/{team_id}` · scope `teams:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TeamDetail | NotModifiedType",
-            self._client._call(_OPS["teams.read"], path=(team_id,), if_none_match=if_none_match),
-        )
-
-    def replace(
-        self, team_id: str, body: models.TeamUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TeamDetail:
-        """Update a team (PUT; partial).
-
-        `PUT /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDetail",
-            self._client._call(_OPS["teams.replace"], path=(team_id,), body=body, if_match=if_match),
-        )
-
-    def update(
-        self, team_id: str, body: models.TeamUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TeamDetail:
-        """Update a team (JSON merge-patch).
-
-        `PATCH /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDetail", self._client._call(_OPS["teams.update"], path=(team_id,), body=body, if_match=if_match)
-        )
-
-    def delete(
-        self, team_id: str, *, detach: bool | None = None, reason: str | None = None, if_match: str | None = None
-    ) -> models.TeamDeleted:
-        """Delete a team.
-
-        `DELETE /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDeleted",
-            self._client._call(
-                _OPS["teams.delete"], path=(team_id,), query={"detach": detach, "reason": reason}, if_match=if_match
-            ),
-        )
-
-    def add_member(self, team_id: str, body: models.TeamMemberCreate | Mapping[str, Any]) -> models.TeamMemberOut:
-        """Add a member to a team.
-
-        `POST /v1/teams/{team_id}/members` · scope `teams:write`
-        """
-        return cast("models.TeamMemberOut", self._client._call(_OPS["teams.add_member"], path=(team_id,), body=body))
-
-    def replace_member(
-        self, team_id: str, user_id: str, body: models.TeamMemberUpdate | Mapping[str, Any]
-    ) -> models.TeamMemberOut:
-        """Change a team member's role (PUT).
-
-        `PUT /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.TeamMemberOut", self._client._call(_OPS["teams.replace_member"], path=(team_id, user_id), body=body)
-        )
-
-    def update_member(
-        self, team_id: str, user_id: str, body: models.TeamMemberUpdate | Mapping[str, Any]
-    ) -> models.TeamMemberOut:
-        """Change a team member's role.
-
-        `PATCH /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.TeamMemberOut", self._client._call(_OPS["teams.update_member"], path=(team_id, user_id), body=body)
-        )
-
-    def remove_member(self, team_id: str, user_id: str) -> models.Acknowledgement:
-        """Remove a team member.
-
-        `DELETE /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast("models.Acknowledgement", self._client._call(_OPS["teams.remove_member"], path=(team_id, user_id)))
-
-    def list_tasks(
-        self,
-        team_id: str,
-        *,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-        include_inaccessible: bool | None = None,
-        section_scope: str | None = None,
-    ) -> Page[models.TaskCardView]:
-        """A team's unfiled tasks (the team List's read; task-list envelope).
-
-        `GET /v1/teams/{team_id}/intake` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.TaskCardView]",
-            self._client._call(
-                _OPS["teams.list_tasks"],
-                path=(team_id,),
-                query={
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                    "include_inaccessible": include_inaccessible,
-                    "section_scope": section_scope,
-                },
-            ),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class SprintsResource:
-    """A team's sprints."""
+    """A project's sprints, and every sprint of an organization (Planning)."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
 
     def list(
         self,
-        team_id: str,
+        project_id: str,
         *,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
     ) -> Page[models.SprintOut]:
-        """List a team's sprints.
+        """List a project's sprints.
 
-        `GET /v1/teams/{team_id}/sprints` · scope `teams:read` · a `Page` — iterate it for every item
+        `GET /v1/projects/{project_id}/sprints` · scope `projects:read` · a `Page` — iterate it for every item
         """
         return cast(
             "Page[models.SprintOut]",
             self._client._call(
                 _OPS["sprints.list"],
-                path=(team_id,),
+                path=(project_id,),
                 query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
             ),
         )
 
-    def create(self, team_id: str, body: models.SprintCreate | Mapping[str, Any]) -> models.SprintOut:
-        """Create a sprint.
+    def create(self, project_id: str, body: models.SprintCreate | Mapping[str, Any]) -> models.SprintOut:
+        """Create a sprint in a project.
 
-        `POST /v1/teams/{team_id}/sprints` · scope `teams:write`
+        `POST /v1/projects/{project_id}/sprints` · scope `projects:write`
         """
-        return cast("models.SprintOut", self._client._call(_OPS["sprints.create"], path=(team_id,), body=body))
+        return cast("models.SprintOut", self._client._call(_OPS["sprints.create"], path=(project_id,), body=body))
 
-    def update(self, team_id: str, sprint_id: str, body: models.SprintUpdate | Mapping[str, Any]) -> models.SprintOut:
-        """Update a sprint.
+    def list_org(
+        self,
+        *,
+        org_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.SprintOut]:
+        """Every sprint you can read in an organization (Planning).
 
-        `PUT /v1/teams/{team_id}/sprints/{sprint_id}` · scope `teams:write`
+        `GET /v1/sprints` · scope `projects:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "models.SprintOut", self._client._call(_OPS["sprints.update"], path=(team_id, sprint_id), body=body)
+            "Page[models.SprintOut]",
+            self._client._call(
+                _OPS["sprints.list_org"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
         )
 
-    def delete(self, team_id: str, sprint_id: str, *, reason: str | None = None) -> models.SprintDeleted:
+    @overload
+    def read(self, sprint_id: str, *, if_none_match: None = None) -> models.SprintOut: ...
+    @overload
+    def read(self, sprint_id: str, *, if_none_match: str) -> models.SprintOut | NotModifiedType: ...
+    def read(self, sprint_id: str, *, if_none_match: str | None = None) -> models.SprintOut | NotModifiedType:
+        """Read a sprint.
+
+        `GET /v1/sprints/{sprint_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.SprintOut | NotModifiedType",
+            self._client._call(_OPS["sprints.read"], path=(sprint_id,), if_none_match=if_none_match),
+        )
+
+    def update(self, sprint_id: str, body: models.SprintUpdate | Mapping[str, Any]) -> models.SprintOut:
+        """Update a sprint (name, dates, status, position, project).
+
+        `PATCH /v1/sprints/{sprint_id}` · scope `projects:write`
+        """
+        return cast("models.SprintOut", self._client._call(_OPS["sprints.update"], path=(sprint_id,), body=body))
+
+    def delete(self, sprint_id: str, *, reason: str | None = None) -> models.SprintDeleted:
         """Delete a sprint (its tasks are unfiled).
 
-        `DELETE /v1/teams/{team_id}/sprints/{sprint_id}` · scope `teams:write`
+        `DELETE /v1/sprints/{sprint_id}` · scope `projects:write`
         """
         return cast(
             "models.SprintDeleted",
-            self._client._call(_OPS["sprints.delete"], path=(team_id, sprint_id), query={"reason": reason}),
+            self._client._call(_OPS["sprints.delete"], path=(sprint_id,), query={"reason": reason}),
         )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AvailabilityResource:
-    """Who on a team is unavailable, and when."""
+    """Who in the organization is unavailable, and when."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
 
     @overload
     def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
     ) -> models.AvailabilityRange: ...
     @overload
     def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
     ) -> models.AvailabilityRange | NotModifiedType: ...
     def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
     ) -> models.AvailabilityRange | NotModifiedType:
-        """A team's availability over a date range.
+        """Everyone's availability over a date range.
 
-        `GET /v1/teams/{team_id}/availability` · scope `teams:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organizations/{org_id}/availability` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.AvailabilityRange | NotModifiedType",
             self._client._call(
-                _OPS["availability.range"],
-                path=(team_id,),
-                query={"from": from_, "to": to},
-                if_none_match=if_none_match,
+                _OPS["availability.range"], path=(org_id,), query={"from": from_, "to": to}, if_none_match=if_none_match
             ),
         )
 
-    def create(self, team_id: str, body: models.AvailabilityCreate | Mapping[str, Any]) -> models.AvailabilityEntry:
-        """Mark someone unavailable.
+    def create(self, org_id: str, body: models.AvailabilityCreate | Mapping[str, Any]) -> models.AvailabilityEntry:
+        """Mark someone unavailable (yourself, or anyone as an admin).
 
-        `POST /v1/teams/{team_id}/availability` · scope `teams:write`
+        `POST /v1/organizations/{org_id}/availability` · scope `org:write`
         """
         return cast(
-            "models.AvailabilityEntry", self._client._call(_OPS["availability.create"], path=(team_id,), body=body)
+            "models.AvailabilityEntry", self._client._call(_OPS["availability.create"], path=(org_id,), body=body)
         )
 
     def update(
-        self, team_id: str, entry_id: str, body: models.AvailabilityUpdate | Mapping[str, Any]
+        self, org_id: str, entry_id: str, body: models.AvailabilityUpdate | Mapping[str, Any]
     ) -> models.AvailabilityEntry:
         """Change an unavailability entry.
 
-        `PUT /v1/teams/{team_id}/availability/{entry_id}` · scope `teams:write`
+        `PUT /v1/organizations/{org_id}/availability/{entry_id}` · scope `org:write`
         """
         return cast(
             "models.AvailabilityEntry",
-            self._client._call(_OPS["availability.update"], path=(team_id, entry_id), body=body),
+            self._client._call(_OPS["availability.update"], path=(org_id, entry_id), body=body),
         )
 
-    def delete(self, team_id: str, entry_id: str) -> models.AvailabilityDeleted:
+    def delete(self, org_id: str, entry_id: str) -> models.AvailabilityDeleted:
         """Remove an unavailability entry.
 
-        `DELETE /v1/teams/{team_id}/availability/{entry_id}` · scope `teams:write`
+        `DELETE /v1/organizations/{org_id}/availability/{entry_id}` · scope `org:write`
         """
         return cast(
-            "models.AvailabilityDeleted", self._client._call(_OPS["availability.delete"], path=(team_id, entry_id))
+            "models.AvailabilityDeleted", self._client._call(_OPS["availability.delete"], path=(org_id, entry_id))
         )
+
+    def mark_mine(self, body: models.MyAvailabilitySet | Mapping[str, Any]) -> models.AvailabilityEntry:
+        """Mark your own days unavailable.
+
+        `PUT /v1/me/availability` · scope `org:write`
+        """
+        return cast("models.AvailabilityEntry", self._client._call(_OPS["availability.mark_mine"], body=body))
+
+
+class WorkloadResource:
+    """Open work per person: who is heavy, who has capacity."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def read(self, org_id: str, *, project_id: str | None = None, if_none_match: None = None) -> models.WorkloadOut: ...
+    @overload
+    def read(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str
+    ) -> models.WorkloadOut | NotModifiedType: ...
+    def read(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str | None = None
+    ) -> models.WorkloadOut | NotModifiedType:
+        """Open work per person (who is heavy, who has capacity).
+
+        `GET /v1/organizations/{org_id}/workload` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.WorkloadOut | NotModifiedType",
+            self._client._call(
+                _OPS["workload.read"], path=(org_id,), query={"project_id": project_id}, if_none_match=if_none_match
+            ),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class GoalsResource:
@@ -2628,6 +2761,13 @@ class MeResource:
 
     get = read
     """Alias of `read`."""
+
+    def set_availability(self, body: models.MyAvailabilitySet | Mapping[str, Any]) -> models.AvailabilityEntry:
+        """Mark your own days unavailable.
+
+        `PUT /v1/me/availability` · scope `org:write`
+        """
+        return cast("models.AvailabilityEntry", self._client._call(_OPS["availability.mark_mine"], body=body))
 
     __call__ = read
     """`tm.me()` is `tm.me.read()`."""
@@ -3004,28 +3144,33 @@ class ViewPinsResource:
         """
         return cast("models.Acknowledgement", self._client._call(_OPS["view-pins.unpin_project"], path=(project_id,)))
 
-    def pin_team(self, team_id: str, *, org_id: str) -> models.PinOut:
-        """Pin a team.
-
-        `PUT /v1/view-pins/teams/{team_id}` · scope `tasks:write`
-        """
-        return cast(
-            "models.PinOut", self._client._call(_OPS["view-pins.pin_team"], path=(team_id,), query={"org_id": org_id})
-        )
-
-    def unpin_team(self, team_id: str) -> models.Acknowledgement:
-        """Unpin a team.
-
-        `DELETE /v1/view-pins/teams/{team_id}` · scope `tasks:write`
-        """
-        return cast("models.Acknowledgement", self._client._call(_OPS["view-pins.unpin_team"], path=(team_id,)))
-
     def reorder(self, body: models.PinOrder | Mapping[str, Any]) -> models.PinListPage:
         """Reorder your pins.
 
         `PUT /v1/view-pins/order` · scope `tasks:write`
         """
         return cast("models.PinListPage", self._client._call(_OPS["view-pins.reorder"], body=body))
+
+
+class StorageResource:
+    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
 
 
 class AsyncHealthResource:
@@ -3249,12 +3394,78 @@ class AsyncOrganizationsResource:
     get = read
     """Alias of `read`."""
 
+    @overload
+    async def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
+    ) -> models.AvailabilityRange: ...
+    @overload
+    async def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
+    ) -> models.AvailabilityRange | NotModifiedType: ...
+    async def availability(
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
+    ) -> models.AvailabilityRange | NotModifiedType:
+        """Everyone's availability over a date range.
+
+        `GET /v1/organizations/{org_id}/availability` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AvailabilityRange | NotModifiedType",
+            await self._client._call(
+                _OPS["availability.range"], path=(org_id,), query={"from": from_, "to": to}, if_none_match=if_none_match
+            ),
+        )
+
+    @overload
+    async def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: None = None
+    ) -> models.WorkloadOut: ...
+    @overload
+    async def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str
+    ) -> models.WorkloadOut | NotModifiedType: ...
+    async def workload(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str | None = None
+    ) -> models.WorkloadOut | NotModifiedType:
+        """Open work per person (who is heavy, who has capacity).
+
+        `GET /v1/organizations/{org_id}/workload` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.WorkloadOut | NotModifiedType",
+            await self._client._call(
+                _OPS["workload.read"], path=(org_id,), query={"project_id": project_id}, if_none_match=if_none_match
+            ),
+        )
+
+
+class AsyncProjectsMembersResource:
+    """A project's members: `tm.projects.members.add_many(project_id, [...])`."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def add_many(
+        self, project_id: str, members: Sequence[models.ProjectMemberBatchItem | Mapping[str, Any]]
+    ) -> models.ProjectMembersBatchAdded:
+        """Add several members to a project.
+
+        `POST /v1/projects/{project_id}/members/batch` · scope `projects:write`
+        """
+        return cast(
+            "models.ProjectMembersBatchAdded",
+            await self._client._call(
+                _OPS["project-members.create_batch"], path=(project_id,), body=_list_body("members", members)
+            ),
+        )
+
 
 class AsyncProjectsResource:
     """Projects: create, read, update, delete, reorder."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
+        self.members = AsyncProjectsMembersResource(client)
 
     async def create(
         self, body: models.ProjectCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -3273,6 +3484,7 @@ class AsyncProjectsResource:
         org_id: str,
         *,
         show_all: bool | None = None,
+        scope: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
@@ -3289,6 +3501,7 @@ class AsyncProjectsResource:
                 path=(org_id,),
                 query={
                     "show_all": show_all,
+                    "scope": scope,
                     "limit": limit,
                     "cursor": cursor,
                     "sort_by": sort_by,
@@ -3355,12 +3568,216 @@ class AsyncProjectsResource:
     get = read
     """Alias of `read`."""
 
+    async def sprints(
+        self,
+        project_id: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.SprintOut]:
+        """List a project's sprints.
+
+        `GET /v1/projects/{project_id}/sprints` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.SprintOut]",
+            await self._client._call(
+                _OPS["sprints.list"],
+                path=(project_id,),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+
+class AsyncProjectMembersResource:
+    """The members of a project and their roles."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def create_batch(
+        self, project_id: str, members: Sequence[models.ProjectMemberBatchItem | Mapping[str, Any]]
+    ) -> models.ProjectMembersBatchAdded:
+        """Add several members to a project.
+
+        `POST /v1/projects/{project_id}/members/batch` · scope `projects:write`
+        """
+        return cast(
+            "models.ProjectMembersBatchAdded",
+            await self._client._call(
+                _OPS["project-members.create_batch"], path=(project_id,), body=_list_body("members", members)
+            ),
+        )
+
+    async def create(self, body: models.ProjectMemberCreate | Mapping[str, Any]) -> models.ProjectMemberInDB:
+        """Add a member to a project.
+
+        `POST /v1/project-members` · scope `projects:write`
+        """
+        return cast("models.ProjectMemberInDB", await self._client._call(_OPS["project-members.create"], body=body))
+
+    async def list(
+        self,
+        *,
+        project_id: str | None = None,
+        search: str | None = None,
+        role: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ProjectMemberInDB]:
+        """List a project's members.
+
+        `GET /v1/project-members` · scope `projects:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ProjectMemberInDB]",
+            await self._client._call(
+                _OPS["project-members.list"],
+                query={
+                    "project_id": project_id,
+                    "search": search,
+                    "role": role,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    @overload
+    async def read(self, user_id: str, project_id: str, *, if_none_match: None = None) -> models.ProjectMemberInDB: ...
+    @overload
+    async def read(
+        self, user_id: str, project_id: str, *, if_none_match: str
+    ) -> models.ProjectMemberInDB | NotModifiedType: ...
+    async def read(
+        self, user_id: str, project_id: str, *, if_none_match: str | None = None
+    ) -> models.ProjectMemberInDB | NotModifiedType:
+        """Read one project member.
+
+        `GET /v1/project-members/{user_id}/{project_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.ProjectMemberInDB | NotModifiedType",
+            await self._client._call(
+                _OPS["project-members.read"], path=(user_id, project_id), if_none_match=if_none_match
+            ),
+        )
+
+    async def replace(
+        self,
+        user_id: str,
+        project_id: str,
+        body: models.ProjectMemberUpdate | Mapping[str, Any],
+        *,
+        if_match: str | None = None,
+    ) -> models.ProjectMemberInDB:
+        """Change a project member's role (PUT).
+
+        `PUT /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.ProjectMemberInDB",
+            await self._client._call(
+                _OPS["project-members.replace"], path=(user_id, project_id), body=body, if_match=if_match
+            ),
+        )
+
+    async def update(
+        self,
+        user_id: str,
+        project_id: str,
+        body: models.ProjectMemberUpdate | Mapping[str, Any],
+        *,
+        if_match: str | None = None,
+    ) -> models.ProjectMemberInDB:
+        """Change a project member's role.
+
+        `PATCH /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.ProjectMemberInDB",
+            await self._client._call(
+                _OPS["project-members.update"], path=(user_id, project_id), body=body, if_match=if_match
+            ),
+        )
+
+    async def delete(self, user_id: str, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Remove a project member.
+
+        `DELETE /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            await self._client._call(_OPS["project-members.delete"], path=(user_id, project_id), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AsyncTasksCommentsResource:
+    """A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and `.reactions(...)`."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def react(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def unreact(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ReactionPerson]",
+            await self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
 
 class AsyncTasksResource:
     """Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
+        self.comments = AsyncTasksCommentsResource(client)
 
     async def create(
         self, body: models.TaskCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -3386,12 +3803,12 @@ class AsyncTasksResource:
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
         subtasks: str | None = None,
-        section_scope: str | None = None,
+        include: str | Sequence[str] | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> AsyncPage[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
 
-        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, team, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
+        `GET /v1/tasks` · scope `tasks:read` · a `Page` — iterate it for every item · filter keys: status, priority, assignee, project, tags, due_after, due_before, created_after, created_before, overdue, search, search_fields, task_type, created_via, review, parent, blocked, has_subtasks, blocks, created_by
         """
         return cast(
             "AsyncPage[models.TaskCardView]",
@@ -3407,7 +3824,7 @@ class AsyncTasksResource:
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
                     "subtasks": subtasks,
-                    "section_scope": section_scope,
+                    "include": include,
                 },
                 filter=filter,
             ),
@@ -3517,7 +3934,7 @@ class AsyncTasksResource:
         return cast("models.TaskInDB", await self._client._call(_OPS["tasks.review"], path=(task_id,), body=body))
 
     async def set_sprint(self, task_id: str, body: models.TaskSprintSet | Mapping[str, Any]) -> models.TaskInDB:
-        """File a task in a team sprint (or none).
+        """File a task in a sprint of its project (or none).
 
         `PUT /v1/tasks/{task_id}/sprint` · scope `tasks:write`
         """
@@ -3530,15 +3947,6 @@ class AsyncTasksResource:
         """
         return cast(
             "models.TaskInDB", await self._client._call(_OPS["tasks.set_milestone"], path=(task_id,), body=body)
-        )
-
-    async def set_section(self, task_id: str, body: models.TaskSectionSet | Mapping[str, Any]) -> models.TaskSectionOut:
-        """Place a task in a section.
-
-        `PUT /v1/tasks/{task_id}/section` · scope `tasks:write`
-        """
-        return cast(
-            "models.TaskSectionOut", await self._client._call(_OPS["tasks.set_section"], path=(task_id,), body=body)
         )
 
     async def add_subtask(self, task_id: str, body: models.SubtaskLink | Mapping[str, Any]) -> models.TaskInDB:
@@ -3582,11 +3990,203 @@ class AsyncTasksResource:
             "models.TaskInDB", await self._client._call(_OPS["tasks.remove_dependency"], path=(task_id, dependency_id))
         )
 
+    @overload
+    async def list_subscribers(self, task_id: str, *, if_none_match: None = None) -> models.TaskSubscribers: ...
+    @overload
+    async def list_subscribers(
+        self, task_id: str, *, if_none_match: str
+    ) -> models.TaskSubscribers | NotModifiedType: ...
+    async def list_subscribers(
+        self, task_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskSubscribers | NotModifiedType:
+        """List a task's subscribers.
+
+        `GET /v1/tasks/{task_id}/subscribers` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskSubscribers | NotModifiedType",
+            await self._client._call(_OPS["tasks.list_subscribers"], path=(task_id,), if_none_match=if_none_match),
+        )
+
+    async def set_subscribers(self, task_id: str, user_ids: Sequence[str]) -> models.TaskSubscribers:
+        """Set a task's subscribers.
+
+        `PUT /v1/tasks/{task_id}/subscribers` · scope `tasks:write`
+        """
+        return cast(
+            "models.TaskSubscribers",
+            await self._client._call(
+                _OPS["tasks.set_subscribers"], path=(task_id,), body=_list_body("user_ids", user_ids)
+            ),
+        )
+
+    async def subscribe(self, task_id: str) -> models.TaskSubscribers:
+        """Subscribe yourself to a task.
+
+        `POST /v1/tasks/{task_id}/subscribers/me` · scope `tasks:write`
+        """
+        return cast("models.TaskSubscribers", await self._client._call(_OPS["tasks.subscribe"], path=(task_id,)))
+
+    async def unsubscribe(self, task_id: str) -> models.TaskSubscribers:
+        """Unsubscribe yourself from a task.
+
+        `DELETE /v1/tasks/{task_id}/subscribers/me` · scope `tasks:write`
+        """
+        return cast("models.TaskSubscribers", await self._client._call(_OPS["tasks.unsubscribe"], path=(task_id,)))
+
     get = read
     """Alias of `read`."""
 
     move = set_project
     """Alias of `set_project`."""
+
+    subscribers = list_subscribers
+    """Alias of `list_subscribers`."""
+
+
+class AsyncTaskCommentsResource:
+    """Comments on a task (threaded)."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def add_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def remove_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def list_reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ReactionPerson]",
+            await self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    async def create(
+        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Comment on a task.
+
+        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    async def list(
+        self,
+        *,
+        task_id: str,
+        search: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.TaskCommentInDB]:
+        """List a task's comments (threaded).
+
+        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.TaskCommentInDB]",
+            await self._client._call(
+                _OPS["task-comments.list"],
+                query={
+                    "task_id": task_id,
+                    "search": search,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    async def reply(
+        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Reply to a comment.
+
+        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    async def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
+    @overload
+    async def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
+    async def read(
+        self, comment_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskCommentInDB | NotModifiedType:
+        """Read a comment.
+
+        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskCommentInDB | NotModifiedType",
+            await self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
+        )
+
+    async def update(
+        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
+    ) -> models.TaskCommentInDB:
+        """Edit your comment.
+
+        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
+        )
+
+    async def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Delete a comment.
+
+        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            await self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AsyncOrganizationMembersResource:
@@ -3964,122 +4564,6 @@ class AsyncDesignationsResource:
     """Alias of `read`."""
 
 
-class AsyncProjectMembersResource:
-    """The members of a project and their roles."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def create(self, body: models.ProjectMemberCreate | Mapping[str, Any]) -> models.ProjectMemberInDB:
-        """Add a member to a project.
-
-        `POST /v1/project-members` · scope `projects:write`
-        """
-        return cast("models.ProjectMemberInDB", await self._client._call(_OPS["project-members.create"], body=body))
-
-    async def list(
-        self,
-        *,
-        project_id: str | None = None,
-        search: str | None = None,
-        role: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.ProjectMemberInDB]:
-        """List a project's members.
-
-        `GET /v1/project-members` · scope `projects:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.ProjectMemberInDB]",
-            await self._client._call(
-                _OPS["project-members.list"],
-                query={
-                    "project_id": project_id,
-                    "search": search,
-                    "role": role,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    @overload
-    async def read(self, user_id: str, project_id: str, *, if_none_match: None = None) -> models.ProjectMemberInDB: ...
-    @overload
-    async def read(
-        self, user_id: str, project_id: str, *, if_none_match: str
-    ) -> models.ProjectMemberInDB | NotModifiedType: ...
-    async def read(
-        self, user_id: str, project_id: str, *, if_none_match: str | None = None
-    ) -> models.ProjectMemberInDB | NotModifiedType:
-        """Read one project member.
-
-        `GET /v1/project-members/{user_id}/{project_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.ProjectMemberInDB | NotModifiedType",
-            await self._client._call(
-                _OPS["project-members.read"], path=(user_id, project_id), if_none_match=if_none_match
-            ),
-        )
-
-    async def replace(
-        self,
-        user_id: str,
-        project_id: str,
-        body: models.ProjectMemberUpdate | Mapping[str, Any],
-        *,
-        if_match: str | None = None,
-    ) -> models.ProjectMemberInDB:
-        """Change a project member's role (PUT).
-
-        `PUT /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.ProjectMemberInDB",
-            await self._client._call(
-                _OPS["project-members.replace"], path=(user_id, project_id), body=body, if_match=if_match
-            ),
-        )
-
-    async def update(
-        self,
-        user_id: str,
-        project_id: str,
-        body: models.ProjectMemberUpdate | Mapping[str, Any],
-        *,
-        if_match: str | None = None,
-    ) -> models.ProjectMemberInDB:
-        """Change a project member's role.
-
-        `PATCH /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.ProjectMemberInDB",
-            await self._client._call(
-                _OPS["project-members.update"], path=(user_id, project_id), body=body, if_match=if_match
-            ),
-        )
-
-    async def delete(self, user_id: str, project_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Remove a project member.
-
-        `DELETE /v1/project-members/{user_id}/{project_id}` · scope `projects:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            await self._client._call(_OPS["project-members.delete"], path=(user_id, project_id), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class AsyncProjectResourcesResource:
     """Links and files attached to a project."""
 
@@ -4233,6 +4717,7 @@ class AsyncTaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        purpose: str | None = None,
         progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
@@ -4248,6 +4733,7 @@ class AsyncTaskAttachmentsResource:
                     "project_id": project_id,
                     "title": title,
                     "is_inline": is_inline,
+                    "purpose": purpose,
                     "file": file,
                 },
                 progress=progress,
@@ -4363,107 +4849,6 @@ class AsyncUploadsResource:
         )
 
 
-class AsyncTaskCommentsResource:
-    """Comments on a task (threaded)."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def create(
-        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Comment on a task.
-
-        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
-        )
-
-    async def list(
-        self,
-        *,
-        task_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.TaskCommentInDB]:
-        """List a task's comments (threaded).
-
-        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.TaskCommentInDB]",
-            await self._client._call(
-                _OPS["task-comments.list"],
-                query={
-                    "task_id": task_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    async def reply(
-        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Reply to a comment.
-
-        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
-        )
-
-    @overload
-    async def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
-    @overload
-    async def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
-    async def read(
-        self, comment_id: str, *, if_none_match: str | None = None
-    ) -> models.TaskCommentInDB | NotModifiedType:
-        """Read a comment.
-
-        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TaskCommentInDB | NotModifiedType",
-            await self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
-        )
-
-    async def update(
-        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TaskCommentInDB:
-        """Edit your comment.
-
-        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
-        )
-
-    async def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Delete a comment.
-
-        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            await self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class AsyncTaskHistoryResource:
     """A task's change history."""
 
@@ -4539,6 +4924,58 @@ class AsyncProjectStatsResource:
         return cast(
             "models.ProjectStatsInDB | NotModifiedType",
             await self._client._call(_OPS["project-stats.read"], path=(project_id,), if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AsyncAccountResource:
+    """Your account: one per email, any number of organizations, one shared storage pool."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
+    @overload
+    async def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
+    async def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
+        """The caller's account: its organizations, the caller's account role and the storage pool.
+
+        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountOut | NotModifiedType",
+            await self._client._call(_OPS["account.read"], if_none_match=if_none_match),
+        )
+
+    @overload
+    async def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
+    @overload
+    async def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
+    async def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
+        """Everyone in the account with their role in each organization (account owner / admin).
+
+        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountPeople | NotModifiedType",
+            await self._client._call(_OPS["account.people"], if_none_match=if_none_match),
+        )
+
+    @overload
+    async def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    async def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    async def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
         )
 
     get = read
@@ -5027,368 +5464,201 @@ class AsyncReleasesResource:
         )
 
 
-class AsyncSectionsResource:
-    """Sections of a project, a team or a person's own list."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def list(
-        self,
-        *,
-        org_id: str,
-        scope_type: str,
-        scope_id: str | None = None,
-        scope_ids: Sequence[str] | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.SectionOut] | AsyncPage[models.SectionOut]:
-        """List a scope's sections (or several scopes').
-
-        `GET /v1/sections` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.SectionOut] | AsyncPage[models.SectionOut]",
-            await self._client._call(
-                _OPS["sections.list"],
-                query={
-                    "org_id": org_id,
-                    "scope_type": scope_type,
-                    "scope_id": scope_id,
-                    "scope_ids": scope_ids,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    async def create(self, body: models.SectionCreate | Mapping[str, Any]) -> models.SectionOut:
-        """Create a section.
-
-        `POST /v1/sections` · scope `tasks:write`
-        """
-        return cast("models.SectionOut", await self._client._call(_OPS["sections.create"], body=body))
-
-    async def reorder(self, body: models.SectionReorder | Mapping[str, Any]) -> builtins.list[models.SectionOut]:
-        """Reorder a scope's sections.
-
-        `POST /v1/sections/reorder` · scope `tasks:write`
-        """
-        return cast("builtins.list[models.SectionOut]", await self._client._call(_OPS["sections.reorder"], body=body))
-
-    async def update(self, section_id: str, body: models.SectionUpdate | Mapping[str, Any]) -> models.SectionOut:
-        """Rename a section.
-
-        `PATCH /v1/sections/{section_id}` · scope `tasks:write`
-        """
-        return cast(
-            "models.SectionOut", await self._client._call(_OPS["sections.update"], path=(section_id,), body=body)
-        )
-
-    async def delete(self, section_id: str) -> models.Acknowledgement:
-        """Delete a section.
-
-        `DELETE /v1/sections/{section_id}` · scope `tasks:write`
-        """
-        return cast("models.Acknowledgement", await self._client._call(_OPS["sections.delete"], path=(section_id,)))
-
-
-class AsyncTeamsResource:
-    """Teams, their members and their task list."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def create(self, body: models.TeamCreate | Mapping[str, Any]) -> models.TeamDetail:
-        """Create a team.
-
-        `POST /v1/teams` · scope `teams:write`
-        """
-        return cast("models.TeamDetail", await self._client._call(_OPS["teams.create"], body=body))
-
-    async def list(
-        self,
-        *,
-        org_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.TeamOut]:
-        """List an organization's teams.
-
-        `GET /v1/teams` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.TeamOut]",
-            await self._client._call(
-                _OPS["teams.list"],
-                query={
-                    "org_id": org_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    @overload
-    async def read(self, team_id: str, *, if_none_match: None = None) -> models.TeamDetail: ...
-    @overload
-    async def read(self, team_id: str, *, if_none_match: str) -> models.TeamDetail | NotModifiedType: ...
-    async def read(self, team_id: str, *, if_none_match: str | None = None) -> models.TeamDetail | NotModifiedType:
-        """Read a team (with its members).
-
-        `GET /v1/teams/{team_id}` · scope `teams:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TeamDetail | NotModifiedType",
-            await self._client._call(_OPS["teams.read"], path=(team_id,), if_none_match=if_none_match),
-        )
-
-    async def replace(
-        self, team_id: str, body: models.TeamUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TeamDetail:
-        """Update a team (PUT; partial).
-
-        `PUT /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDetail",
-            await self._client._call(_OPS["teams.replace"], path=(team_id,), body=body, if_match=if_match),
-        )
-
-    async def update(
-        self, team_id: str, body: models.TeamUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TeamDetail:
-        """Update a team (JSON merge-patch).
-
-        `PATCH /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDetail",
-            await self._client._call(_OPS["teams.update"], path=(team_id,), body=body, if_match=if_match),
-        )
-
-    async def delete(
-        self, team_id: str, *, detach: bool | None = None, reason: str | None = None, if_match: str | None = None
-    ) -> models.TeamDeleted:
-        """Delete a team.
-
-        `DELETE /v1/teams/{team_id}` · scope `teams:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TeamDeleted",
-            await self._client._call(
-                _OPS["teams.delete"], path=(team_id,), query={"detach": detach, "reason": reason}, if_match=if_match
-            ),
-        )
-
-    async def add_member(self, team_id: str, body: models.TeamMemberCreate | Mapping[str, Any]) -> models.TeamMemberOut:
-        """Add a member to a team.
-
-        `POST /v1/teams/{team_id}/members` · scope `teams:write`
-        """
-        return cast(
-            "models.TeamMemberOut", await self._client._call(_OPS["teams.add_member"], path=(team_id,), body=body)
-        )
-
-    async def replace_member(
-        self, team_id: str, user_id: str, body: models.TeamMemberUpdate | Mapping[str, Any]
-    ) -> models.TeamMemberOut:
-        """Change a team member's role (PUT).
-
-        `PUT /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.TeamMemberOut",
-            await self._client._call(_OPS["teams.replace_member"], path=(team_id, user_id), body=body),
-        )
-
-    async def update_member(
-        self, team_id: str, user_id: str, body: models.TeamMemberUpdate | Mapping[str, Any]
-    ) -> models.TeamMemberOut:
-        """Change a team member's role.
-
-        `PATCH /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.TeamMemberOut",
-            await self._client._call(_OPS["teams.update_member"], path=(team_id, user_id), body=body),
-        )
-
-    async def remove_member(self, team_id: str, user_id: str) -> models.Acknowledgement:
-        """Remove a team member.
-
-        `DELETE /v1/teams/{team_id}/members/{user_id}` · scope `teams:write`
-        """
-        return cast(
-            "models.Acknowledgement", await self._client._call(_OPS["teams.remove_member"], path=(team_id, user_id))
-        )
-
-    async def list_tasks(
-        self,
-        team_id: str,
-        *,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-        include_inaccessible: bool | None = None,
-        section_scope: str | None = None,
-    ) -> AsyncPage[models.TaskCardView]:
-        """A team's unfiled tasks (the team List's read; task-list envelope).
-
-        `GET /v1/teams/{team_id}/intake` · scope `teams:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.TaskCardView]",
-            await self._client._call(
-                _OPS["teams.list_tasks"],
-                path=(team_id,),
-                query={
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                    "include_inaccessible": include_inaccessible,
-                    "section_scope": section_scope,
-                },
-            ),
-        )
-
-    get = read
-    """Alias of `read`."""
-
-
 class AsyncSprintsResource:
-    """A team's sprints."""
+    """A project's sprints, and every sprint of an organization (Planning)."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
 
     async def list(
         self,
-        team_id: str,
+        project_id: str,
         *,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: str | None = None,
         sort_order: str | None = None,
     ) -> AsyncPage[models.SprintOut]:
-        """List a team's sprints.
+        """List a project's sprints.
 
-        `GET /v1/teams/{team_id}/sprints` · scope `teams:read` · a `Page` — iterate it for every item
+        `GET /v1/projects/{project_id}/sprints` · scope `projects:read` · a `Page` — iterate it for every item
         """
         return cast(
             "AsyncPage[models.SprintOut]",
             await self._client._call(
                 _OPS["sprints.list"],
-                path=(team_id,),
+                path=(project_id,),
                 query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
             ),
         )
 
-    async def create(self, team_id: str, body: models.SprintCreate | Mapping[str, Any]) -> models.SprintOut:
-        """Create a sprint.
+    async def create(self, project_id: str, body: models.SprintCreate | Mapping[str, Any]) -> models.SprintOut:
+        """Create a sprint in a project.
 
-        `POST /v1/teams/{team_id}/sprints` · scope `teams:write`
+        `POST /v1/projects/{project_id}/sprints` · scope `projects:write`
         """
-        return cast("models.SprintOut", await self._client._call(_OPS["sprints.create"], path=(team_id,), body=body))
+        return cast("models.SprintOut", await self._client._call(_OPS["sprints.create"], path=(project_id,), body=body))
 
-    async def update(
-        self, team_id: str, sprint_id: str, body: models.SprintUpdate | Mapping[str, Any]
-    ) -> models.SprintOut:
-        """Update a sprint.
+    async def list_org(
+        self,
+        *,
+        org_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.SprintOut]:
+        """Every sprint you can read in an organization (Planning).
 
-        `PUT /v1/teams/{team_id}/sprints/{sprint_id}` · scope `teams:write`
+        `GET /v1/sprints` · scope `projects:read` · a `Page` — iterate it for every item
         """
         return cast(
-            "models.SprintOut", await self._client._call(_OPS["sprints.update"], path=(team_id, sprint_id), body=body)
+            "AsyncPage[models.SprintOut]",
+            await self._client._call(
+                _OPS["sprints.list_org"],
+                query={
+                    "org_id": org_id,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
         )
 
-    async def delete(self, team_id: str, sprint_id: str, *, reason: str | None = None) -> models.SprintDeleted:
+    @overload
+    async def read(self, sprint_id: str, *, if_none_match: None = None) -> models.SprintOut: ...
+    @overload
+    async def read(self, sprint_id: str, *, if_none_match: str) -> models.SprintOut | NotModifiedType: ...
+    async def read(self, sprint_id: str, *, if_none_match: str | None = None) -> models.SprintOut | NotModifiedType:
+        """Read a sprint.
+
+        `GET /v1/sprints/{sprint_id}` · scope `projects:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.SprintOut | NotModifiedType",
+            await self._client._call(_OPS["sprints.read"], path=(sprint_id,), if_none_match=if_none_match),
+        )
+
+    async def update(self, sprint_id: str, body: models.SprintUpdate | Mapping[str, Any]) -> models.SprintOut:
+        """Update a sprint (name, dates, status, position, project).
+
+        `PATCH /v1/sprints/{sprint_id}` · scope `projects:write`
+        """
+        return cast("models.SprintOut", await self._client._call(_OPS["sprints.update"], path=(sprint_id,), body=body))
+
+    async def delete(self, sprint_id: str, *, reason: str | None = None) -> models.SprintDeleted:
         """Delete a sprint (its tasks are unfiled).
 
-        `DELETE /v1/teams/{team_id}/sprints/{sprint_id}` · scope `teams:write`
+        `DELETE /v1/sprints/{sprint_id}` · scope `projects:write`
         """
         return cast(
             "models.SprintDeleted",
-            await self._client._call(_OPS["sprints.delete"], path=(team_id, sprint_id), query={"reason": reason}),
+            await self._client._call(_OPS["sprints.delete"], path=(sprint_id,), query={"reason": reason}),
         )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AsyncAvailabilityResource:
-    """Who on a team is unavailable, and when."""
+    """Who in the organization is unavailable, and when."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
 
     @overload
     async def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: None = None
     ) -> models.AvailabilityRange: ...
     @overload
     async def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str
     ) -> models.AvailabilityRange | NotModifiedType: ...
     async def range(
-        self, team_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
+        self, org_id: str, *, from_: str | None = None, to: str | None = None, if_none_match: str | None = None
     ) -> models.AvailabilityRange | NotModifiedType:
-        """A team's availability over a date range.
+        """Everyone's availability over a date range.
 
-        `GET /v1/teams/{team_id}/availability` · scope `teams:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/organizations/{org_id}/availability` · scope `members:read` · `if_none_match=<etag>` → `NotModified` when unchanged
         """
         return cast(
             "models.AvailabilityRange | NotModifiedType",
             await self._client._call(
-                _OPS["availability.range"],
-                path=(team_id,),
-                query={"from": from_, "to": to},
-                if_none_match=if_none_match,
+                _OPS["availability.range"], path=(org_id,), query={"from": from_, "to": to}, if_none_match=if_none_match
             ),
         )
 
     async def create(
-        self, team_id: str, body: models.AvailabilityCreate | Mapping[str, Any]
+        self, org_id: str, body: models.AvailabilityCreate | Mapping[str, Any]
     ) -> models.AvailabilityEntry:
-        """Mark someone unavailable.
+        """Mark someone unavailable (yourself, or anyone as an admin).
 
-        `POST /v1/teams/{team_id}/availability` · scope `teams:write`
+        `POST /v1/organizations/{org_id}/availability` · scope `org:write`
         """
         return cast(
-            "models.AvailabilityEntry",
-            await self._client._call(_OPS["availability.create"], path=(team_id,), body=body),
+            "models.AvailabilityEntry", await self._client._call(_OPS["availability.create"], path=(org_id,), body=body)
         )
 
     async def update(
-        self, team_id: str, entry_id: str, body: models.AvailabilityUpdate | Mapping[str, Any]
+        self, org_id: str, entry_id: str, body: models.AvailabilityUpdate | Mapping[str, Any]
     ) -> models.AvailabilityEntry:
         """Change an unavailability entry.
 
-        `PUT /v1/teams/{team_id}/availability/{entry_id}` · scope `teams:write`
+        `PUT /v1/organizations/{org_id}/availability/{entry_id}` · scope `org:write`
         """
         return cast(
             "models.AvailabilityEntry",
-            await self._client._call(_OPS["availability.update"], path=(team_id, entry_id), body=body),
+            await self._client._call(_OPS["availability.update"], path=(org_id, entry_id), body=body),
         )
 
-    async def delete(self, team_id: str, entry_id: str) -> models.AvailabilityDeleted:
+    async def delete(self, org_id: str, entry_id: str) -> models.AvailabilityDeleted:
         """Remove an unavailability entry.
 
-        `DELETE /v1/teams/{team_id}/availability/{entry_id}` · scope `teams:write`
+        `DELETE /v1/organizations/{org_id}/availability/{entry_id}` · scope `org:write`
         """
         return cast(
-            "models.AvailabilityDeleted",
-            await self._client._call(_OPS["availability.delete"], path=(team_id, entry_id)),
+            "models.AvailabilityDeleted", await self._client._call(_OPS["availability.delete"], path=(org_id, entry_id))
         )
+
+    async def mark_mine(self, body: models.MyAvailabilitySet | Mapping[str, Any]) -> models.AvailabilityEntry:
+        """Mark your own days unavailable.
+
+        `PUT /v1/me/availability` · scope `org:write`
+        """
+        return cast("models.AvailabilityEntry", await self._client._call(_OPS["availability.mark_mine"], body=body))
+
+
+class AsyncWorkloadResource:
+    """Open work per person: who is heavy, who has capacity."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def read(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: None = None
+    ) -> models.WorkloadOut: ...
+    @overload
+    async def read(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str
+    ) -> models.WorkloadOut | NotModifiedType: ...
+    async def read(
+        self, org_id: str, *, project_id: str | None = None, if_none_match: str | None = None
+    ) -> models.WorkloadOut | NotModifiedType:
+        """Open work per person (who is heavy, who has capacity).
+
+        `GET /v1/organizations/{org_id}/workload` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.WorkloadOut | NotModifiedType",
+            await self._client._call(
+                _OPS["workload.read"], path=(org_id,), query={"project_id": project_id}, if_none_match=if_none_match
+            ),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AsyncGoalsResource:
@@ -5731,6 +6001,13 @@ class AsyncMeResource:
 
     get = read
     """Alias of `read`."""
+
+    async def set_availability(self, body: models.MyAvailabilitySet | Mapping[str, Any]) -> models.AvailabilityEntry:
+        """Mark your own days unavailable.
+
+        `PUT /v1/me/availability` · scope `org:write`
+        """
+        return cast("models.AvailabilityEntry", await self._client._call(_OPS["availability.mark_mine"], body=body))
 
     __call__ = read
     """`tm.me()` is `tm.me.read()`."""
@@ -6112,23 +6389,6 @@ class AsyncViewPinsResource:
             "models.Acknowledgement", await self._client._call(_OPS["view-pins.unpin_project"], path=(project_id,))
         )
 
-    async def pin_team(self, team_id: str, *, org_id: str) -> models.PinOut:
-        """Pin a team.
-
-        `PUT /v1/view-pins/teams/{team_id}` · scope `tasks:write`
-        """
-        return cast(
-            "models.PinOut",
-            await self._client._call(_OPS["view-pins.pin_team"], path=(team_id,), query={"org_id": org_id}),
-        )
-
-    async def unpin_team(self, team_id: str) -> models.Acknowledgement:
-        """Unpin a team.
-
-        `DELETE /v1/view-pins/teams/{team_id}` · scope `tasks:write`
-        """
-        return cast("models.Acknowledgement", await self._client._call(_OPS["view-pins.unpin_team"], path=(team_id,)))
-
     async def reorder(self, body: models.PinOrder | Mapping[str, Any]) -> models.PinListPage:
         """Reorder your pins.
 
@@ -6137,33 +6397,54 @@ class AsyncViewPinsResource:
         return cast("models.PinListPage", await self._client._call(_OPS["view-pins.reorder"], body=body))
 
 
+class AsyncStorageResource:
+    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
+    @overload
+    async def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
+    async def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
+        """The account's storage pool: totals and the per-organization breakdown.
+
+        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccountStorage | NotModifiedType",
+            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
+        )
+
+
 class SyncResources:
     """Every resource namespace, attached to a client."""
 
     health: HealthResource
     organizations: OrganizationsResource
     projects: ProjectsResource
+    project_members: ProjectMembersResource
     tasks: TasksResource
+    task_comments: TaskCommentsResource
     organization_members: OrganizationMembersResource
     organization_invites: OrganizationInvitesResource
     designations: DesignationsResource
-    project_members: ProjectMembersResource
     project_resources: ProjectResourcesResource
     task_attachments: TaskAttachmentsResource
     uploads: UploadsResource
-    task_comments: TaskCommentsResource
     task_history: TaskHistoryResource
     project_stats: ProjectStatsResource
+    account: AccountResource
     service_accounts: ServiceAccountsResource
     tokens: TokensResource
     webhooks: WebhooksResource
     oauth_clients: OauthClientsResource
     connected_apps: ConnectedAppsResource
     releases: ReleasesResource
-    sections: SectionsResource
-    teams: TeamsResource
     sprints: SprintsResource
     availability: AvailabilityResource
+    workload: WorkloadResource
     goals: GoalsResource
     milestones: MilestonesResource
     me: MeResource
@@ -6171,32 +6452,33 @@ class SyncResources:
     audit: AuditResource
     views: ViewsResource
     view_pins: ViewPinsResource
+    storage: StorageResource
 
     def _attach(self, core: SyncCore) -> None:
         self.health = HealthResource(core)
         self.organizations = OrganizationsResource(core)
         self.projects = ProjectsResource(core)
+        self.project_members = ProjectMembersResource(core)
         self.tasks = TasksResource(core)
+        self.task_comments = TaskCommentsResource(core)
         self.organization_members = OrganizationMembersResource(core)
         self.organization_invites = OrganizationInvitesResource(core)
         self.designations = DesignationsResource(core)
-        self.project_members = ProjectMembersResource(core)
         self.project_resources = ProjectResourcesResource(core)
         self.task_attachments = TaskAttachmentsResource(core)
         self.uploads = UploadsResource(core)
-        self.task_comments = TaskCommentsResource(core)
         self.task_history = TaskHistoryResource(core)
         self.project_stats = ProjectStatsResource(core)
+        self.account = AccountResource(core)
         self.service_accounts = ServiceAccountsResource(core)
         self.tokens = TokensResource(core)
         self.webhooks = WebhooksResource(core)
         self.oauth_clients = OauthClientsResource(core)
         self.connected_apps = ConnectedAppsResource(core)
         self.releases = ReleasesResource(core)
-        self.sections = SectionsResource(core)
-        self.teams = TeamsResource(core)
         self.sprints = SprintsResource(core)
         self.availability = AvailabilityResource(core)
+        self.workload = WorkloadResource(core)
         self.goals = GoalsResource(core)
         self.milestones = MilestonesResource(core)
         self.me = MeResource(core)
@@ -6204,6 +6486,7 @@ class SyncResources:
         self.audit = AuditResource(core)
         self.views = ViewsResource(core)
         self.view_pins = ViewPinsResource(core)
+        self.storage = StorageResource(core)
 
 
 class AsyncResources:
@@ -6212,27 +6495,27 @@ class AsyncResources:
     health: AsyncHealthResource
     organizations: AsyncOrganizationsResource
     projects: AsyncProjectsResource
+    project_members: AsyncProjectMembersResource
     tasks: AsyncTasksResource
+    task_comments: AsyncTaskCommentsResource
     organization_members: AsyncOrganizationMembersResource
     organization_invites: AsyncOrganizationInvitesResource
     designations: AsyncDesignationsResource
-    project_members: AsyncProjectMembersResource
     project_resources: AsyncProjectResourcesResource
     task_attachments: AsyncTaskAttachmentsResource
     uploads: AsyncUploadsResource
-    task_comments: AsyncTaskCommentsResource
     task_history: AsyncTaskHistoryResource
     project_stats: AsyncProjectStatsResource
+    account: AsyncAccountResource
     service_accounts: AsyncServiceAccountsResource
     tokens: AsyncTokensResource
     webhooks: AsyncWebhooksResource
     oauth_clients: AsyncOauthClientsResource
     connected_apps: AsyncConnectedAppsResource
     releases: AsyncReleasesResource
-    sections: AsyncSectionsResource
-    teams: AsyncTeamsResource
     sprints: AsyncSprintsResource
     availability: AsyncAvailabilityResource
+    workload: AsyncWorkloadResource
     goals: AsyncGoalsResource
     milestones: AsyncMilestonesResource
     me: AsyncMeResource
@@ -6240,32 +6523,33 @@ class AsyncResources:
     audit: AsyncAuditResource
     views: AsyncViewsResource
     view_pins: AsyncViewPinsResource
+    storage: AsyncStorageResource
 
     def _attach(self, core: AsyncCore) -> None:
         self.health = AsyncHealthResource(core)
         self.organizations = AsyncOrganizationsResource(core)
         self.projects = AsyncProjectsResource(core)
+        self.project_members = AsyncProjectMembersResource(core)
         self.tasks = AsyncTasksResource(core)
+        self.task_comments = AsyncTaskCommentsResource(core)
         self.organization_members = AsyncOrganizationMembersResource(core)
         self.organization_invites = AsyncOrganizationInvitesResource(core)
         self.designations = AsyncDesignationsResource(core)
-        self.project_members = AsyncProjectMembersResource(core)
         self.project_resources = AsyncProjectResourcesResource(core)
         self.task_attachments = AsyncTaskAttachmentsResource(core)
         self.uploads = AsyncUploadsResource(core)
-        self.task_comments = AsyncTaskCommentsResource(core)
         self.task_history = AsyncTaskHistoryResource(core)
         self.project_stats = AsyncProjectStatsResource(core)
+        self.account = AsyncAccountResource(core)
         self.service_accounts = AsyncServiceAccountsResource(core)
         self.tokens = AsyncTokensResource(core)
         self.webhooks = AsyncWebhooksResource(core)
         self.oauth_clients = AsyncOauthClientsResource(core)
         self.connected_apps = AsyncConnectedAppsResource(core)
         self.releases = AsyncReleasesResource(core)
-        self.sections = AsyncSectionsResource(core)
-        self.teams = AsyncTeamsResource(core)
         self.sprints = AsyncSprintsResource(core)
         self.availability = AsyncAvailabilityResource(core)
+        self.workload = AsyncWorkloadResource(core)
         self.goals = AsyncGoalsResource(core)
         self.milestones = AsyncMilestonesResource(core)
         self.me = AsyncMeResource(core)
@@ -6273,6 +6557,7 @@ class AsyncResources:
         self.audit = AsyncAuditResource(core)
         self.views = AsyncViewsResource(core)
         self.view_pins = AsyncViewPinsResource(core)
+        self.storage = AsyncStorageResource(core)
 
 
 RESOURCE_METHODS: dict[str, tuple[str, str]] = {
@@ -6285,6 +6570,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "projects.replace": ("projects", "replace"),
     "projects.update": ("projects", "update"),
     "projects.delete": ("projects", "delete"),
+    "project-members.create_batch": ("project_members", "create_batch"),
     "tasks.create": ("tasks", "create"),
     "tasks.list": ("tasks", "list"),
     "tasks.create_batch": ("tasks", "create_batch"),
@@ -6298,12 +6584,18 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "tasks.review": ("tasks", "review"),
     "tasks.set_sprint": ("tasks", "set_sprint"),
     "tasks.set_milestone": ("tasks", "set_milestone"),
-    "tasks.set_section": ("tasks", "set_section"),
     "tasks.add_subtask": ("tasks", "add_subtask"),
     "tasks.remove_subtask": ("tasks", "remove_subtask"),
     "tasks.reopen": ("tasks", "reopen"),
     "tasks.add_dependency": ("tasks", "add_dependency"),
     "tasks.remove_dependency": ("tasks", "remove_dependency"),
+    "tasks.list_subscribers": ("tasks", "list_subscribers"),
+    "tasks.set_subscribers": ("tasks", "set_subscribers"),
+    "tasks.subscribe": ("tasks", "subscribe"),
+    "tasks.unsubscribe": ("tasks", "unsubscribe"),
+    "task-comments.add_reaction": ("task_comments", "add_reaction"),
+    "task-comments.remove_reaction": ("task_comments", "remove_reaction"),
+    "task-comments.list_reactions": ("task_comments", "list_reactions"),
     "organization-members.list": ("organization_members", "list"),
     "organization-members.read": ("organization_members", "read"),
     "organization-members.replace": ("organization_members", "replace"),
@@ -6351,6 +6643,9 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "task-history.list": ("task_history", "list"),
     "task-history.read": ("task_history", "read"),
     "project-stats.read": ("project_stats", "read"),
+    "account.read": ("account", "read"),
+    "account.people": ("account", "people"),
+    "account.storage": ("account", "storage"),
     "organizations.settings": ("organizations", "settings"),
     "organizations.update_settings": ("organizations", "update_settings"),
     "service-accounts.create": ("service_accounts", "create"),
@@ -6387,30 +6682,18 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "connected-apps.list": ("connected_apps", "list"),
     "connected-apps.delete": ("connected_apps", "delete"),
     "releases.whats_new": ("releases", "whats_new"),
-    "sections.list": ("sections", "list"),
-    "sections.create": ("sections", "create"),
-    "sections.reorder": ("sections", "reorder"),
-    "sections.update": ("sections", "update"),
-    "sections.delete": ("sections", "delete"),
-    "teams.create": ("teams", "create"),
-    "teams.list": ("teams", "list"),
-    "teams.read": ("teams", "read"),
-    "teams.replace": ("teams", "replace"),
-    "teams.update": ("teams", "update"),
-    "teams.delete": ("teams", "delete"),
-    "teams.add_member": ("teams", "add_member"),
-    "teams.replace_member": ("teams", "replace_member"),
-    "teams.update_member": ("teams", "update_member"),
-    "teams.remove_member": ("teams", "remove_member"),
-    "teams.list_tasks": ("teams", "list_tasks"),
     "sprints.list": ("sprints", "list"),
     "sprints.create": ("sprints", "create"),
+    "sprints.list_org": ("sprints", "list_org"),
+    "sprints.read": ("sprints", "read"),
     "sprints.update": ("sprints", "update"),
     "sprints.delete": ("sprints", "delete"),
     "availability.range": ("availability", "range"),
     "availability.create": ("availability", "create"),
     "availability.update": ("availability", "update"),
     "availability.delete": ("availability", "delete"),
+    "availability.mark_mine": ("availability", "mark_mine"),
+    "workload.read": ("workload", "read"),
     "goals.org": ("goals", "org"),
     "goals.list": ("goals", "list"),
     "goals.create": ("goals", "create"),
@@ -6449,8 +6732,6 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "view-pins.list": ("view_pins", "list"),
     "view-pins.pin_project": ("view_pins", "pin_project"),
     "view-pins.unpin_project": ("view_pins", "unpin_project"),
-    "view-pins.pin_team": ("view_pins", "pin_team"),
-    "view-pins.unpin_team": ("view_pins", "unpin_team"),
     "view-pins.reorder": ("view_pins", "reorder"),
 }
 """operationId → (resource attribute, method) — `tests/test_drift.py` checks it covers the spec."""

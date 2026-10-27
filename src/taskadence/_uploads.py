@@ -68,7 +68,7 @@ class DirectKind:
 
 DIRECT: Final[Mapping[str, DirectKind]] = {
     "task-attachments.create": DirectKind(
-        "attachment", "task_id", "TaskAttachmentInDB", extra=("project_id", "is_inline")
+        "attachment", "task_id", "TaskAttachmentInDB", extra=("project_id", "is_inline", "purpose")
     ),
     "project-resources.upload": DirectKind(
         "project_file", "project_id", "ProjectResourceInDB", extra=("project_name",)

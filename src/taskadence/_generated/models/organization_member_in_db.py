@@ -47,6 +47,11 @@ class OrganizationMemberInDB:
             Default: 'user'.
         mfa_enrolled (bool | None | Unset): Whether the member has set up two-step sign-in. Only in the members list,
             and only for owners and admins; null otherwise.
+        linked (bool | None | Unset): Release 10: false when this member's sign-in has no TasKadence profile row yet (an
+            SSO account sharing an email with an older account): they cannot be subscribed to tasks or react until they sign
+            in again (`member-not-linked`). Null when not computed.
+        avatar_preset (None | str | Unset): The illustrated avatar this person chose from the app's set (an id such as
+            `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead.
         admin_grants (list[str] | Unset): The owner-only powers an owner granted this admin (`manage_sso`,
             `manage_domain_restriction`, `manage_retention`). Empty for anyone else; an owner holds all three without a
             grant.
@@ -71,6 +76,8 @@ class OrganizationMemberInDB:
     last_active_at: datetime.datetime | None | Unset = UNSET
     kind: str | Unset = "user"
     mfa_enrolled: bool | None | Unset = UNSET
+    linked: bool | None | Unset = UNSET
+    avatar_preset: None | str | Unset = UNSET
     admin_grants: list[str] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -184,6 +191,18 @@ class OrganizationMemberInDB:
         else:
             mfa_enrolled = self.mfa_enrolled
 
+        linked: bool | None | Unset
+        if isinstance(self.linked, Unset):
+            linked = UNSET
+        else:
+            linked = self.linked
+
+        avatar_preset: None | str | Unset
+        if isinstance(self.avatar_preset, Unset):
+            avatar_preset = UNSET
+        else:
+            avatar_preset = self.avatar_preset
+
         admin_grants: list[str] | Unset = UNSET
         if not isinstance(self.admin_grants, Unset):
             admin_grants = self.admin_grants
@@ -228,6 +247,10 @@ class OrganizationMemberInDB:
             field_dict["kind"] = kind
         if mfa_enrolled is not UNSET:
             field_dict["mfa_enrolled"] = mfa_enrolled
+        if linked is not UNSET:
+            field_dict["linked"] = linked
+        if avatar_preset is not UNSET:
+            field_dict["avatar_preset"] = avatar_preset
         if admin_grants is not UNSET:
             field_dict["admin_grants"] = admin_grants
 
@@ -422,6 +445,24 @@ class OrganizationMemberInDB:
 
         mfa_enrolled = _parse_mfa_enrolled(d.pop("mfa_enrolled", UNSET))
 
+        def _parse_linked(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        linked = _parse_linked(d.pop("linked", UNSET))
+
+        def _parse_avatar_preset(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        avatar_preset = _parse_avatar_preset(d.pop("avatar_preset", UNSET))
+
         admin_grants = cast(list[str], d.pop("admin_grants", UNSET))
 
         organization_member_in_db = cls(
@@ -444,6 +485,8 @@ class OrganizationMemberInDB:
             last_active_at=last_active_at,
             kind=kind,
             mfa_enrolled=mfa_enrolled,
+            linked=linked,
+            avatar_preset=avatar_preset,
             admin_grants=admin_grants,
         )
 

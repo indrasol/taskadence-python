@@ -17,7 +17,7 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     body: AvailabilityUpdate,
@@ -26,8 +26,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "put",
-        "url": "/v1/teams/{team_id}/availability/{entry_id}".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/organizations/{org_id}/availability/{entry_id}".format(
+            org_id=quote(str(org_id), safe=""),
             entry_id=quote(str(entry_id), safe=""),
         ),
     }
@@ -111,7 +111,7 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
@@ -119,11 +119,11 @@ def sync_detailed(
 ) -> Response[AvailabilityEntry | Problem]:
     """Change an unavailability entry
 
-     A true partial over dates and note. `user_id` is immutable (422). 404 for an unknown
-    entry or one of another org.
+     Change an entry's dates or note (the same who-may rule as creating it). `user_id` cannot change
+    (422).
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
             is a 422 - moving a day
@@ -138,7 +138,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
         body=body,
     )
@@ -151,7 +151,7 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
@@ -159,11 +159,11 @@ def sync(
 ) -> AvailabilityEntry | Problem | None:
     """Change an unavailability entry
 
-     A true partial over dates and note. `user_id` is immutable (422). 404 for an unknown
-    entry or one of another org.
+     Change an entry's dates or note (the same who-may rule as creating it). `user_id` cannot change
+    (422).
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
             is a 422 - moving a day
@@ -178,7 +178,7 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
         client=client,
         body=body,
@@ -186,7 +186,7 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
@@ -194,11 +194,11 @@ async def asyncio_detailed(
 ) -> Response[AvailabilityEntry | Problem]:
     """Change an unavailability entry
 
-     A true partial over dates and note. `user_id` is immutable (422). 404 for an unknown
-    entry or one of another org.
+     Change an entry's dates or note (the same who-may rule as creating it). `user_id` cannot change
+    (422).
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
             is a 422 - moving a day
@@ -213,7 +213,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         entry_id=entry_id,
         body=body,
     )
@@ -224,7 +224,7 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    org_id: str,
     entry_id: str,
     *,
     client: AuthenticatedClient,
@@ -232,11 +232,11 @@ async def asyncio(
 ) -> AvailabilityEntry | Problem | None:
     """Change an unavailability entry
 
-     A true partial over dates and note. `user_id` is immutable (422). 404 for an unknown
-    entry or one of another org.
+     Change an entry's dates or note (the same who-may rule as creating it). `user_id` cannot change
+    (422).
 
     Args:
-        team_id (str):
+        org_id (str):
         entry_id (str):
         body (AvailabilityUpdate): A true partial. `user_id` is IMMUTABLE: sending a different one
             is a 422 - moving a day
@@ -252,7 +252,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            org_id=org_id,
             entry_id=entry_id,
             client=client,
             body=body,

@@ -22,8 +22,8 @@ class TeamMemberDesignation:
     """Part of `ProjectCreate` and `ProjectUpdate`.
 
     Attributes:
-        id (str): Team member user ID
-        designation (None | str | Unset): Team member designation
+        id (str): The member's user ID
+        designation (None | str | Unset): Accepted and ignored (the member shows their live org designation)
     """
 
     id: str

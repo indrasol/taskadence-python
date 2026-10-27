@@ -23,7 +23,8 @@ class AvailabilityCreate:
     """The request body of `availability.create`.
 
     Attributes:
-        user_id (str): The person who is away - must be an active member of THIS team (422 otherwise)
+        user_id (str): The person who is away - an active member of the organization (422 otherwise). Yourself, or
+            anyone when you are an org owner / admin (403 otherwise).
         start_date (datetime.date): First unavailable day
         end_date (datetime.date): Last unavailable day (INCLUSIVE). Not earlier than start_date (422).
         note (None | str | Unset): Optional, at most 200 characters

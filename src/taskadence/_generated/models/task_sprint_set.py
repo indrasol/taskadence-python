@@ -19,10 +19,12 @@ T = TypeVar("T", bound="TaskSprintSet")
 
 @_attrs_define
 class TaskSprintSet:
-    """The body of `PUT /v1/tasks/{task_id}/sprint`: the team sprint to file the task into, or `null` to take it out.
+    """The body of `PUT /v1/tasks/{task_id}/sprint`: the sprint (of the task's own project) to file the task into, or
+    `null` to take it out.
 
-    Attributes:
-        sprint_id (None | str | Unset): The team sprint to file this task into, or null for none. Example: SP12345.
+        Attributes:
+            sprint_id (None | str | Unset): The sprint (of the task's own project) to file this task into, or null for none.
+                Example: SP12345.
     """
 
     sprint_id: None | str | Unset = UNSET

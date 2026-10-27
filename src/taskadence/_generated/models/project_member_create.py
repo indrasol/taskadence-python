@@ -35,7 +35,7 @@ class ProjectMemberCreate:
         role (None | str | Unset): The older role field (`owner` / `admin` / `member`); derived from `project_role` when
             omitted. Prefer `project_role`. Example: owner.
         project_role (None | ProjectRoleEnum | Unset): The member's role on the project; derived from `role` when
-            omitted. Example: editor.
+            omitted. Example: member.
         created_by (None | str | Unset): Who created the membership (username)
         updated_by (None | str | Unset): Who last updated the membership (username)
         is_active (bool | None | Unset): Is the member active? Default: True. Example: True.

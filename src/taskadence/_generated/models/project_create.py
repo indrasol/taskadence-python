@@ -46,13 +46,12 @@ class ProjectCreate:
         is_active (bool | None | Unset): Is the project active? Default: True. Example: True.
         delete_reason (None | str | Unset): Reason for deletion
         owner (None | str | Unset): User name of the project owner
-        team_members (list[str] | None | Unset): List of user names to add as members
+        members (list[str] | None | Unset): The project's members: user ids (or usernames) to add on create; the
+            members' user ids on a read
         visibility (None | ProjectVisibilityEnum | Unset): `public`: every member of the organization can see the
             project; `private`: only its members and org admins. Default: 'public'. Example: public.
-        team_id (None | str | Unset): The team the project is filed under; it must be an active team of the same
-            organization (422 otherwise). null = none.
         parent_project_id (None | str | Unset): The parent project (N.3): a top-level project of the same organization
-            on which the caller is owner or editor (or an org owner / admin); a project with sub-projects cannot get a
+            on which the caller is owner or member (or an org owner / admin); a project with sub-projects cannot get a
             parent (422). null = top-level.
         owner_designation (None | str | Unset): Accepted and ignored: a project member shows their live org designation
             Example: manager.
@@ -73,9 +72,8 @@ class ProjectCreate:
     is_active: bool | None | Unset = True
     delete_reason: None | str | Unset = UNSET
     owner: None | str | Unset = UNSET
-    team_members: list[str] | None | Unset = UNSET
+    members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = "public"
-    team_id: None | str | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
@@ -167,14 +165,14 @@ class ProjectCreate:
         else:
             owner = self.owner
 
-        team_members: list[str] | None | Unset
-        if isinstance(self.team_members, Unset):
-            team_members = UNSET
-        elif isinstance(self.team_members, list):
-            team_members = self.team_members
+        members: list[str] | None | Unset
+        if isinstance(self.members, Unset):
+            members = UNSET
+        elif isinstance(self.members, list):
+            members = self.members
 
         else:
-            team_members = self.team_members
+            members = self.members
 
         visibility: None | str | Unset
         if isinstance(self.visibility, Unset):
@@ -183,12 +181,6 @@ class ProjectCreate:
             visibility = self.visibility
         else:
             visibility = self.visibility
-
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
 
         parent_project_id: None | str | Unset
         if isinstance(self.parent_project_id, Unset):
@@ -244,12 +236,10 @@ class ProjectCreate:
             field_dict["delete_reason"] = delete_reason
         if owner is not UNSET:
             field_dict["owner"] = owner
-        if team_members is not UNSET:
-            field_dict["team_members"] = team_members
+        if members is not UNSET:
+            field_dict["members"] = members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if parent_project_id is not UNSET:
             field_dict["parent_project_id"] = parent_project_id
         if owner_designation is not UNSET:
@@ -408,7 +398,7 @@ class ProjectCreate:
 
         owner = _parse_owner(d.pop("owner", UNSET))
 
-        def _parse_team_members(data: object) -> list[str] | None | Unset:
+        def _parse_members(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -416,14 +406,14 @@ class ProjectCreate:
             try:
                 if not isinstance(data, list):
                     raise TypeError()
-                team_members_type_0 = cast(list[str], data)
+                members_type_0 = cast(list[str], data)
 
-                return team_members_type_0
+                return members_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             return cast(list[str] | None | Unset, data)
 
-        team_members = _parse_team_members(d.pop("team_members", UNSET))
+        members = _parse_members(d.pop("members", UNSET))
 
         def _parse_visibility(data: object) -> None | ProjectVisibilityEnum | Unset:
             if data is None:
@@ -441,15 +431,6 @@ class ProjectCreate:
             return cast(None | ProjectVisibilityEnum | Unset, data)
 
         visibility = _parse_visibility(d.pop("visibility", UNSET))
-
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
 
         def _parse_parent_project_id(data: object) -> None | str | Unset:
             if data is None:
@@ -507,9 +488,8 @@ class ProjectCreate:
             is_active=is_active,
             delete_reason=delete_reason,
             owner=owner,
-            team_members=team_members,
+            members=members,
             visibility=visibility,
-            team_id=team_id,
             parent_project_id=parent_project_id,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,

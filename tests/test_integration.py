@@ -1,6 +1,6 @@
 """The quickstart against a live API — `pytest -m integration`. Skipped unless TASKADENCE_TOKEN, TASKADENCE_API_URL and
 TASKADENCE_ORG are set (CI's `integration` job sets them from secrets when present). It writes one task and one saved
-view in that organization and deletes both."""
+view, plus a project and a sprint, in that organization and deletes them all."""
 
 from __future__ import annotations
 

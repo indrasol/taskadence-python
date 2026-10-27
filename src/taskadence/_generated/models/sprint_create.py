@@ -23,14 +23,16 @@ class SprintCreate:
     """The request body of `sprints.create`.
 
     Attributes:
-        name (str): Unique among the team's active sprints (case-insensitive) - 409 otherwise
+        name (str): Unique among the project's active sprints (case-insensitive) - 409 otherwise
         start_date (datetime.date): First day of the time box
         description (None | str | Unset):
-        goal (None | str | Unset): What the sprint is for, in the team's words. Free text; nothing is derived from it.
+        goal (None | str | Unset): What the sprint is for, in the project's words. Free text; nothing is derived from
+            it.
         end_date (datetime.date | None | Unset): Last day of the time box (inclusive). Exactly one of `end_date` /
             `duration_weeks` is required; both is a 422.
         duration_weeks (int | None | Unset): Convenience: the end date is derived as start + 7*weeks - 1. The server
             stores the END DATE, never this.
+        position (int | None | Unset): Drag order among the project's sprints; omitted = after the last one
     """
 
     name: str
@@ -39,6 +41,7 @@ class SprintCreate:
     goal: None | str | Unset = UNSET
     end_date: datetime.date | None | Unset = UNSET
     duration_weeks: int | None | Unset = UNSET
+    position: int | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -74,6 +77,12 @@ class SprintCreate:
         else:
             duration_weeks = self.duration_weeks
 
+        position: int | None | Unset
+        if isinstance(self.position, Unset):
+            position = UNSET
+        else:
+            position = self.position
+
         field_dict: dict[str, Any] = {}
 
         field_dict.update(
@@ -90,6 +99,8 @@ class SprintCreate:
             field_dict["end_date"] = end_date
         if duration_weeks is not UNSET:
             field_dict["duration_weeks"] = duration_weeks
+        if position is not UNSET:
+            field_dict["position"] = position
 
         return field_dict
 
@@ -144,6 +155,15 @@ class SprintCreate:
 
         duration_weeks = _parse_duration_weeks(d.pop("duration_weeks", UNSET))
 
+        def _parse_position(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        position = _parse_position(d.pop("position", UNSET))
+
         sprint_create = cls(
             name=name,
             start_date=start_date,
@@ -151,6 +171,7 @@ class SprintCreate:
             goal=goal,
             end_date=end_date,
             duration_weeks=duration_weeks,
+            position=position,
         )
 
         return sprint_create

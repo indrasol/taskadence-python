@@ -49,7 +49,42 @@ LEAKED = {"is_registration", "authorization"}
 # access token is simply `Taskadence(token=...)`. They are dropped before generation (client, facade and docs alike).
 SKIPPED_KINDS = {"oauth"}
 # Friendlier names on top of the operationId verbs (the verbs stay; these are aliases).
-ALIASES = {"tasks": {"move": "set_project"}}
+ALIASES = {"tasks": {"move": "set_project", "subscribers": "list_subscribers"}}
+# Release 10: an operation reachable from the resource a caller thinks in, too (the operationId's method stays).
+# `tm.projects.sprints(project_id)` is `tm.sprints.list(project_id)`, and so on; generated as full methods.
+CROSS_ALIASES = {
+    "projects": {"sprints": "sprints.list"},
+    "organizations": {"availability": "availability.range", "workload": "workload.read"},
+    "me": {"set_availability": "availability.mark_mine"},
+    "storage": {"get": "account.storage"},
+}
+# Release 10: a namespace that exists only for its CROSS_ALIASES (no operationId of its own), with its docstring.
+ALIAS_NAMESPACES = {"storage": "The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."}
+# Release 10 step 3: a namespace under a resource (`tm.projects.members`): its docstring and its methods.
+NESTED = {
+    "projects": {
+        "members": (
+            "A project's members: `tm.projects.members.add_many(project_id, [...])`.",
+            {"add_many": "project-members.create_batch"},
+        )
+    },
+    # Release 10 step 4: comment reactions (`tm.tasks.comments.react(task_id, comment_id, emoji)`).
+    "tasks": {
+        "comments": (
+            "A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and "
+            "`.reactions(...)`.",
+            {
+                "react": "task-comments.add_reaction",
+                "unreact": "task-comments.remove_reaction",
+                "reactions": "task-comments.list_reactions",
+            },
+        )
+    },
+}
+# Release 10 step 3: a body that is one array (`{"members": [...]}`) is taken as that array, an argument of its name.
+LIST_BODIES = {"project-members.create_batch": "members", "tasks.set_subscribers": "user_ids"}
+# Release 10 step 4: a string query parameter that also takes a list (comma-joined): `include=["subscribers"]`.
+MULTI_QUERY = {("tasks.list", "include")}
 
 
 def bin_(name: str) -> str:
@@ -199,6 +234,8 @@ class Op:
     filters: list[str] = field(default_factory=list)
     body: str | None = None
     body_model: str | None = None
+    list_body: str | None = None
+    list_item: str = "str"
     body_required: bool = False
     form: list[Param] = field(default_factory=list)
     files: list[str] = field(default_factory=list)
@@ -292,7 +329,9 @@ class Facade:
                     Param(
                         name,
                         py_name(name),
-                        self.annotation(prm.get("schema", {})),
+                        "str | Sequence[str]"
+                        if (op_id, name) in MULTI_QUERY
+                        else self.annotation(prm.get("schema", {})),
                         bool(prm.get("required")),
                         (prm.get("description") or "").split("\n")[0],
                     )
@@ -311,6 +350,8 @@ class Facade:
                 if len(refs) != 1:
                     sys.exit(f"{op_id}: a JSON body must be one schema (optionally or null)")
                 op.body_model = self.cls(refs[0])
+                if op_id in LIST_BODIES:
+                    self.list_body(op, self.schema(refs[0]), LIST_BODIES[op_id])
             else:
                 op.body = "multipart"
                 schema = self.schema(next(iter(content.values()))["schema"]["$ref"])
@@ -331,6 +372,14 @@ class Facade:
                 False  # a page is re-read, not revalidated: the facade offers If-None-Match on single reads
             )
         return op
+
+    def list_body(self, op: Op, schema: dict[str, Any], name: str) -> None:
+        props = schema.get("properties", {})
+        if list(props) != [name] or props[name].get("type") != "array" or schema.get("required") != [name]:
+            sys.exit(f"LIST_BODIES: {op.op_id}'s body is not one required array `{name}`")
+        items = props[name].get("items", {})
+        op.list_body = name
+        op.list_item = f"models.{self.cls(items['$ref'])} | Mapping[str, Any]" if "$ref" in items else "str"
 
     def response(self, op: Op, raw: dict[str, Any], is_list: bool) -> None:
         status = next((s for s in raw["responses"] if s.startswith("2")), None)
@@ -418,7 +467,10 @@ class Facade:
         if op.path_params:
             joined = ", ".join(op.path_params) + ("," if len(op.path_params) == 1 else "")
             call.append(f"path=({joined})")
-        if op.body == "json":
+        if op.list_body:
+            params.append(f"{op.list_body}: Sequence[{op.list_item}]")
+            call.append(f"body=_list_body({op.list_body!r}, {op.list_body})")
+        elif op.body == "json":
             ann = f"models.{op.body_model} | Mapping[str, Any]"
             params.append(f"body: {ann}" if op.body_required else f"body: {ann} | None = None")
             call.append("body=body")
@@ -517,7 +569,7 @@ class Facade:
             "from collections.abc import Mapping, Sequence",
             "from typing import Any, cast, overload",
             "",
-            "from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto",
+            "from ._core import AUTO, AsyncCore, FileInput, NotModifiedType, SyncCore, _Auto, _list_body",
             "from ._generated import models",
             "from ._operations import OPERATIONS as _OPS",
             "from ._uploads import UploadProgress",
@@ -527,20 +579,38 @@ class Facade:
             "",
             "",
         ]
-        grouped = self.resources()
+        grouped = self.resources() | {name: [] for name in ALIAS_NAMESPACES if name not in self.resources()}
+        by_id = {o.op_id: o for o in self.ops}
         for is_async in (False, True):
+            core = "AsyncCore" if is_async else "SyncCore"
             for resource, ops in grouped.items():
-                cls = ("Async" if is_async else "") + pascal(resource) + "Resource"
-                text = self.tag_text.get(resource, "").replace('"""', "'''")
+                prefix = ("Async" if is_async else "") + pascal(resource)
+                verbs = {op.verb for op in ops}
+                nested = NESTED.get(resource, {})
+                for sub, (doc, methods) in nested.items():
+                    if sub in verbs:
+                        sys.exit(f"NESTED: {resource}.{sub} clashes with an operation")
+                    out += [
+                        f"class {prefix}{pascal(sub)}Resource:",
+                        f'    """{doc}"""',
+                        "",
+                        f"    def __init__(self, client: {core}) -> None:",
+                        "        self._client = client",
+                        "",
+                    ]
+                    for name, op_id in methods.items():
+                        out += self.emit_method(by_id[op_id], name, is_async)
+                    out += [""]
+                text = self.tag_text.get(resource, ALIAS_NAMESPACES.get(resource, "")).replace('"""', "'''")
                 out += [
-                    f"class {cls}:",
+                    f"class {prefix}Resource:",
                     f'    """{text}"""',
                     "",
-                    f"    def __init__(self, client: {'AsyncCore' if is_async else 'SyncCore'}) -> None:",
+                    f"    def __init__(self, client: {core}) -> None:",
                     "        self._client = client",
+                    *(f"        self.{sub} = {prefix}{pascal(sub)}Resource(client)" for sub in nested),
                     "",
                 ]
-                verbs = {op.verb for op in ops}
                 for op in ops:
                     out += self.emit_method(op, op.verb, is_async)
                 if "read" in verbs and "get" not in verbs:
@@ -548,6 +618,11 @@ class Facade:
                 for alias, target in ALIASES.get(resource, {}).items():
                     if target in verbs:
                         out += [f"    {alias} = {target}", f'    """Alias of `{target}`."""', ""]
+                for alias, op_id in CROSS_ALIASES.get(resource, {}).items():
+                    if alias in verbs:
+                        sys.exit(f"CROSS_ALIASES: {resource}.{alias} clashes with an operation")
+                    if op_id in by_id:
+                        out += self.emit_method(by_id[op_id], alias, is_async)
                 if resource == "me":
                     out += ["    __call__ = read", '    """`tm.me()` is `tm.me.read()`."""', ""]
                 out += [""]
@@ -628,6 +703,18 @@ class Facade:
                     )
                 if op.if_none_match:
                     lines.append("- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.")
+                pairs = [(r, a) for r, m in CROSS_ALIASES.items() for a, o in m.items() if o == op.op_id]
+                also = [f"`tm.{py_name(r)}.{a}`" for r, a in pairs]
+                also += [f"`tm.{attr}.{a}`" for a, verb in ALIASES.get(resource, {}).items() if verb == op.verb]
+                also += [
+                    f"`tm.{py_name(r)}.{sub}.{name}`"
+                    for r, subs in NESTED.items()
+                    for sub, (_, methods) in subs.items()
+                    for name, target in methods.items()
+                    if target == op.op_id
+                ]
+                if also:
+                    lines.append("- **Also:** " + ", ".join(also) + " (same call).")
                 lines.append("")
             pages[f"{resource}.md"] = "\n".join(lines).rstrip() + "\n"
         pages["README.md"] = "\n".join(index) + "\n"

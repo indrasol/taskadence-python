@@ -114,8 +114,8 @@ def sync_detailed(
     `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
     - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
     gives.
-    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
-    (project owners and editors; task views only).
+    - Scopes: `user` (anyone in the organization) or `project` (project owners and members; task views
+    only).
     - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
@@ -153,8 +153,8 @@ def sync(
     `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
     - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
     gives.
-    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
-    (project owners and editors; task views only).
+    - Scopes: `user` (anyone in the organization) or `project` (project owners and members; task views
+    only).
     - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
@@ -187,8 +187,8 @@ async def asyncio_detailed(
     `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
     - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
     gives.
-    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
-    (project owners and editors; task views only).
+    - Scopes: `user` (anyone in the organization) or `project` (project owners and members; task views
+    only).
     - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:
@@ -224,8 +224,8 @@ async def asyncio(
     `GET /v1/projects/{org_id}` parameters, `show_all` included. It cannot change later.
     - `query` is checked by that list's own rules: an unknown key or value is the same 400 the list
     gives.
-    - Scopes: `user` (anyone in the organization), `team` (team owners and org admins), `project`
-    (project owners and editors; task views only).
+    - Scopes: `user` (anyone in the organization) or `project` (project owners and members; task views
+    only).
     - A name is unique among a scope's views of the same resource (409 otherwise).
 
     Args:

@@ -50,7 +50,7 @@ def test_every_request_carries_auth_user_agent_and_api_version(tm: Taskadence, a
     headers = route.calls.last.request.headers
     assert headers["authorization"] == f"Bearer {TOKEN}"
     assert headers["user-agent"] == f"taskadence-python/{taskadence.__version__} python/{platform.python_version()}"
-    assert headers["taskadence-version"] == "2026-09-25"
+    assert headers["taskadence-version"] == "2026-10-24"
 
 
 def test_me_is_callable_and_typed(tm: Taskadence, api: respx.MockRouter) -> None:
@@ -159,8 +159,8 @@ def test_creates_get_an_idempotency_key_unless_told_otherwise(tm: Taskadence, ap
 
 
 def test_non_creates_never_send_an_idempotency_key(tm: Taskadence, api: respx.MockRouter) -> None:
-    route = api.post("/v1/teams").respond(201, json=example("teams.create") | {"members": []})
-    tm.teams.create({"org_id": "O123456", "name": "x"})
+    route = api.post("/v1/designations").respond(200, json=example("designations.create"))
+    tm.designations.create({"org_id": "O123456", "label": "x"})
     assert "idempotency-key" not in route.calls.last.request.headers
 
 

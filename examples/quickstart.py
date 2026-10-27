@@ -3,13 +3,15 @@
     export TASKADENCE_TOKEN=tkd_live_… TASKADENCE_ORG=O123456
     python examples/quickstart.py
 
-The three lines everyone starts with, then a round trip that leaves nothing behind: create a task → update it with
-the ETag it was read with (If-Match) → list with a filter → `to_dataframe()` → delete it. A saved view is created for
-`tm.views.rows(...)` and deleted too. Needs a token with `tasks:write`.
+The three lines everyone starts with, then a round trip that leaves nothing behind: create a project and a sprint in
+it → create a task in the project and file it in the sprint → update it with the ETag it was read with (If-Match) →
+list with a filter → `to_dataframe()` → delete it all. A saved view is created for `tm.views.rows(...)` and deleted
+too. Needs a token with `tasks:write` and `projects:write`.
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import sys
 
@@ -28,10 +30,30 @@ def main() -> int:
     # --- the round trip -----------------------------------------------------------------------------------------
     me = tm.me()
     print(f"me: {me.principal.username} ({me.principal.type_}); API {tm.base_url}, version {tm.api_version}")
-    created = tm.tasks.create({"org_id": org_id, "title": "4.5 SDK quickstart (deleted at the end)", "priority": "low"})
+    project = tm.projects.create({"org_id": org_id, "name": "SDK quickstart (deleted at the end)"})
+    sprint = tm.sprints.create(
+        project.project_id, {"name": "Quickstart sprint", "start_date": dt.date.today(), "duration_weeks": 1}
+    )
+    print(
+        f"created project {project.project_id} and sprint {sprint.sprint_id} ({sprint.start_date}..{sprint.end_date})"
+    )
+    created = tm.tasks.create(
+        {
+            "org_id": org_id,
+            "project_id": project.project_id,
+            "title": "4.5 SDK quickstart (deleted at the end)",
+            "priority": "low",
+        }
+    )
     print(f"created {created.task_id}: status={created.status} priority={created.priority}")
     view_id = None
     try:
+        filed = tm.tasks.set_sprint(created.task_id, {"sprint_id": sprint.sprint_id})
+        assert filed.sprint_id == sprint.sprint_id
+        print(
+            f"filed {created.task_id} in {sprint.sprint_id}; the project's sprints: "
+            f"{[s.sprint_id for s in tm.projects.sprints(project.project_id)]}"
+        )
         current = tm.tasks.get(created.task_id)
         print(f"read {current.task_id} with ETag {current.etag}")
         assert tm.tasks.get(created.task_id, if_none_match=current.etag) is NotModified
@@ -68,6 +90,9 @@ def main() -> int:
         if view_id:
             tm.views.delete(view_id)
             print(f"deleted view {view_id}")
+        tm.sprints.delete(sprint.sprint_id)
+        tm.projects.delete(project.project_id)
+        print(f"deleted sprint {sprint.sprint_id} and project {project.project_id}")
     tm.close()
     return 0
 

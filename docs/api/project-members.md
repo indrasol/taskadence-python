@@ -4,6 +4,16 @@ The members of a project and their roles.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
+## `tm.project_members.create_batch(project_id: str, members: Sequence[ProjectMemberBatchItem | Mapping[str, Any]])`
+
+Add several members to a project.
+
+- **HTTP:** `POST /v1/projects/{project_id}/members/batch`
+- **operationId:** `project-members.create_batch`
+- **Token scope:** `projects:write`
+- **Returns:** `ProjectMembersBatchAdded`
+- **Also:** `tm.projects.members.add_many` (same call).
+
 ## `tm.project_members.create(body: ProjectMemberCreate | Mapping[str, Any])`
 
 Add a member to a project.

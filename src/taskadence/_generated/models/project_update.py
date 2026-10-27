@@ -42,11 +42,16 @@ class ProjectUpdate:
         end_date (datetime.date | None | Unset):
         is_active (bool | None | Unset):
         owner (None | str | Unset):
-        team_members (list[str] | None | Unset):
+        members (list[str] | None | Unset):
         visibility (None | ProjectVisibilityEnum | Unset):
-        editors_can_add_members (bool | None | Unset):
-        team_id (None | str | Unset):
+        members_can_add_people (bool | None | Unset): "Members can add people": the project's members may add and remove
+            people. The project owner or an org admin only.
+        editors_can_add_members (bool | None | Unset): Deprecated: the old name of `members_can_add_people`.
+        position (int | None | Unset): The project's place in the organization's drag order; an org owner / admin only
+            (403 otherwise)
         parent_project_id (None | str | Unset):
+        agent_task_review_always (bool | None | Unset): Hold every task an agent creates in this project for a person's
+            review, whatever the organization's setting. Can only make review stricter.
         owner_designation (None | str | Unset):
         team_member_designations (list[TeamMemberDesignation] | None | Unset):
     """
@@ -60,11 +65,13 @@ class ProjectUpdate:
     end_date: datetime.date | None | Unset = UNSET
     is_active: bool | None | Unset = UNSET
     owner: None | str | Unset = UNSET
-    team_members: list[str] | None | Unset = UNSET
+    members: list[str] | None | Unset = UNSET
     visibility: None | ProjectVisibilityEnum | Unset = UNSET
+    members_can_add_people: bool | None | Unset = UNSET
     editors_can_add_members: bool | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
+    position: int | None | Unset = UNSET
     parent_project_id: None | str | Unset = UNSET
+    agent_task_review_always: bool | None | Unset = UNSET
     owner_designation: None | str | Unset = UNSET
     team_member_designations: list[TeamMemberDesignation] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -139,14 +146,14 @@ class ProjectUpdate:
         else:
             owner = self.owner
 
-        team_members: list[str] | None | Unset
-        if isinstance(self.team_members, Unset):
-            team_members = UNSET
-        elif isinstance(self.team_members, list):
-            team_members = self.team_members
+        members: list[str] | None | Unset
+        if isinstance(self.members, Unset):
+            members = UNSET
+        elif isinstance(self.members, list):
+            members = self.members
 
         else:
-            team_members = self.team_members
+            members = self.members
 
         visibility: None | str | Unset
         if isinstance(self.visibility, Unset):
@@ -156,23 +163,35 @@ class ProjectUpdate:
         else:
             visibility = self.visibility
 
+        members_can_add_people: bool | None | Unset
+        if isinstance(self.members_can_add_people, Unset):
+            members_can_add_people = UNSET
+        else:
+            members_can_add_people = self.members_can_add_people
+
         editors_can_add_members: bool | None | Unset
         if isinstance(self.editors_can_add_members, Unset):
             editors_can_add_members = UNSET
         else:
             editors_can_add_members = self.editors_can_add_members
 
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
+        position: int | None | Unset
+        if isinstance(self.position, Unset):
+            position = UNSET
         else:
-            team_id = self.team_id
+            position = self.position
 
         parent_project_id: None | str | Unset
         if isinstance(self.parent_project_id, Unset):
             parent_project_id = UNSET
         else:
             parent_project_id = self.parent_project_id
+
+        agent_task_review_always: bool | None | Unset
+        if isinstance(self.agent_task_review_always, Unset):
+            agent_task_review_always = UNSET
+        else:
+            agent_task_review_always = self.agent_task_review_always
 
         owner_designation: None | str | Unset
         if isinstance(self.owner_designation, Unset):
@@ -213,16 +232,20 @@ class ProjectUpdate:
             field_dict["is_active"] = is_active
         if owner is not UNSET:
             field_dict["owner"] = owner
-        if team_members is not UNSET:
-            field_dict["team_members"] = team_members
+        if members is not UNSET:
+            field_dict["members"] = members
         if visibility is not UNSET:
             field_dict["visibility"] = visibility
+        if members_can_add_people is not UNSET:
+            field_dict["members_can_add_people"] = members_can_add_people
         if editors_can_add_members is not UNSET:
             field_dict["editors_can_add_members"] = editors_can_add_members
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
+        if position is not UNSET:
+            field_dict["position"] = position
         if parent_project_id is not UNSET:
             field_dict["parent_project_id"] = parent_project_id
+        if agent_task_review_always is not UNSET:
+            field_dict["agent_task_review_always"] = agent_task_review_always
         if owner_designation is not UNSET:
             field_dict["owner_designation"] = owner_designation
         if team_member_designations is not UNSET:
@@ -358,7 +381,7 @@ class ProjectUpdate:
 
         owner = _parse_owner(d.pop("owner", UNSET))
 
-        def _parse_team_members(data: object) -> list[str] | None | Unset:
+        def _parse_members(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -366,14 +389,14 @@ class ProjectUpdate:
             try:
                 if not isinstance(data, list):
                     raise TypeError()
-                team_members_type_0 = cast(list[str], data)
+                members_type_0 = cast(list[str], data)
 
-                return team_members_type_0
+                return members_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
             return cast(list[str] | None | Unset, data)
 
-        team_members = _parse_team_members(d.pop("team_members", UNSET))
+        members = _parse_members(d.pop("members", UNSET))
 
         def _parse_visibility(data: object) -> None | ProjectVisibilityEnum | Unset:
             if data is None:
@@ -392,6 +415,15 @@ class ProjectUpdate:
 
         visibility = _parse_visibility(d.pop("visibility", UNSET))
 
+        def _parse_members_can_add_people(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        members_can_add_people = _parse_members_can_add_people(d.pop("members_can_add_people", UNSET))
+
         def _parse_editors_can_add_members(data: object) -> bool | None | Unset:
             if data is None:
                 return data
@@ -401,14 +433,14 @@ class ProjectUpdate:
 
         editors_can_add_members = _parse_editors_can_add_members(d.pop("editors_can_add_members", UNSET))
 
-        def _parse_team_id(data: object) -> None | str | Unset:
+        def _parse_position(data: object) -> int | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(None | str | Unset, data)
+            return cast(int | None | Unset, data)
 
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
+        position = _parse_position(d.pop("position", UNSET))
 
         def _parse_parent_project_id(data: object) -> None | str | Unset:
             if data is None:
@@ -418,6 +450,15 @@ class ProjectUpdate:
             return cast(None | str | Unset, data)
 
         parent_project_id = _parse_parent_project_id(d.pop("parent_project_id", UNSET))
+
+        def _parse_agent_task_review_always(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        agent_task_review_always = _parse_agent_task_review_always(d.pop("agent_task_review_always", UNSET))
 
         def _parse_owner_designation(data: object) -> None | str | Unset:
             if data is None:
@@ -462,11 +503,13 @@ class ProjectUpdate:
             end_date=end_date,
             is_active=is_active,
             owner=owner,
-            team_members=team_members,
+            members=members,
             visibility=visibility,
+            members_can_add_people=members_can_add_people,
             editors_can_add_members=editors_can_add_members,
-            team_id=team_id,
+            position=position,
             parent_project_id=parent_project_id,
+            agent_task_review_always=agent_task_review_always,
             owner_designation=owner_designation,
             team_member_designations=team_member_designations,
         )

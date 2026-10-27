@@ -54,7 +54,7 @@ class TaskInDB:
 
             - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
             `actual_result`, `recommendation`.
-            - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+            - **Read-only:** `legacy_bug_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
             - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
             the key).
         metadata (list[TaskInDBMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
@@ -62,15 +62,11 @@ class TaskInDB:
         created_by (None | str | Unset): Who created the task
         updated_by (None | str | Unset): Who last updated the task
         is_subtask (bool | None | Unset): Is Sub Task
-        bug_id (None | str | Unset): Bug ID (text) Example: B1234.
-        tracker_id (None | str | Unset): On create, for a bug only: the test tracker to file it under. Refused (422) for
-            a task that is not a bug or a tracker of another project. Example: TR1234.
         restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
             Responses also carry `restricted_to_user_ids`.
-        team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
-            team's intake. null = none.
-        sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
-            task is reachable from the sprint's team. null = none. Example: SP12345.
+        sprint_id (None | str | Unset): The sprint this task is filed into. One per task, a sprint of the task's own
+            project (409 `sprint-project-mismatch` otherwise); moving the task to another project clears it. null = none.
+            Example: SP12345.
         milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
             `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
             Example: MS12345.
@@ -97,8 +93,12 @@ class TaskInDB:
         has_edit_access (bool | None | Unset): True unless the task is restricted and the caller is neither listed
             creator/assignee nor an org admin
         can_delete (bool | None | Unset): Whether the caller may delete this task (exactly what `DELETE
-            /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or editor,
+            /v1/tasks/{task_id}` decides): the caller may edit it and is an org owner or admin, a project owner or member,
             its creator, its assignee, or the person behind the access token that created it. Response only.
+        subscriber_ids (list[str] | None | Unset): The user ids subscribed to this task: they get its assignment,
+            comment and status emails. Set on single-task reads. Response only.
+        is_subscribed (bool | None | Unset): Whether the caller is subscribed to this task. Set on single-task reads.
+            Response only.
         parent_task_id (None | str | Unset): The task this one is a subtask of (one parent at most); null for a top-
             level task. Linked through POST /tasks/{id}/subtasks. Response only. Example: T123456.
         parent_title (None | str | Unset): The parent's title, for a subtask; null for a top-level task or a parent the
@@ -137,10 +137,7 @@ class TaskInDB:
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     is_subtask: bool | None | Unset = UNSET
-    bug_id: None | str | Unset = UNSET
-    tracker_id: None | str | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
@@ -155,6 +152,8 @@ class TaskInDB:
     has_access: bool | None | Unset = UNSET
     has_edit_access: bool | None | Unset = UNSET
     can_delete: bool | None | Unset = UNSET
+    subscriber_ids: list[str] | None | Unset = UNSET
+    is_subscribed: bool | None | Unset = UNSET
     parent_task_id: None | str | Unset = UNSET
     parent_title: None | str | Unset = UNSET
     subtasks_done: int | Unset = 0
@@ -317,18 +316,6 @@ class TaskInDB:
         else:
             is_subtask = self.is_subtask
 
-        bug_id: None | str | Unset
-        if isinstance(self.bug_id, Unset):
-            bug_id = UNSET
-        else:
-            bug_id = self.bug_id
-
-        tracker_id: None | str | Unset
-        if isinstance(self.tracker_id, Unset):
-            tracker_id = UNSET
-        else:
-            tracker_id = self.tracker_id
-
         restricted_to: list[str] | None | Unset
         if isinstance(self.restricted_to, Unset):
             restricted_to = UNSET
@@ -337,12 +324,6 @@ class TaskInDB:
 
         else:
             restricted_to = self.restricted_to
-
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
 
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
@@ -433,6 +414,21 @@ class TaskInDB:
         else:
             can_delete = self.can_delete
 
+        subscriber_ids: list[str] | None | Unset
+        if isinstance(self.subscriber_ids, Unset):
+            subscriber_ids = UNSET
+        elif isinstance(self.subscriber_ids, list):
+            subscriber_ids = self.subscriber_ids
+
+        else:
+            subscriber_ids = self.subscriber_ids
+
+        is_subscribed: bool | None | Unset
+        if isinstance(self.is_subscribed, Unset):
+            is_subscribed = UNSET
+        else:
+            is_subscribed = self.is_subscribed
+
         parent_task_id: None | str | Unset
         if isinstance(self.parent_task_id, Unset):
             parent_task_id = UNSET
@@ -501,14 +497,8 @@ class TaskInDB:
             field_dict["updated_by"] = updated_by
         if is_subtask is not UNSET:
             field_dict["is_subtask"] = is_subtask
-        if bug_id is not UNSET:
-            field_dict["bug_id"] = bug_id
-        if tracker_id is not UNSET:
-            field_dict["tracker_id"] = tracker_id
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
@@ -537,6 +527,10 @@ class TaskInDB:
             field_dict["has_edit_access"] = has_edit_access
         if can_delete is not UNSET:
             field_dict["can_delete"] = can_delete
+        if subscriber_ids is not UNSET:
+            field_dict["subscriber_ids"] = subscriber_ids
+        if is_subscribed is not UNSET:
+            field_dict["is_subscribed"] = is_subscribed
         if parent_task_id is not UNSET:
             field_dict["parent_task_id"] = parent_task_id
         if parent_title is not UNSET:
@@ -834,24 +828,6 @@ class TaskInDB:
 
         is_subtask = _parse_is_subtask(d.pop("is_subtask", UNSET))
 
-        def _parse_bug_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        bug_id = _parse_bug_id(d.pop("bug_id", UNSET))
-
-        def _parse_tracker_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        tracker_id = _parse_tracker_id(d.pop("tracker_id", UNSET))
-
         def _parse_restricted_to(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -868,15 +844,6 @@ class TaskInDB:
             return cast(list[str] | None | Unset, data)
 
         restricted_to = _parse_restricted_to(d.pop("restricted_to", UNSET))
-
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
 
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
@@ -1020,6 +987,32 @@ class TaskInDB:
 
         can_delete = _parse_can_delete(d.pop("can_delete", UNSET))
 
+        def _parse_subscriber_ids(data: object) -> list[str] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                subscriber_ids_type_0 = cast(list[str], data)
+
+                return subscriber_ids_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[str] | None | Unset, data)
+
+        subscriber_ids = _parse_subscriber_ids(d.pop("subscriber_ids", UNSET))
+
+        def _parse_is_subscribed(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_subscribed = _parse_is_subscribed(d.pop("is_subscribed", UNSET))
+
         def _parse_parent_task_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -1072,10 +1065,7 @@ class TaskInDB:
             created_by=created_by,
             updated_by=updated_by,
             is_subtask=is_subtask,
-            bug_id=bug_id,
-            tracker_id=tracker_id,
             restricted_to=restricted_to,
-            team_id=team_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
@@ -1090,6 +1080,8 @@ class TaskInDB:
             has_access=has_access,
             has_edit_access=has_edit_access,
             can_delete=can_delete,
+            subscriber_ids=subscriber_ids,
+            is_subscribed=is_subscribed,
             parent_task_id=parent_task_id,
             parent_title=parent_title,
             subtasks_done=subtasks_done,

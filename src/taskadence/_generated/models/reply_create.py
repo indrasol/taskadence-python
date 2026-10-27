@@ -10,6 +10,9 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..types import UNSET, Unset
+from typing import cast
+
 
 T = TypeVar("T", bound="ReplyCreate")
 
@@ -21,10 +24,14 @@ class ReplyCreate:
     Attributes:
         content (str):
         parent_comment_id (str):
+        attachment_ids (list[str] | None | Unset): Up to 5 task attachments YOU uploaded to the same task and not yet on
+            a comment (upload them like task attachments first). On an edit the list replaces the comment's files (omitted =
+            unchanged, [] = none; a removed file is deleted).
     """
 
     content: str
     parent_comment_id: str
+    attachment_ids: list[str] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -34,6 +41,15 @@ class ReplyCreate:
 
         parent_comment_id = self.parent_comment_id
 
+        attachment_ids: list[str] | None | Unset
+        if isinstance(self.attachment_ids, Unset):
+            attachment_ids = UNSET
+        elif isinstance(self.attachment_ids, list):
+            attachment_ids = self.attachment_ids
+
+        else:
+            attachment_ids = self.attachment_ids
+
         field_dict: dict[str, Any] = {}
 
         field_dict.update(
@@ -42,6 +58,8 @@ class ReplyCreate:
                 "parent_comment_id": parent_comment_id,
             }
         )
+        if attachment_ids is not UNSET:
+            field_dict["attachment_ids"] = attachment_ids
 
         return field_dict
 
@@ -52,9 +70,27 @@ class ReplyCreate:
 
         parent_comment_id = d.pop("parent_comment_id")
 
+        def _parse_attachment_ids(data: object) -> list[str] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                attachment_ids_type_0 = cast(list[str], data)
+
+                return attachment_ids_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[str] | None | Unset, data)
+
+        attachment_ids = _parse_attachment_ids(d.pop("attachment_ids", UNSET))
+
         reply_create = cls(
             content=content,
             parent_comment_id=parent_comment_id,
+            attachment_ids=attachment_ids,
         )
 
         return reply_create

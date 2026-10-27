@@ -52,17 +52,16 @@ class TaskUpdate:
 
                 - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
                 `actual_result`, `recommendation`.
-                - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+                - **Read-only:** `legacy_bug_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
                 - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
                 the key).
             metadata (list[TaskUpdateMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
                 'new': 'in_progress', 'old': 'not_started'}].
             restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
                 Setting it needs `restrict` on the task.
-            team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
-                team's intake. null = none.
-            sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
-                task is reachable from the sprint's team. null = none. Example: SP12345.
+            sprint_id (None | str | Unset): The sprint this task is filed into. One per task, a sprint of the task's own
+                project (409 `sprint-project-mismatch` otherwise); moving the task to another project clears it. null = none.
+                Example: SP12345.
             milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
                 `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
                 Example: MS12345.
@@ -86,7 +85,6 @@ class TaskUpdate:
     type_data: None | TaskUpdateTypeDataType0 | Unset = UNSET
     metadata: list[TaskUpdateMetadataType0Item] | None | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
@@ -218,12 +216,6 @@ class TaskUpdate:
         else:
             restricted_to = self.restricted_to
 
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
-
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
             sprint_id = UNSET
@@ -275,8 +267,6 @@ class TaskUpdate:
             field_dict["metadata"] = metadata
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
@@ -521,15 +511,6 @@ class TaskUpdate:
 
         restricted_to = _parse_restricted_to(d.pop("restricted_to", UNSET))
 
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
-
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -573,7 +554,6 @@ class TaskUpdate:
             type_data=type_data,
             metadata=metadata,
             restricted_to=restricted_to,
-            team_id=team_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,

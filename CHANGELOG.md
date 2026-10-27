@@ -7,20 +7,187 @@ entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
-Re-generated from the API contract at `taskadence-api` `9b7e748` (branch `feat/sub-projects`, API version `2026-09-25`,
-unchanged). Additive only: no operation, schema or webhook removed.
+## [2.0.0] - 2026-10-24
+
+Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
+to an account (one per email) that shares one storage pool, and the project roles are owner, member and viewer.
+Re-generated from the API contract at `taskadence-api` `2695ecb` (branch `dev`, after PR #270); the API version is
+now `2026-10-24` (was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because
+methods, models and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
+answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
+change only their shared version.
+
+### Removed
+- **Teams:** `tm.teams` (`list`, `create`, `read` / `get`, `update`, `replace`, `delete`, `list_tasks`, `add_member`,
+  `update_member`, `replace_member`, `remove_member`) and the models `TeamCreate`, `TeamUpdate`, `TeamOut`,
+  `TeamDetail`, `TeamDeleted`, `TeamListPage`, `TeamListSummary`, `TeamMemberCreate`, `TeamMemberUpdate`,
+  `TeamMemberOut`, `TeamRoleEnum`, `TeamTagOut`. `tm.view_pins.pin_team` / `unpin_team`.
+- **Sections:** `tm.sections` (`list`, `create`, `update`, `delete`, `reorder`), `tm.tasks.set_section`, and the
+  models `SectionCreate`, `SectionUpdate`, `SectionOut`, `PageSectionOut`, `SectionReorder`, `SectionScopeEnum`,
+  `SectionsForScopes`, `ScopeRef`, `TaskSectionOut`, `TaskSectionSet`.
+- **Test sprints:** the `tracker_id` and `bug_id` fields (the `bug` task type stays; list bugs with
+  `filter={"task_type": "bug"}`).
+- **Fields:** `team_id` on `TaskInDB`, `TaskCreate`, `TaskUpdate`, `TaskCardView`, the `TaskBatch*` models,
+  `ProjectInDB`, `ProjectCard`, `ProjectCreate`, `ProjectUpdate` and `SprintOut`; `section_id` (and
+  `TaskCardView.section_position`) on the task models; `AvailabilityRange.team_id` (now `org_id`) and
+  `AvailabilityMember.team_role` (now `org_role`); `PinOut.logo_url`.
+- **Task list:** the `team` filter key (`filter={"team": ...}` raises `ValueError`) and the `section_scope` argument.
+- **Storage:** `StorageUsage.billing_exempt` (`tm.organizations.storage`): read `exempt_message` instead. The
+  per-organization billing routes are gone (410); billing is the account owner's, in the web app, and not in the SDK.
+- **Webhooks:** `team.created`, `team.updated`, `team.deleted`, `team.member_added`, `team.member_removed`,
+  `team.member_role_changed`, `team.leads_changed`, `team.managers_changed`, `project.team_linked`,
+  `project.team_unlinked`.
+- **Project role `editor`:** `ProjectRoleEnum` is `owner | member | viewer` (was `owner | editor | viewer`); see
+  Changed.
+- The `teams:read` / `teams:write` scopes are retired by the API (a token that carries them keeps working; the scope
+  is ignored). The SDK had no scope helper naming them.
+
+### Changed
+- **Sprints belong to a project.** `tm.sprints.list(project_id)` and `tm.sprints.create(project_id, body)` (were
+  `team_id`); `tm.sprints.update(sprint_id, body)` is now a PATCH (JSON merge-patch) and `tm.sprints.delete(sprint_id)`
+  takes the sprint id alone (both were `(team_id, sprint_id, ...)`). `SprintOut` has `project_id` and `position`;
+  `SprintCreate` takes `position`; `SprintUpdate` takes `position` (reorder) and `project_id` (move an empty sprint;
+  one holding tasks is a 409 `ConflictError`).
+- **Capacity is organization-wide.** `tm.availability.range` / `create` / `update` / `delete` take `org_id` (were
+  `team_id`): `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE .../availability/{entry_id}`.
+- `tm.tasks.set_sprint(task_id, {"sprint_id": ...})` accepts only a sprint of the task's own project.
+- **Projects say `members`.** `ProjectCreate`, `ProjectUpdate`, `ProjectInDB` and `ProjectCard` have `members` (was
+  `team_members`; on a read, the members' user ids), and `ProjectStatsInDB.members` counts them. The SDK sends only
+  `members` (the API still accepts `team_members` for one release).
+- **Storage is the account's.** `tm.organizations.storage(org_id)` gains `account_id`, `account_used_bytes`,
+  `account_quota_bytes`, `account_percent` and `exempt_message`; `included_bytes`, `overage_bytes` and `status` are
+  the account's, and `percent` is the organization's share of the account's free storage.
+- `tm storage` (the CLI) prints the account's totals and the exempt message.
+- **Project roles are `owner`, `member` and `viewer`.** `editor` is now `member` (`ProjectMemberCreate`,
+  `ProjectMemberUpdate`, `ProjectMemberInDB`, `ReviewProject.role`); the SDK sends `member`. For one release the API
+  still accepts `editor` on input and always answers `member`, so a 1.x caller that sends `editor` keeps working.
+- `ProjectInDB.members_can_add_people` (set with `ProjectUpdate`, by the project owner or an org admin): when true,
+  the project's members may add and remove people and change their roles. `editors_can_add_members` is its
+  deprecated old name (the same value, still answered; the API drops it in the next release).
+- **Org owners and admins are owners of every project** of their organization without being added. Project member
+  lists include them: `ProjectMemberInDB.source` is `member` (added to the project), `org_owner` or `org_admin`, and
+  `removable` is False for the last two.
+- **Ids grow past 6 digits.** The API widens a prefix's ids by itself as they fill up (`T1234567`, up to 12 digits).
+  The SDK never checked an id's shape; it now has tests that ids of 6 to 12 digits pass through paths, models and
+  webhook events unchanged. Do not assume six digits in your own code.
 
 ### Added
-- Sub-projects (N.3): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry `parent_project_id`;
-  `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children` (`ProjectChildOut`);
-  `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes `include_children`.
-  Webhooks `project.parent_changed` and `project.children_detached`. Example in the README.
-- From the batch branch since the previous pin: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`,
-  `tm.tasks.reopen`, `tm.view_pins.pin_team` / `unpin_team`, and their models; webhooks `member.admin_grants_changed`,
-  `project.managers_changed`, `project.team_linked`, `project.team_unlinked`, `team.leads_changed`,
-  `team.managers_changed`.
+- `tm.projects.sprints(project_id)`: a project's sprints (the same call as `tm.sprints.list`).
+- `tm.sprints.list_org(org_id=...)`: every sprint you can read in an organization, for Planning (`GET /v1/sprints`).
+- `tm.sprints.read(sprint_id)` (also `get`).
+- `tm.organizations.availability(org_id, from_=, to=)` (the same call as `tm.availability.range`) and
+  `tm.me.set_availability(body)` (`PUT /v1/me/availability`, also `tm.availability.mark_mine`; model
+  `MyAvailabilitySet`).
+- `tm.organizations.workload(org_id, project_id=None)` (also `tm.workload.read`): open work per person, heaviest first.
+  Models `WorkloadOut` (`people`, `totals`, `mean`, `as_of`, `truncated`), `WorkloadPerson` (`open_`, `in_progress`,
+  `blocked`, `not_started`, `overdue`, `due_this_week`, `heavy`, `top`), `WorkloadCounts` and `WorkloadTask`.
+  `open` is a Python builtin, so the generated attribute is `open_` (the JSON key stays `open`).
+- `SprintProjectMismatchError` (also importable as `SprintProjectMismatch`), a `ConflictError`: the 409
+  `urn:taskadence:problem:sprint-project-mismatch` when a task is filed in a sprint of another project.
+  `errors[0]` names both projects.
+- **The account (read-only, scope `account:read`).** `tm.account.get()` (also `read`; `GET /v1/account`): the
+  account's organizations with their member counts and storage, the caller's `my_role`, `owner`, `can_create_orgs`,
+  the storage pool and `billing.exempt_message` (set only for an exempt account; there is no exempt flag).
+  `tm.account.people()` (`GET /v1/account/people`, account owners and admins): everyone in the account with their
+  role in each organization. `tm.storage.get()` (also `tm.account.storage()`; `GET /v1/storage`): the account's
+  `bytes_used`, `quota_bytes`, `available_bytes`, `overage_bytes`, `percent`, `status` (`ok` · `warning` · `blocked` ·
+  `metered` · `exempt`), `payment_method_on_file` and the per-organization `orgs`. Models `AccountOut`, `AccountOrg`,
+  `AccountOwner`, `AccountBillingBrief`, `AccountPeople`, `AccountPerson`, `PersonOrg`, `AccountStorage`,
+  `AccountStorageOrg`. Writes on `/v1/account*` and billing are the web app's (session only) and not in the SDK.
+- `tm.me()` / `tm.me.get()` has `account` (`MeAccount`: `account_id`, `name`, `role`; None for a principal without
+  one).
+- `WorkloadPerson.active_sprint` (`WorkloadSprint`: `sprint_id`, `name`, `done`, `total`): the person's current
+  sprint (active, today inside its dates; the one ending soonest when several), or None.
+- `EmailInOtherAccountError` (also `EmailInOtherAccount`), a `ConflictError`: the 409
+  `urn:taskadence:problem:email-in-other-account` when an invitee's email already belongs to another account
+  (`errors[0]["code"]` is `email_in_other_account`).
+- `GoneError` (410) and `RemovedInRelease10Error` (also `RemovedInRelease10`): the 410
+  `urn:taskadence:problem:removed-in-release-10` of a route release 10 removed; `.successor` names what to call
+  instead (or None), `.changelog` links the docs changelog, and the message ends with that link. A 410 is never
+  retried.
+- Not in the SDK: support tickets (internal routes) and the MCP tool `contact_support`.
+- **Batch members.** `tm.projects.members.add_many(project_id, [{"user_id", "project_role"}, ...])` (also
+  `tm.project_members.create_batch`; `POST /v1/projects/{project_id}/members/batch`, scope `projects:write`): up to 50
+  people, each with their own role, all or nothing. Returns `ProjectMembersBatchAdded`: `added` (the
+  `ProjectMemberInDB` rows, in the order asked) and `skipped` (`ProjectMemberSkipped`: `user_id`, `reason`
+  `already_member`). Models `ProjectMembersBatchAdd`, `ProjectMemberBatchItem`.
+- **Task subscribers** get a task's assignment, comment and status emails (its creator and assignee are subscribed
+  automatically). `tm.tasks.subscribers(task_id)` (also `list_subscribers`; scope `tasks:read`),
+  `tm.tasks.set_subscribers(task_id, user_ids)` (the FULL list, up to 100), `tm.tasks.subscribe(task_id)` and
+  `tm.tasks.unsubscribe(task_id)` (yourself; `tasks:write`); each returns `TaskSubscribers` (`subscribers`
+  (`TaskSubscriber`), `subscriber_ids`, `is_subscribed`). `TaskInDB.subscriber_ids` and `is_subscribed` are set on
+  single-task reads.
+- `ProjectInDB.implicit_members` (`ProjectImplicitMember`: `user_id`, `username`, `project_role` owner, `source`
+  `org_owner` / `org_admin`, `removable` False): the organization's owners and admins, on the single-project read.
+- `tm.projects.list(org_id, scope="all" | "mine")`: `mine` is the projects you are in (every project for an org owner
+  or admin), `all` (the default) every project you can read; the same as `show_all=False` / `True`.
+- `OrganizationSettingsOut.only_admins_create_projects` (and on `OrganizationSettingsUpdate`): when true, only org
+  owners and admins create projects.
+- The generator: a body that is one array is taken as that array (`set_subscribers(task_id, user_ids)`,
+  `add_many(project_id, members)`; a bare string or mapping is a `TypeError`), and a resource can carry a nested
+  namespace (`tm.projects.members`).
+- The README has Project members and roles and Task subscribers sections.
+- **Always review agent tasks.** `ProjectInDB.agent_task_review_always` (set with `ProjectUpdate`; default False):
+  when true, every task an agent creates in the project waits for a person's review, whatever the organization's
+  setting (it can only make review stricter). `ProjectInDB.agent_task_review_effective` (read-only, not on
+  `ProjectUpdate`; model `AgentTaskReviewEffectiveEnum`): `always`, `private_project` (the org default, private
+  project) or `never`, the stricter of the org's `agent_task_review` and the project's flag. Webhook
+  `project.agent_review_changed`.
+- `ProjectUpdate.position`: a project's place in the organization's order (owners and admins); `ProjectInDB.position`
+  (the single-project read, `tm.projects.read`). `ProjectCard.position` is unchanged.
+- Sub-projects (N.3, not released before): `ProjectCreate` / `ProjectUpdate` / `ProjectCard` / `ProjectInDB` carry
+  `parent_project_id`; `ProjectCard.child_count`; `ProjectInDB.parent` (`ProjectRef`) and `children`
+  (`ProjectChildOut`); `tm.projects.delete` returns `ProjectDeleted` (`children_detached`); `tm.tasks.list` takes
+  `include_children`. Webhooks `project.parent_changed` and `project.children_detached`.
+- Also not released before: `tm.tasks.create_batch` / `update_batch`, `tm.tasks.list_dependents`, `tm.tasks.reopen`,
+  and their models; webhooks `member.admin_grants_changed` and `project.managers_changed`.
 - `ProblemType` includes `urn:taskadence:problem:database-unavailable` (503: the database did not answer after
-  retries, nothing was applied; retry after `Retry-After` seconds).
+  retries, nothing was applied; retry after `Retry-After` seconds), `sprint-project-mismatch`, `sprint-not-empty`,
+  `email-in-other-account` and `removed-in-release-10`.
+- The quickstart (`examples/quickstart.py`) creates a project and a sprint, files its task in the sprint, and deletes
+  them at the end; the README has a Sprints, capacity and workload section.
+- **Comment reactions.** `tm.tasks.comments.react(task_id, comment_id, emoji)` and `.unreact(...)` (also
+  `tm.task_comments.add_reaction` / `remove_reaction`; `PUT` / `DELETE
+  /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`, scope `tasks:write`) return `CommentReactions`, the
+  comment's reactions now; `.reactions(task_id, comment_id, emoji)` (also `list_reactions`; `tasks:read`) is a `Page`
+  of `ReactionPerson` (`user_id`, `name`), oldest first. The emoji is percent-encoded in the path. Reacting twice, or
+  removing a reaction you did not make, is harmless; a comment holds at most 50 different emojis (409).
+- **Comment attachments.** `TaskCommentInDB.attachments` (`CommentAttachment`: `attachment_id`, `name`, `size`,
+  `content_type`, `thumb`) and `reactions` (`CommentReaction`: `emoji`, `count`, `reacted_by_me`, `people`).
+  `attachment_ids` (up to 5) on `TaskCommentCreate`, `TaskCommentUpdate` and `ReplyCreate`: files you uploaded to the
+  same task and not yet on a comment; on an edit the list replaces the comment's files (`[]` = none; a removed file is
+  deleted). `tm.task_attachments.create(..., purpose="comment")` uploads one (needs permission to comment rather than
+  to edit the task, and does not count toward the task's attachment limit), direct to storage or multipart alike;
+  `TaskAttachmentInDB.comment_id` and `purpose`, `UploadCreateIn.purpose`.
+- `tm.tasks.list(..., include=["subscribers"])` (or `include="subscribers"`): each row carries `subscriber_count` and
+  `subscribers_preview` (the first 3, `TaskSubscriberPreview`: `user_id`, `name`); without it, neither. The
+  generator types this query parameter `str | Sequence[str]` (a list is comma-joined).
+- `avatar_preset` (the illustrated avatar a person chose, or None) on `tm.me()`'s `principal` (`MePrincipal`),
+  `OrganizationMemberInDB` and `ProjectMemberInDB`; `OrganizationMemberInDB.linked` (False: the member's sign-in has
+  no TasKadence profile yet).
+- `MemberNotLinkedError` (also `MemberNotLinked`), a `ConflictError`: the 409
+  `urn:taskadence:problem:member-not-linked` when a member must sign in again before they can be subscribed to a task
+  or react to a comment; `.user_ids` names them (`errors[0]["user_ids"]`). `ProblemType` includes it.
+- `MeAuth.resource`: the protected resource an OAuth token is bound to (RFC 8707: the API's origin, or `<origin>/mcp`),
+  or None. The SDK has no OAuth helpers (the `/oauth/*` protocol operations are not generated), so the new optional
+  `resource` on authorize / token is the third-party app's to send.
+- `AccountOut.pending_actions` (`AccountPendingActions`: `incoming_transfers`, `outgoing_waiting_for_storage`,
+  `outgoing_needs_decision`, `billing_attention`), the account owner's to-dos; all zero for everyone else.
+- Webhooks `task.comment_reaction_added` and `task.comment_reaction_removed` (`data.after`: `comment_id`, `emoji`).
+- The README has a Comment reactions and attachments section.
+- Not in the SDK: renaming your username (`PATCH /v1/me/username`) and choosing an illustrated avatar
+  (`PUT /v1/me/avatar-preset`) are the web app's (internal routes, a signed-in session only) and not in the public
+  contract, so there is no `tm.me.rename_username` or `tm.me.set_avatar_preset`.
+
+### Migrating from 1.x
+- `tm.teams.*`, `tm.sections.*`: no replacement; group tasks with the list's `sort_by` / filters instead.
+- `tm.sprints.list(team_id)` → `tm.projects.sprints(project_id)`, or `tm.sprints.list_org(org_id=...)` for all.
+- `tm.availability.range(team_id, ...)` → `tm.organizations.availability(org_id, ...)`.
+- `tm.sprints.update(team_id, sprint_id, body)` → `tm.sprints.update(sprint_id, body)`; the same for `delete`.
+- `team_members=` on a project → `members=`; `storage.billing_exempt` → `storage.exempt_message is not None`.
+- `except NotFoundError` around a removed route → `except RemovedInRelease10Error` (a 410 now, not a 404).
+- `project_role="editor"` → `"member"` (and compare answers against `"member"`); `editors_can_add_members` →
+  `members_can_add_people`.
 
 ## [1.0.0] - 2026-10-08
 

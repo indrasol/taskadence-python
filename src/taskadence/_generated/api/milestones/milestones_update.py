@@ -119,7 +119,7 @@ def sync_detailed(
 
      A partial update: fields you leave out are unchanged.
 
-    - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
+    - **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
     - `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them.
     Neither touches its tasks.
@@ -170,7 +170,7 @@ def sync(
 
      A partial update: fields you leave out are unchanged.
 
-    - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
+    - **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
     - `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them.
     Neither touches its tasks.
@@ -216,7 +216,7 @@ async def asyncio_detailed(
 
      A partial update: fields you leave out are unchanged.
 
-    - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
+    - **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
     - `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them.
     Neither touches its tasks.
@@ -265,7 +265,7 @@ async def asyncio(
 
      A partial update: fields you leave out are unchanged.
 
-    - **Who:** a project owner / editor or an org admin; the milestone's owner may send `status` alone
+    - **Who:** a project owner / member or an org admin; the milestone's owner may send `status` alone
     (anything else is a 403).
     - `status` closes or re-opens it: closing records `closed_at` / `closed_by`, re-opening clears them.
     Neither touches its tasks.

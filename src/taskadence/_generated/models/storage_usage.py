@@ -33,19 +33,25 @@ class StorageUsage:
         bytes_used (int): Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)
         file_count (int): Counted files (task attachments, project files, legacy bug attachments); `GET
             .../storage/files` lists them
-        included_bytes (int): Storage included before overage, in bytes (decimal). The plan's value is 10^10 (10 GB); an
-            organization may have its own.
-        overage_bytes (int): max(0, bytes_used - included_bytes)
-        percent (float): bytes_used / included_bytes, in percent, one decimal
-        status (StorageUsageStatus): ok; warning (80 % or more); blocked (full, no payment method: new uploads answer
-            402); metered (full, a payment method on file: billed per GB-month at month end); exempt (full, an internal
-            organization that is never billed or blocked)
-        payment_method_on_file (bool):
-        billing_exempt (bool): An internal organization: metered and shown, never billed or blocked
+        included_bytes (int): The free storage of the organization's ACCOUNT, which all its organizations share, in
+            bytes (decimal). The plan's value is 10^10 (10 GB); an account may be granted more.
+        overage_bytes (int): The account's: max(0, account_used_bytes - included_bytes)
+        percent (float): This organization's bytes_used / included_bytes, in percent, one decimal (its share of the
+            account's free storage)
+        status (StorageUsageStatus): The account's: ok; warning (80 % or more); blocked (full, no card on file: new
+            uploads answer 402); metered (full, a card on file: billed per GB-month at month end); exempt (full, an account
+            exempt from billing: never billed or blocked)
+        payment_method_on_file (bool): The account owner has a card on file (uploads continue past the free storage)
+        account_used_bytes (int): Bytes of every organization of the account
+        account_quota_bytes (int): The account's free storage (same as included_bytes)
+        account_percent (float): account_used_bytes / account_quota_bytes, in percent, one decimal
         breakdown (StorageBreakdown): Part of `StorageUsage`.
-        manage_url (str): The Storage and billing page in the web app
+        manage_url (str): The account's Storage page in the web app
         project_count (int | Unset): Projects holding at least one counted file; `GET .../storage/projects` lists them
             Default: 0.
+        account_id (None | str | Unset): The account the organization belongs to
+        exempt_message (None | str | Unset): Set only while the account is exempt from billing: "Your account is exempt
+            from billing. No charge for this account."
         top_files (list[StorageFile] | Unset): The 20 largest files (empty for a guest)
         trend (list[StorageDay] | Unset): The last 30 days, one row per day recorded
         updated_at (None | str | Unset): When the ledger last changed
@@ -59,10 +65,14 @@ class StorageUsage:
     percent: float
     status: StorageUsageStatus
     payment_method_on_file: bool
-    billing_exempt: bool
+    account_used_bytes: int
+    account_quota_bytes: int
+    account_percent: float
     breakdown: StorageBreakdown
     manage_url: str
     project_count: int | Unset = 0
+    account_id: None | str | Unset = UNSET
+    exempt_message: None | str | Unset = UNSET
     top_files: list[StorageFile] | Unset = UNSET
     trend: list[StorageDay] | Unset = UNSET
     updated_at: None | str | Unset = UNSET
@@ -92,13 +102,29 @@ class StorageUsage:
 
         payment_method_on_file = self.payment_method_on_file
 
-        billing_exempt = self.billing_exempt
+        account_used_bytes = self.account_used_bytes
+
+        account_quota_bytes = self.account_quota_bytes
+
+        account_percent = self.account_percent
 
         breakdown = self.breakdown.to_dict()
 
         manage_url = self.manage_url
 
         project_count = self.project_count
+
+        account_id: None | str | Unset
+        if isinstance(self.account_id, Unset):
+            account_id = UNSET
+        else:
+            account_id = self.account_id
+
+        exempt_message: None | str | Unset
+        if isinstance(self.exempt_message, Unset):
+            exempt_message = UNSET
+        else:
+            exempt_message = self.exempt_message
 
         top_files: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.top_files, Unset):
@@ -132,13 +158,19 @@ class StorageUsage:
                 "percent": percent,
                 "status": status,
                 "payment_method_on_file": payment_method_on_file,
-                "billing_exempt": billing_exempt,
+                "account_used_bytes": account_used_bytes,
+                "account_quota_bytes": account_quota_bytes,
+                "account_percent": account_percent,
                 "breakdown": breakdown,
                 "manage_url": manage_url,
             }
         )
         if project_count is not UNSET:
             field_dict["project_count"] = project_count
+        if account_id is not UNSET:
+            field_dict["account_id"] = account_id
+        if exempt_message is not UNSET:
+            field_dict["exempt_message"] = exempt_message
         if top_files is not UNSET:
             field_dict["top_files"] = top_files
         if trend is not UNSET:
@@ -171,13 +203,35 @@ class StorageUsage:
 
         payment_method_on_file = d.pop("payment_method_on_file")
 
-        billing_exempt = d.pop("billing_exempt")
+        account_used_bytes = d.pop("account_used_bytes")
+
+        account_quota_bytes = d.pop("account_quota_bytes")
+
+        account_percent = d.pop("account_percent")
 
         breakdown = StorageBreakdown.from_dict(d.pop("breakdown"))
 
         manage_url = d.pop("manage_url")
 
         project_count = d.pop("project_count", UNSET)
+
+        def _parse_account_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        account_id = _parse_account_id(d.pop("account_id", UNSET))
+
+        def _parse_exempt_message(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        exempt_message = _parse_exempt_message(d.pop("exempt_message", UNSET))
 
         _top_files = d.pop("top_files", UNSET)
         top_files: list[StorageFile] | Unset = UNSET
@@ -215,10 +269,14 @@ class StorageUsage:
             percent=percent,
             status=status,
             payment_method_on_file=payment_method_on_file,
-            billing_exempt=billing_exempt,
+            account_used_bytes=account_used_bytes,
+            account_quota_bytes=account_quota_bytes,
+            account_percent=account_percent,
             breakdown=breakdown,
             manage_url=manage_url,
             project_count=project_count,
+            account_id=account_id,
+            exempt_message=exempt_message,
             top_files=top_files,
             trend=trend,
             updated_at=updated_at,

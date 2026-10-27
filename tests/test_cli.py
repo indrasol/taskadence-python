@@ -164,7 +164,11 @@ STORAGE = {
     "percent": 100.0,
     "status": "blocked",
     "payment_method_on_file": False,
-    "billing_exempt": False,
+    "account_id": "A1",
+    "account_used_bytes": 1_000_400_000_000,
+    "account_quota_bytes": 10**12,
+    "account_percent": 100.0,
+    "exempt_message": None,
     "breakdown": {
         "by_kind": {"task": 710_000_000_000, "project": 270_000_000_000, "bug": 20_400_000_000},
         "by_project": [{"project_id": "P0007", "name": "Website relaunch", "bytes": 340_000_000_000}],
@@ -191,6 +195,7 @@ def test_storage(signed_in: None, api: respx.MockRouter) -> None:
     result = invoke("storage", "--org", "O123456")
     assert result.exit_code == 0, result.output
     assert "1.00 TB of 1.00 TB included" in result.output and "status blocked" in result.output
+    assert "Account: 1.00 TB of 1.00 TB (100.0%)" in result.output and "exempt" not in result.output
     assert (
         "New uploads are paused" in result.output
         and "Website relaunch" in result.output

@@ -20,12 +20,12 @@ T = TypeVar("T", bound="SprintOut")
 
 @_attrs_define
 class SprintOut:
-    """Returned by `sprints.create` and `sprints.update`.
+    """A sprint: a time box of one project holding tasks of that project, with its task counts and derived duration.
 
     Attributes:
         sprint_id (str):
         org_id (str):
-        team_id (str):
+        project_id (str):
         name (str):
         start_date (datetime.date):
         end_date (datetime.date):
@@ -39,6 +39,7 @@ class SprintOut:
         created_at (datetime.datetime | None | Unset):
         updated_at (datetime.datetime | None | Unset):
         is_active (bool | Unset):  Default: True.
+        position (int | Unset): Drag order among the project's sprints (Planning), 0..n-1 Default: 0.
         duration_weeks (int | None | Unset): Derived: whole weeks between start and end inclusive, or null when the
             range is not a whole number of weeks (a custom sprint).
         duration_label (str | Unset): Derived: '2 weeks' for a preset length, 'Custom' otherwise. Default: ''.
@@ -49,7 +50,7 @@ class SprintOut:
 
     sprint_id: str
     org_id: str
-    team_id: str
+    project_id: str
     name: str
     start_date: datetime.date
     end_date: datetime.date
@@ -63,6 +64,7 @@ class SprintOut:
     created_at: datetime.datetime | None | Unset = UNSET
     updated_at: datetime.datetime | None | Unset = UNSET
     is_active: bool | Unset = True
+    position: int | Unset = 0
     duration_weeks: int | None | Unset = UNSET
     duration_label: str | Unset = ""
     task_count: int | Unset = 0
@@ -77,7 +79,7 @@ class SprintOut:
 
         org_id = self.org_id
 
-        team_id = self.team_id
+        project_id = self.project_id
 
         name = self.name
 
@@ -143,6 +145,8 @@ class SprintOut:
 
         is_active = self.is_active
 
+        position = self.position
+
         duration_weeks: int | None | Unset
         if isinstance(self.duration_weeks, Unset):
             duration_weeks = UNSET
@@ -161,7 +165,7 @@ class SprintOut:
             {
                 "sprint_id": sprint_id,
                 "org_id": org_id,
-                "team_id": team_id,
+                "project_id": project_id,
                 "name": name,
                 "start_date": start_date,
                 "end_date": end_date,
@@ -187,6 +191,8 @@ class SprintOut:
             field_dict["updated_at"] = updated_at
         if is_active is not UNSET:
             field_dict["is_active"] = is_active
+        if position is not UNSET:
+            field_dict["position"] = position
         if duration_weeks is not UNSET:
             field_dict["duration_weeks"] = duration_weeks
         if duration_label is not UNSET:
@@ -205,7 +211,7 @@ class SprintOut:
 
         org_id = d.pop("org_id")
 
-        team_id = d.pop("team_id")
+        project_id = d.pop("project_id")
 
         name = d.pop("name")
 
@@ -313,6 +319,8 @@ class SprintOut:
 
         is_active = d.pop("is_active", UNSET)
 
+        position = d.pop("position", UNSET)
+
         def _parse_duration_weeks(data: object) -> int | None | Unset:
             if data is None:
                 return data
@@ -331,7 +339,7 @@ class SprintOut:
         sprint_out = cls(
             sprint_id=sprint_id,
             org_id=org_id,
-            team_id=team_id,
+            project_id=project_id,
             name=name,
             start_date=start_date,
             end_date=end_date,
@@ -345,6 +353,7 @@ class SprintOut:
             created_at=created_at,
             updated_at=updated_at,
             is_active=is_active,
+            position=position,
             duration_weeks=duration_weeks,
             duration_label=duration_label,
             task_count=task_count,

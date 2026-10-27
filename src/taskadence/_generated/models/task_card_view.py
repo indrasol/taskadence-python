@@ -23,6 +23,7 @@ import datetime
 if TYPE_CHECKING:
     from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item
     from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0
+    from ..models.task_subscriber_preview import TaskSubscriberPreview
 
 
 T = TypeVar("T", bound="TaskCardView")
@@ -55,7 +56,7 @@ class TaskCardView:
 
             - **Writable:** `bug_status`, `bug_kind`, `environment`, `steps_to_reproduce`, `expected_result`,
             `actual_result`, `recommendation`.
-            - **Read-only:** `legacy_bug_id`, `tracker_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
+            - **Read-only:** `legacy_bug_id`, `reporter`, `estimated_time`, `actual_time`, `closed_at`.
             - A write merges into the stored object; a key sent as null is removed. `goal_*` keys are refused (422 naming
             the key).
         metadata (list[TaskCardViewMetadataType0Item] | None | Unset): Additional metadata Example: [{'field': 'status',
@@ -63,15 +64,11 @@ class TaskCardView:
         created_by (None | str | Unset): Who created the task
         updated_by (None | str | Unset): Who last updated the task
         is_subtask (bool | None | Unset): Is Sub Task
-        bug_id (None | str | Unset): Bug ID (text) Example: B1234.
-        tracker_id (None | str | Unset): On create, for a bug only: the test tracker to file it under. Refused (422) for
-            a task that is not a bug or a tracker of another project. Example: TR1234.
         restricted_to (list[str] | None | Unset): Usernames allowed on this task (empty = everyone with membership).
             Responses also carry `restricted_to_user_ids`.
-        team_id (None | str | Unset): The team the task is filed under. A task with a team and no project is in that
-            team's intake. null = none.
-        sprint_id (None | str | Unset): The team sprint this task is filed into. One per task; refused (422) unless the
-            task is reachable from the sprint's team. null = none. Example: SP12345.
+        sprint_id (None | str | Unset): The sprint this task is filed into. One per task, a sprint of the task's own
+            project (409 `sprint-project-mismatch` otherwise); moving the task to another project clears it. null = none.
+            Example: SP12345.
         milestone_id (None | str | Unset): The milestone this task is filed under. One per task, independent of
             `goal_id` and `sprint_id`; refused (422) unless it is a live milestone of the task's own project. null = none.
             Example: MS12345.
@@ -95,10 +92,8 @@ class TaskCardView:
         has_edit_access (bool | None | Unset): True for task creator, project owner, or organization owner Default:
             False.
         can_delete (bool | Unset): Whether the caller may delete this task (exactly what `DELETE /v1/tasks/{task_id}`
-            decides): the caller may edit it and is an org owner or admin, a project owner or editor, its creator, its
+            decides): the caller may edit it and is an org owner or admin, a project owner or member, its creator, its
             assignee, or the person behind the access token that created it. Response only. Default: False.
-        section_id (None | str | Unset): Section the task sits in for the requested `section_scope`, if any
-        section_position (float | None | Unset): Position inside that section
         parent_task_id (None | str | Unset): The task this one is a subtask of (one parent at most); null for a top-
             level task. Linked through POST /tasks/{id}/subtasks. Response only. Example: T123456.
         parent_title (None | str | Unset): The parent's title, for a subtask; null for a top-level task or a parent the
@@ -116,6 +111,11 @@ class TaskCardView:
             only. Default: 0.
         subtask_context (bool | None | Unset): `subtasks=nested` only: a parent shown because one of its subtasks
             matches the query (it does not match itself). Response only.
+        subscriber_count (int | None | Unset): `include=subscribers` only (absent otherwise, and on rows with
+            `has_access=false`): how many people follow the task. Response only. Example: 3.
+        subscribers_preview (list[TaskSubscriberPreview] | None | Unset): `include=subscribers` only (absent otherwise,
+            and on rows with `has_access=false`): the first 3 subscribers, oldest first, as `GET
+            /v1/tasks/{task_id}/subscribers` lists them. Response only.
     """
 
     title: str
@@ -140,10 +140,7 @@ class TaskCardView:
     created_by: None | str | Unset = UNSET
     updated_by: None | str | Unset = UNSET
     is_subtask: bool | None | Unset = UNSET
-    bug_id: None | str | Unset = UNSET
-    tracker_id: None | str | Unset = UNSET
     restricted_to: list[str] | None | Unset = UNSET
-    team_id: None | str | Unset = UNSET
     sprint_id: None | str | Unset = UNSET
     milestone_id: None | str | Unset = UNSET
     goal_id: None | str | Unset = UNSET
@@ -157,8 +154,6 @@ class TaskCardView:
     has_access: bool | None | Unset = True
     has_edit_access: bool | None | Unset = False
     can_delete: bool | Unset = False
-    section_id: None | str | Unset = UNSET
-    section_position: float | None | Unset = UNSET
     parent_task_id: None | str | Unset = UNSET
     parent_title: None | str | Unset = UNSET
     subtasks_done: int | Unset = 0
@@ -168,6 +163,8 @@ class TaskCardView:
     subtask_count: int | Unset = 0
     subtask_done_count: int | Unset = 0
     subtask_context: bool | None | Unset = UNSET
+    subscriber_count: int | None | Unset = UNSET
+    subscribers_preview: list[TaskSubscriberPreview] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -176,6 +173,7 @@ class TaskCardView:
     def to_dict(self) -> dict[str, Any]:
         from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item  # noqa: PLC0415
         from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0  # noqa: PLC0415
+        from ..models.task_subscriber_preview import TaskSubscriberPreview  # noqa: PLC0415
 
         title = self.title
 
@@ -325,18 +323,6 @@ class TaskCardView:
         else:
             is_subtask = self.is_subtask
 
-        bug_id: None | str | Unset
-        if isinstance(self.bug_id, Unset):
-            bug_id = UNSET
-        else:
-            bug_id = self.bug_id
-
-        tracker_id: None | str | Unset
-        if isinstance(self.tracker_id, Unset):
-            tracker_id = UNSET
-        else:
-            tracker_id = self.tracker_id
-
         restricted_to: list[str] | None | Unset
         if isinstance(self.restricted_to, Unset):
             restricted_to = UNSET
@@ -345,12 +331,6 @@ class TaskCardView:
 
         else:
             restricted_to = self.restricted_to
-
-        team_id: None | str | Unset
-        if isinstance(self.team_id, Unset):
-            team_id = UNSET
-        else:
-            team_id = self.team_id
 
         sprint_id: None | str | Unset
         if isinstance(self.sprint_id, Unset):
@@ -431,18 +411,6 @@ class TaskCardView:
 
         can_delete = self.can_delete
 
-        section_id: None | str | Unset
-        if isinstance(self.section_id, Unset):
-            section_id = UNSET
-        else:
-            section_id = self.section_id
-
-        section_position: float | None | Unset
-        if isinstance(self.section_position, Unset):
-            section_position = UNSET
-        else:
-            section_position = self.section_position
-
         parent_task_id: None | str | Unset
         if isinstance(self.parent_task_id, Unset):
             parent_task_id = UNSET
@@ -472,6 +440,24 @@ class TaskCardView:
             subtask_context = UNSET
         else:
             subtask_context = self.subtask_context
+
+        subscriber_count: int | None | Unset
+        if isinstance(self.subscriber_count, Unset):
+            subscriber_count = UNSET
+        else:
+            subscriber_count = self.subscriber_count
+
+        subscribers_preview: list[dict[str, Any]] | None | Unset
+        if isinstance(self.subscribers_preview, Unset):
+            subscribers_preview = UNSET
+        elif isinstance(self.subscribers_preview, list):
+            subscribers_preview = []
+            for subscribers_preview_type_0_item_data in self.subscribers_preview:
+                subscribers_preview_type_0_item = subscribers_preview_type_0_item_data.to_dict()
+                subscribers_preview.append(subscribers_preview_type_0_item)
+
+        else:
+            subscribers_preview = self.subscribers_preview
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -518,14 +504,8 @@ class TaskCardView:
             field_dict["updated_by"] = updated_by
         if is_subtask is not UNSET:
             field_dict["is_subtask"] = is_subtask
-        if bug_id is not UNSET:
-            field_dict["bug_id"] = bug_id
-        if tracker_id is not UNSET:
-            field_dict["tracker_id"] = tracker_id
         if restricted_to is not UNSET:
             field_dict["restricted_to"] = restricted_to
-        if team_id is not UNSET:
-            field_dict["team_id"] = team_id
         if sprint_id is not UNSET:
             field_dict["sprint_id"] = sprint_id
         if milestone_id is not UNSET:
@@ -552,10 +532,6 @@ class TaskCardView:
             field_dict["has_edit_access"] = has_edit_access
         if can_delete is not UNSET:
             field_dict["can_delete"] = can_delete
-        if section_id is not UNSET:
-            field_dict["section_id"] = section_id
-        if section_position is not UNSET:
-            field_dict["section_position"] = section_position
         if parent_task_id is not UNSET:
             field_dict["parent_task_id"] = parent_task_id
         if parent_title is not UNSET:
@@ -574,6 +550,10 @@ class TaskCardView:
             field_dict["subtask_done_count"] = subtask_done_count
         if subtask_context is not UNSET:
             field_dict["subtask_context"] = subtask_context
+        if subscriber_count is not UNSET:
+            field_dict["subscriber_count"] = subscriber_count
+        if subscribers_preview is not UNSET:
+            field_dict["subscribers_preview"] = subscribers_preview
 
         return field_dict
 
@@ -581,6 +561,7 @@ class TaskCardView:
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item  # noqa: PLC0415
         from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0  # noqa: PLC0415
+        from ..models.task_subscriber_preview import TaskSubscriberPreview  # noqa: PLC0415
 
         d = dict(src_dict)
         title = d.pop("title")
@@ -862,24 +843,6 @@ class TaskCardView:
 
         is_subtask = _parse_is_subtask(d.pop("is_subtask", UNSET))
 
-        def _parse_bug_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        bug_id = _parse_bug_id(d.pop("bug_id", UNSET))
-
-        def _parse_tracker_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        tracker_id = _parse_tracker_id(d.pop("tracker_id", UNSET))
-
         def _parse_restricted_to(data: object) -> list[str] | None | Unset:
             if data is None:
                 return data
@@ -896,15 +859,6 @@ class TaskCardView:
             return cast(list[str] | None | Unset, data)
 
         restricted_to = _parse_restricted_to(d.pop("restricted_to", UNSET))
-
-        def _parse_team_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        team_id = _parse_team_id(d.pop("team_id", UNSET))
 
         def _parse_sprint_id(data: object) -> None | str | Unset:
             if data is None:
@@ -1032,24 +986,6 @@ class TaskCardView:
 
         can_delete = d.pop("can_delete", UNSET)
 
-        def _parse_section_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        section_id = _parse_section_id(d.pop("section_id", UNSET))
-
-        def _parse_section_position(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
-
-        section_position = _parse_section_position(d.pop("section_position", UNSET))
-
         def _parse_parent_task_id(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -1089,6 +1025,39 @@ class TaskCardView:
 
         subtask_context = _parse_subtask_context(d.pop("subtask_context", UNSET))
 
+        def _parse_subscriber_count(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        subscriber_count = _parse_subscriber_count(d.pop("subscriber_count", UNSET))
+
+        def _parse_subscribers_preview(data: object) -> list[TaskSubscriberPreview] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                subscribers_preview_type_0 = []
+                _subscribers_preview_type_0 = data
+                for subscribers_preview_type_0_item_data in _subscribers_preview_type_0:
+                    subscribers_preview_type_0_item = TaskSubscriberPreview.from_dict(
+                        subscribers_preview_type_0_item_data
+                    )
+
+                    subscribers_preview_type_0.append(subscribers_preview_type_0_item)
+
+                return subscribers_preview_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[TaskSubscriberPreview] | None | Unset, data)
+
+        subscribers_preview = _parse_subscribers_preview(d.pop("subscribers_preview", UNSET))
+
         task_card_view = cls(
             title=title,
             task_id=task_id,
@@ -1112,10 +1081,7 @@ class TaskCardView:
             created_by=created_by,
             updated_by=updated_by,
             is_subtask=is_subtask,
-            bug_id=bug_id,
-            tracker_id=tracker_id,
             restricted_to=restricted_to,
-            team_id=team_id,
             sprint_id=sprint_id,
             milestone_id=milestone_id,
             goal_id=goal_id,
@@ -1129,8 +1095,6 @@ class TaskCardView:
             has_access=has_access,
             has_edit_access=has_edit_access,
             can_delete=can_delete,
-            section_id=section_id,
-            section_position=section_position,
             parent_task_id=parent_task_id,
             parent_title=parent_title,
             subtasks_done=subtasks_done,
@@ -1140,6 +1104,8 @@ class TaskCardView:
             subtask_count=subtask_count,
             subtask_done_count=subtask_done_count,
             subtask_context=subtask_context,
+            subscriber_count=subscriber_count,
+            subscribers_preview=subscribers_preview,
         )
 
         task_card_view.additional_properties = d

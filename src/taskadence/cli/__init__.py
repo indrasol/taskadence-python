@@ -296,10 +296,16 @@ def storage(org: OrgOpt = None, json_: JsonOpt = False) -> None:
     out.print(
         f"[bold]{_bytes(data.get('bytes_used'))}[/bold] of {_bytes(data.get('included_bytes'))} included "
         f"({data.get('percent')}%), {data.get('file_count')} files - status [bold]{status}[/bold]"
-        + (" (internal org, not billed)" if data.get("billing_exempt") else "")
     )
+    if data.get("account_quota_bytes"):
+        out.print(
+            f"Account: {_bytes(data.get('account_used_bytes'))} of {_bytes(data.get('account_quota_bytes'))} "
+            f"({data.get('account_percent')}%), shared by every organization of the account"
+        )
+    if data.get("exempt_message"):
+        out.print(str(data["exempt_message"]))
     if status == "blocked":
-        out.print("New uploads are paused until an owner or admin adds a payment method.", style="red")
+        out.print("New uploads are paused until the account owner adds a payment method.", style="red")
     breakdown = data.get("breakdown") or {}
     kinds = breakdown.get("by_kind") or {}
     _table(

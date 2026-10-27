@@ -17,7 +17,7 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    project_id: str,
     *,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
@@ -53,8 +53,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/v1/teams/{team_id}/sprints".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/projects/{project_id}/sprints".format(
+            project_id=quote(str(project_id), safe=""),
         ),
         "params": params,
     }
@@ -138,7 +138,7 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     limit: int | Unset = 1000,
@@ -147,18 +147,20 @@ def sync_detailed(
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | SprintListPage]:
-    """List a team's sprints
+    """List a project's sprints
 
-     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
-    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
-    the current sprint.
+     The project's live sprints in their order (`position`), paginated as `{data, next_cursor}`.
+
+    - Each carries `task_count` / `completed_count` and the derived `duration_weeks` / `duration_label`.
+    - Completed sprints are included; they are no longer offered as the current sprint.
+    - You need to be able to read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
-            list's natural order.
+        sort_by (None | str | Unset): One of: position, start_date, end_date, name, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -171,7 +173,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -187,7 +189,7 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     limit: int | Unset = 1000,
@@ -196,18 +198,20 @@ def sync(
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | SprintListPage | None:
-    """List a team's sprints
+    """List a project's sprints
 
-     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
-    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
-    the current sprint.
+     The project's live sprints in their order (`position`), paginated as `{data, next_cursor}`.
+
+    - Each carries `task_count` / `completed_count` and the derived `duration_weeks` / `duration_label`.
+    - Completed sprints are included; they are no longer offered as the current sprint.
+    - You need to be able to read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
-            list's natural order.
+        sort_by (None | str | Unset): One of: position, start_date, end_date, name, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -220,7 +224,7 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        project_id=project_id,
         client=client,
         limit=limit,
         cursor=cursor,
@@ -231,7 +235,7 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     limit: int | Unset = 1000,
@@ -240,18 +244,20 @@ async def asyncio_detailed(
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Response[Any | Problem | SprintListPage]:
-    """List a team's sprints
+    """List a project's sprints
 
-     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
-    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
-    the current sprint.
+     The project's live sprints in their order (`position`), paginated as `{data, next_cursor}`.
+
+    - Each carries `task_count` / `completed_count` and the derived `duration_weeks` / `duration_label`.
+    - Completed sprints are included; they are no longer offered as the current sprint.
+    - You need to be able to read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
-            list's natural order.
+        sort_by (None | str | Unset): One of: position, start_date, end_date, name, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -264,7 +270,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -278,7 +284,7 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     limit: int | Unset = 1000,
@@ -287,18 +293,20 @@ async def asyncio(
     sort_order: str | Unset = "asc",
     if_none_match: str | Unset = UNSET,
 ) -> Any | Problem | SprintListPage | None:
-    """List a team's sprints
+    """List a project's sprints
 
-     The team's live sprints, latest first, each with `task_count` / `completed_count` and the derived
-    `duration_weeks` / `duration_label`. Completed sprints are included; they are no longer offered as
-    the current sprint.
+     The project's live sprints in their order (`position`), paginated as `{data, next_cursor}`.
+
+    - Each carries `task_count` / `completed_count` and the derived `duration_weeks` / `duration_label`.
+    - Completed sprints are included; they are no longer offered as the current sprint.
+    - You need to be able to read the project.
 
     Args:
-        team_id (str):
+        project_id (str):
         limit (int | Unset): Page size; default 1000, capped at 1000. Default: 1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
-        sort_by (None | str | Unset): One of: start_date, end_date, name, created_at. Default: the
-            list's natural order.
+        sort_by (None | str | Unset): One of: position, start_date, end_date, name, created_at.
+            Default: the list's natural order.
         sort_order (str | Unset): `asc` or `desc` Default: 'asc'.
         if_none_match (str | Unset):
 
@@ -312,7 +320,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            project_id=project_id,
             client=client,
             limit=limit,
             cursor=cursor,

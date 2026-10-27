@@ -17,7 +17,7 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    project_id: str,
     *,
     body: SprintCreate,
 ) -> dict[str, Any]:
@@ -25,8 +25,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "post",
-        "url": "/v1/teams/{team_id}/sprints".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/projects/{project_id}/sprints".format(
+            project_id=quote(str(project_id), safe=""),
         ),
     }
 
@@ -105,18 +105,23 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 
 
 def sync_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintCreate,
 ) -> Response[Problem | SprintOut]:
-    """Create a sprint
+    """Create a sprint in a project
 
-     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` - both is a
-    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint in the project.
+
+    - **Who:** the project's owners and members, or an org owner / admin.
+    - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
+    the weeks.
+    - `position` omitted places it after the project's last sprint.
+    - 409 on a name already used by a live sprint of the project (case-insensitive).
 
     Args:
-        team_id (str):
+        project_id (str):
         body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
@@ -128,7 +133,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         body=body,
     )
 
@@ -140,18 +145,23 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintCreate,
 ) -> Problem | SprintOut | None:
-    """Create a sprint
+    """Create a sprint in a project
 
-     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` - both is a
-    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint in the project.
+
+    - **Who:** the project's owners and members, or an org owner / admin.
+    - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
+    the weeks.
+    - `position` omitted places it after the project's last sprint.
+    - 409 on a name already used by a live sprint of the project (case-insensitive).
 
     Args:
-        team_id (str):
+        project_id (str):
         body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
@@ -163,25 +173,30 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        project_id=project_id,
         client=client,
         body=body,
     ).parsed
 
 
 async def asyncio_detailed(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintCreate,
 ) -> Response[Problem | SprintOut]:
-    """Create a sprint
+    """Create a sprint in a project
 
-     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` - both is a
-    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint in the project.
+
+    - **Who:** the project's owners and members, or an org owner / admin.
+    - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
+    the weeks.
+    - `position` omitted places it after the project's last sprint.
+    - 409 on a name already used by a live sprint of the project (case-insensitive).
 
     Args:
-        team_id (str):
+        project_id (str):
         body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
@@ -193,7 +208,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        project_id=project_id,
         body=body,
     )
 
@@ -203,18 +218,23 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    project_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintCreate,
 ) -> Problem | SprintOut | None:
-    """Create a sprint
+    """Create a sprint in a project
 
-     Create a sprint. Requires edit access to the team. Send `end_date` or `duration_weeks` - both is a
-    422; the sprint stores the end date and derives the weeks. 409 on a duplicate active name.
+     Create a sprint in the project.
+
+    - **Who:** the project's owners and members, or an org owner / admin.
+    - Send `end_date` or `duration_weeks` - both is a 422; the sprint stores the end date and derives
+    the weeks.
+    - `position` omitted places it after the project's last sprint.
+    - 409 on a name already used by a live sprint of the project (case-insensitive).
 
     Args:
-        team_id (str):
+        project_id (str):
         body (SprintCreate): The request body of `sprints.create`.
 
     Raises:
@@ -227,7 +247,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            project_id=project_id,
             client=client,
             body=body,
         )

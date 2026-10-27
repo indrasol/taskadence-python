@@ -12,6 +12,8 @@ from ... import errors
 
 from ...models.page_project_card import PageProjectCard
 from ...models.problem import Problem
+from ...models.projects_list_scope_type_0 import check_projects_list_scope_type_0
+from ...models.projects_list_scope_type_0 import ProjectsListScopeType0
 from ...types import UNSET, Unset
 from typing import cast
 
@@ -20,6 +22,7 @@ def _get_kwargs(
     org_id: str,
     *,
     show_all: bool | Unset = True,
+    scope: None | ProjectsListScopeType0 | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -33,6 +36,15 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["show_all"] = show_all
+
+    json_scope: None | str | Unset
+    if isinstance(scope, Unset):
+        json_scope = UNSET
+    elif isinstance(scope, str):
+        json_scope = scope
+    else:
+        json_scope = scope
+    params["scope"] = json_scope
 
     params["limit"] = limit
 
@@ -145,6 +157,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     show_all: bool | Unset = True,
+    scope: None | ProjectsListScopeType0 | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -159,8 +172,8 @@ def sync_detailed(
     of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
-    ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[project]` (project ids) and `filter[parent]` (a
+    project id, or `none` for top-level projects) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
     - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
@@ -168,8 +181,11 @@ def sync_detailed(
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
+        scope (None | ProjectsListScopeType0 | Unset): `mine`: the projects you are in - every
+            project for an org owner or admin (their org role makes them an owner of each); `all`
+            (default): every project you can read. Same as `show_all=false` / `true`
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
+            `filter[priority]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -190,6 +206,7 @@ def sync_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         show_all=show_all,
+        scope=scope,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -209,6 +226,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     show_all: bool | Unset = True,
+    scope: None | ProjectsListScopeType0 | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -223,8 +241,8 @@ def sync(
     of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
-    ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[project]` (project ids) and `filter[parent]` (a
+    project id, or `none` for top-level projects) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
     - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
@@ -232,8 +250,11 @@ def sync(
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
+        scope (None | ProjectsListScopeType0 | Unset): `mine`: the projects you are in - every
+            project for an org owner or admin (their org role makes them an owner of each); `all`
+            (default): every project you can read. Same as `show_all=false` / `true`
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
+            `filter[priority]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -255,6 +276,7 @@ def sync(
         org_id=org_id,
         client=client,
         show_all=show_all,
+        scope=scope,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -268,6 +290,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     show_all: bool | Unset = True,
+    scope: None | ProjectsListScopeType0 | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -282,8 +305,8 @@ async def asyncio_detailed(
     of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
-    ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[project]` (project ids) and `filter[parent]` (a
+    project id, or `none` for top-level projects) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
     - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
@@ -291,8 +314,11 @@ async def asyncio_detailed(
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
+        scope (None | ProjectsListScopeType0 | Unset): `mine`: the projects you are in - every
+            project for an org owner or admin (their org role makes them an owner of each); `all`
+            (default): every project you can read. Same as `show_all=false` / `true`
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
+            `filter[priority]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -313,6 +339,7 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         org_id=org_id,
         show_all=show_all,
+        scope=scope,
         limit=limit,
         cursor=cursor,
         sort_by=sort_by,
@@ -330,6 +357,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     show_all: bool | Unset = True,
+    scope: None | ProjectsListScopeType0 | Unset = UNSET,
     limit: int | Unset = 1000,
     cursor: None | str | Unset = UNSET,
     sort_by: None | str | Unset = UNSET,
@@ -344,8 +372,8 @@ async def asyncio(
     of, and - for org owners and admins - all of them. Private projects you are not a member of never
     appear.
     - `show_all=false` returns only the projects you are a member of.
-    - `filter[status]`, `filter[priority]`, `filter[team]` (team ids) and `filter[project]` (project
-    ids) narrow the list.
+    - `filter[status]`, `filter[priority]`, `filter[project]` (project ids) and `filter[parent]` (a
+    project id, or `none` for top-level projects) narrow the list.
     - `filter[search]` matches the name, description or id (case-insensitive substring).
     - `filter[start_after]` / `filter[start_before]` (`YYYY-MM-DD`, inclusive) bound the start date -
     the creation date when a project has none.
@@ -353,8 +381,11 @@ async def asyncio(
     Args:
         org_id (str):
         show_all (bool | Unset):  Default: True.
+        scope (None | ProjectsListScopeType0 | Unset): `mine`: the projects you are in - every
+            project for an org owner or admin (their org role makes them an owner of each); `all`
+            (default): every project you can read. Same as `show_all=false` / `true`
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[status]`,
-            `filter[priority]`, `filter[team]`, `filter[project]`, `filter[parent]`, `filter[search]`,
+            `filter[priority]`, `filter[project]`, `filter[parent]`, `filter[search]`,
             `filter[start_after]`, `filter[start_before]` (comma-separated values are OR-ed). Default:
             1000.
         cursor (None | str | Unset): The previous page's `next_cursor`, echoed back verbatim
@@ -377,6 +408,7 @@ async def asyncio(
             org_id=org_id,
             client=client,
             show_all=show_all,
+            scope=scope,
             limit=limit,
             cursor=cursor,
             sort_by=sort_by,

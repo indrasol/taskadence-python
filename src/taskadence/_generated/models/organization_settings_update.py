@@ -57,10 +57,12 @@ class OrganizationSettingsUpdate:
         restrict_to_verified_domains (bool | None | Unset): S.7: only people with an email at one of the org's verified
             domains get in by themselves; an invite to another domain needs an owner, a join request from one is refused.
             Owners only (default false)
-        deleted_item_retention_days (int | None | Unset): S.13: days a deleted task, project, goal, milestone, sprint,
-            team or test run stays restorable before it is purged (default 30). Owners only
+        deleted_item_retention_days (int | None | Unset): S.13: days a deleted task, project, goal, milestone or sprint
+            stays restorable before it is purged (default 30). Owners only
         attachment_retention_days (int | None | Unset): S.13: days a deleted attachment's file is kept before it is
             removed from storage (default 30; 0 = at the next purge run). Owners only
+        only_admins_create_projects (bool | None | Unset): Release 10: only org owners and admins create projects
+            (default false: any member who is not a guest)
     """
 
     default_visibility: None | ProjectVisibilityEnum | Unset = UNSET
@@ -75,6 +77,7 @@ class OrganizationSettingsUpdate:
     restrict_to_verified_domains: bool | None | Unset = UNSET
     deleted_item_retention_days: int | None | Unset = UNSET
     attachment_retention_days: int | None | Unset = UNSET
+    only_admins_create_projects: bool | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -162,6 +165,12 @@ class OrganizationSettingsUpdate:
         else:
             attachment_retention_days = self.attachment_retention_days
 
+        only_admins_create_projects: bool | None | Unset
+        if isinstance(self.only_admins_create_projects, Unset):
+            only_admins_create_projects = UNSET
+        else:
+            only_admins_create_projects = self.only_admins_create_projects
+
         field_dict: dict[str, Any] = {}
 
         field_dict.update({})
@@ -189,6 +198,8 @@ class OrganizationSettingsUpdate:
             field_dict["deleted_item_retention_days"] = deleted_item_retention_days
         if attachment_retention_days is not UNSET:
             field_dict["attachment_retention_days"] = attachment_retention_days
+        if only_admins_create_projects is not UNSET:
+            field_dict["only_admins_create_projects"] = only_admins_create_projects
 
         return field_dict
 
@@ -346,6 +357,15 @@ class OrganizationSettingsUpdate:
 
         attachment_retention_days = _parse_attachment_retention_days(d.pop("attachment_retention_days", UNSET))
 
+        def _parse_only_admins_create_projects(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        only_admins_create_projects = _parse_only_admins_create_projects(d.pop("only_admins_create_projects", UNSET))
+
         organization_settings_update = cls(
             default_visibility=default_visibility,
             domain_join_mode=domain_join_mode,
@@ -359,6 +379,7 @@ class OrganizationSettingsUpdate:
             restrict_to_verified_domains=restrict_to_verified_domains,
             deleted_item_retention_days=deleted_item_retention_days,
             attachment_retention_days=attachment_retention_days,
+            only_admins_create_projects=only_admins_create_projects,
         )
 
         return organization_settings_update

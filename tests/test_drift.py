@@ -107,7 +107,7 @@ def test_generated_files_say_do_not_edit() -> None:
 
 
 def test_the_sdk_knows_its_api_version_and_default_server() -> None:
-    assert taskadence.API_VERSION == SPEC["info"]["version"] == "2026-09-25"
+    assert taskadence.API_VERSION == SPEC["info"]["version"] == "2026-10-24"
     assert SPEC["servers"][0]["url"] == taskadence.DEFAULT_BASE_URL
 
 

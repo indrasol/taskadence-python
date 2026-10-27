@@ -23,7 +23,7 @@ class PinRef:
     """Part of `PinOrder`.
 
     Attributes:
-        pin_type (PinTypeEnum): One of `view`, `project`, `team`. Used by `PinOut` and 1 more.
+        pin_type (PinTypeEnum): One of `view`, `project`. Used by `PinOut` and 1 more.
         pin_id (str):
     """
 

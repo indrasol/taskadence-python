@@ -17,7 +17,6 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
     sprint_id: str,
     *,
     body: SprintUpdate,
@@ -25,9 +24,8 @@ def _get_kwargs(
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
-        "method": "put",
-        "url": "/v1/teams/{team_id}/sprints/{sprint_id}".format(
-            team_id=quote(str(team_id), safe=""),
+        "method": "patch",
+        "url": "/v1/sprints/{sprint_id}".format(
             sprint_id=quote(str(sprint_id), safe=""),
         ),
     }
@@ -107,20 +105,24 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 
 
 def sync_detailed(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
 ) -> Response[Problem | SprintOut]:
-    """Update a sprint
+    """Update a sprint (name, dates, status, position, project)
 
-     Rename / re-describe / reschedule / complete / re-open. A true partial. Completing
-    a sprint writes `status`, `completed_at` and `completed_by` on THIS ROW and does
-    nothing whatever to its tasks.
+     A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
+    (`active` / `completed`), `position`, or `project_id` to move it.
+
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
+    target project too.
+    - Completing a sprint records who and when and does nothing to its tasks.
+    - **Moving:** only a sprint that holds no task moves to another project of the organization (409
+    `sprint-not-empty` otherwise).
+    - **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.
 
     Args:
-        team_id (str):
         sprint_id (str):
         body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
@@ -133,7 +135,6 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
         sprint_id=sprint_id,
         body=body,
     )
@@ -146,20 +147,24 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
 ) -> Problem | SprintOut | None:
-    """Update a sprint
+    """Update a sprint (name, dates, status, position, project)
 
-     Rename / re-describe / reschedule / complete / re-open. A true partial. Completing
-    a sprint writes `status`, `completed_at` and `completed_by` on THIS ROW and does
-    nothing whatever to its tasks.
+     A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
+    (`active` / `completed`), `position`, or `project_id` to move it.
+
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
+    target project too.
+    - Completing a sprint records who and when and does nothing to its tasks.
+    - **Moving:** only a sprint that holds no task moves to another project of the organization (409
+    `sprint-not-empty` otherwise).
+    - **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.
 
     Args:
-        team_id (str):
         sprint_id (str):
         body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
@@ -172,7 +177,6 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
         sprint_id=sprint_id,
         client=client,
         body=body,
@@ -180,20 +184,24 @@ def sync(
 
 
 async def asyncio_detailed(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
 ) -> Response[Problem | SprintOut]:
-    """Update a sprint
+    """Update a sprint (name, dates, status, position, project)
 
-     Rename / re-describe / reschedule / complete / re-open. A true partial. Completing
-    a sprint writes `status`, `completed_at` and `completed_by` on THIS ROW and does
-    nothing whatever to its tasks.
+     A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
+    (`active` / `completed`), `position`, or `project_id` to move it.
+
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
+    target project too.
+    - Completing a sprint records who and when and does nothing to its tasks.
+    - **Moving:** only a sprint that holds no task moves to another project of the organization (409
+    `sprint-not-empty` otherwise).
+    - **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.
 
     Args:
-        team_id (str):
         sprint_id (str):
         body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
@@ -206,7 +214,6 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
         sprint_id=sprint_id,
         body=body,
     )
@@ -217,20 +224,24 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
     sprint_id: str,
     *,
     client: AuthenticatedClient,
     body: SprintUpdate,
 ) -> Problem | SprintOut | None:
-    """Update a sprint
+    """Update a sprint (name, dates, status, position, project)
 
-     Rename / re-describe / reschedule / complete / re-open. A true partial. Completing
-    a sprint writes `status`, `completed_at` and `completed_by` on THIS ROW and does
-    nothing whatever to its tasks.
+     A partial update: name, description, goal, dates (`end_date` or `duration_weeks`), `status`
+    (`active` / `completed`), `position`, or `project_id` to move it.
+
+    - **Who:** the project's owners and members, or an org owner / admin; a move needs that in the
+    target project too.
+    - Completing a sprint records who and when and does nothing to its tasks.
+    - **Moving:** only a sprint that holds no task moves to another project of the organization (409
+    `sprint-not-empty` otherwise).
+    - **Errors:** 409 on a duplicate name in the project; 422 for a project of another organization.
 
     Args:
-        team_id (str):
         sprint_id (str):
         body (SprintUpdate): A true partial - every field optional; an absent field is left alone.
 
@@ -244,7 +255,6 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
             sprint_id=sprint_id,
             client=client,
             body=body,

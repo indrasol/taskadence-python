@@ -2,11 +2,10 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-ViewScopeEnum = Literal["project", "team", "user"]
+ViewScopeEnum = Literal["project", "user"]
 
 VIEW_SCOPE_ENUM_VALUES: set[ViewScopeEnum] = {
     "project",
-    "team",
     "user",
 }
 

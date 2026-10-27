@@ -36,6 +36,8 @@ class MeAuth:
             for a person) Default: 'personal'.
         token_kind (MeAuthTokenKind | Unset):  Default: 'live'.
         client_id (None | str | Unset): The OAuth app the token was issued to (authorization_code); null otherwise
+        resource (None | str | Unset): RFC 8707: the protected resource an OAuth token is bound to (this API's origin,
+            or `<origin>/mcp`); null = not bound to one
         org_ids (list[str] | Unset): The organizations the token names; when `all_orgs`, the ones the person consented
             to explicitly (often [])
         all_orgs (bool | Unset): The token reaches every organization its principal is an active member of, resolved per
@@ -51,6 +53,7 @@ class MeAuth:
     grant_type: MeAuthGrantType | Unset = "personal"
     token_kind: MeAuthTokenKind | Unset = "live"
     client_id: None | str | Unset = UNSET
+    resource: None | str | Unset = UNSET
     org_ids: list[str] | Unset = UNSET
     all_orgs: bool | Unset = False
     home_org_id: None | str | Unset = UNSET
@@ -95,6 +98,12 @@ class MeAuth:
         else:
             client_id = self.client_id
 
+        resource: None | str | Unset
+        if isinstance(self.resource, Unset):
+            resource = UNSET
+        else:
+            resource = self.resource
+
         org_ids: list[str] | Unset = UNSET
         if not isinstance(self.org_ids, Unset):
             org_ids = self.org_ids
@@ -127,6 +136,8 @@ class MeAuth:
             field_dict["token_kind"] = token_kind
         if client_id is not UNSET:
             field_dict["client_id"] = client_id
+        if resource is not UNSET:
+            field_dict["resource"] = resource
         if org_ids is not UNSET:
             field_dict["org_ids"] = org_ids
         if all_orgs is not UNSET:
@@ -196,6 +207,15 @@ class MeAuth:
 
         client_id = _parse_client_id(d.pop("client_id", UNSET))
 
+        def _parse_resource(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        resource = _parse_resource(d.pop("resource", UNSET))
+
         org_ids = cast(list[str], d.pop("org_ids", UNSET))
 
         all_orgs = d.pop("all_orgs", UNSET)
@@ -218,6 +238,7 @@ class MeAuth:
             grant_type=grant_type,
             token_kind=token_kind,
             client_id=client_id,
+            resource=resource,
             org_ids=org_ids,
             all_orgs=all_orgs,
             home_org_id=home_org_id,

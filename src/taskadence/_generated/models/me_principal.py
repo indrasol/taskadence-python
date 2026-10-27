@@ -29,6 +29,8 @@ class MePrincipal:
         username (None | str | Unset):
         email (None | str | Unset):
         email_verified (bool | None | Unset):
+        avatar_preset (None | str | Unset): The illustrated avatar this person chose from the app's set (an id such as
+            `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead.
     """
 
     id: str
@@ -36,6 +38,7 @@ class MePrincipal:
     username: None | str | Unset = UNSET
     email: None | str | Unset = UNSET
     email_verified: bool | None | Unset = UNSET
+    avatar_preset: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -66,6 +69,12 @@ class MePrincipal:
         else:
             email_verified = self.email_verified
 
+        avatar_preset: None | str | Unset
+        if isinstance(self.avatar_preset, Unset):
+            avatar_preset = UNSET
+        else:
+            avatar_preset = self.avatar_preset
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -81,6 +90,8 @@ class MePrincipal:
             field_dict["email"] = email
         if email_verified is not UNSET:
             field_dict["email_verified"] = email_verified
+        if avatar_preset is not UNSET:
+            field_dict["avatar_preset"] = avatar_preset
 
         return field_dict
 
@@ -123,12 +134,22 @@ class MePrincipal:
 
         email_verified = _parse_email_verified(d.pop("email_verified", UNSET))
 
+        def _parse_avatar_preset(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        avatar_preset = _parse_avatar_preset(d.pop("avatar_preset", UNSET))
+
         me_principal = cls(
             id=id,
             type_=type_,
             username=username,
             email=email,
             email_verified=email_verified,
+            avatar_preset=avatar_preset,
         )
 
         me_principal.additional_properties = d

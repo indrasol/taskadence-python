@@ -25,7 +25,7 @@ class WebhookEventData:
     """What changed: the audit row's scrubbed diff - never a whole resource, never a secret.
 
     Attributes:
-        resource_type (str): `task`, `project`, `member`, `invite`, `organization`, `team`, `webhook`, …
+        resource_type (str): `task`, `project`, `sprint`, `member`, `invite`, `organization`, `webhook`, …
         resource_id (str): The resource's id - read it with the API for the full object
         before (None | WebhookEventDataBeforeType0): The changed fields before (null on a create)
         after (None | WebhookEventDataAfterType0): The changed fields after (null on a delete)

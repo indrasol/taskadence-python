@@ -26,19 +26,17 @@ T = TypeVar("T", bound="PinOut")
 
 @_attrs_define
 class PinOut:
-    """Returned by `view-pins.pin_project`, `view-pins.pin_team` and `view-pins.pin_view`.
+    """Returned by `view-pins.pin_project` and `view-pins.pin_view`.
 
     Attributes:
-        pin_type (PinTypeEnum): One of `view`, `project`, `team`. Used by `PinOut` and 1 more.
+        pin_type (PinTypeEnum): One of `view`, `project`. Used by `PinOut` and 1 more.
         pin_id (str):
         org_id (str):
         position (float):
-        label (str): The view's, project's or team's name, resolved server-side
+        label (str): The view's or project's name, resolved server-side
         scope_type (None | Unset | ViewScopeEnum): For a view pin: the view's scope
         resource (None | Unset | ViewResourceEnum): For a view pin: the list the view queries, `task` or `project`.
             Empty for a project pin.
-        logo_url (None | str | Unset): Batch 7: for a team pin, a 60-minute link to the team's logo; null otherwise or
-            without one
         created_at (datetime.datetime | None | Unset):
     """
 
@@ -49,7 +47,6 @@ class PinOut:
     label: str
     scope_type: None | Unset | ViewScopeEnum = UNSET
     resource: None | Unset | ViewResourceEnum = UNSET
-    logo_url: None | str | Unset = UNSET
     created_at: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -83,12 +80,6 @@ class PinOut:
         else:
             resource = self.resource
 
-        logo_url: None | str | Unset
-        if isinstance(self.logo_url, Unset):
-            logo_url = UNSET
-        else:
-            logo_url = self.logo_url
-
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
             created_at = UNSET
@@ -112,8 +103,6 @@ class PinOut:
             field_dict["scope_type"] = scope_type
         if resource is not UNSET:
             field_dict["resource"] = resource
-        if logo_url is not UNSET:
-            field_dict["logo_url"] = logo_url
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
 
@@ -166,15 +155,6 @@ class PinOut:
 
         resource = _parse_resource(d.pop("resource", UNSET))
 
-        def _parse_logo_url(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
-
         def _parse_created_at(data: object) -> datetime.datetime | None | Unset:
             if data is None:
                 return data
@@ -200,7 +180,6 @@ class PinOut:
             label=label,
             scope_type=scope_type,
             resource=resource,
-            logo_url=logo_url,
             created_at=created_at,
         )
 

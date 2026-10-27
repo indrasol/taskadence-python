@@ -239,9 +239,9 @@ def test_a_post_without_an_idempotency_key_is_never_retried(tm: Taskadence, api:
     with pytest.raises(InternalError):
         tm.tasks.create({"org_id": "O123456", "title": "x"}, idempotency_key=None)
     assert route.call_count == 1
-    other = api.post("/v1/teams").respond(503)  # not a create at all
+    other = api.post("/v1/designations").respond(503)  # not an idempotent create
     with pytest.raises(InternalError):
-        tm.teams.create({"org_id": "O123456", "name": "x"})
+        tm.designations.create({"org_id": "O123456", "label": "x"})
     assert other.call_count == 1
 
 

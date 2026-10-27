@@ -12,7 +12,11 @@
         ├── ForbiddenError (403)          ├── InsufficientScopeError  (.required_scope)
         │                                 └── TestTokenReadOnlyError
         ├── NotFoundError (404)
-        ├── ConflictError (409)           └── IdempotencyKeyInFlightError
+        ├── ConflictError (409)           ├── IdempotencyKeyInFlightError
+        │                                 ├── SprintProjectMismatchError  a task joins only a sprint of its project
+        │                                 ├── EmailInOtherAccountError    the invitee's email is in another account
+        │                                 └── MemberNotLinkedError        a member must sign in again (.user_ids)
+        ├── GoneError (410)               └── RemovedInRelease10Error  (.changelog .successor) never retried
         ├── PreconditionFailedError (412)
         ├── UnprocessableEntityError (422) ├── ValidationError, IdempotencyKeyReusedError, UrlRefusedError
         │                                 └── InvalidValueError   422 invalid-parameter: also an InvalidParameterError
@@ -154,6 +158,10 @@ class ConflictError(TaskadenceError):
     """409."""
 
 
+class GoneError(TaskadenceError):
+    """410: the route was removed. Not retried: it will not come back."""
+
+
 class PreconditionFailedError(TaskadenceError):
     """412: `If-Match` named a stale `ETag` — re-read the resource and retry. Nothing was written."""
 
@@ -202,6 +210,69 @@ class IdempotencyKeyReusedError(UnprocessableEntityError):
 
 class IdempotencyKeyInFlightError(ConflictError):
     """The first request with this `Idempotency-Key` has not finished; retry shortly."""
+
+
+class SprintProjectMismatchError(ConflictError):
+    """A task joins only a sprint of its own project (`tm.tasks.set_sprint`, or a task create / update with a
+    `sprint_id`): the sprint belongs to another project, or the task has none. `errors[0]` names both projects."""
+
+
+SprintProjectMismatch = SprintProjectMismatchError
+"""The name the release 10 notes use; the same class."""
+
+
+class EmailInOtherAccountError(ConflictError):
+    """An invite (or a member add) of a person who already uses TasKadence with another account: one email belongs to
+    one account. `errors[0]["code"]` is `email_in_other_account`."""
+
+
+EmailInOtherAccount = EmailInOtherAccountError
+"""The name the release 10 notes use; the same class."""
+
+
+class MemberNotLinkedError(ConflictError):
+    """A member whose sign-in is not linked to their TasKadence profile yet (an SSO account sharing an email with an
+    older one) cannot be subscribed to a task or react to a comment until they sign in again. `.user_ids` names them
+    (`errors[0]["user_ids"]`); `OrganizationMemberInDB.linked` is False for them."""
+
+    @property
+    def user_ids(self) -> list[str]:
+        first = self.errors[0] if self.errors else None
+        ids = first.get("user_ids") if isinstance(first, Mapping) else None
+        return [str(i) for i in ids] if isinstance(ids, list) else []
+
+
+MemberNotLinked = MemberNotLinkedError
+"""The name the release 10 notes use; the same class."""
+
+
+CHANGELOG_URL = "https://docs.taskadence.com/changelog"
+
+
+class RemovedInRelease10Error(GoneError):
+    """A route release 10 removed (teams, sections, test sprints, the per-organization billing routes). `.successor`
+    names what to call instead (None when nothing replaces it); `.changelog` links the docs changelog entry, and the
+    message ends with it."""
+
+    @property
+    def changelog(self) -> str:
+        value = self.body.get("changelog") if isinstance(self.body, dict) else None
+        return str(value) if value else CHANGELOG_URL
+
+    @property
+    def successor(self) -> str | None:
+        value = self.body.get("successor") if isinstance(self.body, dict) else None
+        return str(value) if value else None
+
+    def __str__(self) -> str:
+        text = super().__str__()
+        if self.successor and self.successor not in text:
+            text += f" Use {self.successor} instead."
+        return text if self.changelog in text else f"{text} See {self.changelog}"
+
+
+RemovedInRelease10 = RemovedInRelease10Error
+"""The name the release 10 notes use; the same class."""
 
 
 class UrlRefusedError(UnprocessableEntityError):
@@ -258,6 +329,10 @@ BY_TYPE: dict[str, type[TaskadenceError]] = {
     URN + "test-token-read-only": TestTokenReadOnlyError,
     URN + "token-policy": TokenPolicyError,
     URN + "url-refused": UrlRefusedError,
+    URN + "sprint-project-mismatch": SprintProjectMismatchError,
+    URN + "email-in-other-account": EmailInOtherAccountError,
+    URN + "member-not-linked": MemberNotLinkedError,
+    URN + "removed-in-release-10": RemovedInRelease10Error,
 }
 
 BY_STATUS: dict[int, type[TaskadenceError]] = {
@@ -266,6 +341,7 @@ BY_STATUS: dict[int, type[TaskadenceError]] = {
     403: ForbiddenError,
     404: NotFoundError,
     409: ConflictError,
+    410: GoneError,
     412: PreconditionFailedError,
     422: UnprocessableEntityError,
     429: RateLimitedError,

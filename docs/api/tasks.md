@@ -14,7 +14,7 @@ Create a task.
 - **Returns:** `TaskInDB`
 - **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
 
-## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, include_children: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, subtasks: str | None = None, section_scope: str | None = None, filter: Mapping[str, Any] | None = None)`
+## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, include_children: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, subtasks: str | None = None, include: str | Sequence[str] | None = None, filter: Mapping[str, Any] | None = None)`
 
 List / search tasks (the filter grammar; `filter[search]` is search).
 
@@ -23,7 +23,7 @@ List / search tasks (the filter grammar; `filter[search]` is search).
 - **Token scope:** `tasks:read`
 - **Returns:** `Page[TaskCardView]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
-- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `team`, `task_type`, `created_via`, `review`, `parent`, `blocked`, `has_subtasks`, `blocks`, `created_by`
+- **`filter=` keys:** `status`, `priority`, `assignee`, `project`, `tags`, `due_after`, `due_before`, `created_after`, `created_before`, `overdue`, `search`, `search_fields`, `task_type`, `created_via`, `review`, `parent`, `blocked`, `has_subtasks`, `blocks`, `created_by`
 
 ## `tm.tasks.create_batch(body: TaskBatchCreate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
 
@@ -103,6 +103,7 @@ Move a task to another project (or unfile it).
 - **operationId:** `tasks.set_project`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
+- **Also:** `tm.tasks.move` (same call).
 
 ## `tm.tasks.review(task_id: str, body: TaskReviewDecision | Mapping[str, Any])`
 
@@ -115,7 +116,7 @@ Accept or reject a task an agent created.
 
 ## `tm.tasks.set_sprint(task_id: str, body: TaskSprintSet | Mapping[str, Any])`
 
-File a task in a team sprint (or none).
+File a task in a sprint of its project (or none).
 
 - **HTTP:** `PUT /v1/tasks/{task_id}/sprint`
 - **operationId:** `tasks.set_sprint`
@@ -130,15 +131,6 @@ Attach a task to a milestone of its project (or none).
 - **operationId:** `tasks.set_milestone`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
-
-## `tm.tasks.set_section(task_id: str, body: TaskSectionSet | Mapping[str, Any])`
-
-Place a task in a section.
-
-- **HTTP:** `PUT /v1/tasks/{task_id}/section`
-- **operationId:** `tasks.set_section`
-- **Token scope:** `tasks:write`
-- **Returns:** `TaskSectionOut`
 
 ## `tm.tasks.add_subtask(task_id: str, body: SubtaskLink | Mapping[str, Any])`
 
@@ -184,3 +176,41 @@ Remove a dependency.
 - **operationId:** `tasks.remove_dependency`
 - **Token scope:** `tasks:write`
 - **Returns:** `TaskInDB`
+
+## `tm.tasks.list_subscribers(task_id: str, if_none_match: str | None = None)`
+
+List a task's subscribers.
+
+- **HTTP:** `GET /v1/tasks/{task_id}/subscribers`
+- **operationId:** `tasks.list_subscribers`
+- **Token scope:** `tasks:read`
+- **Returns:** `TaskSubscribers`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Also:** `tm.tasks.subscribers` (same call).
+
+## `tm.tasks.set_subscribers(task_id: str, user_ids: Sequence[str])`
+
+Set a task's subscribers.
+
+- **HTTP:** `PUT /v1/tasks/{task_id}/subscribers`
+- **operationId:** `tasks.set_subscribers`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`
+
+## `tm.tasks.subscribe(task_id: str)`
+
+Subscribe yourself to a task.
+
+- **HTTP:** `POST /v1/tasks/{task_id}/subscribers/me`
+- **operationId:** `tasks.subscribe`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`
+
+## `tm.tasks.unsubscribe(task_id: str)`
+
+Unsubscribe yourself from a task.
+
+- **HTTP:** `DELETE /v1/tasks/{task_id}/subscribers/me`
+- **operationId:** `tasks.unsubscribe`
+- **Token scope:** `tasks:write`
+- **Returns:** `TaskSubscribers`

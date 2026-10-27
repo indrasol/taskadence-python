@@ -2,11 +2,10 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-PinTypeEnum = Literal["project", "team", "view"]
+PinTypeEnum = Literal["project", "view"]
 
 PIN_TYPE_ENUM_VALUES: set[PinTypeEnum] = {
     "project",
-    "team",
     "view",
 }
 

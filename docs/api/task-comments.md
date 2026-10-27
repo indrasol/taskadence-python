@@ -4,6 +4,37 @@ Comments on a task (threaded).
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
+## `tm.task_comments.add_reaction(task_id: str, comment_id: str, emoji: str)`
+
+React to a comment with an emoji.
+
+- **HTTP:** `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`
+- **operationId:** `task-comments.add_reaction`
+- **Token scope:** `tasks:write`
+- **Returns:** `CommentReactions`
+- **Also:** `tm.tasks.comments.react` (same call).
+
+## `tm.task_comments.remove_reaction(task_id: str, comment_id: str, emoji: str)`
+
+Remove your reaction from a comment.
+
+- **HTTP:** `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`
+- **operationId:** `task-comments.remove_reaction`
+- **Token scope:** `tasks:write`
+- **Returns:** `CommentReactions`
+- **Also:** `tm.tasks.comments.unreact` (same call).
+
+## `tm.task_comments.list_reactions(task_id: str, comment_id: str, emoji: str, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None)`
+
+List who reacted to a comment with an emoji.
+
+- **HTTP:** `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`
+- **operationId:** `task-comments.list_reactions`
+- **Token scope:** `tasks:read`
+- **Returns:** `Page[ReactionPerson]`
+- **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
+- **Also:** `tm.tasks.comments.reactions` (same call).
+
 ## `tm.task_comments.create(body: TaskCommentCreate | Mapping[str, Any], idempotency_key: str | None = AUTO)`
 
 Comment on a task.

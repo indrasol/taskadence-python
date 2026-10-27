@@ -17,7 +17,7 @@ from typing import cast
 
 
 def _get_kwargs(
-    team_id: str,
+    org_id: str,
     *,
     body: AvailabilityCreate,
 ) -> dict[str, Any]:
@@ -25,8 +25,8 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "post",
-        "url": "/v1/teams/{team_id}/availability".format(
-            team_id=quote(str(team_id), safe=""),
+        "url": "/v1/organizations/{org_id}/availability".format(
+            org_id=quote(str(org_id), safe=""),
         ),
     }
 
@@ -109,19 +109,19 @@ def _build_response(
 
 
 def sync_detailed(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     body: AvailabilityCreate,
 ) -> Response[AvailabilityEntry | Problem]:
-    """Mark someone unavailable
+    """Mark someone unavailable (yourself, or anyone as an admin)
 
-     Mark a range unavailable. 422 when the person is not on this team or the range is
-    inverted; 403 when the caller may not write that person; 409 (with the colliding
-    `entry_id`) when it overlaps one of their entries.
+     Mark a range of days unavailable for a person: yourself, or anyone when you are an org owner or
+    admin (403 otherwise). 422 when the person is not an active member or the range is inverted; 409
+    (with the colliding `entry_id`) when it overlaps one of their entries.
 
     Args:
-        team_id (str):
+        org_id (str):
         body (AvailabilityCreate): The request body of `availability.create`.
 
     Raises:
@@ -133,7 +133,7 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         body=body,
     )
 
@@ -145,19 +145,19 @@ def sync_detailed(
 
 
 def sync(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     body: AvailabilityCreate,
 ) -> AvailabilityEntry | Problem | None:
-    """Mark someone unavailable
+    """Mark someone unavailable (yourself, or anyone as an admin)
 
-     Mark a range unavailable. 422 when the person is not on this team or the range is
-    inverted; 403 when the caller may not write that person; 409 (with the colliding
-    `entry_id`) when it overlaps one of their entries.
+     Mark a range of days unavailable for a person: yourself, or anyone when you are an org owner or
+    admin (403 otherwise). 422 when the person is not an active member or the range is inverted; 409
+    (with the colliding `entry_id`) when it overlaps one of their entries.
 
     Args:
-        team_id (str):
+        org_id (str):
         body (AvailabilityCreate): The request body of `availability.create`.
 
     Raises:
@@ -169,26 +169,26 @@ def sync(
     """
 
     return sync_detailed(
-        team_id=team_id,
+        org_id=org_id,
         client=client,
         body=body,
     ).parsed
 
 
 async def asyncio_detailed(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     body: AvailabilityCreate,
 ) -> Response[AvailabilityEntry | Problem]:
-    """Mark someone unavailable
+    """Mark someone unavailable (yourself, or anyone as an admin)
 
-     Mark a range unavailable. 422 when the person is not on this team or the range is
-    inverted; 403 when the caller may not write that person; 409 (with the colliding
-    `entry_id`) when it overlaps one of their entries.
+     Mark a range of days unavailable for a person: yourself, or anyone when you are an org owner or
+    admin (403 otherwise). 422 when the person is not an active member or the range is inverted; 409
+    (with the colliding `entry_id`) when it overlaps one of their entries.
 
     Args:
-        team_id (str):
+        org_id (str):
         body (AvailabilityCreate): The request body of `availability.create`.
 
     Raises:
@@ -200,7 +200,7 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        team_id=team_id,
+        org_id=org_id,
         body=body,
     )
 
@@ -210,19 +210,19 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    team_id: str,
+    org_id: str,
     *,
     client: AuthenticatedClient,
     body: AvailabilityCreate,
 ) -> AvailabilityEntry | Problem | None:
-    """Mark someone unavailable
+    """Mark someone unavailable (yourself, or anyone as an admin)
 
-     Mark a range unavailable. 422 when the person is not on this team or the range is
-    inverted; 403 when the caller may not write that person; 409 (with the colliding
-    `entry_id`) when it overlaps one of their entries.
+     Mark a range of days unavailable for a person: yourself, or anyone when you are an org owner or
+    admin (403 otherwise). 422 when the person is not an active member or the range is inverted; 409
+    (with the colliding `entry_id`) when it overlaps one of their entries.
 
     Args:
-        team_id (str):
+        org_id (str):
         body (AvailabilityCreate): The request body of `availability.create`.
 
     Raises:
@@ -235,7 +235,7 @@ async def asyncio(
 
     return (
         await asyncio_detailed(
-            team_id=team_id,
+            org_id=org_id,
             client=client,
             body=body,
         )
