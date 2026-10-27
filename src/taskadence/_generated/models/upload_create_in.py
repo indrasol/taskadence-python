@@ -14,6 +14,7 @@ from ..models.upload_create_in_kind import check_upload_create_in_kind
 from ..models.upload_create_in_kind import UploadCreateInKind
 from ..types import UNSET, Unset
 from typing import cast
+from typing import Literal, cast
 
 
 T = TypeVar("T", bound="UploadCreateIn")
@@ -33,6 +34,9 @@ class UploadCreateIn:
         is_inline (bool | None | Unset): attachment: an inline image in the description, not a listed attachment
         project_name (None | str | Unset): project_file: the project's display name, as the form takes it
         title (None | str | Unset): Optional display name; `complete` can also set it
+        purpose (Literal['comment'] | None | Unset): attachment: `comment`: a file for a comment (then link it with the
+            comment's `attachment_ids`). Needs permission to comment on the task instead of to edit it, and does not count
+            toward the task's attachment limit; every other check (type, size, scan, storage quota) is the same.
     """
 
     kind: UploadCreateInKind
@@ -44,6 +48,7 @@ class UploadCreateIn:
     is_inline: bool | None | Unset = UNSET
     project_name: None | str | Unset = UNSET
     title: None | str | Unset = UNSET
+    purpose: Literal["comment"] | None | Unset = UNSET
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
@@ -91,6 +96,12 @@ class UploadCreateIn:
         else:
             title = self.title
 
+        purpose: Literal["comment"] | None | Unset
+        if isinstance(self.purpose, Unset):
+            purpose = UNSET
+        else:
+            purpose = self.purpose
+
         field_dict: dict[str, Any] = {}
 
         field_dict.update(
@@ -112,6 +123,8 @@ class UploadCreateIn:
             field_dict["project_name"] = project_name
         if title is not UNSET:
             field_dict["title"] = title
+        if purpose is not UNSET:
+            field_dict["purpose"] = purpose
 
         return field_dict
 
@@ -178,6 +191,19 @@ class UploadCreateIn:
 
         title = _parse_title(d.pop("title", UNSET))
 
+        def _parse_purpose(data: object) -> Literal["comment"] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            purpose_type_0 = cast(Literal["comment"], data)
+            if purpose_type_0 != "comment":
+                raise ValueError(f"purpose_type_0 must match const 'comment', got '{purpose_type_0}'")
+            return purpose_type_0
+            return cast(Literal["comment"] | None | Unset, data)
+
+        purpose = _parse_purpose(d.pop("purpose", UNSET))
+
         upload_create_in = cls(
             kind=kind,
             filename=filename,
@@ -188,6 +214,7 @@ class UploadCreateIn:
             is_inline=is_inline,
             project_name=project_name,
             title=title,
+            purpose=purpose,
         )
 
         return upload_create_in

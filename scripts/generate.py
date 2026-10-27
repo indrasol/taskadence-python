@@ -67,10 +67,24 @@ NESTED = {
             "A project's members: `tm.projects.members.add_many(project_id, [...])`.",
             {"add_many": "project-members.create_batch"},
         )
-    }
+    },
+    # Release 10 step 4: comment reactions (`tm.tasks.comments.react(task_id, comment_id, emoji)`).
+    "tasks": {
+        "comments": (
+            "A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and "
+            "`.reactions(...)`.",
+            {
+                "react": "task-comments.add_reaction",
+                "unreact": "task-comments.remove_reaction",
+                "reactions": "task-comments.list_reactions",
+            },
+        )
+    },
 }
 # Release 10 step 3: a body that is one array (`{"members": [...]}`) is taken as that array, an argument of its name.
 LIST_BODIES = {"project-members.create_batch": "members", "tasks.set_subscribers": "user_ids"}
+# Release 10 step 4: a string query parameter that also takes a list (comma-joined): `include=["subscribers"]`.
+MULTI_QUERY = {("tasks.list", "include")}
 
 
 def bin_(name: str) -> str:
@@ -315,7 +329,9 @@ class Facade:
                     Param(
                         name,
                         py_name(name),
-                        self.annotation(prm.get("schema", {})),
+                        "str | Sequence[str]"
+                        if (op_id, name) in MULTI_QUERY
+                        else self.annotation(prm.get("schema", {})),
                         bool(prm.get("required")),
                         (prm.get("description") or "").split("\n")[0],
                     )

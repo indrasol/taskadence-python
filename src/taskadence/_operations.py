@@ -112,10 +112,13 @@ from ._generated.api.task_attachments import task_attachments_delete as _task_at
 from ._generated.api.task_attachments import task_attachments_list as _task_attachments_list
 from ._generated.api.task_attachments import task_attachments_read as _task_attachments_read
 from ._generated.api.task_attachments import task_attachments_update as _task_attachments_update
+from ._generated.api.task_comments import task_comments_add_reaction as _task_comments_add_reaction
 from ._generated.api.task_comments import task_comments_create as _task_comments_create
 from ._generated.api.task_comments import task_comments_delete as _task_comments_delete
 from ._generated.api.task_comments import task_comments_list as _task_comments_list
+from ._generated.api.task_comments import task_comments_list_reactions as _task_comments_list_reactions
 from ._generated.api.task_comments import task_comments_read as _task_comments_read
+from ._generated.api.task_comments import task_comments_remove_reaction as _task_comments_remove_reaction
 from ._generated.api.task_comments import task_comments_reply as _task_comments_reply
 from ._generated.api.task_comments import task_comments_update as _task_comments_update
 from ._generated.api.task_history import task_history_list as _task_history_list
@@ -190,6 +193,7 @@ from ._generated.models import (
     ProjectCard,
     ProjectMemberInDB,
     ProjectResourceInDB,
+    ReactionPerson,
     ServiceAccountOut,
     SprintOut,
     TaskAttachmentInDB,
@@ -335,6 +339,7 @@ OPERATIONS: dict[str, Operation] = {
             "sort_order",
             "include_inaccessible",
             "subtasks",
+            "include",
         ),
         filters=(
             "status",
@@ -560,6 +565,36 @@ OPERATIONS: dict[str, Operation] = {
         parse=_tasks_unsubscribe._parse_response,
         scopes=("tasks:write",),
         summary="Unsubscribe yourself from a task",
+    ),
+    "task-comments.add_reaction": Operation(
+        op_id="task-comments.add_reaction",
+        method="PUT",
+        path="/v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}",
+        path_params=("task_id", "comment_id", "emoji"),
+        parse=_task_comments_add_reaction._parse_response,
+        scopes=("tasks:write",),
+        summary="React to a comment with an emoji",
+    ),
+    "task-comments.remove_reaction": Operation(
+        op_id="task-comments.remove_reaction",
+        method="DELETE",
+        path="/v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}",
+        path_params=("task_id", "comment_id", "emoji"),
+        parse=_task_comments_remove_reaction._parse_response,
+        scopes=("tasks:write",),
+        summary="Remove your reaction from a comment",
+    ),
+    "task-comments.list_reactions": Operation(
+        op_id="task-comments.list_reactions",
+        method="GET",
+        path="/v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}",
+        path_params=("task_id", "comment_id", "emoji"),
+        query=("limit", "cursor", "sort_by", "sort_order"),
+        is_list=True,
+        parse=_task_comments_list_reactions._parse_response,
+        item=ReactionPerson.from_dict,
+        scopes=("tasks:read",),
+        summary="List who reacted to a comment with an emoji",
     ),
     "organization-members.list": Operation(
         op_id="organization-members.list",

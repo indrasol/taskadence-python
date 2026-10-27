@@ -116,8 +116,9 @@ def sync_detailed(
 
      The caller's account: its name, the caller's account role, the owner, its organizations (with
     members and
-    storage each), the shared storage pool and `billing.exempt_message` (only while the account is
-    exempt).
+    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
+    and
+    `pending_actions` (the account owner's; all zero for everyone else).
 
     Args:
         if_none_match (str | Unset):
@@ -150,8 +151,9 @@ def sync(
 
      The caller's account: its name, the caller's account role, the owner, its organizations (with
     members and
-    storage each), the shared storage pool and `billing.exempt_message` (only while the account is
-    exempt).
+    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
+    and
+    `pending_actions` (the account owner's; all zero for everyone else).
 
     Args:
         if_none_match (str | Unset):
@@ -179,8 +181,9 @@ async def asyncio_detailed(
 
      The caller's account: its name, the caller's account role, the owner, its organizations (with
     members and
-    storage each), the shared storage pool and `billing.exempt_message` (only while the account is
-    exempt).
+    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
+    and
+    `pending_actions` (the account owner's; all zero for everyone else).
 
     Args:
         if_none_match (str | Unset):
@@ -211,8 +214,9 @@ async def asyncio(
 
      The caller's account: its name, the caller's account role, the owner, its organizations (with
     members and
-    storage each), the shared storage pool and `billing.exempt_message` (only while the account is
-    exempt).
+    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
+    and
+    `pending_actions` (the account owner's; all zero for everyone else).
 
     Args:
         if_none_match (str | Unset):

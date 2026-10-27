@@ -556,11 +556,63 @@ class ProjectMembersResource:
     """Alias of `read`."""
 
 
+class TasksCommentsResource:
+    """A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and `.reactions(...)`."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def react(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def unreact(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ReactionPerson]",
+            self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+
 class TasksResource:
     """Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
+        self.comments = TasksCommentsResource(client)
 
     def create(
         self, body: models.TaskCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -585,6 +637,7 @@ class TasksResource:
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
         subtasks: str | None = None,
+        include: str | Sequence[str] | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> Page[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
@@ -605,6 +658,7 @@ class TasksResource:
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
                     "subtasks": subtasks,
+                    "include": include,
                 },
                 filter=filter,
             ),
@@ -808,6 +862,149 @@ class TasksResource:
 
     subscribers = list_subscribers
     """Alias of `list_subscribers`."""
+
+
+class TaskCommentsResource:
+    """Comments on a task (threaded)."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def add_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def remove_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    def list_reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.ReactionPerson]",
+            self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    def create(
+        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Comment on a task.
+
+        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    def list(
+        self,
+        *,
+        task_id: str,
+        search: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> Page[models.TaskCommentInDB]:
+        """List a task's comments (threaded).
+
+        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "Page[models.TaskCommentInDB]",
+            self._client._call(
+                _OPS["task-comments.list"],
+                query={
+                    "task_id": task_id,
+                    "search": search,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    def reply(
+        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Reply to a comment.
+
+        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
+    @overload
+    def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
+    def read(self, comment_id: str, *, if_none_match: str | None = None) -> models.TaskCommentInDB | NotModifiedType:
+        """Read a comment.
+
+        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskCommentInDB | NotModifiedType",
+            self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
+        )
+
+    def update(
+        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
+    ) -> models.TaskCommentInDB:
+        """Edit your comment.
+
+        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
+        )
+
+    def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Delete a comment.
+
+        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class OrganizationMembersResource:
@@ -1329,6 +1526,7 @@ class TaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        purpose: str | None = None,
         progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
@@ -1344,6 +1542,7 @@ class TaskAttachmentsResource:
                     "project_id": project_id,
                     "title": title,
                     "is_inline": is_inline,
+                    "purpose": purpose,
                     "file": file,
                 },
                 progress=progress,
@@ -1453,105 +1652,6 @@ class UploadsResource:
             "models.TaskAttachmentInDB | models.ProjectResourceInDB",
             self._client._call(_OPS["uploads.complete"], path=(upload_id,), body=body, idempotency_key=idempotency_key),
         )
-
-
-class TaskCommentsResource:
-    """Comments on a task (threaded)."""
-
-    def __init__(self, client: SyncCore) -> None:
-        self._client = client
-
-    def create(
-        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Comment on a task.
-
-        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
-        )
-
-    def list(
-        self,
-        *,
-        task_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> Page[models.TaskCommentInDB]:
-        """List a task's comments (threaded).
-
-        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "Page[models.TaskCommentInDB]",
-            self._client._call(
-                _OPS["task-comments.list"],
-                query={
-                    "task_id": task_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    def reply(
-        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Reply to a comment.
-
-        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
-        )
-
-    @overload
-    def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
-    @overload
-    def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
-    def read(self, comment_id: str, *, if_none_match: str | None = None) -> models.TaskCommentInDB | NotModifiedType:
-        """Read a comment.
-
-        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TaskCommentInDB | NotModifiedType",
-            self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
-        )
-
-    def update(
-        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TaskCommentInDB:
-        """Edit your comment.
-
-        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
-        )
-
-    def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Delete a comment.
-
-        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
 
 
 class TaskHistoryResource:
@@ -3621,11 +3721,63 @@ class AsyncProjectMembersResource:
     """Alias of `read`."""
 
 
+class AsyncTasksCommentsResource:
+    """A task's comments: `tm.tasks.comments.react(task_id, comment_id, emoji)`, `.unreact(...)` and `.reactions(...)`."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def react(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def unreact(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ReactionPerson]",
+            await self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+
 class AsyncTasksResource:
     """Tasks, the filter grammar and search (`GET /v1/tasks` with `filter[search]` IS search), and a task's links."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
+        self.comments = AsyncTasksCommentsResource(client)
 
     async def create(
         self, body: models.TaskCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
@@ -3651,6 +3803,7 @@ class AsyncTasksResource:
         sort_order: str | None = None,
         include_inaccessible: bool | None = None,
         subtasks: str | None = None,
+        include: str | Sequence[str] | None = None,
         filter: Mapping[str, Any] | None = None,
     ) -> AsyncPage[models.TaskCardView]:
         """List / search tasks (the filter grammar; `filter[search]` is search).
@@ -3671,6 +3824,7 @@ class AsyncTasksResource:
                     "sort_order": sort_order,
                     "include_inaccessible": include_inaccessible,
                     "subtasks": subtasks,
+                    "include": include,
                 },
                 filter=filter,
             ),
@@ -3888,6 +4042,151 @@ class AsyncTasksResource:
 
     subscribers = list_subscribers
     """Alias of `list_subscribers`."""
+
+
+class AsyncTaskCommentsResource:
+    """Comments on a task (threaded)."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def add_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """React to a comment with an emoji.
+
+        `PUT /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.add_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def remove_reaction(self, task_id: str, comment_id: str, emoji: str) -> models.CommentReactions:
+        """Remove your reaction from a comment.
+
+        `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:write`
+        """
+        return cast(
+            "models.CommentReactions",
+            await self._client._call(_OPS["task-comments.remove_reaction"], path=(task_id, comment_id, emoji)),
+        )
+
+    async def list_reactions(
+        self,
+        task_id: str,
+        comment_id: str,
+        emoji: str,
+        *,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.ReactionPerson]:
+        """List who reacted to a comment with an emoji.
+
+        `GET /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.ReactionPerson]",
+            await self._client._call(
+                _OPS["task-comments.list_reactions"],
+                path=(task_id, comment_id, emoji),
+                query={"limit": limit, "cursor": cursor, "sort_by": sort_by, "sort_order": sort_order},
+            ),
+        )
+
+    async def create(
+        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Comment on a task.
+
+        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    async def list(
+        self,
+        *,
+        task_id: str,
+        search: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
+    ) -> AsyncPage[models.TaskCommentInDB]:
+        """List a task's comments (threaded).
+
+        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
+        """
+        return cast(
+            "AsyncPage[models.TaskCommentInDB]",
+            await self._client._call(
+                _OPS["task-comments.list"],
+                query={
+                    "task_id": task_id,
+                    "search": search,
+                    "limit": limit,
+                    "cursor": cursor,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                },
+            ),
+        )
+
+    async def reply(
+        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.TaskCommentInDB:
+        """Reply to a comment.
+
+        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    async def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
+    @overload
+    async def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
+    async def read(
+        self, comment_id: str, *, if_none_match: str | None = None
+    ) -> models.TaskCommentInDB | NotModifiedType:
+        """Read a comment.
+
+        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskCommentInDB | NotModifiedType",
+            await self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
+        )
+
+    async def update(
+        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
+    ) -> models.TaskCommentInDB:
+        """Edit your comment.
+
+        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.TaskCommentInDB",
+            await self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
+        )
+
+    async def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
+        """Delete a comment.
+
+        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
+        """
+        return cast(
+            "models.Acknowledgement",
+            await self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AsyncOrganizationMembersResource:
@@ -4418,6 +4717,7 @@ class AsyncTaskAttachmentsResource:
         project_id: str | None = None,
         title: str | None = None,
         is_inline: bool | None = None,
+        purpose: str | None = None,
         progress: UploadProgress | None = None,
     ) -> models.TaskAttachmentInDB:
         """Upload an attachment to a task (multipart).
@@ -4433,6 +4733,7 @@ class AsyncTaskAttachmentsResource:
                     "project_id": project_id,
                     "title": title,
                     "is_inline": is_inline,
+                    "purpose": purpose,
                     "file": file,
                 },
                 progress=progress,
@@ -4546,107 +4847,6 @@ class AsyncUploadsResource:
                 _OPS["uploads.complete"], path=(upload_id,), body=body, idempotency_key=idempotency_key
             ),
         )
-
-
-class AsyncTaskCommentsResource:
-    """Comments on a task (threaded)."""
-
-    def __init__(self, client: AsyncCore) -> None:
-        self._client = client
-
-    async def create(
-        self, body: models.TaskCommentCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Comment on a task.
-
-        `POST /v1/task-comments` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.create"], body=body, idempotency_key=idempotency_key),
-        )
-
-    async def list(
-        self,
-        *,
-        task_id: str,
-        search: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort_by: str | None = None,
-        sort_order: str | None = None,
-    ) -> AsyncPage[models.TaskCommentInDB]:
-        """List a task's comments (threaded).
-
-        `GET /v1/task-comments` · scope `tasks:read` · a `Page` — iterate it for every item
-        """
-        return cast(
-            "AsyncPage[models.TaskCommentInDB]",
-            await self._client._call(
-                _OPS["task-comments.list"],
-                query={
-                    "task_id": task_id,
-                    "search": search,
-                    "limit": limit,
-                    "cursor": cursor,
-                    "sort_by": sort_by,
-                    "sort_order": sort_order,
-                },
-            ),
-        )
-
-    async def reply(
-        self, body: models.ReplyCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
-    ) -> models.TaskCommentInDB:
-        """Reply to a comment.
-
-        `POST /v1/task-comments/reply` · scope `tasks:write` · `Idempotency-Key` sent automatically
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.reply"], body=body, idempotency_key=idempotency_key),
-        )
-
-    @overload
-    async def read(self, comment_id: str, *, if_none_match: None = None) -> models.TaskCommentInDB: ...
-    @overload
-    async def read(self, comment_id: str, *, if_none_match: str) -> models.TaskCommentInDB | NotModifiedType: ...
-    async def read(
-        self, comment_id: str, *, if_none_match: str | None = None
-    ) -> models.TaskCommentInDB | NotModifiedType:
-        """Read a comment.
-
-        `GET /v1/task-comments/{comment_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
-        """
-        return cast(
-            "models.TaskCommentInDB | NotModifiedType",
-            await self._client._call(_OPS["task-comments.read"], path=(comment_id,), if_none_match=if_none_match),
-        )
-
-    async def update(
-        self, comment_id: str, body: models.TaskCommentUpdate | Mapping[str, Any], *, if_match: str | None = None
-    ) -> models.TaskCommentInDB:
-        """Edit your comment.
-
-        `PUT /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.TaskCommentInDB",
-            await self._client._call(_OPS["task-comments.update"], path=(comment_id,), body=body, if_match=if_match),
-        )
-
-    async def delete(self, comment_id: str, *, if_match: str | None = None) -> models.Acknowledgement:
-        """Delete a comment.
-
-        `DELETE /v1/task-comments/{comment_id}` · scope `tasks:write` · `if_match=<etag>` → 412 when stale
-        """
-        return cast(
-            "models.Acknowledgement",
-            await self._client._call(_OPS["task-comments.delete"], path=(comment_id,), if_match=if_match),
-        )
-
-    get = read
-    """Alias of `read`."""
 
 
 class AsyncTaskHistoryResource:
@@ -6226,13 +6426,13 @@ class SyncResources:
     projects: ProjectsResource
     project_members: ProjectMembersResource
     tasks: TasksResource
+    task_comments: TaskCommentsResource
     organization_members: OrganizationMembersResource
     organization_invites: OrganizationInvitesResource
     designations: DesignationsResource
     project_resources: ProjectResourcesResource
     task_attachments: TaskAttachmentsResource
     uploads: UploadsResource
-    task_comments: TaskCommentsResource
     task_history: TaskHistoryResource
     project_stats: ProjectStatsResource
     account: AccountResource
@@ -6260,13 +6460,13 @@ class SyncResources:
         self.projects = ProjectsResource(core)
         self.project_members = ProjectMembersResource(core)
         self.tasks = TasksResource(core)
+        self.task_comments = TaskCommentsResource(core)
         self.organization_members = OrganizationMembersResource(core)
         self.organization_invites = OrganizationInvitesResource(core)
         self.designations = DesignationsResource(core)
         self.project_resources = ProjectResourcesResource(core)
         self.task_attachments = TaskAttachmentsResource(core)
         self.uploads = UploadsResource(core)
-        self.task_comments = TaskCommentsResource(core)
         self.task_history = TaskHistoryResource(core)
         self.project_stats = ProjectStatsResource(core)
         self.account = AccountResource(core)
@@ -6297,13 +6497,13 @@ class AsyncResources:
     projects: AsyncProjectsResource
     project_members: AsyncProjectMembersResource
     tasks: AsyncTasksResource
+    task_comments: AsyncTaskCommentsResource
     organization_members: AsyncOrganizationMembersResource
     organization_invites: AsyncOrganizationInvitesResource
     designations: AsyncDesignationsResource
     project_resources: AsyncProjectResourcesResource
     task_attachments: AsyncTaskAttachmentsResource
     uploads: AsyncUploadsResource
-    task_comments: AsyncTaskCommentsResource
     task_history: AsyncTaskHistoryResource
     project_stats: AsyncProjectStatsResource
     account: AsyncAccountResource
@@ -6331,13 +6531,13 @@ class AsyncResources:
         self.projects = AsyncProjectsResource(core)
         self.project_members = AsyncProjectMembersResource(core)
         self.tasks = AsyncTasksResource(core)
+        self.task_comments = AsyncTaskCommentsResource(core)
         self.organization_members = AsyncOrganizationMembersResource(core)
         self.organization_invites = AsyncOrganizationInvitesResource(core)
         self.designations = AsyncDesignationsResource(core)
         self.project_resources = AsyncProjectResourcesResource(core)
         self.task_attachments = AsyncTaskAttachmentsResource(core)
         self.uploads = AsyncUploadsResource(core)
-        self.task_comments = AsyncTaskCommentsResource(core)
         self.task_history = AsyncTaskHistoryResource(core)
         self.project_stats = AsyncProjectStatsResource(core)
         self.account = AsyncAccountResource(core)
@@ -6393,6 +6593,9 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "tasks.set_subscribers": ("tasks", "set_subscribers"),
     "tasks.subscribe": ("tasks", "subscribe"),
     "tasks.unsubscribe": ("tasks", "unsubscribe"),
+    "task-comments.add_reaction": ("task_comments", "add_reaction"),
+    "task-comments.remove_reaction": ("task_comments", "remove_reaction"),
+    "task-comments.list_reactions": ("task_comments", "list_reactions"),
     "organization-members.list": ("organization_members", "list"),
     "organization-members.read": ("organization_members", "read"),
     "organization-members.replace": ("organization_members", "replace"),

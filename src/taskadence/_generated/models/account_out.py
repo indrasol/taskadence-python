@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ..models.account_billing_brief import AccountBillingBrief
     from ..models.account_org import AccountOrg
     from ..models.account_owner import AccountOwner
+    from ..models.account_pending_actions import AccountPendingActions
     from ..models.account_storage import AccountStorage
 
 
@@ -39,6 +40,7 @@ class AccountOut:
         billing (AccountBillingBrief | Unset): Part of `AccountOut`.
         orgs (list[AccountOrg] | Unset): The account's organizations (an account member who is not an owner / admin sees
             the ones they are in)
+        pending_actions (AccountPendingActions | Unset): Part of `AccountOut`.
         created_at (None | str | Unset):
     """
 
@@ -50,6 +52,7 @@ class AccountOut:
     owner: AccountOwner | None | Unset = UNSET
     billing: AccountBillingBrief | Unset = UNSET
     orgs: list[AccountOrg] | Unset = UNSET
+    pending_actions: AccountPendingActions | Unset = UNSET
     created_at: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -60,6 +63,7 @@ class AccountOut:
         from ..models.account_billing_brief import AccountBillingBrief  # noqa: PLC0415
         from ..models.account_org import AccountOrg  # noqa: PLC0415
         from ..models.account_owner import AccountOwner  # noqa: PLC0415
+        from ..models.account_pending_actions import AccountPendingActions  # noqa: PLC0415
         from ..models.account_storage import AccountStorage  # noqa: PLC0415
 
         account_id = self.account_id
@@ -91,6 +95,10 @@ class AccountOut:
                 orgs_item = orgs_item_data.to_dict()
                 orgs.append(orgs_item)
 
+        pending_actions: dict[str, Any] | Unset = UNSET
+        if not isinstance(self.pending_actions, Unset):
+            pending_actions = self.pending_actions.to_dict()
+
         created_at: None | str | Unset
         if isinstance(self.created_at, Unset):
             created_at = UNSET
@@ -114,6 +122,8 @@ class AccountOut:
             field_dict["billing"] = billing
         if orgs is not UNSET:
             field_dict["orgs"] = orgs
+        if pending_actions is not UNSET:
+            field_dict["pending_actions"] = pending_actions
         if created_at is not UNSET:
             field_dict["created_at"] = created_at
 
@@ -124,6 +134,7 @@ class AccountOut:
         from ..models.account_billing_brief import AccountBillingBrief  # noqa: PLC0415
         from ..models.account_org import AccountOrg  # noqa: PLC0415
         from ..models.account_owner import AccountOwner  # noqa: PLC0415
+        from ..models.account_pending_actions import AccountPendingActions  # noqa: PLC0415
         from ..models.account_storage import AccountStorage  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -170,6 +181,13 @@ class AccountOut:
 
                 orgs.append(orgs_item)
 
+        _pending_actions = d.pop("pending_actions", UNSET)
+        pending_actions: AccountPendingActions | Unset
+        if isinstance(_pending_actions, Unset):
+            pending_actions = UNSET
+        else:
+            pending_actions = AccountPendingActions.from_dict(_pending_actions)
+
         def _parse_created_at(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -188,6 +206,7 @@ class AccountOut:
             owner=owner,
             billing=billing,
             orgs=orgs,
+            pending_actions=pending_actions,
             created_at=created_at,
         )
 

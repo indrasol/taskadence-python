@@ -12,6 +12,7 @@ from ..types import UNSET, Unset
 
 from ..types import UNSET, Unset
 from typing import cast
+from typing import Literal, cast
 import datetime
 
 
@@ -37,6 +38,9 @@ class TaskAttachmentInDB:
             expire)
         content_type (None | str | Unset): The file's detected type
         size_bytes (int | None | Unset): The stored file's size in bytes (null when nothing is stored) Example: 1048576.
+        comment_id (None | str | Unset): The comment this file was posted with, or null
+        purpose (Literal['comment'] | None | Unset): `comment`: uploaded for a comment (see the upload's `purpose`), or
+            null
     """
 
     task_id: str
@@ -52,6 +56,8 @@ class TaskAttachmentInDB:
     url_expires_at: datetime.datetime | None | Unset = UNSET
     content_type: None | str | Unset = UNSET
     size_bytes: int | None | Unset = UNSET
+    comment_id: None | str | Unset = UNSET
+    purpose: Literal["comment"] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -134,6 +140,18 @@ class TaskAttachmentInDB:
         else:
             size_bytes = self.size_bytes
 
+        comment_id: None | str | Unset
+        if isinstance(self.comment_id, Unset):
+            comment_id = UNSET
+        else:
+            comment_id = self.comment_id
+
+        purpose: Literal["comment"] | None | Unset
+        if isinstance(self.purpose, Unset):
+            purpose = UNSET
+        else:
+            purpose = self.purpose
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -164,6 +182,10 @@ class TaskAttachmentInDB:
             field_dict["content_type"] = content_type
         if size_bytes is not UNSET:
             field_dict["size_bytes"] = size_bytes
+        if comment_id is not UNSET:
+            field_dict["comment_id"] = comment_id
+        if purpose is not UNSET:
+            field_dict["purpose"] = purpose
 
         return field_dict
 
@@ -297,6 +319,28 @@ class TaskAttachmentInDB:
 
         size_bytes = _parse_size_bytes(d.pop("size_bytes", UNSET))
 
+        def _parse_comment_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        comment_id = _parse_comment_id(d.pop("comment_id", UNSET))
+
+        def _parse_purpose(data: object) -> Literal["comment"] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            purpose_type_0 = cast(Literal["comment"], data)
+            if purpose_type_0 != "comment":
+                raise ValueError(f"purpose_type_0 must match const 'comment', got '{purpose_type_0}'")
+            return purpose_type_0
+            return cast(Literal["comment"] | None | Unset, data)
+
+        purpose = _parse_purpose(d.pop("purpose", UNSET))
+
         task_attachment_in_db = cls(
             task_id=task_id,
             attachment_id=attachment_id,
@@ -311,6 +355,8 @@ class TaskAttachmentInDB:
             url_expires_at=url_expires_at,
             content_type=content_type,
             size_bytes=size_bytes,
+            comment_id=comment_id,
+            purpose=purpose,
         )
 
         task_attachment_in_db.additional_properties = d

@@ -14,7 +14,7 @@ Create a task.
 - **Returns:** `TaskInDB`
 - **Idempotent create:** an `Idempotency-Key` is sent (and reused by retries) unless `idempotency_key=None`.
 
-## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, include_children: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, subtasks: str | None = None, filter: Mapping[str, Any] | None = None)`
+## `tm.tasks.list(org_id: str | None = None, project_id: str | None = None, include_children: bool | None = None, limit: int | None = None, cursor: str | None = None, sort_by: str | None = None, sort_order: str | None = None, include_inaccessible: bool | None = None, subtasks: str | None = None, include: str | Sequence[str] | None = None, filter: Mapping[str, Any] | None = None)`
 
 List / search tasks (the filter grammar; `filter[search]` is search).
 

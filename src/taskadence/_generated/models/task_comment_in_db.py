@@ -15,6 +15,8 @@ from typing import cast
 import datetime
 
 if TYPE_CHECKING:
+    from ..models.comment_attachment import CommentAttachment
+    from ..models.comment_reaction import CommentReaction
     from ..models.mention import Mention
 
 
@@ -37,6 +39,8 @@ class TaskCommentInDB:
         updated_at (datetime.datetime | None | Unset): When the comment was last updated
         mentions (list[Mention] | None | Unset): List of mentioned users details in the comment
         org_id (None | str | Unset): Organization ID (UUID)
+        attachments (list[CommentAttachment] | Unset): The files posted with the comment (also task attachments)
+        reactions (list[CommentReaction] | Unset): Emoji reactions, ordered by each emoji's first reaction
         replies (list[TaskCommentInDB] | Unset): List of reply comments
     """
 
@@ -51,6 +55,8 @@ class TaskCommentInDB:
     updated_at: datetime.datetime | None | Unset = UNSET
     mentions: list[Mention] | None | Unset = UNSET
     org_id: None | str | Unset = UNSET
+    attachments: list[CommentAttachment] | Unset = UNSET
+    reactions: list[CommentReaction] | Unset = UNSET
     replies: list[TaskCommentInDB] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -58,6 +64,8 @@ class TaskCommentInDB:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.comment_attachment import CommentAttachment  # noqa: PLC0415
+        from ..models.comment_reaction import CommentReaction  # noqa: PLC0415
         from ..models.mention import Mention  # noqa: PLC0415
 
         task_id = self.task_id
@@ -128,6 +136,20 @@ class TaskCommentInDB:
         else:
             org_id = self.org_id
 
+        attachments: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.attachments, Unset):
+            attachments = []
+            for attachments_item_data in self.attachments:
+                attachments_item = attachments_item_data.to_dict()
+                attachments.append(attachments_item)
+
+        reactions: list[dict[str, Any]] | Unset = UNSET
+        if not isinstance(self.reactions, Unset):
+            reactions = []
+            for reactions_item_data in self.reactions:
+                reactions_item = reactions_item_data.to_dict()
+                reactions.append(reactions_item)
+
         replies: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.replies, Unset):
             replies = []
@@ -161,6 +183,10 @@ class TaskCommentInDB:
             field_dict["mentions"] = mentions
         if org_id is not UNSET:
             field_dict["org_id"] = org_id
+        if attachments is not UNSET:
+            field_dict["attachments"] = attachments
+        if reactions is not UNSET:
+            field_dict["reactions"] = reactions
         if replies is not UNSET:
             field_dict["replies"] = replies
 
@@ -168,6 +194,8 @@ class TaskCommentInDB:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.comment_attachment import CommentAttachment  # noqa: PLC0415
+        from ..models.comment_reaction import CommentReaction  # noqa: PLC0415
         from ..models.mention import Mention  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -285,6 +313,24 @@ class TaskCommentInDB:
 
         org_id = _parse_org_id(d.pop("org_id", UNSET))
 
+        _attachments = d.pop("attachments", UNSET)
+        attachments: list[CommentAttachment] | Unset = UNSET
+        if _attachments is not UNSET:
+            attachments = []
+            for attachments_item_data in _attachments:
+                attachments_item = CommentAttachment.from_dict(attachments_item_data)
+
+                attachments.append(attachments_item)
+
+        _reactions = d.pop("reactions", UNSET)
+        reactions: list[CommentReaction] | Unset = UNSET
+        if _reactions is not UNSET:
+            reactions = []
+            for reactions_item_data in _reactions:
+                reactions_item = CommentReaction.from_dict(reactions_item_data)
+
+                reactions.append(reactions_item)
+
         _replies = d.pop("replies", UNSET)
         replies: list[TaskCommentInDB] | Unset = UNSET
         if _replies is not UNSET:
@@ -306,6 +352,8 @@ class TaskCommentInDB:
             updated_at=updated_at,
             mentions=mentions,
             org_id=org_id,
+            attachments=attachments,
+            reactions=reactions,
             replies=replies,
         )
 

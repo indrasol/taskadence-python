@@ -14,7 +14,8 @@
         ├── NotFoundError (404)
         ├── ConflictError (409)           ├── IdempotencyKeyInFlightError
         │                                 ├── SprintProjectMismatchError  a task joins only a sprint of its project
-        │                                 └── EmailInOtherAccountError    the invitee's email is in another account
+        │                                 ├── EmailInOtherAccountError    the invitee's email is in another account
+        │                                 └── MemberNotLinkedError        a member must sign in again (.user_ids)
         ├── GoneError (410)               └── RemovedInRelease10Error  (.changelog .successor) never retried
         ├── PreconditionFailedError (412)
         ├── UnprocessableEntityError (422) ├── ValidationError, IdempotencyKeyReusedError, UrlRefusedError
@@ -229,6 +230,22 @@ EmailInOtherAccount = EmailInOtherAccountError
 """The name the release 10 notes use; the same class."""
 
 
+class MemberNotLinkedError(ConflictError):
+    """A member whose sign-in is not linked to their TasKadence profile yet (an SSO account sharing an email with an
+    older one) cannot be subscribed to a task or react to a comment until they sign in again. `.user_ids` names them
+    (`errors[0]["user_ids"]`); `OrganizationMemberInDB.linked` is False for them."""
+
+    @property
+    def user_ids(self) -> list[str]:
+        first = self.errors[0] if self.errors else None
+        ids = first.get("user_ids") if isinstance(first, Mapping) else None
+        return [str(i) for i in ids] if isinstance(ids, list) else []
+
+
+MemberNotLinked = MemberNotLinkedError
+"""The name the release 10 notes use; the same class."""
+
+
 CHANGELOG_URL = "https://docs.taskadence.com/changelog"
 
 
@@ -314,6 +331,7 @@ BY_TYPE: dict[str, type[TaskadenceError]] = {
     URN + "url-refused": UrlRefusedError,
     URN + "sprint-project-mismatch": SprintProjectMismatchError,
     URN + "email-in-other-account": EmailInOtherAccountError,
+    URN + "member-not-linked": MemberNotLinkedError,
     URN + "removed-in-release-10": RemovedInRelease10Error,
 }
 

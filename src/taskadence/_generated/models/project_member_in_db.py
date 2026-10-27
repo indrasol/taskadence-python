@@ -49,6 +49,8 @@ class ProjectMemberInDB:
             source (ProjectMemberInDBSource | Unset): `member`: added to the project. `org_owner` / `org_admin`: an owner of
                 every project of the organization through their org role (`project_role` owner; not added, so not removable
                 here) Default: 'member'.
+            avatar_preset (None | str | Unset): The illustrated avatar this person chose from the app's set (an id such as
+                `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead.
             removable (bool | Unset): False for an org owner or admin shown through their org role: nothing to remove
                 Default: True.
     """
@@ -68,6 +70,7 @@ class ProjectMemberInDB:
     deleted_at: datetime.datetime | None | Unset = UNSET
     delete_reason: None | str | Unset = UNSET
     source: ProjectMemberInDBSource | Unset = "member"
+    avatar_preset: None | str | Unset = UNSET
     removable: bool | Unset = True
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -163,6 +166,12 @@ class ProjectMemberInDB:
         if not isinstance(self.source, Unset):
             source = self.source
 
+        avatar_preset: None | str | Unset
+        if isinstance(self.avatar_preset, Unset):
+            avatar_preset = UNSET
+        else:
+            avatar_preset = self.avatar_preset
+
         removable = self.removable
 
         field_dict: dict[str, Any] = {}
@@ -199,6 +208,8 @@ class ProjectMemberInDB:
             field_dict["delete_reason"] = delete_reason
         if source is not UNSET:
             field_dict["source"] = source
+        if avatar_preset is not UNSET:
+            field_dict["avatar_preset"] = avatar_preset
         if removable is not UNSET:
             field_dict["removable"] = removable
 
@@ -358,6 +369,15 @@ class ProjectMemberInDB:
         else:
             source = check_project_member_in_db_source(_source)
 
+        def _parse_avatar_preset(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        avatar_preset = _parse_avatar_preset(d.pop("avatar_preset", UNSET))
+
         removable = d.pop("removable", UNSET)
 
         project_member_in_db = cls(
@@ -376,6 +396,7 @@ class ProjectMemberInDB:
             deleted_at=deleted_at,
             delete_reason=delete_reason,
             source=source,
+            avatar_preset=avatar_preset,
             removable=removable,
         )
 

@@ -9,6 +9,7 @@ from .account_org_my_role_type_0 import AccountOrgMyRoleType0
 from .account_out import AccountOut
 from .account_out_my_role import AccountOutMyRole
 from .account_owner import AccountOwner
+from .account_pending_actions import AccountPendingActions
 from .account_people import AccountPeople
 from .account_person import AccountPerson
 from .account_person_account_role_type_0 import AccountPersonAccountRoleType0
@@ -34,6 +35,9 @@ from .availability_update import AvailabilityUpdate
 from .body_upload_attachment_v1_task_attachments_post import BodyUploadAttachmentV1TaskAttachmentsPost
 from .body_upload_resource_v1_project_resources_upload_post import BodyUploadResourceV1ProjectResourcesUploadPost
 from .client_registration_response import ClientRegistrationResponse
+from .comment_attachment import CommentAttachment
+from .comment_reaction import CommentReaction
+from .comment_reactions import CommentReactions
 from .commit_type import CommitType
 from .connected_app import ConnectedApp
 from .connected_app_revoked import ConnectedAppRevoked
@@ -155,6 +159,7 @@ from .page_organization_member_in_db import PageOrganizationMemberInDB
 from .page_project_card import PageProjectCard
 from .page_project_member_in_db import PageProjectMemberInDB
 from .page_project_resource_in_db import PageProjectResourceInDB
+from .page_reaction_person import PageReactionPerson
 from .page_service_account_out import PageServiceAccountOut
 from .page_storage_file import PageStorageFile
 from .page_storage_project import PageStorageProject
@@ -214,6 +219,7 @@ from .project_visibility_enum import ProjectVisibilityEnum
 from .projects_list_scope_type_0 import ProjectsListScopeType0
 from .projects_reordered import ProjectsReordered
 from .protected_resource_metadata import ProtectedResourceMetadata
+from .reaction_person import ReactionPerson
 from .registration_error_body import RegistrationErrorBody
 from .registration_error_body_error import RegistrationErrorBodyError
 from .release import Release
@@ -287,6 +293,7 @@ from .task_review_decision_decision import TaskReviewDecisionDecision
 from .task_sprint_set import TaskSprintSet
 from .task_status_enum import TaskStatusEnum
 from .task_subscriber import TaskSubscriber
+from .task_subscriber_preview import TaskSubscriberPreview
 from .task_subscribers import TaskSubscribers
 from .task_subscribers_set import TaskSubscribersSet
 from .task_type_enum import TaskTypeEnum
@@ -358,6 +365,7 @@ __all__ = (
     "AccountOut",
     "AccountOutMyRole",
     "AccountOwner",
+    "AccountPendingActions",
     "AccountPeople",
     "AccountPerson",
     "AccountPersonAccountRoleType0",
@@ -383,6 +391,9 @@ __all__ = (
     "BodyUploadAttachmentV1TaskAttachmentsPost",
     "BodyUploadResourceV1ProjectResourcesUploadPost",
     "ClientRegistrationResponse",
+    "CommentAttachment",
+    "CommentReaction",
+    "CommentReactions",
     "CommitType",
     "ConnectedApp",
     "ConnectedAppRevoked",
@@ -504,6 +515,7 @@ __all__ = (
     "PageProjectCard",
     "PageProjectMemberInDB",
     "PageProjectResourceInDB",
+    "PageReactionPerson",
     "PageServiceAccountOut",
     "PageStorageFile",
     "PageStorageProject",
@@ -563,6 +575,7 @@ __all__ = (
     "ProjectUpdateMetadataType0",
     "ProjectVisibilityEnum",
     "ProtectedResourceMetadata",
+    "ReactionPerson",
     "RegistrationErrorBody",
     "RegistrationErrorBodyError",
     "Release",
@@ -636,6 +649,7 @@ __all__ = (
     "TaskSprintSet",
     "TaskStatusEnum",
     "TaskSubscriber",
+    "TaskSubscriberPreview",
     "TaskSubscribers",
     "TaskSubscribersSet",
     "TaskTypeEnum",

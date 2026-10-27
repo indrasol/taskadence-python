@@ -16,6 +16,7 @@ from ..types import File, FileTypes
 from ..types import UNSET, Unset
 from io import BytesIO
 from typing import cast
+from typing import Literal, cast
 
 
 T = TypeVar("T", bound="BodyUploadAttachmentV1TaskAttachmentsPost")
@@ -31,6 +32,9 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
         project_id (None | str | Unset):
         title (None | str | Unset):
         is_inline (bool | None | Unset):
+        purpose (Literal['comment'] | None | Unset): `comment`: a file for a comment (then link it with the comment's
+            `attachment_ids`). Needs permission to comment on the task instead of to edit it, and does not count toward the
+            task's attachment limit; every other check (type, size, scan, storage quota) is the same.
     """
 
     task_id: str
@@ -38,6 +42,7 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
     project_id: None | str | Unset = UNSET
     title: None | str | Unset = UNSET
     is_inline: bool | None | Unset = UNSET
+    purpose: Literal["comment"] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -66,6 +71,12 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
         else:
             is_inline = self.is_inline
 
+        purpose: Literal["comment"] | None | Unset
+        if isinstance(self.purpose, Unset):
+            purpose = UNSET
+        else:
+            purpose = self.purpose
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -80,6 +91,8 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
             field_dict["title"] = title
         if is_inline is not UNSET:
             field_dict["is_inline"] = is_inline
+        if purpose is not UNSET:
+            field_dict["purpose"] = purpose
 
         return field_dict
 
@@ -107,6 +120,12 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
                 files.append(("is_inline", (None, str(self.is_inline).encode(), "text/plain")))
             else:
                 files.append(("is_inline", (None, str(self.is_inline).encode(), "text/plain")))
+
+        if not isinstance(self.purpose, Unset):
+            if isinstance(self.purpose, Literal["comment"]):
+                files.append(("purpose", (None, self.purpose, "text/plain")))
+            else:
+                files.append(("purpose", (None, str(self.purpose).encode(), "text/plain")))
 
         for prop_name, prop in self.additional_properties.items():
             files.append((prop_name, (None, str(prop).encode(), "text/plain")))
@@ -147,12 +166,26 @@ class BodyUploadAttachmentV1TaskAttachmentsPost:
 
         is_inline = _parse_is_inline(d.pop("is_inline", UNSET))
 
+        def _parse_purpose(data: object) -> Literal["comment"] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            purpose_type_0 = cast(Literal["comment"], data)
+            if purpose_type_0 != "comment":
+                raise ValueError(f"purpose_type_0 must match const 'comment', got '{purpose_type_0}'")
+            return purpose_type_0
+            return cast(Literal["comment"] | None | Unset, data)
+
+        purpose = _parse_purpose(d.pop("purpose", UNSET))
+
         body_upload_attachment_v1_task_attachments_post = cls(
             task_id=task_id,
             file=file,
             project_id=project_id,
             title=title,
             is_inline=is_inline,
+            purpose=purpose,
         )
 
         body_upload_attachment_v1_task_attachments_post.additional_properties = d

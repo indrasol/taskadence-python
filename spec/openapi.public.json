@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasKadence API",
-    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The account has used its free storage (shared by its organizations) and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where the account owner adds a card) are in the body. Reads, downloads and deletes still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:email-in-other-account` | The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`). |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:member-not-linked` | This member's sign-in is not linked to their TasKadence profile yet, so they cannot be subscribed to a task or react to a comment; they need to sign in again. `errors[0].user_ids` names them. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The account has used its free storage (shared by its organizations) and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where the account owner adds a card) are in the body. Reads, downloads and deletes still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:email-in-other-account` | The person already uses TasKadence with another account, and one email can belong to one account, so they cannot join this organization (code `email_in_other_account`). |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
     "version": "2026-10-24"
   },
   "paths": {
@@ -2641,6 +2641,7 @@
                       "deleted_at": "2026-09-25T12:00:00Z",
                       "delete_reason": "string",
                       "source": "member",
+                      "avatar_preset": "string",
                       "removable": true
                     }
                   ],
@@ -3686,6 +3687,24 @@
             "description": "How subtasks show: `hidden` (default, top-level tasks only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its subtasks). Unknown value \u2192 400. See the list grammar."
           },
           {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Release 10: extra data on each row, comma-separated or repeated; unknown value \u2192 400. `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows carry neither field.",
+              "title": "Include"
+            },
+            "description": "Release 10: extra data on each row, comma-separated or repeated; unknown value \u2192 400. `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows carry neither field."
+          },
+          {
             "name": "search",
             "in": "query",
             "required": false,
@@ -3840,7 +3859,14 @@
                       "blocks_count": 0,
                       "subtask_count": 0,
                       "subtask_done_count": 0,
-                      "subtask_context": false
+                      "subtask_context": false,
+                      "subscriber_count": 3,
+                      "subscribers_preview": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
                     }
                   ],
                   "next_cursor": "string"
@@ -6021,7 +6047,14 @@
                       "blocks_count": 0,
                       "subtask_count": 0,
                       "subtask_done_count": 0,
-                      "subtask_context": false
+                      "subtask_context": false,
+                      "subscriber_count": 3,
+                      "subscribers_preview": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -9681,6 +9714,793 @@
         ]
       }
     },
+    "/v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}": {
+      "put": {
+        "tags": [
+          "task-comments"
+        ],
+        "summary": "React to a comment with an emoji",
+        "description": "React to a comment with one emoji (anyone who can see the task). Reacting twice is harmless. A comment holds at\nmost 50 different emojis: a new one past that is a 409.",
+        "operationId": "task-comments.add_reaction",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Comment Id"
+            }
+          },
+          {
+            "name": "emoji",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Emoji"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentReactions"
+                },
+                "example": {
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "task-comments"
+        ],
+        "summary": "Remove your reaction from a comment",
+        "description": "Take your reaction back. Removing one you did not make is harmless.",
+        "operationId": "task-comments.remove_reaction",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Comment Id"
+            }
+          },
+          {
+            "name": "emoji",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Emoji"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentReactions"
+                },
+                "example": {
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-scopes": [
+          "tasks:write"
+        ]
+      },
+      "get": {
+        "tags": [
+          "task-comments"
+        ],
+        "summary": "List who reacted to a comment with an emoji",
+        "description": "Everyone who reacted to the comment with this emoji, oldest first, with the name people know them by.",
+        "operationId": "task-comments.list_reactions",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Comment Id"
+            }
+          },
+          {
+            "name": "emoji",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Emoji"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page size; default 1000, capped at 1000.",
+              "default": 1000,
+              "title": "Limit"
+            },
+            "description": "Page size; default 1000, capped at 1000."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The previous page's `next_cursor`, echoed back verbatim",
+              "title": "Cursor"
+            },
+            "description": "The previous page's `next_cursor`, echoed back verbatim"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "This list has one fixed order. Default: the list's natural order.",
+              "title": "Sort By"
+            },
+            "description": "This list has one fixed order. Default: the list's natural order."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "`asc` or `desc`",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "`asc` or `desc`"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `ETag` you hold; unchanged \u2192 304 with no body."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ReactionPerson_"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "user_id": "string",
+                      "name": "string"
+                    }
+                  ],
+                  "next_cursor": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "The body or query did not validate (`validation`), or an `Idempotency-Key` was reused",
+                  "status": 422,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - a query parameter outside what the operation accepts (`invalid-parameter`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Missing or invalid bearer token",
+                  "status": 401,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but not allowed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Authenticated, but not allowed",
+                  "status": 403,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Not found",
+                  "status": 404,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Conflict (a duplicate, or an `Idempotency-Key` still in flight)",
+                  "status": 409,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "`If-Match` does not match the current `ETag`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "`If-Match` does not match the current `ETag`",
+                  "status": 412,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "An access token, or a signed-in user, or an address over its limit (`rate-limit`; see `Retry-After`)",
+                  "status": 429,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error - quote `request_id`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                },
+                "example": {
+                  "type": "about:blank",
+                  "title": "Unexpected server error",
+                  "status": 500,
+                  "detail": "\u2026",
+                  "instance": "/v1/\u2026",
+                  "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified - `If-None-Match` matched the current `ETag` (no body)"
+          }
+        },
+        "x-decision": "public",
+        "x-public": true,
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "TaskadenceToken": []
+          }
+        ],
+        "x-kind": "list",
+        "x-scopes": [
+          "tasks:read"
+        ]
+      }
+    },
     "/v1/organization-members/{org_id}": {
       "get": {
         "tags": [
@@ -9851,6 +10671,8 @@
                       "last_active_at": "2026-09-25T12:00:00Z",
                       "kind": "user",
                       "mfa_enrolled": false,
+                      "linked": false,
+                      "avatar_preset": "string",
                       "admin_grants": [
                         "string"
                       ]
@@ -10107,6 +10929,8 @@
                   "last_active_at": "2026-09-25T12:00:00Z",
                   "kind": "user",
                   "mfa_enrolled": false,
+                  "linked": false,
+                  "avatar_preset": "string",
                   "admin_grants": [
                     "string"
                   ]
@@ -10374,6 +11198,8 @@
                   "last_active_at": "2026-09-25T12:00:00Z",
                   "kind": "user",
                   "mfa_enrolled": false,
+                  "linked": false,
+                  "avatar_preset": "string",
                   "admin_grants": [
                     "string"
                   ]
@@ -10639,6 +11465,8 @@
                   "last_active_at": "2026-09-25T12:00:00Z",
                   "kind": "user",
                   "mfa_enrolled": false,
+                  "linked": false,
+                  "avatar_preset": "string",
                   "admin_grants": [
                     "string"
                   ]
@@ -14760,6 +15588,7 @@
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "delete_reason": "string",
                   "source": "member",
+                  "avatar_preset": "string",
                   "removable": true
                 }
               }
@@ -15097,6 +15926,7 @@
                       "deleted_at": "2026-09-25T12:00:00Z",
                       "delete_reason": "string",
                       "source": "member",
+                      "avatar_preset": "string",
                       "removable": true
                     }
                   ],
@@ -15347,6 +16177,7 @@
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "delete_reason": "string",
                   "source": "member",
+                  "avatar_preset": "string",
                   "removable": true
                 }
               }
@@ -15609,6 +16440,7 @@
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "delete_reason": "string",
                   "source": "member",
+                  "avatar_preset": "string",
                   "removable": true
                 }
               }
@@ -15869,6 +16701,7 @@
                   "deleted_at": "2026-09-25T12:00:00Z",
                   "delete_reason": "string",
                   "source": "member",
+                  "avatar_preset": "string",
                   "removable": true
                 }
               }
@@ -17989,7 +18822,9 @@
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
                   "content_type": "string",
-                  "size_bytes": 1048576
+                  "size_bytes": 1048576,
+                  "comment_id": "string",
+                  "purpose": "comment"
                 }
               }
             }
@@ -18408,7 +19243,9 @@
                       "attachment_id": "string",
                       "url_expires_at": "2026-09-25T12:00:00Z",
                       "content_type": "string",
-                      "size_bytes": 1048576
+                      "size_bytes": 1048576,
+                      "comment_id": "string",
+                      "purpose": "comment"
                     }
                   ],
                   "next_cursor": "string"
@@ -18664,7 +19501,9 @@
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
                   "content_type": "string",
-                  "size_bytes": 1048576
+                  "size_bytes": 1048576,
+                  "comment_id": "string",
+                  "purpose": "comment"
                 }
               }
             }
@@ -18931,7 +19770,9 @@
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
                   "content_type": "string",
-                  "size_bytes": 1048576
+                  "size_bytes": 1048576,
+                  "comment_id": "string",
+                  "purpose": "comment"
                 }
               }
             }
@@ -19364,7 +20205,8 @@
                 "project_id": "string",
                 "is_inline": false,
                 "project_name": "string",
-                "title": "string"
+                "title": "string",
+                "purpose": "comment"
               }
             }
           },
@@ -19657,7 +20499,9 @@
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
                   "content_type": "string",
-                  "size_bytes": 1048576
+                  "size_bytes": 1048576,
+                  "comment_id": "string",
+                  "purpose": "comment"
                 }
               }
             }
@@ -19690,7 +20534,9 @@
                   "attachment_id": "string",
                   "url_expires_at": "2026-09-25T12:00:00Z",
                   "content_type": "string",
-                  "size_bytes": 1048576
+                  "size_bytes": 1048576,
+                  "comment_id": "string",
+                  "purpose": "comment"
                 }
               }
             }
@@ -19903,7 +20749,10 @@
                     "email": "string"
                   }
                 ],
-                "org_id": "string"
+                "org_id": "string",
+                "attachment_ids": [
+                  "string"
+                ]
               }
             }
           }
@@ -19934,6 +20783,28 @@
                   ],
                   "org_id": "string",
                   "comment_id": "string",
+                  "attachments": [
+                    {
+                      "attachment_id": "string",
+                      "name": "string",
+                      "size": 0,
+                      "content_type": "string",
+                      "thumb": "string"
+                    }
+                  ],
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ],
                   "replies": []
                 }
               }
@@ -20265,6 +21136,28 @@
                       ],
                       "org_id": "string",
                       "comment_id": "string",
+                      "attachments": [
+                        {
+                          "attachment_id": "string",
+                          "name": "string",
+                          "size": 0,
+                          "content_type": "string",
+                          "thumb": "string"
+                        }
+                      ],
+                      "reactions": [
+                        {
+                          "emoji": "\ud83d\udc4d",
+                          "count": 0,
+                          "reacted_by_me": false,
+                          "people": [
+                            {
+                              "user_id": "string",
+                              "name": "string"
+                            }
+                          ]
+                        }
+                      ],
                       "replies": []
                     }
                   ],
@@ -20471,7 +21364,10 @@
               },
               "example": {
                 "content": "string",
-                "parent_comment_id": "string"
+                "parent_comment_id": "string",
+                "attachment_ids": [
+                  "string"
+                ]
               }
             }
           },
@@ -20503,6 +21399,28 @@
                   ],
                   "org_id": "string",
                   "comment_id": "string",
+                  "attachments": [
+                    {
+                      "attachment_id": "string",
+                      "name": "string",
+                      "size": 0,
+                      "content_type": "string",
+                      "thumb": "string"
+                    }
+                  ],
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ],
                   "replies": []
                 }
               }
@@ -20771,6 +21689,28 @@
                   ],
                   "org_id": "string",
                   "comment_id": "string",
+                  "attachments": [
+                    {
+                      "attachment_id": "string",
+                      "name": "string",
+                      "size": 0,
+                      "content_type": "string",
+                      "thumb": "string"
+                    }
+                  ],
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ],
                   "replies": []
                 }
               }
@@ -21010,7 +21950,10 @@
               },
               "example": {
                 "comment": "string",
-                "content": "string"
+                "content": "string",
+                "attachment_ids": [
+                  "string"
+                ]
               }
             }
           }
@@ -21041,6 +21984,28 @@
                   ],
                   "org_id": "string",
                   "comment_id": "string",
+                  "attachments": [
+                    {
+                      "attachment_id": "string",
+                      "name": "string",
+                      "size": 0,
+                      "content_type": "string",
+                      "thumb": "string"
+                    }
+                  ],
+                  "reactions": [
+                    {
+                      "emoji": "\ud83d\udc4d",
+                      "count": 0,
+                      "reacted_by_me": false,
+                      "people": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
+                    }
+                  ],
                   "replies": []
                 }
               }
@@ -22274,7 +23239,7 @@
           "account"
         ],
         "summary": "The caller's account: its organizations, the caller's account role and the storage pool",
-        "description": "The caller's account: its name, the caller's account role, the owner, its organizations (with members and\nstorage each), the shared storage pool and `billing.exempt_message` (only while the account is exempt).",
+        "description": "The caller's account: its name, the caller's account role, the owner, its organizations (with members and\nstorage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt) and\n`pending_actions` (the account owner's; all zero for everyone else).",
         "operationId": "account.read",
         "responses": {
           "200": {
@@ -22326,6 +23291,12 @@
                         "deleted": false
                       }
                     ]
+                  },
+                  "pending_actions": {
+                    "incoming_transfers": 0,
+                    "outgoing_waiting_for_storage": 0,
+                    "outgoing_needs_decision": 0,
+                    "billing_attention": false
                   },
                   "created_at": "string"
                 }
@@ -43949,7 +44920,14 @@
                       "blocks_count": 0,
                       "subtask_count": 0,
                       "subtask_done_count": 0,
-                      "subtask_context": false
+                      "subtask_context": false,
+                      "subscriber_count": 3,
+                      "subscribers_preview": [
+                        {
+                          "user_id": "string",
+                          "name": "string"
+                        }
+                      ]
                     }
                   ],
                   "next_cursor": "string"
@@ -45738,10 +46716,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Required: base64url(SHA-256(code_verifier)), 43 characters",
+              "description": "Required for a public app: base64url(SHA-256(code_verifier)), 43 characters; a confidential app may leave PKCE out",
               "title": "Code Challenge"
             },
-            "description": "Required: base64url(SHA-256(code_verifier)), 43 characters"
+            "description": "Required for a public app: base64url(SHA-256(code_verifier)), 43 characters; a confidential app may leave PKCE out"
           },
           {
             "name": "code_challenge_method",
@@ -45760,6 +46738,24 @@
               "title": "Code Challenge Method"
             },
             "description": "Must be `S256`"
+          },
+          {
+            "name": "resource",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "RFC 8707: the protected resource the token is for - this API's origin or `<origin>/mcp`; tokens are bound to it (anything else: `invalid_target`)",
+              "title": "Resource"
+            },
+            "description": "RFC 8707: the protected resource the token is for - this API's origin or `<origin>/mcp`; tokens are bound to it (anything else: `invalid_target`)"
           }
         ],
         "responses": {
@@ -45845,6 +46841,10 @@
                     "type": "string",
                     "description": "refresh_token: optional, narrower scopes (space-separated)"
                   },
+                  "resource": {
+                    "type": "string",
+                    "description": "RFC 8707: optional; the token is bound to it. Must match the authorization request's (or the refreshed token's) when that had one"
+                  },
                   "client_id": {
                     "type": "string",
                     "description": "Required for a public app; a confidential app may send it with `client_secret` instead of HTTP Basic"
@@ -45928,6 +46928,7 @@
                         "urn:taskadence:problem:idempotency-key-invalid",
                         "urn:taskadence:problem:rate-limit",
                         "urn:taskadence:problem:database-unavailable",
+                        "urn:taskadence:problem:member-not-linked",
                         "urn:taskadence:problem:internal",
                         "urn:taskadence:problem:token-invalid",
                         "urn:taskadence:problem:token-expired",
@@ -46256,6 +47257,7 @@
                         "urn:taskadence:problem:idempotency-key-invalid",
                         "urn:taskadence:problem:rate-limit",
                         "urn:taskadence:problem:database-unavailable",
+                        "urn:taskadence:problem:member-not-linked",
                         "urn:taskadence:problem:internal",
                         "urn:taskadence:problem:token-invalid",
                         "urn:taskadence:problem:token-expired",
@@ -46379,6 +47381,7 @@
                         "urn:taskadence:problem:idempotency-key-invalid",
                         "urn:taskadence:problem:rate-limit",
                         "urn:taskadence:problem:database-unavailable",
+                        "urn:taskadence:problem:member-not-linked",
                         "urn:taskadence:problem:internal",
                         "urn:taskadence:problem:token-invalid",
                         "urn:taskadence:problem:token-expired",
@@ -46754,6 +47757,10 @@
           "storage": {
             "$ref": "#/components/schemas/AccountStorage"
           },
+          "pending_actions": {
+            "$ref": "#/components/schemas/AccountPendingActions",
+            "description": "What waits for the account owner in Settings > Account. Computed for the account owner only: all zero for everyone else"
+          },
           "created_at": {
             "anyOf": [
               {
@@ -46811,6 +47818,37 @@
           "user_id"
         ],
         "title": "AccountOwner",
+        "description": "Part of `AccountOut`."
+      },
+      "AccountPendingActions": {
+        "properties": {
+          "incoming_transfers": {
+            "type": "integer",
+            "title": "Incoming Transfers",
+            "description": "Organizations offered to this account by another one, waiting for the account owner to accept or decline",
+            "default": 0
+          },
+          "outgoing_waiting_for_storage": {
+            "type": "integer",
+            "title": "Outgoing Waiting For Storage",
+            "description": "This account's organizations on their way to another account, waiting for that account to make room in its storage",
+            "default": 0
+          },
+          "outgoing_needs_decision": {
+            "type": "integer",
+            "title": "Outgoing Needs Decision",
+            "description": "This account's organizations on their way to another account, waiting for the account owner to decide who moves with them",
+            "default": 0
+          },
+          "billing_attention": {
+            "type": "boolean",
+            "title": "Billing Attention",
+            "description": "The card on file was declined: the account owner should update it",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AccountPendingActions",
         "description": "Part of `AccountOut`."
       },
       "AccountPeople": {
@@ -47546,6 +48584,19 @@
             ],
             "title": "Is Inline"
           },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "comment"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose",
+            "description": "`comment`: a file for a comment (then link it with the comment's `attachment_ids`). Needs permission to comment on the task instead of to edit it, and does not count toward the task's attachment limit; every other check (type, size, scan, storage quota) is the same."
+          },
           "file": {
             "type": "string",
             "contentMediaType": "application/octet-stream",
@@ -47710,6 +48761,118 @@
           "token_endpoint_auth_method": "none"
         },
         "description": "Returned by `oauth.register`."
+      },
+      "CommentAttachment": {
+        "properties": {
+          "attachment_id": {
+            "type": "string",
+            "title": "Attachment Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "The file's name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size",
+            "description": "The stored file's size in bytes"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type",
+            "description": "The file's detected type"
+          },
+          "thumb": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumb",
+            "description": "Images: a short-lived read link for a thumbnail (same links as task attachments); null for other files. Download with `GET /v1/task-attachments/{attachment_id}/url`."
+          }
+        },
+        "type": "object",
+        "required": [
+          "attachment_id"
+        ],
+        "title": "CommentAttachment",
+        "description": "Part of `TaskCommentInDB`."
+      },
+      "CommentReaction": {
+        "properties": {
+          "emoji": {
+            "type": "string",
+            "title": "Emoji",
+            "description": "One emoji",
+            "example": "\ud83d\udc4d"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "description": "How many people reacted with it"
+          },
+          "reacted_by_me": {
+            "type": "boolean",
+            "title": "Reacted By Me",
+            "description": "Whether you are one of them",
+            "default": false
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/ReactionPerson"
+            },
+            "type": "array",
+            "title": "People",
+            "description": "The first people who reacted with it (at most 5; the full list is `GET .../reactions/{emoji}`)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "emoji",
+          "count"
+        ],
+        "title": "CommentReaction",
+        "description": "Part of `CommentReactions` and `TaskCommentInDB`."
+      },
+      "CommentReactions": {
+        "properties": {
+          "reactions": {
+            "items": {
+              "$ref": "#/components/schemas/CommentReaction"
+            },
+            "type": "array",
+            "title": "Reactions"
+          }
+        },
+        "type": "object",
+        "title": "CommentReactions",
+        "description": "`PUT` / `DELETE /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`: the comment's reactions now."
       },
       "CommitType": {
         "type": "string",
@@ -49904,6 +51067,18 @@
             "title": "Client Id",
             "description": "The OAuth app the token was issued to (authorization_code); null otherwise"
           },
+          "resource": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource",
+            "description": "RFC 8707: the protected resource an OAuth token is bound to (this API's origin, or `<origin>/mcp`); null = not bound to one"
+          },
           "org_ids": {
             "items": {
               "type": "string"
@@ -50117,6 +51292,18 @@
               }
             ],
             "title": "Email Verified"
+          },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset",
+            "description": "The illustrated avatar this person chose from the app's set (an id such as `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead."
           }
         },
         "type": "object",
@@ -51794,7 +52981,7 @@
           "error": {
             "type": "string",
             "title": "Error",
-            "description": "invalid_request \u00b7 invalid_client \u00b7 invalid_grant \u00b7 unauthorized_client \u00b7 unsupported_grant_type \u00b7 invalid_scope",
+            "description": "invalid_request \u00b7 invalid_client \u00b7 invalid_grant \u00b7 unauthorized_client \u00b7 unsupported_grant_type \u00b7 invalid_scope \u00b7 invalid_target (RFC 8707: a `resource` this server does not serve)",
             "examples": [
               "invalid_grant"
             ]
@@ -52990,6 +54177,30 @@
             "title": "Mfa Enrolled",
             "description": "Whether the member has set up two-step sign-in. Only in the members list, and only for owners and admins; null otherwise."
           },
+          "linked": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linked",
+            "description": "Release 10: false when this member's sign-in has no TasKadence profile row yet (an SSO account sharing an email with an older account): they cannot be subscribed to tasks or react until they sign in again (`member-not-linked`). Null when not computed."
+          },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset",
+            "description": "The illustrated avatar this person chose from the app's set (an id such as `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead."
+          },
           "admin_grants": {
             "items": {
               "type": "string"
@@ -53686,6 +54897,35 @@
         ],
         "title": "Page[ProjectResourceInDB]",
         "description": "Returned by `project-resources.list`."
+      },
+      "Page_ReactionPerson_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ReactionPerson"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Opaque token for the next page (send it back as `cursor`); null on the last page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[ReactionPerson]",
+        "description": "Returned by `task-comments.list_reactions`."
       },
       "Page_ServiceAccountOut_": {
         "properties": {
@@ -55699,6 +56939,18 @@
             "description": "`member`: added to the project. `org_owner` / `org_admin`: an owner of every project of the organization through their org role (`project_role` owner; not added, so not removable here)",
             "default": "member"
           },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset",
+            "description": "The illustrated avatar this person chose from the app's set (an id such as `fern`), or null when they chose none. An uploaded photo, when they have one, is shown instead."
+          },
           "removable": {
             "type": "boolean",
             "title": "Removable",
@@ -56793,6 +58045,32 @@
         "title": "ProtectedResourceMetadata",
         "description": "Returned by `oauth.resource_metadata`."
       },
+      "ReactionPerson": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Their display name (the username when they have none)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "ReactionPerson",
+        "description": "Part of `CommentReaction` and `Page_ReactionPerson_`."
+      },
       "RegistrationErrorBody": {
         "properties": {
           "error": {
@@ -57085,6 +58363,22 @@
             "type": "string",
             "maxLength": 1000,
             "title": "Parent Comment Id"
+          },
+          "attachment_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachment Ids",
+            "description": "Up to 5 task attachments YOU uploaded to the same task and not yet on a comment (upload them like task attachments first). On an edit the list replaces the comment's files (omitted = unchanged, [] = none; a removed file is deleted)."
           }
         },
         "additionalProperties": false,
@@ -58571,6 +59865,31 @@
             "title": "Size Bytes",
             "description": "The stored file's size in bytes (null when nothing is stored)",
             "example": 1048576
+          },
+          "comment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment Id",
+            "description": "The comment this file was posted with, or null"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "comment"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose",
+            "description": "`comment`: uploaded for a comment (see the upload's `purpose`), or null"
           }
         },
         "type": "object",
@@ -60494,6 +61813,34 @@
             ],
             "title": "Subtask Context",
             "description": "`subtasks=nested` only: a parent shown because one of its subtasks matches the query (it does not match itself). Response only."
+          },
+          "subscriber_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscriber Count",
+            "description": "`include=subscribers` only (absent otherwise, and on rows with `has_access=false`): how many people follow the task. Response only.",
+            "example": 3
+          },
+          "subscribers_preview": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TaskSubscriberPreview"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscribers Preview",
+            "description": "`include=subscribers` only (absent otherwise, and on rows with `has_access=false`): the first 3 subscribers, oldest first, as `GET /v1/tasks/{task_id}/subscribers` lists them. Response only."
           }
         },
         "type": "object",
@@ -60637,6 +61984,22 @@
             ],
             "title": "Org Id",
             "description": "Organization ID (UUID)"
+          },
+          "attachment_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachment Ids",
+            "description": "Up to 5 task attachments YOU uploaded to the same task and not yet on a comment (upload them like task attachments first). On an edit the list replaces the comment's files (omitted = unchanged, [] = none; a removed file is deleted)."
           }
         },
         "additionalProperties": false,
@@ -60775,6 +62138,22 @@
             "type": "string",
             "title": "Comment Id"
           },
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentAttachment"
+            },
+            "type": "array",
+            "title": "Attachments",
+            "description": "The files posted with the comment (also task attachments)"
+          },
+          "reactions": {
+            "items": {
+              "$ref": "#/components/schemas/CommentReaction"
+            },
+            "type": "array",
+            "title": "Reactions",
+            "description": "Emoji reactions, ordered by each emoji's first reaction"
+          },
           "replies": {
             "items": {
               "$ref": "#/components/schemas/TaskCommentInDB"
@@ -60819,6 +62198,22 @@
             ],
             "title": "Content",
             "description": "Comment content"
+          },
+          "attachment_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachment Ids",
+            "description": "Up to 5 task attachments YOU uploaded to the same task and not yet on a comment (upload them like task attachments first). On an edit the list replaces the comment's files (omitted = unchanged, [] = none; a removed file is deleted)."
           }
         },
         "additionalProperties": false,
@@ -62039,6 +63434,33 @@
         ],
         "title": "TaskSubscriber",
         "description": "Part of `TaskSubscribers`."
+      },
+      "TaskSubscriberPreview": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "The subscriber (`users.id`)."
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "The name people know them by: their display name, else their username."
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "TaskSubscriberPreview",
+        "description": "Release 10 (r10 comment attachments section 4): one of the first subscribers of a task list row."
       },
       "TaskSubscribers": {
         "properties": {
@@ -63263,6 +64685,19 @@
             ],
             "title": "Title",
             "description": "Optional display name; `complete` can also set it"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "comment"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose",
+            "description": "attachment: `comment`: a file for a comment (then link it with the comment's `attachment_ids`). Needs permission to comment on the task instead of to edit it, and does not count toward the task's attachment limit; every other check (type, size, scan, storage quota) is the same."
           }
         },
         "additionalProperties": false,
@@ -64681,6 +66116,7 @@
               "urn:taskadence:problem:idempotency-key-invalid",
               "urn:taskadence:problem:rate-limit",
               "urn:taskadence:problem:database-unavailable",
+              "urn:taskadence:problem:member-not-linked",
               "urn:taskadence:problem:internal",
               "urn:taskadence:problem:token-invalid",
               "urn:taskadence:problem:token-expired",
@@ -71829,6 +73265,210 @@
         }
       }
     },
+    "task.comment_reaction_added": {
+      "post": {
+        "summary": "task.comment_reaction_added",
+        "description": "Someone reacted to a comment on a task with an emoji (`data.after`: `comment_id`, `emoji`).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it - the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.task.comment_reaction_added",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id - equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-Taskadence-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies TasKadence's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "task.comment_reaction_added",
+                "api_version": "2026-10-24",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O123456",
+                "project_id": "P30104",
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "task",
+                  "resource_id": "T869658",
+                  "before": null,
+                  "after": {
+                    "name": "After"
+                  }
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received - any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone - TasKadence disables the webhook and stops sending"
+          }
+        }
+      }
+    },
+    "task.comment_reaction_removed": {
+      "post": {
+        "summary": "task.comment_reaction_removed",
+        "description": "Someone took back their emoji reaction to a comment on a task (`data.after`: `comment_id`, `emoji`).\n\n- **Signed** with Standard Webhooks (the headers below). Verify the signature over the raw body before parsing it - the recipes are in the developer docs' Webhooks guide.\n- **Answer any 2xx within 20 s.** Anything else, or no answer, is retried: 8 attempts over about 21 h.\n- **410 Gone** disables the webhook.",
+        "operationId": "webhook.task.comment_reaction_removed",
+        "tags": [
+          "webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "WD000001",
+            "description": "The delivery id - equal to the body's `id`. Dedupe on it (delivery is at-least-once)."
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1790380800",
+            "description": "Unix seconds when this attempt was signed. Refuse one more than 5 minutes from now (a replay)."
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "v1,K5oZfzN95Z9UVu1EsfQmfVNQhnkZ2pj9o9NDN/H/pI4=",
+            "description": "Space-separated `v1,<base64>` HMAC-SHA256 signatures of `{webhook-id}.{webhook-timestamp}.{raw body}`, keyed with the base64-decoded part of the secret after `whsec_`. Two during a rotation's 24 h grace."
+          },
+          {
+            "name": "X-Taskadence-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "task.updated",
+            "description": "The event type (the body's `type`), for routing before parsing."
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Taskadence-Webhooks/1",
+            "description": "Identifies TasKadence's sender."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              },
+              "example": {
+                "id": "WD000001",
+                "type": "task.comment_reaction_removed",
+                "api_version": "2026-10-24",
+                "created_at": "2026-09-25T12:00:00Z",
+                "org_id": "O123456",
+                "project_id": "P30104",
+                "actor": {
+                  "kind": "user",
+                  "id": "406670f1-c819-4d27-9552-1747c551cf5c",
+                  "username": "ada"
+                },
+                "data": {
+                  "resource_type": "task",
+                  "resource_id": "T869658",
+                  "before": {
+                    "name": "Before"
+                  },
+                  "after": null
+                },
+                "request_id": "9b2f1c1e-8c1a-4a53-9f9e-0f5f1f2d7c11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Received - any 2xx within 20 s ends the delivery"
+          },
+          "410": {
+            "description": "Gone - TasKadence disables the webhook and stops sending"
+          }
+        }
+      }
+    },
     "task.comment_removed": {
       "post": {
         "summary": "task.comment_removed",
@@ -74711,6 +76351,13 @@
         503
       ],
       "description": "The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds."
+    },
+    {
+      "type": "urn:taskadence:problem:member-not-linked",
+      "statuses": [
+        409
+      ],
+      "description": "This member's sign-in is not linked to their TasKadence profile yet, so they cannot be subscribed to a task or react to a comment; they need to sign in again. `errors[0].user_ids` names them."
     },
     {
       "type": "urn:taskadence:problem:internal",

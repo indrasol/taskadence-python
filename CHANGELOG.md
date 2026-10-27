@@ -11,7 +11,7 @@ entries below were pre-releases with no compatibility promise.
 
 Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong
 to an account (one per email) that shares one storage pool, and the project roles are owner, member and viewer.
-Re-generated from the API contract at `taskadence-api` `37ea9d8` (branch `feature/ia-redesign`); the API version is
+Re-generated from the API contract at `taskadence-api` `2695ecb` (branch `dev`, after PR #270); the API version is
 now `2026-10-24` (was `2026-09-25`), so every request sends `TasKadence-Version: 2026-10-24`. A major version because
 methods, models and fields are removed (the 1.0 promise: a breaking change needs a 2.0). The API stopped serving the removed routes in the same release, so 1.x calls to them now
 answer 410 Gone (in 2.0, `RemovedInRelease10Error`). `taskadence-mcp` and `@taskadence/mcp` have no generated code and
@@ -146,6 +146,38 @@ change only their shared version.
   `email-in-other-account` and `removed-in-release-10`.
 - The quickstart (`examples/quickstart.py`) creates a project and a sprint, files its task in the sprint, and deletes
   them at the end; the README has a Sprints, capacity and workload section.
+- **Comment reactions.** `tm.tasks.comments.react(task_id, comment_id, emoji)` and `.unreact(...)` (also
+  `tm.task_comments.add_reaction` / `remove_reaction`; `PUT` / `DELETE
+  /v1/tasks/{task_id}/comments/{comment_id}/reactions/{emoji}`, scope `tasks:write`) return `CommentReactions`, the
+  comment's reactions now; `.reactions(task_id, comment_id, emoji)` (also `list_reactions`; `tasks:read`) is a `Page`
+  of `ReactionPerson` (`user_id`, `name`), oldest first. The emoji is percent-encoded in the path. Reacting twice, or
+  removing a reaction you did not make, is harmless; a comment holds at most 50 different emojis (409).
+- **Comment attachments.** `TaskCommentInDB.attachments` (`CommentAttachment`: `attachment_id`, `name`, `size`,
+  `content_type`, `thumb`) and `reactions` (`CommentReaction`: `emoji`, `count`, `reacted_by_me`, `people`).
+  `attachment_ids` (up to 5) on `TaskCommentCreate`, `TaskCommentUpdate` and `ReplyCreate`: files you uploaded to the
+  same task and not yet on a comment; on an edit the list replaces the comment's files (`[]` = none; a removed file is
+  deleted). `tm.task_attachments.create(..., purpose="comment")` uploads one (needs permission to comment rather than
+  to edit the task, and does not count toward the task's attachment limit), direct to storage or multipart alike;
+  `TaskAttachmentInDB.comment_id` and `purpose`, `UploadCreateIn.purpose`.
+- `tm.tasks.list(..., include=["subscribers"])` (or `include="subscribers"`): each row carries `subscriber_count` and
+  `subscribers_preview` (the first 3, `TaskSubscriberPreview`: `user_id`, `name`); without it, neither. The
+  generator types this query parameter `str | Sequence[str]` (a list is comma-joined).
+- `avatar_preset` (the illustrated avatar a person chose, or None) on `tm.me()`'s `principal` (`MePrincipal`),
+  `OrganizationMemberInDB` and `ProjectMemberInDB`; `OrganizationMemberInDB.linked` (False: the member's sign-in has
+  no TasKadence profile yet).
+- `MemberNotLinkedError` (also `MemberNotLinked`), a `ConflictError`: the 409
+  `urn:taskadence:problem:member-not-linked` when a member must sign in again before they can be subscribed to a task
+  or react to a comment; `.user_ids` names them (`errors[0]["user_ids"]`). `ProblemType` includes it.
+- `MeAuth.resource`: the protected resource an OAuth token is bound to (RFC 8707: the API's origin, or `<origin>/mcp`),
+  or None. The SDK has no OAuth helpers (the `/oauth/*` protocol operations are not generated), so the new optional
+  `resource` on authorize / token is the third-party app's to send.
+- `AccountOut.pending_actions` (`AccountPendingActions`: `incoming_transfers`, `outgoing_waiting_for_storage`,
+  `outgoing_needs_decision`, `billing_attention`), the account owner's to-dos; all zero for everyone else.
+- Webhooks `task.comment_reaction_added` and `task.comment_reaction_removed` (`data.after`: `comment_id`, `emoji`).
+- The README has a Comment reactions and attachments section.
+- Not in the SDK: renaming your username (`PATCH /v1/me/username`) and choosing an illustrated avatar
+  (`PUT /v1/me/avatar-preset`) are the web app's (internal routes, a signed-in session only) and not in the public
+  contract, so there is no `tm.me.rename_username` or `tm.me.set_avatar_preset`.
 
 ### Migrating from 1.x
 - `tm.teams.*`, `tm.sections.*`: no replacement; group tasks with the list's `sort_by` / filters instead.

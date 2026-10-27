@@ -23,7 +23,7 @@ class OAuthErrorBody:
 
     Attributes:
         error (str): invalid_request · invalid_client · invalid_grant · unauthorized_client · unsupported_grant_type ·
-            invalid_scope
+            invalid_scope · invalid_target (RFC 8707: a `resource` this server does not serve)
         error_description (None | str | Unset):
     """
 

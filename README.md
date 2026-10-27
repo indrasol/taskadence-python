@@ -248,7 +248,44 @@ tm.tasks.unsubscribe("T123456")
 ```
 
 Reads need `tasks:read`, changes `tasks:write`. `set_subscribers` replaces the whole list (up to 100; whoever is left
-out is unsubscribed), and each new person must be able to see the task.
+out is unsubscribed), and each new person must be able to see the task. The task list adds a count and the first
+three subscribers to each row when asked: `tm.tasks.list(org_id=..., include=["subscribers"])` (`subscriber_count`,
+`subscribers_preview`).
+
+### Comment reactions and attachments
+
+Anyone who can see a task can react to its comments with an emoji. Each answer is the comment's reactions now.
+
+```python
+from taskadence import Taskadence
+
+tm = Taskadence()
+
+now = tm.tasks.comments.react("T123456", "C123456", "👍")
+print([(r.emoji, r.count, r.reacted_by_me) for r in now.reactions])
+for person in tm.tasks.comments.reactions("T123456", "C123456", "👍"):   # who reacted, oldest first
+    print(person.name)
+tm.tasks.comments.unreact("T123456", "C123456", "👍")
+```
+
+A comment holds up to 5 files. Upload each one to the task with `purpose="comment"` (it needs permission to comment,
+not to edit the task, and does not count toward the task's attachment limit), then link them on the comment:
+
+```python
+from taskadence import Taskadence, models
+
+tm = Taskadence()
+
+plan = tm.task_attachments.create(task_id="T123456", file="plan.pdf", purpose="comment")
+comment = tm.task_comments.create(
+    models.TaskCommentCreate(task_id="T123456", content="The plan is attached.", attachment_ids=[plan.attachment_id])
+)
+print([(f.name, f.size) for f in comment.attachments])
+tm.task_comments.update(comment.comment_id, {"attachment_ids": []})   # an edit replaces the list; removed files are deleted
+```
+
+Reacting, or subscribing someone, can answer `MemberNotLinkedError` (409): that member must sign in again first
+(`.user_ids` names them; `OrganizationMemberInDB.linked` is False for them).
 
 ### Sprints, capacity and workload
 

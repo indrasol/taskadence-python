@@ -47,6 +47,7 @@ def _get_kwargs(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
+    include: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -267,6 +268,13 @@ def _get_kwargs(
         json_subtasks = subtasks
     params["subtasks"] = json_subtasks
 
+    json_include: None | str | Unset
+    if isinstance(include, Unset):
+        json_include = UNSET
+    else:
+        json_include = include
+    params["include"] = json_include
+
     json_search: None | str | Unset
     if isinstance(search, Unset):
         json_search = UNSET
@@ -408,6 +416,7 @@ def sync_detailed(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
+    include: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -513,6 +522,10 @@ def sync_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
+        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
+            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
+            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
+            carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -559,6 +572,7 @@ def sync_detailed(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
+        include=include,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -605,6 +619,7 @@ def sync(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
+    include: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -710,6 +725,10 @@ def sync(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
+        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
+            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
+            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
+            carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -757,6 +776,7 @@ def sync(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
+        include=include,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -797,6 +817,7 @@ async def asyncio_detailed(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
+    include: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -902,6 +923,10 @@ async def asyncio_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
+        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
+            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
+            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
+            carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -948,6 +973,7 @@ async def asyncio_detailed(
         filterblocks=filterblocks,
         filtercreated_by=filtercreated_by,
         subtasks=subtasks,
+        include=include,
         search=search,
         status=status,
         unfiled=unfiled,
@@ -992,6 +1018,7 @@ async def asyncio(
     filterblocks: None | str | Unset = UNSET,
     filtercreated_by: list[str] | None | Unset = UNSET,
     subtasks: None | str | Unset = UNSET,
+    include: None | str | Unset = UNSET,
     search: None | str | Unset = UNSET,
     status: None | str | Unset = UNSET,
     unfiled: bool | None | Unset = UNSET,
@@ -1097,6 +1124,10 @@ async def asyncio(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
+        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
+            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
+            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
+            carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -1145,6 +1176,7 @@ async def asyncio(
             filterblocks=filterblocks,
             filtercreated_by=filtercreated_by,
             subtasks=subtasks,
+            include=include,
             search=search,
             status=status,
             unfiled=unfiled,

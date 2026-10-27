@@ -23,6 +23,7 @@ import datetime
 if TYPE_CHECKING:
     from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item
     from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0
+    from ..models.task_subscriber_preview import TaskSubscriberPreview
 
 
 T = TypeVar("T", bound="TaskCardView")
@@ -110,6 +111,11 @@ class TaskCardView:
             only. Default: 0.
         subtask_context (bool | None | Unset): `subtasks=nested` only: a parent shown because one of its subtasks
             matches the query (it does not match itself). Response only.
+        subscriber_count (int | None | Unset): `include=subscribers` only (absent otherwise, and on rows with
+            `has_access=false`): how many people follow the task. Response only. Example: 3.
+        subscribers_preview (list[TaskSubscriberPreview] | None | Unset): `include=subscribers` only (absent otherwise,
+            and on rows with `has_access=false`): the first 3 subscribers, oldest first, as `GET
+            /v1/tasks/{task_id}/subscribers` lists them. Response only.
     """
 
     title: str
@@ -157,6 +163,8 @@ class TaskCardView:
     subtask_count: int | Unset = 0
     subtask_done_count: int | Unset = 0
     subtask_context: bool | None | Unset = UNSET
+    subscriber_count: int | None | Unset = UNSET
+    subscribers_preview: list[TaskSubscriberPreview] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -165,6 +173,7 @@ class TaskCardView:
     def to_dict(self) -> dict[str, Any]:
         from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item  # noqa: PLC0415
         from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0  # noqa: PLC0415
+        from ..models.task_subscriber_preview import TaskSubscriberPreview  # noqa: PLC0415
 
         title = self.title
 
@@ -432,6 +441,24 @@ class TaskCardView:
         else:
             subtask_context = self.subtask_context
 
+        subscriber_count: int | None | Unset
+        if isinstance(self.subscriber_count, Unset):
+            subscriber_count = UNSET
+        else:
+            subscriber_count = self.subscriber_count
+
+        subscribers_preview: list[dict[str, Any]] | None | Unset
+        if isinstance(self.subscribers_preview, Unset):
+            subscribers_preview = UNSET
+        elif isinstance(self.subscribers_preview, list):
+            subscribers_preview = []
+            for subscribers_preview_type_0_item_data in self.subscribers_preview:
+                subscribers_preview_type_0_item = subscribers_preview_type_0_item_data.to_dict()
+                subscribers_preview.append(subscribers_preview_type_0_item)
+
+        else:
+            subscribers_preview = self.subscribers_preview
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -523,6 +550,10 @@ class TaskCardView:
             field_dict["subtask_done_count"] = subtask_done_count
         if subtask_context is not UNSET:
             field_dict["subtask_context"] = subtask_context
+        if subscriber_count is not UNSET:
+            field_dict["subscriber_count"] = subscriber_count
+        if subscribers_preview is not UNSET:
+            field_dict["subscribers_preview"] = subscribers_preview
 
         return field_dict
 
@@ -530,6 +561,7 @@ class TaskCardView:
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item  # noqa: PLC0415
         from ..models.task_card_view_type_data_type_0 import TaskCardViewTypeDataType0  # noqa: PLC0415
+        from ..models.task_subscriber_preview import TaskSubscriberPreview  # noqa: PLC0415
 
         d = dict(src_dict)
         title = d.pop("title")
@@ -993,6 +1025,39 @@ class TaskCardView:
 
         subtask_context = _parse_subtask_context(d.pop("subtask_context", UNSET))
 
+        def _parse_subscriber_count(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        subscriber_count = _parse_subscriber_count(d.pop("subscriber_count", UNSET))
+
+        def _parse_subscribers_preview(data: object) -> list[TaskSubscriberPreview] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                subscribers_preview_type_0 = []
+                _subscribers_preview_type_0 = data
+                for subscribers_preview_type_0_item_data in _subscribers_preview_type_0:
+                    subscribers_preview_type_0_item = TaskSubscriberPreview.from_dict(
+                        subscribers_preview_type_0_item_data
+                    )
+
+                    subscribers_preview_type_0.append(subscribers_preview_type_0_item)
+
+                return subscribers_preview_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[TaskSubscriberPreview] | None | Unset, data)
+
+        subscribers_preview = _parse_subscribers_preview(d.pop("subscribers_preview", UNSET))
+
         task_card_view = cls(
             title=title,
             task_id=task_id,
@@ -1039,6 +1104,8 @@ class TaskCardView:
             subtask_count=subtask_count,
             subtask_done_count=subtask_done_count,
             subtask_context=subtask_context,
+            subscriber_count=subscriber_count,
+            subscribers_preview=subscribers_preview,
         )
 
         task_card_view.additional_properties = d
