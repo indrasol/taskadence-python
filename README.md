@@ -9,6 +9,7 @@ change your organization's tasks, projects and sprints, and it adds `tm`, a comm
 
 > **Stable since 1.0.** The SDK follows [semantic versioning](https://semver.org/) and the API's
 > [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within a major version.
+> **3.0** makes the organization the top level, each with its own plan, storage and bill.
 > **2.0** removes teams, sections and test sprints, which left the product; sprints now belong to projects. Read the
 > [changelog](https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md) before upgrading.
 
@@ -18,7 +19,7 @@ change your organization's tasks, projects and sprints, and it adds `tm`, a comm
 
 ## Get started in 3 steps
 
-You need Python 3.10 or later and a TasKadence account. This takes about five minutes.
+You need Python 3.10 or later and your TasKadence account. This takes about five minutes.
 
 ### 1. Get a token
 
@@ -107,8 +108,10 @@ Something went wrong? See Troubleshooting near the end of this page.
 
 Four things that make the rest of this page easier to read.
 
-- **Organization.** Everything in TasKadence (tasks, projects, sprints) belongs to an organization, your company's
-  workspace. Most calls need its id, `org_id`. A token works in exactly one organization.
+- **Organization.** The organization is the top level: everything in TasKadence (tasks, projects, sprints, files, the
+  bill) belongs to one, and one person can belong to many, with a different role in each. Most calls need its id,
+  `org_id`. A token works in exactly one organization. The first organization you create is free; each further one
+  needs a card before it can be used.
 - **Token and scopes.** The token proves who you are; its scopes say what it may do. `tasks:read` reads tasks,
   `tasks:write` also creates and changes them, and the same pattern holds for `projects` and `webhooks`.
   A call your token's scopes do not cover fails with a clear error naming the scope it needs. Each method's
@@ -121,7 +124,7 @@ Four things that make the rest of this page easier to read.
   `https://taskadence.com/tasks/T123456`, and `org_id=O123456` in the address names the organization.
 - **Versions.** The SDK follows [semantic versioning](https://semver.org/) and the API's
   [versioning policy](https://docs.taskadence.com/guides/versioning/): a `1.x` release never breaks your code,
-  and anything deprecated warns first. Pin a major version if you like (`pip install "taskadence>=2,<3"`).
+  and anything deprecated warns first. Pin a major version if you like (`pip install "taskadence>=3,<4"`).
 
 ## Using the client
 
@@ -329,43 +332,40 @@ in the organization's order (owners and admins). Deleting a sprint unfiles its t
 and `tm.workload.read`. Each workload row's `active_sprint` is the person's current sprint (`sprint_id`, `name`,
 `done`, `total`), or `None`.
 
-### Account and storage
+### Organizations, plans and storage
 
-An account holds your organizations and their people; one email belongs to one account, and every organization of
-the account shares one storage pool. The SDK reads it (a token with `account:read`); changes are made in the web app.
+Each organization has its own plan, storage, card and invoice. `plan` is `free` (storage included) or `paid` (every GB
+billed), and `state` is `active`, `pending_payment` (it waits for its first card), `restricted` or `read_only` (a paid
+organization that lost its card).
 
 ```python
-from taskadence import EmailInOtherAccountError, Taskadence
+from taskadence import OrganizationReadOnlyError, OrganizationRestrictedError, Taskadence
 
 tm = Taskadence()
-print(tm.me().account)                                  # MeAccount(account_id, name, role), or None
+for org in tm.organizations.list():
+    print(org.org_id, org.name, org.plan, org.state)
 
-account = tm.account.get()
-print(account.name, account.my_role, [(o.name, o.member_count) for o in account.orgs])
-if account.billing.exempt_message:
-    print(account.billing.exempt_message)
-
-pool = tm.storage.get()                                 # also tm.account.storage()
-print(pool.bytes_used, "of", pool.quota_bytes, pool.status, "card on file" if pool.payment_method_on_file else "")
-for org in pool.orgs:
-    print(" ", org.name, org.bytes_used, f"{org.percent_of_quota}%")
-
-org_storage = tm.organizations.storage(account.orgs[0].org_id)   # one org, with the account's totals
-print(org_storage.account_used_bytes, org_storage.account_quota_bytes, org_storage.account_percent)
+org_id = tm.me().organizations[0].org_id
+storage = tm.organizations.storage(org_id)              # this organization alone, any member can read it
+print(storage.plan, storage.state, storage.bytes_used, "of", storage.included_bytes, storage.status)
+print("manage it at", storage.manage_url)
 
 try:
-    tm.organization_invites.create({"org_id": account.orgs[0].org_id, "email": "someone@example.com"})
-except EmailInOtherAccountError as exc:                 # 409: that email already belongs to another account
-    print(exc.detail)
+    tm.organization_invites.create({"org_id": org_id, "email": "someone@example.com"})
+except OrganizationRestrictedError as exc:              # 423: no usable card, it cannot add people
+    print(exc.state, "since", exc.since, exc.detail)
+except OrganizationReadOnlyError as exc:                # 423: read-only from the third day, nothing is deleted
+    print(exc.state, "since", exc.since, exc.detail)
 ```
 
-`tm.account.people()` lists everyone in the account with their role in each organization (account owners and admins
-only). `status` is `ok`, `warning` (80 % or more), `blocked` (full, no card on file: new uploads answer 402),
-`metered` (full, a card on file: billed per GB-month) or `exempt`.
+`status` is `ok`, `warning` (80 % or more), `blocked` (full, no card on file: new uploads answer 402), `metered` (full, a
+card on file: billed per GB-month) or `exempt`. A working card, with the open invoice paid, restores a restricted or
+read-only organization. An organization that waits for its first card answers every call with
+`OrganizationPendingPaymentError` (409).
 
-**Not in the SDK:** billing (the card, invoices: the account owner manages them in the web app; the old
-per-organization billing routes answer 410), changes to the account, support tickets, and the MCP tool
-`contact_support`.
+**Not in the SDK:** creating an organization and billing (the card, invoices, handing billing to another owner). The API
+accepts these from a signed-in session only and refuses every access token, so owners use the web app
+(`storage.manage_url`). Support tickets are not in the SDK either; the MCP tool `contact_support` files one.
 
 ### Errors
 
@@ -394,7 +394,8 @@ and `.errors`:
 | 400 | `BadRequestError` · `InvalidParameterError` · `IdempotencyKeyInvalidError` |
 | 401 | `AuthenticationError` · `TokenInvalidError` · `TokenExpiredError` · `TokenRevokedError` |
 | 403 | `ForbiddenError` · `InsufficientScopeError` · `TestTokenReadOnlyError` · `TokenPolicyError` (also 422) |
-| 404 · 409 · 410 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`, `EmailInOtherAccountError`) · `GoneError` (`RemovedInRelease10Error`: `.successor`, `.changelog`) · `PreconditionFailedError` |
+| 404 · 409 · 410 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`, `OrganizationPendingPaymentError`, `BillingOwnerMustHandOverError`) · `GoneError` (`RemovedInRelease10Error`, `RemovedInRelease11Error`: `.successor`, `.changelog`) · `PreconditionFailedError` |
+| 423 | `OrganizationSuspendedError` · `OrganizationRestrictedError` · `OrganizationReadOnlyError` (all with `.state`, `.since`) |
 | 422 | `UnprocessableEntityError` · `ValidationError` (`InvalidValueError`) · `IdempotencyKeyReusedError` · `UrlRefusedError` |
 | 429 · 5xx | `RateLimitedError` (`.retry_after`) · `InternalError` |
 | none | `APIConnectionError` / `APITimeoutError` (no answer from the server) · `ResponseValidationError` (an answer this SDK version cannot read: upgrade) |
@@ -500,6 +501,7 @@ tm me                             # who you are, and your organization
 tm tasks list --status in_progress --status blocked
 tm tasks create --title "Try the TasKadence CLI" --due 2027-01-15
 tm projects list
+tm orgs list                      # your organizations, with each one's plan and state
 tm storage                        # how much file storage your organization uses
 tm --version
 ```

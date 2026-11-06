@@ -14,6 +14,8 @@ from ..models.agent_task_review_effective_enum import AgentTaskReviewEffectiveEn
 from ..models.agent_task_review_effective_enum import check_agent_task_review_effective_enum
 from ..models.priority_enum import check_priority_enum
 from ..models.priority_enum import PriorityEnum
+from ..models.project_in_db_my_role_type_0 import check_project_in_db_my_role_type_0
+from ..models.project_in_db_my_role_type_0 import ProjectInDBMyRoleType0
 from ..models.project_status_enum import check_project_status_enum
 from ..models.project_status_enum import ProjectStatusEnum
 from ..models.project_visibility_enum import check_project_visibility_enum
@@ -80,6 +82,11 @@ class ProjectInDB:
             access); optional, usually empty.
         implicit_members (list[ProjectImplicitMember] | Unset): Release 10: the organization's owners and admins -
             owners of this project through their org role (not added, not removable here). Set on the single project read
+        my_role (None | ProjectInDBMyRoleType0 | Unset): Your role on the project: `owner` (its owner, or an
+            organization owner / admin), `lead`, `manager`, `member` or `viewer`, the strongest that applies; null when you
+            can only read it because it is public.
+        can_manage_sprints (bool | Unset): Whether you may create and change the project's sprints (its owners, leads,
+            managers and members, organization owners and admins); a viewer may not. Default: False.
         parent (None | ProjectRef | Unset): The parent project (N.3), or null when the project is top-level or the
             caller cannot read its parent (`parent_project_id` still names it).
         children (list[ProjectChildOut] | Unset): The project's active sub-projects the caller can read (N.3), by name.
@@ -115,6 +122,8 @@ class ProjectInDB:
     leads: list[ProjectLeadOut] | Unset = UNSET
     managers: list[ProjectManagerOut] | Unset = UNSET
     implicit_members: list[ProjectImplicitMember] | Unset = UNSET
+    my_role: None | ProjectInDBMyRoleType0 | Unset = UNSET
+    can_manage_sprints: bool | Unset = False
     parent: None | ProjectRef | Unset = UNSET
     children: list[ProjectChildOut] | Unset = UNSET
     logo_url: None | str | Unset = UNSET
@@ -291,6 +300,16 @@ class ProjectInDB:
                 implicit_members_item = implicit_members_item_data.to_dict()
                 implicit_members.append(implicit_members_item)
 
+        my_role: None | str | Unset
+        if isinstance(self.my_role, Unset):
+            my_role = UNSET
+        elif isinstance(self.my_role, str):
+            my_role = self.my_role
+        else:
+            my_role = self.my_role
+
+        can_manage_sprints = self.can_manage_sprints
+
         parent: dict[str, Any] | None | Unset
         if isinstance(self.parent, Unset):
             parent = UNSET
@@ -368,6 +387,10 @@ class ProjectInDB:
             field_dict["managers"] = managers
         if implicit_members is not UNSET:
             field_dict["implicit_members"] = implicit_members
+        if my_role is not UNSET:
+            field_dict["my_role"] = my_role
+        if can_manage_sprints is not UNSET:
+            field_dict["can_manage_sprints"] = can_manage_sprints
         if parent is not UNSET:
             field_dict["parent"] = parent
         if children is not UNSET:
@@ -672,6 +695,25 @@ class ProjectInDB:
 
                 implicit_members.append(implicit_members_item)
 
+        def _parse_my_role(data: object) -> None | ProjectInDBMyRoleType0 | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                my_role_type_0 = check_project_in_db_my_role_type_0(data)
+
+                return my_role_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | ProjectInDBMyRoleType0 | Unset, data)
+
+        my_role = _parse_my_role(d.pop("my_role", UNSET))
+
+        can_manage_sprints = d.pop("can_manage_sprints", UNSET)
+
         def _parse_parent(data: object) -> None | ProjectRef | Unset:
             if data is None:
                 return data
@@ -736,6 +778,8 @@ class ProjectInDB:
             leads=leads,
             managers=managers,
             implicit_members=implicit_members,
+            my_role=my_role,
+            can_manage_sprints=can_manage_sprints,
             parent=parent,
             children=children,
             logo_url=logo_url,

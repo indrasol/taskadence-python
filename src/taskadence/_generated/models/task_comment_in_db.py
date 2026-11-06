@@ -39,6 +39,8 @@ class TaskCommentInDB:
         updated_at (datetime.datetime | None | Unset): When the comment was last updated
         mentions (list[Mention] | None | Unset): List of mentioned users details in the comment
         org_id (None | str | Unset): Organization ID (UUID)
+        created_by_display_name (None | str | Unset): R10.2d: the author's display name (null when they set none;
+            `created_by` is their username)
         attachments (list[CommentAttachment] | Unset): The files posted with the comment (also task attachments)
         reactions (list[CommentReaction] | Unset): Emoji reactions, ordered by each emoji's first reaction
         replies (list[TaskCommentInDB] | Unset): List of reply comments
@@ -55,6 +57,7 @@ class TaskCommentInDB:
     updated_at: datetime.datetime | None | Unset = UNSET
     mentions: list[Mention] | None | Unset = UNSET
     org_id: None | str | Unset = UNSET
+    created_by_display_name: None | str | Unset = UNSET
     attachments: list[CommentAttachment] | Unset = UNSET
     reactions: list[CommentReaction] | Unset = UNSET
     replies: list[TaskCommentInDB] | Unset = UNSET
@@ -136,6 +139,12 @@ class TaskCommentInDB:
         else:
             org_id = self.org_id
 
+        created_by_display_name: None | str | Unset
+        if isinstance(self.created_by_display_name, Unset):
+            created_by_display_name = UNSET
+        else:
+            created_by_display_name = self.created_by_display_name
+
         attachments: list[dict[str, Any]] | Unset = UNSET
         if not isinstance(self.attachments, Unset):
             attachments = []
@@ -183,6 +192,8 @@ class TaskCommentInDB:
             field_dict["mentions"] = mentions
         if org_id is not UNSET:
             field_dict["org_id"] = org_id
+        if created_by_display_name is not UNSET:
+            field_dict["created_by_display_name"] = created_by_display_name
         if attachments is not UNSET:
             field_dict["attachments"] = attachments
         if reactions is not UNSET:
@@ -313,6 +324,15 @@ class TaskCommentInDB:
 
         org_id = _parse_org_id(d.pop("org_id", UNSET))
 
+        def _parse_created_by_display_name(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        created_by_display_name = _parse_created_by_display_name(d.pop("created_by_display_name", UNSET))
+
         _attachments = d.pop("attachments", UNSET)
         attachments: list[CommentAttachment] | Unset = UNSET
         if _attachments is not UNSET:
@@ -352,6 +372,7 @@ class TaskCommentInDB:
             updated_at=updated_at,
             mentions=mentions,
             org_id=org_id,
+            created_by_display_name=created_by_display_name,
             attachments=attachments,
             reactions=reactions,
             replies=replies,

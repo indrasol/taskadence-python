@@ -10,81 +10,31 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..models.person_org_role import check_person_org_role
-from ..models.person_org_role import PersonOrgRole
-from ..types import UNSET, Unset
-from typing import cast
 
-
-T = TypeVar("T", bound="PersonOrg")
+T = TypeVar("T", bound="AccessSystemOutPresetsItem")
 
 
 @_attrs_define
-class PersonOrg:
-    """Part of `AccountPerson`.
-
-    Attributes:
-        org_id (str):
-        role (PersonOrgRole):
-        name (None | str | Unset):
-    """
-
-    org_id: str
-    role: PersonOrgRole
-    name: None | str | Unset = UNSET
+class AccessSystemOutPresetsItem:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        org_id = self.org_id
-
-        role: str = self.role
-
-        name: None | str | Unset
-        if isinstance(self.name, Unset):
-            name = UNSET
-        else:
-            name = self.name
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "org_id": org_id,
-                "role": role,
-            }
-        )
-        if name is not UNSET:
-            field_dict["name"] = name
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        org_id = d.pop("org_id")
+        access_system_out_presets_item = cls()
 
-        role = check_person_org_role(d.pop("role"))
-
-        def _parse_name(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        name = _parse_name(d.pop("name", UNSET))
-
-        person_org = cls(
-            org_id=org_id,
-            role=role,
-            name=name,
-        )
-
-        person_org.additional_properties = d
-        return person_org
+        access_system_out_presets_item.additional_properties = d
+        return access_system_out_presets_item
 
     @property
     def additional_keys(self) -> list[str]:

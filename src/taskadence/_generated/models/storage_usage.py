@@ -10,6 +10,10 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..models.storage_usage_plan import check_storage_usage_plan
+from ..models.storage_usage_plan import StorageUsagePlan
+from ..models.storage_usage_state import check_storage_usage_state
+from ..models.storage_usage_state import StorageUsageState
 from ..models.storage_usage_status import check_storage_usage_status
 from ..models.storage_usage_status import StorageUsageStatus
 from ..types import UNSET, Unset
@@ -33,25 +37,25 @@ class StorageUsage:
         bytes_used (int): Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)
         file_count (int): Counted files (task attachments, project files, legacy bug attachments); `GET
             .../storage/files` lists them
-        included_bytes (int): The free storage of the organization's ACCOUNT, which all its organizations share, in
-            bytes (decimal). The plan's value is 10^10 (10 GB); an account may be granted more.
-        overage_bytes (int): The account's: max(0, account_used_bytes - included_bytes)
-        percent (float): This organization's bytes_used / included_bytes, in percent, one decimal (its share of the
-            account's free storage)
-        status (StorageUsageStatus): The account's: ok; warning (80 % or more); blocked (full, no card on file: new
-            uploads answer 402); metered (full, a card on file: billed per GB-month at month end); exempt (full, an account
-            exempt from billing: never billed or blocked)
-        payment_method_on_file (bool): The account owner has a card on file (uploads continue past the free storage)
-        account_used_bytes (int): Bytes of every organization of the account
-        account_quota_bytes (int): The account's free storage (same as included_bytes)
-        account_percent (float): account_used_bytes / account_quota_bytes, in percent, one decimal
+        included_bytes (int): Storage included before overage, in bytes (decimal). A free organization's plan value is
+            10^10 (10 GB), a paid one's is 0 (every GB is billed); an organization may have a grant.
+        overage_bytes (int): max(0, bytes_used - included_bytes)
+        percent (float): bytes_used / included_bytes, in percent, one decimal (100 when nothing is included and
+            something is stored)
+        status (StorageUsageStatus): ok; warning (80 % or more); blocked (full, no card on file: new uploads answer
+            402); metered (full, a card on file: billed per GB-month at month end); exempt (full, exempt from billing: never
+            billed or blocked)
+        payment_method_on_file (bool): An owner has a card on file (uploads continue past the included storage)
+        billing_exempt (bool): Exempt from billing: metered and shown, never billed or blocked
         breakdown (StorageBreakdown): Part of `StorageUsage`.
-        manage_url (str): The account's Storage page in the web app
+        manage_url (str): The organization's Billing settings in the web app
+        plan (StorageUsagePlan | Unset): free: storage included; paid: nothing included, every GB billed Default:
+            'free'.
+        state (StorageUsageState | Unset): The card lifecycle of a paid organization; a free one is always active
+            Default: 'active'.
         project_count (int | Unset): Projects holding at least one counted file; `GET .../storage/projects` lists them
             Default: 0.
-        account_id (None | str | Unset): The account the organization belongs to
-        exempt_message (None | str | Unset): Set only while the account is exempt from billing: "Your account is exempt
-            from billing. No charge for this account."
+        exempt_message (None | str | Unset): Set only while the organization is exempt from billing
         top_files (list[StorageFile] | Unset): The 20 largest files (empty for a guest)
         trend (list[StorageDay] | Unset): The last 30 days, one row per day recorded
         updated_at (None | str | Unset): When the ledger last changed
@@ -65,13 +69,12 @@ class StorageUsage:
     percent: float
     status: StorageUsageStatus
     payment_method_on_file: bool
-    account_used_bytes: int
-    account_quota_bytes: int
-    account_percent: float
+    billing_exempt: bool
     breakdown: StorageBreakdown
     manage_url: str
+    plan: StorageUsagePlan | Unset = "free"
+    state: StorageUsageState | Unset = "active"
     project_count: int | Unset = 0
-    account_id: None | str | Unset = UNSET
     exempt_message: None | str | Unset = UNSET
     top_files: list[StorageFile] | Unset = UNSET
     trend: list[StorageDay] | Unset = UNSET
@@ -102,23 +105,21 @@ class StorageUsage:
 
         payment_method_on_file = self.payment_method_on_file
 
-        account_used_bytes = self.account_used_bytes
-
-        account_quota_bytes = self.account_quota_bytes
-
-        account_percent = self.account_percent
+        billing_exempt = self.billing_exempt
 
         breakdown = self.breakdown.to_dict()
 
         manage_url = self.manage_url
 
-        project_count = self.project_count
+        plan: str | Unset = UNSET
+        if not isinstance(self.plan, Unset):
+            plan = self.plan
 
-        account_id: None | str | Unset
-        if isinstance(self.account_id, Unset):
-            account_id = UNSET
-        else:
-            account_id = self.account_id
+        state: str | Unset = UNSET
+        if not isinstance(self.state, Unset):
+            state = self.state
+
+        project_count = self.project_count
 
         exempt_message: None | str | Unset
         if isinstance(self.exempt_message, Unset):
@@ -158,17 +159,17 @@ class StorageUsage:
                 "percent": percent,
                 "status": status,
                 "payment_method_on_file": payment_method_on_file,
-                "account_used_bytes": account_used_bytes,
-                "account_quota_bytes": account_quota_bytes,
-                "account_percent": account_percent,
+                "billing_exempt": billing_exempt,
                 "breakdown": breakdown,
                 "manage_url": manage_url,
             }
         )
+        if plan is not UNSET:
+            field_dict["plan"] = plan
+        if state is not UNSET:
+            field_dict["state"] = state
         if project_count is not UNSET:
             field_dict["project_count"] = project_count
-        if account_id is not UNSET:
-            field_dict["account_id"] = account_id
         if exempt_message is not UNSET:
             field_dict["exempt_message"] = exempt_message
         if top_files is not UNSET:
@@ -203,26 +204,27 @@ class StorageUsage:
 
         payment_method_on_file = d.pop("payment_method_on_file")
 
-        account_used_bytes = d.pop("account_used_bytes")
-
-        account_quota_bytes = d.pop("account_quota_bytes")
-
-        account_percent = d.pop("account_percent")
+        billing_exempt = d.pop("billing_exempt")
 
         breakdown = StorageBreakdown.from_dict(d.pop("breakdown"))
 
         manage_url = d.pop("manage_url")
 
+        _plan = d.pop("plan", UNSET)
+        plan: StorageUsagePlan | Unset
+        if isinstance(_plan, Unset):
+            plan = UNSET
+        else:
+            plan = check_storage_usage_plan(_plan)
+
+        _state = d.pop("state", UNSET)
+        state: StorageUsageState | Unset
+        if isinstance(_state, Unset):
+            state = UNSET
+        else:
+            state = check_storage_usage_state(_state)
+
         project_count = d.pop("project_count", UNSET)
-
-        def _parse_account_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        account_id = _parse_account_id(d.pop("account_id", UNSET))
 
         def _parse_exempt_message(data: object) -> None | str | Unset:
             if data is None:
@@ -269,13 +271,12 @@ class StorageUsage:
             percent=percent,
             status=status,
             payment_method_on_file=payment_method_on_file,
-            account_used_bytes=account_used_bytes,
-            account_quota_bytes=account_quota_bytes,
-            account_percent=account_percent,
+            billing_exempt=billing_exempt,
             breakdown=breakdown,
             manage_url=manage_url,
+            plan=plan,
+            state=state,
             project_count=project_count,
-            account_id=account_id,
             exempt_message=exempt_message,
             top_files=top_files,
             trend=trend,

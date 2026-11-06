@@ -111,11 +111,11 @@ class TaskCardView:
             only. Default: 0.
         subtask_context (bool | None | Unset): `subtasks=nested` only: a parent shown because one of its subtasks
             matches the query (it does not match itself). Response only.
-        subscriber_count (int | None | Unset): `include=subscribers` only (absent otherwise, and on rows with
-            `has_access=false`): how many people follow the task. Response only. Example: 3.
-        subscribers_preview (list[TaskSubscriberPreview] | None | Unset): `include=subscribers` only (absent otherwise,
-            and on rows with `has_access=false`): the first 3 subscribers, oldest first, as `GET
-            /v1/tasks/{task_id}/subscribers` lists them. Response only.
+        subscriber_count (int | None | Unset): With `include=subscribers` only (absent otherwise, and on rows with
+            `has_access: false`): how many people follow the task, not counting its current assignee. Example: 3.
+        subscribers_preview (list[TaskSubscriberPreview] | None | Unset): With `include=subscribers` only (absent
+            otherwise, and on rows with `has_access: false`): the first 3 followers other than the current assignee, oldest
+            first, as `GET /v1/tasks/{task_id}/subscribers` lists them.
     """
 
     title: str

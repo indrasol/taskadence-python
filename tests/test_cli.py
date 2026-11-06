@@ -151,8 +151,33 @@ def test_me(signed_in: None, api: respx.MockRouter) -> None:
     api.get("/v1/me").respond(json=example("me.read"))
     result = invoke("me")
     assert result.exit_code == 0 and "Organizations" in result.output
+    assert "Accounts" not in result.output
     as_json = invoke("me", "--json")
     assert json.loads(as_json.output)["principal"] == example("me.read")["principal"]
+
+
+def test_me_shows_each_organizations_plan_and_state(signed_in: None, api: respx.MockRouter) -> None:
+    org = {"org_id": "O1", "name": "Acme", "role": "owner", "plan": "paid", "state": "read_only"}
+    api.get("/v1/me").respond(json=example("me.read") | {"organizations": [org]})
+    result = invoke("me")
+    assert result.exit_code == 0 and "paid" in result.output and "read_only" in result.output
+
+
+def test_orgs_list_shows_plan_and_state(signed_in: None, api: respx.MockRouter) -> None:
+    free = {"org_id": "O1", "name": "Acme", "role": "owner", "plan": "free", "state": "active"}
+    paid = {"org_id": "O2", "name": "Labs", "role": "owner", "plan": "paid", "state": "pending_payment"}
+    route = api.get("/v1/organizations").respond(json={"data": [free, paid], "next_cursor": None})
+    result = invoke("orgs", "list")
+    assert result.exit_code == 0, result.output
+    for text in ("plan", "state", "free", "active", "paid", "pending_payment", "2 rows"):
+        assert text in result.output, text
+    assert route.called
+    assert [o["org_id"] for o in json.loads(invoke("orgs", "list", "--json").output)] == ["O1", "O2"]
+
+
+def test_orgs_has_no_create_command(signed_in: None) -> None:
+    """Creating an organization is internal in the contract: the API refuses every access token there."""
+    assert invoke("orgs", "create").exit_code == 2
 
 
 STORAGE = {
@@ -164,10 +189,9 @@ STORAGE = {
     "percent": 100.0,
     "status": "blocked",
     "payment_method_on_file": False,
-    "account_id": "A1",
-    "account_used_bytes": 1_000_400_000_000,
-    "account_quota_bytes": 10**12,
-    "account_percent": 100.0,
+    "plan": "free",
+    "state": "active",
+    "billing_exempt": False,
     "exempt_message": None,
     "breakdown": {
         "by_kind": {"task": 710_000_000_000, "project": 270_000_000_000, "bug": 20_400_000_000},
@@ -195,7 +219,8 @@ def test_storage(signed_in: None, api: respx.MockRouter) -> None:
     result = invoke("storage", "--org", "O123456")
     assert result.exit_code == 0, result.output
     assert "1.00 TB of 1.00 TB included" in result.output and "status blocked" in result.output
-    assert "Account: 1.00 TB of 1.00 TB (100.0%)" in result.output and "exempt" not in result.output
+    assert "Plan: free, state: active" in result.output and "exempt" not in result.output
+    assert "account" not in result.output.lower()
     assert (
         "New uploads are paused" in result.output
         and "Website relaunch" in result.output

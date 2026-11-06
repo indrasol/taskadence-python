@@ -7,6 +7,54 @@ entries below were pre-releases with no compatibility promise.
 
 ## [Unreleased]
 
+## [3.0.0] - unreleased
+
+Release 11: the organization is the top level. There is no account object any more: each organization has its own plan,
+storage, card, invoice and suspension state, and one person can belong to any number of organizations. Re-generated from
+the API contract at `taskadence-api` `242ed401` (branch `feature/org-billing`); the API version is now `2026-11-05` (was
+`2026-10-24`), so every request sends `TasKadence-Version: 2026-11-05`. A major version because methods, models, fields
+and an exception are removed, and the API stops serving the account routes in the same release. `taskadence-mcp` and
+`@taskadence/mcp` have no generated code and change only their shared version.
+
+**Upgrading from 2.x:**
+- `tm.account.*` and `tm.storage.get()` now raise `RemovedInRelease11Error`. For organizations use
+  `tm.organizations.list()`, for people `tm.organization_members.list(...)`, for storage
+  `tm.organizations.storage(org_id)`.
+- Delete `me.account` reads, and any `except EmailInOtherAccountError` (the class is gone, the API never answers it now).
+- Catch `OrganizationSuspendedError` (423) and `OrganizationPendingPaymentError` (409) where an organization may have no
+  card: these are new answers on routes that used to succeed.
+
+### Removed
+- **Account methods:** `tm.account.read` / `get`, `tm.account.people`, `tm.account.storage` and `tm.storage.get` remain
+  callable only to raise `RemovedInRelease11Error` with the 410's message (`.successor` names the route to call instead);
+  they return nothing and go when the API drops the routes.
+- **Models:** `AccountOut`, `AccountOrg`, `AccountOwner`, `AccountBillingBrief`, `AccountPendingActions`, `AccountPeople`,
+  `AccountPerson`, `AccountStorage`, `AccountStorageOrg`, `MeAccount`, `PersonOrg`.
+- **Fields:** `me.account`; `account_id`, `account_used_bytes`, `account_quota_bytes` and `account_percent` on
+  `StorageUsage`.
+- **Errors:** `EmailInOtherAccountError` and its alias `EmailInOtherAccount`. Invitations and joins never answer it.
+
+### Added
+- `plan`, `state` and `state_since` on `OrgCard`, `OrganizationInDB` and `MeOrganization` (`tm.organizations.list`,
+  `tm.organizations.read`, `tm.me`); `billing_owner_user_id`, `pending_billing_owner_user_id` and `grandfathered` on
+  `OrgCard` and `OrganizationInDB`; `plan`, `state` and `billing_exempt` on `StorageUsage`.
+- **Errors:** `RemovedInRelease11Error` (410, a subclass of `RemovedInRelease10Error`); `OrganizationSuspendedError` (423),
+  with `OrganizationRestrictedError` and `OrganizationReadOnlyError` (`.state`, `.since`); `OrganizationPendingPaymentError`
+  (409, `.org_id`, `.setup_url_route`); `BillingOwnerMustHandOverError` (409, `.org_id`, `.handover_route`).
+- `tm orgs list` shows each organization's plan and state, and `tm me` shows them too.
+- **Access requests:** `tm.access_systems` (`list`, `read`, `resources`, `roles`) and `tm.access_requests` (`create`,
+  `create_batch`, `list`, `read`), with their models. Deciding stays in the app.
+- `tm.task_history.batch`.
+
+### Changed
+- **Storage is the organization's.** `tm.organizations.storage(org_id)` measures that organization alone, and
+  `included_bytes` is 0 on a paid organization. `tm storage` prints its plan and state, not an account total.
+- The `account:read` and `account:write` scopes are still accepted and grant nothing.
+
+### Not in the SDK
+Creating an organization, its billing and handing billing to another owner stay out of the SDK: the API keeps those routes
+internal and refuses every access token on them. Owners use the web app (`StorageUsage.manage_url`).
+
 ## [2.0.0] - 2026-10-24
 
 Release 10: sprints belong to projects, teams, sections and test sprints have left TasKadence, and organizations belong

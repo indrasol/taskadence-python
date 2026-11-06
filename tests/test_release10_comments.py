@@ -218,7 +218,7 @@ def test_rename_and_avatar_preset_are_not_sdk_methods() -> None:
 
 
 # ---------------------------------------------------------------------------
-# OAuth resource, the account's pending actions
+# OAuth resource
 # ---------------------------------------------------------------------------
 
 
@@ -228,14 +228,6 @@ def test_me_says_which_resource_an_oauth_token_is_bound_to(tm: Taskadence, api: 
     api.get("/v1/me").respond(json=me)
     auth = tm.me().auth
     assert isinstance(auth, models.MeAuth) and auth.resource == "https://api.taskadence.com/mcp"
-
-
-def test_the_account_counts_its_pending_actions(tm: Taskadence, api: respx.MockRouter) -> None:
-    body = example("account.read") | {"pending_actions": {"incoming_transfers": 2}}
-    api.get("/v1/account").respond(json=body)
-    pending = tm.account.get().pending_actions
-    assert isinstance(pending, models.AccountPendingActions)
-    assert pending.incoming_transfers == 2
 
 
 # ---------------------------------------------------------------------------

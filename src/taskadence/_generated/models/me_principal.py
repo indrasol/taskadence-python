@@ -27,6 +27,8 @@ class MePrincipal:
         id (str): The user id (Supabase `auth.users.id`)
         type_ (MePrincipalType | Unset): What authenticated this request Default: 'user'.
         username (None | str | Unset):
+        display_name (None | str | Unset): R10.2d: the name the person chose to be shown by (spaces allowed); null when
+            none is set. The username stays the @handle
         email (None | str | Unset):
         email_verified (bool | None | Unset):
         avatar_preset (None | str | Unset): The illustrated avatar this person chose from the app's set (an id such as
@@ -36,6 +38,7 @@ class MePrincipal:
     id: str
     type_: MePrincipalType | Unset = "user"
     username: None | str | Unset = UNSET
+    display_name: None | str | Unset = UNSET
     email: None | str | Unset = UNSET
     email_verified: bool | None | Unset = UNSET
     avatar_preset: None | str | Unset = UNSET
@@ -56,6 +59,12 @@ class MePrincipal:
             username = UNSET
         else:
             username = self.username
+
+        display_name: None | str | Unset
+        if isinstance(self.display_name, Unset):
+            display_name = UNSET
+        else:
+            display_name = self.display_name
 
         email: None | str | Unset
         if isinstance(self.email, Unset):
@@ -86,6 +95,8 @@ class MePrincipal:
             field_dict["type"] = type_
         if username is not UNSET:
             field_dict["username"] = username
+        if display_name is not UNSET:
+            field_dict["display_name"] = display_name
         if email is not UNSET:
             field_dict["email"] = email
         if email_verified is not UNSET:
@@ -115,6 +126,15 @@ class MePrincipal:
             return cast(None | str | Unset, data)
 
         username = _parse_username(d.pop("username", UNSET))
+
+        def _parse_display_name(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        display_name = _parse_display_name(d.pop("display_name", UNSET))
 
         def _parse_email(data: object) -> None | str | Unset:
             if data is None:
@@ -147,6 +167,7 @@ class MePrincipal:
             id=id,
             type_=type_,
             username=username,
+            display_name=display_name,
             email=email,
             email_verified=email_verified,
             avatar_preset=avatar_preset,

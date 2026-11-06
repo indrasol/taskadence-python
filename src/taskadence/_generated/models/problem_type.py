@@ -4,9 +4,10 @@ from typing import Literal
 
 ProblemType = Literal[
     "about:blank",
+    "urn:taskadence:problem:billing-owner-must-hand-over",
     "urn:taskadence:problem:database-unavailable",
-    "urn:taskadence:problem:email-in-other-account",
     "urn:taskadence:problem:email-unverified",
+    "urn:taskadence:problem:gone",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",
     "urn:taskadence:problem:idempotency-key-reused",
@@ -15,6 +16,9 @@ ProblemType = Literal[
     "urn:taskadence:problem:invalid-parameter",
     "urn:taskadence:problem:member-not-linked",
     "urn:taskadence:problem:mfa-required",
+    "urn:taskadence:problem:organization-pending-payment",
+    "urn:taskadence:problem:organization-read-only",
+    "urn:taskadence:problem:organization-restricted",
     "urn:taskadence:problem:precondition-failed",
     "urn:taskadence:problem:rate-limit",
     "urn:taskadence:problem:removed-in-release-10",
@@ -37,9 +41,10 @@ ProblemType = Literal[
 
 PROBLEM_TYPE_VALUES: set[ProblemType] = {
     "about:blank",
+    "urn:taskadence:problem:billing-owner-must-hand-over",
     "urn:taskadence:problem:database-unavailable",
-    "urn:taskadence:problem:email-in-other-account",
     "urn:taskadence:problem:email-unverified",
+    "urn:taskadence:problem:gone",
     "urn:taskadence:problem:idempotency-key-in-flight",
     "urn:taskadence:problem:idempotency-key-invalid",
     "urn:taskadence:problem:idempotency-key-reused",
@@ -48,6 +53,9 @@ PROBLEM_TYPE_VALUES: set[ProblemType] = {
     "urn:taskadence:problem:invalid-parameter",
     "urn:taskadence:problem:member-not-linked",
     "urn:taskadence:problem:mfa-required",
+    "urn:taskadence:problem:organization-pending-payment",
+    "urn:taskadence:problem:organization-read-only",
+    "urn:taskadence:problem:organization-restricted",
     "urn:taskadence:problem:precondition-failed",
     "urn:taskadence:problem:rate-limit",
     "urn:taskadence:problem:removed-in-release-10",

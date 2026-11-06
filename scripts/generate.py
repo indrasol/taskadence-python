@@ -59,7 +59,9 @@ CROSS_ALIASES = {
     "storage": {"get": "account.storage"},
 }
 # Release 10: a namespace that exists only for its CROSS_ALIASES (no operationId of its own), with its docstring.
-ALIAS_NAMESPACES = {"storage": "The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."}
+ALIAS_NAMESPACES = {
+    "storage": "Removed in release 11: `tm.storage.get()` answers 410. Use `tm.organizations.storage(org_id)`."
+}
 # Release 10 step 3: a namespace under a resource (`tm.projects.members`): its docstring and its methods.
 NESTED = {
     "projects": {

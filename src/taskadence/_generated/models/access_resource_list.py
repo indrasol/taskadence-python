@@ -13,102 +13,99 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 
+if TYPE_CHECKING:
+    from ..models.access_resource import AccessResource
 
-T = TypeVar("T", bound="AccountStorageOrg")
+
+T = TypeVar("T", bound="AccessResourceList")
 
 
 @_attrs_define
-class AccountStorageOrg:
-    """Part of `AccountStorage`.
+class AccessResourceList:
+    """Returned by `access-systems.resources`.
 
     Attributes:
-        org_id (str):
-        bytes_used (int):
-        percent_of_quota (float): This organization's share of the account's quota, in percent
-        name (None | str | Unset):
-        file_count (int | Unset):  Default: 0.
-        deleted (bool | Unset): Pending deletion: its files count until they are purged Default: False.
+        data (list[AccessResource]):
+        total (int):
+        type_ (str):
+        next_cursor (None | str | Unset):
     """
 
-    org_id: str
-    bytes_used: int
-    percent_of_quota: float
-    name: None | str | Unset = UNSET
-    file_count: int | Unset = 0
-    deleted: bool | Unset = False
+    data: list[AccessResource]
+    total: int
+    type_: str
+    next_cursor: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        org_id = self.org_id
+        from ..models.access_resource import AccessResource  # noqa: PLC0415
 
-        bytes_used = self.bytes_used
+        data = []
+        for data_item_data in self.data:
+            data_item = data_item_data.to_dict()
+            data.append(data_item)
 
-        percent_of_quota = self.percent_of_quota
+        total = self.total
 
-        name: None | str | Unset
-        if isinstance(self.name, Unset):
-            name = UNSET
+        type_ = self.type_
+
+        next_cursor: None | str | Unset
+        if isinstance(self.next_cursor, Unset):
+            next_cursor = UNSET
         else:
-            name = self.name
-
-        file_count = self.file_count
-
-        deleted = self.deleted
+            next_cursor = self.next_cursor
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "org_id": org_id,
-                "bytes_used": bytes_used,
-                "percent_of_quota": percent_of_quota,
+                "data": data,
+                "total": total,
+                "type": type_,
             }
         )
-        if name is not UNSET:
-            field_dict["name"] = name
-        if file_count is not UNSET:
-            field_dict["file_count"] = file_count
-        if deleted is not UNSET:
-            field_dict["deleted"] = deleted
+        if next_cursor is not UNSET:
+            field_dict["next_cursor"] = next_cursor
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.access_resource import AccessResource  # noqa: PLC0415
+
         d = dict(src_dict)
-        org_id = d.pop("org_id")
+        data = []
+        _data = d.pop("data")
+        for data_item_data in _data:
+            data_item = AccessResource.from_dict(data_item_data)
 
-        bytes_used = d.pop("bytes_used")
+            data.append(data_item)
 
-        percent_of_quota = d.pop("percent_of_quota")
+        total = d.pop("total")
 
-        def _parse_name(data: object) -> None | str | Unset:
+        type_ = d.pop("type")
+
+        def _parse_next_cursor(data: object) -> None | str | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
             return cast(None | str | Unset, data)
 
-        name = _parse_name(d.pop("name", UNSET))
+        next_cursor = _parse_next_cursor(d.pop("next_cursor", UNSET))
 
-        file_count = d.pop("file_count", UNSET)
-
-        deleted = d.pop("deleted", UNSET)
-
-        account_storage_org = cls(
-            org_id=org_id,
-            bytes_used=bytes_used,
-            percent_of_quota=percent_of_quota,
-            name=name,
-            file_count=file_count,
-            deleted=deleted,
+        access_resource_list = cls(
+            data=data,
+            total=total,
+            type_=type_,
+            next_cursor=next_cursor,
         )
 
-        account_storage_org.additional_properties = d
-        return account_storage_org
+        access_resource_list.additional_properties = d
+        return access_resource_list
 
     @property
     def additional_keys(self) -> list[str]:

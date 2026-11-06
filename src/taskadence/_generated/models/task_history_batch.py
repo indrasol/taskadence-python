@@ -10,89 +10,57 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..models.me_account_role import check_me_account_role
-from ..models.me_account_role import MeAccountRole
-from ..types import UNSET, Unset
 from typing import cast
 
+if TYPE_CHECKING:
+    from ..models.task_history_batch_data import TaskHistoryBatchData
 
-T = TypeVar("T", bound="MeAccount")
+
+T = TypeVar("T", bound="TaskHistoryBatch")
 
 
 @_attrs_define
-class MeAccount:
-    """Release 10: the one account the person belongs to (one email = one account).
+class TaskHistoryBatch:
+    """Returned by `task-history.batch`.
 
     Attributes:
-        account_id (str):
-        name (None | str | Unset):
-        role (MeAccountRole | Unset): Account role: owner · admin · member Default: 'member'.
+        data (TaskHistoryBatchData):
     """
 
-    account_id: str
-    name: None | str | Unset = UNSET
-    role: MeAccountRole | Unset = "member"
+    data: TaskHistoryBatchData
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        account_id = self.account_id
+        from ..models.task_history_batch_data import TaskHistoryBatchData  # noqa: PLC0415
 
-        name: None | str | Unset
-        if isinstance(self.name, Unset):
-            name = UNSET
-        else:
-            name = self.name
-
-        role: str | Unset = UNSET
-        if not isinstance(self.role, Unset):
-            role = self.role
+        data = self.data.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "account_id": account_id,
+                "data": data,
             }
         )
-        if name is not UNSET:
-            field_dict["name"] = name
-        if role is not UNSET:
-            field_dict["role"] = role
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.task_history_batch_data import TaskHistoryBatchData  # noqa: PLC0415
+
         d = dict(src_dict)
-        account_id = d.pop("account_id")
+        data = TaskHistoryBatchData.from_dict(d.pop("data"))
 
-        def _parse_name(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        name = _parse_name(d.pop("name", UNSET))
-
-        _role = d.pop("role", UNSET)
-        role: MeAccountRole | Unset
-        if isinstance(_role, Unset):
-            role = UNSET
-        else:
-            role = check_me_account_role(_role)
-
-        me_account = cls(
-            account_id=account_id,
-            name=name,
-            role=role,
+        task_history_batch = cls(
+            data=data,
         )
 
-        me_account.additional_properties = d
-        return me_account
+        task_history_batch.additional_properties = d
+        return task_history_batch
 
     @property
     def additional_keys(self) -> list[str]:

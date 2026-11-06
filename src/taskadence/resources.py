@@ -1690,6 +1690,22 @@ class TaskHistoryResource:
         )
 
     @overload
+    def batch(self, *, task_id: Sequence[str], if_none_match: None = None) -> models.TaskHistoryBatch: ...
+    @overload
+    def batch(self, *, task_id: Sequence[str], if_none_match: str) -> models.TaskHistoryBatch | NotModifiedType: ...
+    def batch(
+        self, *, task_id: Sequence[str], if_none_match: str | None = None
+    ) -> models.TaskHistoryBatch | NotModifiedType:
+        """Several tasks' change histories in one call.
+
+        `GET /v1/task-history/batch` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskHistoryBatch | NotModifiedType",
+            self._client._call(_OPS["task-history.batch"], query={"task_id": task_id}, if_none_match=if_none_match),
+        )
+
+    @overload
     def read(self, history_id: str, *, if_none_match: None = None) -> models.TaskHistoryInDB: ...
     @overload
     def read(self, history_id: str, *, if_none_match: str) -> models.TaskHistoryInDB | NotModifiedType: ...
@@ -1732,51 +1748,31 @@ class ProjectStatsResource:
 
 
 class AccountResource:
-    """Your account: one per email, any number of organizations, one shared storage pool."""
+    """Removed in release 11: every operation here answers 410 Gone. An organization is now the top level."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
 
-    @overload
-    def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
-    @overload
-    def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
-    def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
-        """The caller's account: its organizations, the caller's account role and the storage pool.
+    def read(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/account`
         """
-        return cast(
-            "models.AccountOut | NotModifiedType", self._client._call(_OPS["account.read"], if_none_match=if_none_match)
-        )
+        return cast("None", self._client._call(_OPS["account.read"]))
 
-    @overload
-    def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
-    @overload
-    def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
-    def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
-        """Everyone in the account with their role in each organization (account owner / admin).
+    def people(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/account/people`
         """
-        return cast(
-            "models.AccountPeople | NotModifiedType",
-            self._client._call(_OPS["account.people"], if_none_match=if_none_match),
-        )
+        return cast("None", self._client._call(_OPS["account.people"]))
 
-    @overload
-    def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
-    @overload
-    def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
-    def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
-        """The account's storage pool: totals and the per-organization breakdown.
+    def storage(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/storage`
         """
-        return cast(
-            "models.AccountStorage | NotModifiedType",
-            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
-        )
+        return cast("None", self._client._call(_OPS["account.storage"]))
 
     get = read
     """Alias of `read`."""
@@ -2249,6 +2245,191 @@ class ReleasesResource:
                 if_none_match=if_none_match,
             ),
         )
+
+
+class AccessSystemsResource:
+    """The systems people request access to (a cloud, GitHub, a SaaS seat...): their access levels, which need an end date, who approves, and a connected system's resources and roles to pick from. Read-only."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    @overload
+    def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: None = None
+    ) -> models.AccessSystemList: ...
+    @overload
+    def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: str
+    ) -> models.AccessSystemList | NotModifiedType: ...
+    def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: str | None = None
+    ) -> models.AccessSystemList | NotModifiedType:
+        """List the organization's access systems.
+
+        `GET /v1/access-systems` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessSystemList | NotModifiedType",
+            self._client._call(
+                _OPS["access-systems.list"],
+                query={"org_id": org_id, "include_archived": include_archived},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    def read(self, system_id: str, *, if_none_match: None = None) -> models.AccessSystemOut: ...
+    @overload
+    def read(self, system_id: str, *, if_none_match: str) -> models.AccessSystemOut | NotModifiedType: ...
+    def read(self, system_id: str, *, if_none_match: str | None = None) -> models.AccessSystemOut | NotModifiedType:
+        """Read an access system.
+
+        `GET /v1/access-systems/{system_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessSystemOut | NotModifiedType",
+            self._client._call(_OPS["access-systems.read"], path=(system_id,), if_none_match=if_none_match),
+        )
+
+    @overload
+    def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: None = None,
+    ) -> models.AccessResourceList: ...
+    @overload
+    def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: str,
+    ) -> models.AccessResourceList | NotModifiedType: ...
+    def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.AccessResourceList | NotModifiedType:
+        """A connected system's resources to request.
+
+        `GET /v1/access-systems/{system_id}/resources` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessResourceList | NotModifiedType",
+            self._client._call(
+                _OPS["access-systems.resources"],
+                path=(system_id,),
+                query={"type": type, "q": q, "cursor": cursor},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: None = None
+    ) -> models.AccessRoleList: ...
+    @overload
+    def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: str
+    ) -> models.AccessRoleList | NotModifiedType: ...
+    def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: str | None = None
+    ) -> models.AccessRoleList | NotModifiedType:
+        """The roles a system's resource type offers.
+
+        `GET /v1/access-systems/{system_id}/roles` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRoleList | NotModifiedType",
+            self._client._call(
+                _OPS["access-systems.roles"], path=(system_id,), query={"type": type}, if_none_match=if_none_match
+            ),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AccessRequestsResource:
+    """Access requests: file one or several, list the ones you filed or decide, read one. Filing grants nothing: the system's approvers approve and grant in the app."""
+
+    def __init__(self, client: SyncCore) -> None:
+        self._client = client
+
+    def create(
+        self, body: models.AccessRequestCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.AccessRequestOut:
+        """File an access request.
+
+        `POST /v1/access-requests` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.AccessRequestOut",
+            self._client._call(_OPS["access-requests.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: None = None
+    ) -> models.AccessRequestList: ...
+    @overload
+    def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: str
+    ) -> models.AccessRequestList | NotModifiedType: ...
+    def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: str | None = None
+    ) -> models.AccessRequestList | NotModifiedType:
+        """List the access requests you filed or decide.
+
+        `GET /v1/access-requests` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRequestList | NotModifiedType",
+            self._client._call(
+                _OPS["access-requests.list"],
+                query={"org_id": org_id, "scope": scope, "state": state},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    def create_batch(
+        self, body: models.AccessBatchCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.AccessBatchCreated:
+        """File up to 20 access requests (per-item results).
+
+        `POST /v1/access-requests/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.AccessBatchCreated",
+            self._client._call(_OPS["access-requests.create_batch"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    def read(self, task_id: str, *, if_none_match: None = None) -> models.AccessRequestOut: ...
+    @overload
+    def read(self, task_id: str, *, if_none_match: str) -> models.AccessRequestOut | NotModifiedType: ...
+    def read(self, task_id: str, *, if_none_match: str | None = None) -> models.AccessRequestOut | NotModifiedType:
+        """Read an access request.
+
+        `GET /v1/access-requests/{task_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRequestOut | NotModifiedType",
+            self._client._call(_OPS["access-requests.read"], path=(task_id,), if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class SprintsResource:
@@ -3153,24 +3334,17 @@ class ViewPinsResource:
 
 
 class StorageResource:
-    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+    """Removed in release 11: `tm.storage.get()` answers 410. Use `tm.organizations.storage(org_id)`."""
 
     def __init__(self, client: SyncCore) -> None:
         self._client = client
 
-    @overload
-    def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
-    @overload
-    def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
-    def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
-        """The account's storage pool: totals and the per-organization breakdown.
+    def get(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/storage`
         """
-        return cast(
-            "models.AccountStorage | NotModifiedType",
-            self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
-        )
+        return cast("None", self._client._call(_OPS["account.storage"]))
 
 
 class AsyncHealthResource:
@@ -4885,6 +5059,26 @@ class AsyncTaskHistoryResource:
         )
 
     @overload
+    async def batch(self, *, task_id: Sequence[str], if_none_match: None = None) -> models.TaskHistoryBatch: ...
+    @overload
+    async def batch(
+        self, *, task_id: Sequence[str], if_none_match: str
+    ) -> models.TaskHistoryBatch | NotModifiedType: ...
+    async def batch(
+        self, *, task_id: Sequence[str], if_none_match: str | None = None
+    ) -> models.TaskHistoryBatch | NotModifiedType:
+        """Several tasks' change histories in one call.
+
+        `GET /v1/task-history/batch` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.TaskHistoryBatch | NotModifiedType",
+            await self._client._call(
+                _OPS["task-history.batch"], query={"task_id": task_id}, if_none_match=if_none_match
+            ),
+        )
+
+    @overload
     async def read(self, history_id: str, *, if_none_match: None = None) -> models.TaskHistoryInDB: ...
     @overload
     async def read(self, history_id: str, *, if_none_match: str) -> models.TaskHistoryInDB | NotModifiedType: ...
@@ -4931,52 +5125,31 @@ class AsyncProjectStatsResource:
 
 
 class AsyncAccountResource:
-    """Your account: one per email, any number of organizations, one shared storage pool."""
+    """Removed in release 11: every operation here answers 410 Gone. An organization is now the top level."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
 
-    @overload
-    async def read(self, *, if_none_match: None = None) -> models.AccountOut: ...
-    @overload
-    async def read(self, *, if_none_match: str) -> models.AccountOut | NotModifiedType: ...
-    async def read(self, *, if_none_match: str | None = None) -> models.AccountOut | NotModifiedType:
-        """The caller's account: its organizations, the caller's account role and the storage pool.
+    async def read(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/account` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/account`
         """
-        return cast(
-            "models.AccountOut | NotModifiedType",
-            await self._client._call(_OPS["account.read"], if_none_match=if_none_match),
-        )
+        return cast("None", await self._client._call(_OPS["account.read"]))
 
-    @overload
-    async def people(self, *, if_none_match: None = None) -> models.AccountPeople: ...
-    @overload
-    async def people(self, *, if_none_match: str) -> models.AccountPeople | NotModifiedType: ...
-    async def people(self, *, if_none_match: str | None = None) -> models.AccountPeople | NotModifiedType:
-        """Everyone in the account with their role in each organization (account owner / admin).
+    async def people(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/account/people` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/account/people`
         """
-        return cast(
-            "models.AccountPeople | NotModifiedType",
-            await self._client._call(_OPS["account.people"], if_none_match=if_none_match),
-        )
+        return cast("None", await self._client._call(_OPS["account.people"]))
 
-    @overload
-    async def storage(self, *, if_none_match: None = None) -> models.AccountStorage: ...
-    @overload
-    async def storage(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
-    async def storage(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
-        """The account's storage pool: totals and the per-organization breakdown.
+    async def storage(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/storage`
         """
-        return cast(
-            "models.AccountStorage | NotModifiedType",
-            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
-        )
+        return cast("None", await self._client._call(_OPS["account.storage"]))
 
     get = read
     """Alias of `read`."""
@@ -5462,6 +5635,195 @@ class AsyncReleasesResource:
                 if_none_match=if_none_match,
             ),
         )
+
+
+class AsyncAccessSystemsResource:
+    """The systems people request access to (a cloud, GitHub, a SaaS seat...): their access levels, which need an end date, who approves, and a connected system's resources and roles to pick from. Read-only."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    @overload
+    async def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: None = None
+    ) -> models.AccessSystemList: ...
+    @overload
+    async def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: str
+    ) -> models.AccessSystemList | NotModifiedType: ...
+    async def list(
+        self, *, org_id: str, include_archived: bool | None = None, if_none_match: str | None = None
+    ) -> models.AccessSystemList | NotModifiedType:
+        """List the organization's access systems.
+
+        `GET /v1/access-systems` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessSystemList | NotModifiedType",
+            await self._client._call(
+                _OPS["access-systems.list"],
+                query={"org_id": org_id, "include_archived": include_archived},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    async def read(self, system_id: str, *, if_none_match: None = None) -> models.AccessSystemOut: ...
+    @overload
+    async def read(self, system_id: str, *, if_none_match: str) -> models.AccessSystemOut | NotModifiedType: ...
+    async def read(
+        self, system_id: str, *, if_none_match: str | None = None
+    ) -> models.AccessSystemOut | NotModifiedType:
+        """Read an access system.
+
+        `GET /v1/access-systems/{system_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessSystemOut | NotModifiedType",
+            await self._client._call(_OPS["access-systems.read"], path=(system_id,), if_none_match=if_none_match),
+        )
+
+    @overload
+    async def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: None = None,
+    ) -> models.AccessResourceList: ...
+    @overload
+    async def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: str,
+    ) -> models.AccessResourceList | NotModifiedType: ...
+    async def resources(
+        self,
+        system_id: str,
+        *,
+        type: str | None = None,
+        q: str | None = None,
+        cursor: str | None = None,
+        if_none_match: str | None = None,
+    ) -> models.AccessResourceList | NotModifiedType:
+        """A connected system's resources to request.
+
+        `GET /v1/access-systems/{system_id}/resources` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessResourceList | NotModifiedType",
+            await self._client._call(
+                _OPS["access-systems.resources"],
+                path=(system_id,),
+                query={"type": type, "q": q, "cursor": cursor},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    @overload
+    async def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: None = None
+    ) -> models.AccessRoleList: ...
+    @overload
+    async def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: str
+    ) -> models.AccessRoleList | NotModifiedType: ...
+    async def roles(
+        self, system_id: str, *, type: str | None = None, if_none_match: str | None = None
+    ) -> models.AccessRoleList | NotModifiedType:
+        """The roles a system's resource type offers.
+
+        `GET /v1/access-systems/{system_id}/roles` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRoleList | NotModifiedType",
+            await self._client._call(
+                _OPS["access-systems.roles"], path=(system_id,), query={"type": type}, if_none_match=if_none_match
+            ),
+        )
+
+    get = read
+    """Alias of `read`."""
+
+
+class AsyncAccessRequestsResource:
+    """Access requests: file one or several, list the ones you filed or decide, read one. Filing grants nothing: the system's approvers approve and grant in the app."""
+
+    def __init__(self, client: AsyncCore) -> None:
+        self._client = client
+
+    async def create(
+        self, body: models.AccessRequestCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.AccessRequestOut:
+        """File an access request.
+
+        `POST /v1/access-requests` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.AccessRequestOut",
+            await self._client._call(_OPS["access-requests.create"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    async def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: None = None
+    ) -> models.AccessRequestList: ...
+    @overload
+    async def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: str
+    ) -> models.AccessRequestList | NotModifiedType: ...
+    async def list(
+        self, *, org_id: str, scope: str | None = None, state: str | None = None, if_none_match: str | None = None
+    ) -> models.AccessRequestList | NotModifiedType:
+        """List the access requests you filed or decide.
+
+        `GET /v1/access-requests` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRequestList | NotModifiedType",
+            await self._client._call(
+                _OPS["access-requests.list"],
+                query={"org_id": org_id, "scope": scope, "state": state},
+                if_none_match=if_none_match,
+            ),
+        )
+
+    async def create_batch(
+        self, body: models.AccessBatchCreate | Mapping[str, Any], *, idempotency_key: str | _Auto | None = AUTO
+    ) -> models.AccessBatchCreated:
+        """File up to 20 access requests (per-item results).
+
+        `POST /v1/access-requests/batch` · scope `tasks:write` · `Idempotency-Key` sent automatically
+        """
+        return cast(
+            "models.AccessBatchCreated",
+            await self._client._call(_OPS["access-requests.create_batch"], body=body, idempotency_key=idempotency_key),
+        )
+
+    @overload
+    async def read(self, task_id: str, *, if_none_match: None = None) -> models.AccessRequestOut: ...
+    @overload
+    async def read(self, task_id: str, *, if_none_match: str) -> models.AccessRequestOut | NotModifiedType: ...
+    async def read(
+        self, task_id: str, *, if_none_match: str | None = None
+    ) -> models.AccessRequestOut | NotModifiedType:
+        """Read an access request.
+
+        `GET /v1/access-requests/{task_id}` · scope `tasks:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        """
+        return cast(
+            "models.AccessRequestOut | NotModifiedType",
+            await self._client._call(_OPS["access-requests.read"], path=(task_id,), if_none_match=if_none_match),
+        )
+
+    get = read
+    """Alias of `read`."""
 
 
 class AsyncSprintsResource:
@@ -6398,24 +6760,17 @@ class AsyncViewPinsResource:
 
 
 class AsyncStorageResource:
-    """The account's storage meter: `tm.storage.get()` is `tm.account.storage()`."""
+    """Removed in release 11: `tm.storage.get()` answers 410. Use `tm.organizations.storage(org_id)`."""
 
     def __init__(self, client: AsyncCore) -> None:
         self._client = client
 
-    @overload
-    async def get(self, *, if_none_match: None = None) -> models.AccountStorage: ...
-    @overload
-    async def get(self, *, if_none_match: str) -> models.AccountStorage | NotModifiedType: ...
-    async def get(self, *, if_none_match: str | None = None) -> models.AccountStorage | NotModifiedType:
-        """The account's storage pool: totals and the per-organization breakdown.
+    async def get(self) -> None:
+        """Removed in release 11: answers 410.
 
-        `GET /v1/storage` · scope `account:read` · `if_none_match=<etag>` → `NotModified` when unchanged
+        `GET /v1/storage`
         """
-        return cast(
-            "models.AccountStorage | NotModifiedType",
-            await self._client._call(_OPS["account.storage"], if_none_match=if_none_match),
-        )
+        return cast("None", await self._client._call(_OPS["account.storage"]))
 
 
 class SyncResources:
@@ -6442,6 +6797,8 @@ class SyncResources:
     oauth_clients: OauthClientsResource
     connected_apps: ConnectedAppsResource
     releases: ReleasesResource
+    access_systems: AccessSystemsResource
+    access_requests: AccessRequestsResource
     sprints: SprintsResource
     availability: AvailabilityResource
     workload: WorkloadResource
@@ -6476,6 +6833,8 @@ class SyncResources:
         self.oauth_clients = OauthClientsResource(core)
         self.connected_apps = ConnectedAppsResource(core)
         self.releases = ReleasesResource(core)
+        self.access_systems = AccessSystemsResource(core)
+        self.access_requests = AccessRequestsResource(core)
         self.sprints = SprintsResource(core)
         self.availability = AvailabilityResource(core)
         self.workload = WorkloadResource(core)
@@ -6513,6 +6872,8 @@ class AsyncResources:
     oauth_clients: AsyncOauthClientsResource
     connected_apps: AsyncConnectedAppsResource
     releases: AsyncReleasesResource
+    access_systems: AsyncAccessSystemsResource
+    access_requests: AsyncAccessRequestsResource
     sprints: AsyncSprintsResource
     availability: AsyncAvailabilityResource
     workload: AsyncWorkloadResource
@@ -6547,6 +6908,8 @@ class AsyncResources:
         self.oauth_clients = AsyncOauthClientsResource(core)
         self.connected_apps = AsyncConnectedAppsResource(core)
         self.releases = AsyncReleasesResource(core)
+        self.access_systems = AsyncAccessSystemsResource(core)
+        self.access_requests = AsyncAccessRequestsResource(core)
         self.sprints = AsyncSprintsResource(core)
         self.availability = AsyncAvailabilityResource(core)
         self.workload = AsyncWorkloadResource(core)
@@ -6641,6 +7004,7 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "task-comments.update": ("task_comments", "update"),
     "task-comments.delete": ("task_comments", "delete"),
     "task-history.list": ("task_history", "list"),
+    "task-history.batch": ("task_history", "batch"),
     "task-history.read": ("task_history", "read"),
     "project-stats.read": ("project_stats", "read"),
     "account.read": ("account", "read"),
@@ -6682,6 +7046,14 @@ RESOURCE_METHODS: dict[str, tuple[str, str]] = {
     "connected-apps.list": ("connected_apps", "list"),
     "connected-apps.delete": ("connected_apps", "delete"),
     "releases.whats_new": ("releases", "whats_new"),
+    "access-systems.list": ("access_systems", "list"),
+    "access-systems.read": ("access_systems", "read"),
+    "access-systems.resources": ("access_systems", "resources"),
+    "access-systems.roles": ("access_systems", "roles"),
+    "access-requests.create": ("access_requests", "create"),
+    "access-requests.list": ("access_requests", "list"),
+    "access-requests.create_batch": ("access_requests", "create_batch"),
+    "access-requests.read": ("access_requests", "read"),
     "sprints.list": ("sprints", "list"),
     "sprints.create": ("sprints", "create"),
     "sprints.list_org": ("sprints", "list_org"),

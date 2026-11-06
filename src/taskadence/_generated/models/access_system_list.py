@@ -10,91 +10,73 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
 from typing import cast
 
+if TYPE_CHECKING:
+    from ..models.access_system_out import AccessSystemOut
 
-T = TypeVar("T", bound="AccountOwner")
+
+T = TypeVar("T", bound="AccessSystemList")
 
 
 @_attrs_define
-class AccountOwner:
-    """Part of `AccountOut`.
+class AccessSystemList:
+    """Returned by `access-systems.list`.
 
     Attributes:
-        user_id (str):
-        username (None | str | Unset):
-        email (None | str | Unset):
+        data (list[AccessSystemOut]):
+        total (int):
     """
 
-    user_id: str
-    username: None | str | Unset = UNSET
-    email: None | str | Unset = UNSET
+    data: list[AccessSystemOut]
+    total: int
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        user_id = self.user_id
+        from ..models.access_system_out import AccessSystemOut  # noqa: PLC0415
 
-        username: None | str | Unset
-        if isinstance(self.username, Unset):
-            username = UNSET
-        else:
-            username = self.username
+        data = []
+        for data_item_data in self.data:
+            data_item = data_item_data.to_dict()
+            data.append(data_item)
 
-        email: None | str | Unset
-        if isinstance(self.email, Unset):
-            email = UNSET
-        else:
-            email = self.email
+        total = self.total
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "user_id": user_id,
+                "data": data,
+                "total": total,
             }
         )
-        if username is not UNSET:
-            field_dict["username"] = username
-        if email is not UNSET:
-            field_dict["email"] = email
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.access_system_out import AccessSystemOut  # noqa: PLC0415
+
         d = dict(src_dict)
-        user_id = d.pop("user_id")
+        data = []
+        _data = d.pop("data")
+        for data_item_data in _data:
+            data_item = AccessSystemOut.from_dict(data_item_data)
 
-        def _parse_username(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
+            data.append(data_item)
 
-        username = _parse_username(d.pop("username", UNSET))
+        total = d.pop("total")
 
-        def _parse_email(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        email = _parse_email(d.pop("email", UNSET))
-
-        account_owner = cls(
-            user_id=user_id,
-            username=username,
-            email=email,
+        access_system_list = cls(
+            data=data,
+            total=total,
         )
 
-        account_owner.additional_properties = d
-        return account_owner
+        access_system_list.additional_properties = d
+        return access_system_list
 
     @property
     def additional_keys(self) -> list[str]:

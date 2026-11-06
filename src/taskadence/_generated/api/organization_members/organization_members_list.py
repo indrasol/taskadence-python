@@ -184,7 +184,8 @@ def sync_detailed(
 
     Args:
         org_id (str):
-        search (None | str | Unset): Text to find in the username or email (case-insensitive)
+        search (None | str | Unset): Text to find in the username, display name or email (case-
+            insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -245,7 +246,8 @@ def sync(
 
     Args:
         org_id (str):
-        search (None | str | Unset): Text to find in the username or email (case-insensitive)
+        search (None | str | Unset): Text to find in the username, display name or email (case-
+            insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -301,7 +303,8 @@ async def asyncio_detailed(
 
     Args:
         org_id (str):
-        search (None | str | Unset): Text to find in the username or email (case-insensitive)
+        search (None | str | Unset): Text to find in the username, display name or email (case-
+            insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
@@ -360,7 +363,8 @@ async def asyncio(
 
     Args:
         org_id (str):
-        search (None | str | Unset): Text to find in the username or email (case-insensitive)
+        search (None | str | Unset): Text to find in the username, display name or email (case-
+            insensitive)
         role (None | str | Unset):
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,

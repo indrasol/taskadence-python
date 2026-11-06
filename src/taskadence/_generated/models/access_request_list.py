@@ -13,44 +13,51 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
-    from ..models.account_person import AccountPerson
+    from ..models.access_request_list_counts import AccessRequestListCounts
+    from ..models.access_request_out import AccessRequestOut
 
 
-T = TypeVar("T", bound="AccountPeople")
+T = TypeVar("T", bound="AccessRequestList")
 
 
 @_attrs_define
-class AccountPeople:
-    """Returned by `account.people`.
+class AccessRequestList:
+    """Returned by `access-requests.list`.
 
     Attributes:
-        account_id (str):
-        people (list[AccountPerson]):
+        data (list[AccessRequestOut]):
+        total (int):
+        counts (AccessRequestListCounts): Requests per state in the scope (the `state` filter not applied)
     """
 
-    account_id: str
-    people: list[AccountPerson]
+    data: list[AccessRequestOut]
+    total: int
+    counts: AccessRequestListCounts
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.account_person import AccountPerson  # noqa: PLC0415
+        from ..models.access_request_list_counts import AccessRequestListCounts  # noqa: PLC0415
+        from ..models.access_request_out import AccessRequestOut  # noqa: PLC0415
 
-        account_id = self.account_id
+        data = []
+        for data_item_data in self.data:
+            data_item = data_item_data.to_dict()
+            data.append(data_item)
 
-        people = []
-        for people_item_data in self.people:
-            people_item = people_item_data.to_dict()
-            people.append(people_item)
+        total = self.total
+
+        counts = self.counts.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "account_id": account_id,
-                "people": people,
+                "data": data,
+                "total": total,
+                "counts": counts,
             }
         )
 
@@ -58,25 +65,29 @@ class AccountPeople:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.account_person import AccountPerson  # noqa: PLC0415
+        from ..models.access_request_list_counts import AccessRequestListCounts  # noqa: PLC0415
+        from ..models.access_request_out import AccessRequestOut  # noqa: PLC0415
 
         d = dict(src_dict)
-        account_id = d.pop("account_id")
+        data = []
+        _data = d.pop("data")
+        for data_item_data in _data:
+            data_item = AccessRequestOut.from_dict(data_item_data)
 
-        people = []
-        _people = d.pop("people")
-        for people_item_data in _people:
-            people_item = AccountPerson.from_dict(people_item_data)
+            data.append(data_item)
 
-            people.append(people_item)
+        total = d.pop("total")
 
-        account_people = cls(
-            account_id=account_id,
-            people=people,
+        counts = AccessRequestListCounts.from_dict(d.pop("counts"))
+
+        access_request_list = cls(
+            data=data,
+            total=total,
+            counts=counts,
         )
 
-        account_people.additional_properties = d
-        return account_people
+        access_request_list.additional_properties = d
+        return access_request_list
 
     @property
     def additional_keys(self) -> list[str]:

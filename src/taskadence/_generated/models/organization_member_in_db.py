@@ -43,6 +43,8 @@ class OrganizationMemberInDB:
         deleted_by (None | str | Unset): Who deleted the member
         last_active_at (datetime.datetime | None | Unset): The member's last API request in this organization; null =
             never.
+        display_name (None | str | Unset): R10.2d: the name the person chose to be shown by (spaces allowed); null when
+            none is set. `username` stays their @handle
         kind (str | Unset): `user` (a person) or `service_account` (a non-human member that holds access tokens).
             Default: 'user'.
         mfa_enrolled (bool | None | Unset): Whether the member has set up two-step sign-in. Only in the members list,
@@ -74,6 +76,7 @@ class OrganizationMemberInDB:
     delete_reason: None | str | Unset = UNSET
     deleted_by: None | str | Unset = UNSET
     last_active_at: datetime.datetime | None | Unset = UNSET
+    display_name: None | str | Unset = UNSET
     kind: str | Unset = "user"
     mfa_enrolled: bool | None | Unset = UNSET
     linked: bool | None | Unset = UNSET
@@ -183,6 +186,12 @@ class OrganizationMemberInDB:
         else:
             last_active_at = self.last_active_at
 
+        display_name: None | str | Unset
+        if isinstance(self.display_name, Unset):
+            display_name = UNSET
+        else:
+            display_name = self.display_name
+
         kind = self.kind
 
         mfa_enrolled: bool | None | Unset
@@ -243,6 +252,8 @@ class OrganizationMemberInDB:
             field_dict["deleted_by"] = deleted_by
         if last_active_at is not UNSET:
             field_dict["last_active_at"] = last_active_at
+        if display_name is not UNSET:
+            field_dict["display_name"] = display_name
         if kind is not UNSET:
             field_dict["kind"] = kind
         if mfa_enrolled is not UNSET:
@@ -434,6 +445,15 @@ class OrganizationMemberInDB:
 
         last_active_at = _parse_last_active_at(d.pop("last_active_at", UNSET))
 
+        def _parse_display_name(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        display_name = _parse_display_name(d.pop("display_name", UNSET))
+
         kind = d.pop("kind", UNSET)
 
         def _parse_mfa_enrolled(data: object) -> bool | None | Unset:
@@ -483,6 +503,7 @@ class OrganizationMemberInDB:
             delete_reason=delete_reason,
             deleted_by=deleted_by,
             last_active_at=last_active_at,
+            display_name=display_name,
             kind=kind,
             mfa_enrolled=mfa_enrolled,
             linked=linked,
