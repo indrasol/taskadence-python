@@ -9,7 +9,7 @@ change your organization's tasks, projects and sprints, and it adds `tm`, a comm
 
 > **Stable since 1.0.** The SDK follows [semantic versioning](https://semver.org/) and the API's
 > [versioning policy](https://docs.taskadence.com/guides/versioning/): no breaking change within a major version.
-> **3.0** makes the organization the top level, each with its own plan, storage and bill.
+> **3.0** makes the organization the top level, with 10 GB of storage each, billed to the person who owns it.
 > **2.0** removes teams, sections and test sprints, which left the product; sprints now belong to projects. Read the
 > [changelog](https://github.com/indrasol/taskadence-python/blob/main/CHANGELOG.md) before upgrading.
 
@@ -106,12 +106,14 @@ Something went wrong? See Troubleshooting near the end of this page.
 
 ## Key ideas
 
-Four things that make the rest of this page easier to read.
+Five things that make the rest of this page easier to read.
 
 - **Organization.** The organization is the top level: everything in TasKadence (tasks, projects, sprints, files, the
   bill) belongs to one, and one person can belong to many, with a different role in each. Most calls need its id,
-  `org_id`. A token works in exactly one organization. The first organization you create is free; each further one
-  needs a card before it can be used.
+  `org_id`. A token works in exactly one organization.
+- **Billing owner.** Each organization is paid for by one person, its billing owner, on their one card and one monthly
+  invoice. Every organization includes 10 GB of file storage, and every organization after a person's first costs $1
+  a month. Billing lives in the web app (Profile > Billing), not in the SDK.
 - **Token and scopes.** The token proves who you are; its scopes say what it may do. `tasks:read` reads tasks,
   `tasks:write` also creates and changes them, and the same pattern holds for `projects` and `webhooks`.
   A call your token's scopes do not cover fails with a clear error naming the scope it needs. Each method's
@@ -279,9 +281,9 @@ from taskadence import Taskadence, models
 
 tm = Taskadence()
 
-plan = tm.task_attachments.create(task_id="T123456", file="plan.pdf", purpose="comment")
+brief = tm.task_attachments.create(task_id="T123456", file="brief.pdf", purpose="comment")
 comment = tm.task_comments.create(
-    models.TaskCommentCreate(task_id="T123456", content="The plan is attached.", attachment_ids=[plan.attachment_id])
+    models.TaskCommentCreate(task_id="T123456", content="The brief is attached.", attachment_ids=[brief.attachment_id])
 )
 print([(f.name, f.size) for f in comment.attachments])
 tm.task_comments.update(comment.comment_id, {"attachment_ids": []})   # an edit replaces the list; removed files are deleted
@@ -332,40 +334,48 @@ in the organization's order (owners and admins). Deleting a sprint unfiles its t
 and `tm.workload.read`. Each workload row's `active_sprint` is the person's current sprint (`sprint_id`, `name`,
 `done`, `total`), or `None`.
 
-### Organizations, plans and storage
+### Organizations, storage and who pays
 
-Each organization has its own plan, storage, card and invoice. `plan` is `free` (storage included) or `paid` (every GB
-billed), and `state` is `active`, `pending_payment` (it waits for its first card), `restricted` or `read_only` (a paid
-organization that lost its card).
+Every organization includes 10 GB of file storage. Its billing owner pays for storage beyond that, and $1 a month for
+every organization after their first (organizations that existed before this change carry no fee). `state` is
+`active`, or `restricted`, `read_only`, `locked` or `archived` when the billing owner has had no working card for 0, 3,
+30 or 60 days; on day 90 the organization is deleted. A working card before then restores it fully.
 
 ```python
-from taskadence import OrganizationReadOnlyError, OrganizationRestrictedError, Taskadence
+from taskadence import OrganizationLockedError, OrganizationSuspendedError, StorageLimitReachedError, Taskadence
 
 tm = Taskadence()
 for org in tm.organizations.list():
-    print(org.org_id, org.name, org.plan, org.state)
+    print(org.org_id, org.name, org.state)
 
 org_id = tm.me().organizations[0].org_id
 storage = tm.organizations.storage(org_id)              # this organization alone, any member can read it
-print(storage.plan, storage.state, storage.bytes_used, "of", storage.included_bytes, storage.status)
-print("manage it at", storage.manage_url)
+print(storage.state, storage.bytes_used, "of", storage.included_bytes, storage.status)
+print("fee:", storage.fee.amount_cents, storage.fee.reason)   # 100, or 0 with first / grandfathered / exempt
+print("billed to:", storage.billing_owner.name if storage.billing_owner else None)
 
 try:
-    tm.organization_invites.create({"org_id": org_id, "email": "someone@example.com"})
-except OrganizationRestrictedError as exc:              # 423: no usable card, it cannot add people
+    tm.tasks.list(org_id=org_id)
+except OrganizationLockedError as exc:                  # 423 from day 30: a token gets it on every route
+    print("locked since", exc.since, "archived on", exc.archive_on, "deleted on", exc.delete_on)
+except OrganizationSuspendedError as exc:               # 423 restricted (no new people) or read_only (no writes)
     print(exc.state, "since", exc.since, exc.detail)
-except OrganizationReadOnlyError as exc:                # 423: read-only from the third day, nothing is deleted
-    print(exc.state, "since", exc.since, exc.detail)
+
+try:
+    tm.task_attachments.create(task_id="T123456", file="video.mp4")
+except StorageLimitReachedError as exc:                 # 402: 10 GB used and no working card
+    print("uploads paused; the billing owner adds a card at", exc.manage_url)
 ```
 
 `status` is `ok`, `warning` (80 % or more), `blocked` (full, no card on file: new uploads answer 402), `metered` (full, a
-card on file: billed per GB-month) or `exempt`. A working card, with the open invoice paid, restores a restricted or
-read-only organization. An organization that waits for its first card answers every call with
-`OrganizationPendingPaymentError` (409).
+card on file: billed per GB-month) or `exempt`.
 
-**Not in the SDK:** creating an organization and billing (the card, invoices, handing billing to another owner). The API
-accepts these from a signed-in session only and refuses every access token, so owners use the web app
-(`storage.manage_url`). Support tickets are not in the SDK either; the MCP tool `contact_support` files one.
+**Not in the SDK:** creating an organization and billing (the card, this month so far, invoices, handing billing to
+another owner). The API accepts these from a signed-in session only and refuses every access token, so people use the
+web app (Profile > Billing). Support tickets are not in the SDK either; the MCP tool `contact_support` files one.
+
+`tm.legal_notice()` returns the pending change to the Terms of Service and Privacy Policy (`.effective_date`,
+`.headline`, `.terms_url`, `.privacy_url`), or None. It is public and is sent without your token.
 
 ### Errors
 
@@ -394,8 +404,9 @@ and `.errors`:
 | 400 | `BadRequestError` · `InvalidParameterError` · `IdempotencyKeyInvalidError` |
 | 401 | `AuthenticationError` · `TokenInvalidError` · `TokenExpiredError` · `TokenRevokedError` |
 | 403 | `ForbiddenError` · `InsufficientScopeError` · `TestTokenReadOnlyError` · `TokenPolicyError` (also 422) |
-| 404 · 409 · 410 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`, `OrganizationPendingPaymentError`, `BillingOwnerMustHandOverError`) · `GoneError` (`RemovedInRelease10Error`, `RemovedInRelease11Error`: `.successor`, `.changelog`) · `PreconditionFailedError` |
-| 423 | `OrganizationSuspendedError` · `OrganizationRestrictedError` · `OrganizationReadOnlyError` (all with `.state`, `.since`) |
+| 404 · 409 · 410 · 412 | `NotFoundError` · `ConflictError` (`IdempotencyKeyInFlightError`, `SprintProjectMismatchError`, `BillingOwnerMustHandOverError`) · `GoneError` (`RemovedInRelease10Error`, `RemovedInRelease11Error`: `.successor`, `.changelog`) · `PreconditionFailedError` |
+| 402 | `PaymentRequiredError` · `StorageLimitReachedError` (`.bytes_used`, `.included_bytes`, `.manage_url`) |
+| 423 | `OrganizationSuspendedError` · `OrganizationRestrictedError` · `OrganizationReadOnlyError` · `OrganizationLockedError` (all with `.state`, `.since`; locked adds `.archive_on`, `.delete_on`) |
 | 422 | `UnprocessableEntityError` · `ValidationError` (`InvalidValueError`) · `IdempotencyKeyReusedError` · `UrlRefusedError` |
 | 429 · 5xx | `RateLimitedError` (`.retry_after`) · `InternalError` |
 | none | `APIConnectionError` / `APITimeoutError` (no answer from the server) · `ResponseValidationError` (an answer this SDK version cannot read: upgrade) |
@@ -501,7 +512,7 @@ tm me                             # who you are, and your organization
 tm tasks list --status in_progress --status blocked
 tm tasks create --title "Try the TasKadence CLI" --due 2027-01-15
 tm projects list
-tm orgs list                      # your organizations, with each one's plan and state
+tm orgs list                      # your organizations, with each one's state
 tm storage                        # how much file storage your organization uses
 tm --version
 ```
@@ -513,7 +524,7 @@ from `tm tasks list`, `tm projects list`, `tm webhooks list` or the app's addres
 tm tasks get T123456 --json
 tm tasks update T123456 --status completed       # refuses to overwrite a change someone made since you read it
 tm tasks attach T123456 ./report.pdf --title "Q3 report"   # straight to storage, with a progress bar
-tm projects upload P123456 ./plan.xlsx
+tm projects upload P123456 ./budget.xlsx
 tm views rows V123456 --csv > rows.csv
 tm webhooks test WH123456
 tm webhooks deliveries WH123456

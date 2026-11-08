@@ -32,7 +32,6 @@ class OrganizationInDB:
         designations (list[str] | Unset): List of designation names available in this organization
         logo (None | str | Unset): Logo URL Example: https://example.com/logo.png.
         email (None | str | Unset): Contact email Example: info@acme.com.
-        plan (None | str | Unset): free: storage included; paid: nothing included, every GB billed
         role (str | Unset): Role of the current user in the organization Default: 'owner'.
         metadata (None | OrganizationInDBMetadataType0 | Unset): Additional metadata Example: {'industry': 'tech'}.
         designation (None | str | Unset): Single designation chosen during organization creation
@@ -49,14 +48,12 @@ class OrganizationInDB:
             reports) Default: 0.
         owners (list[str] | Unset): List of usernames of the organization owners
         access_status (None | str | Unset):
-        state (None | str | Unset): active, or pending_payment while it waits for its card (restricted, read_only: a
-            paid organization that lost its card)
+        state (None | str | Unset): active, restricted, read_only, locked or archived (the card lifecycle of a
+            chargeable organization whose billing owner has no working card)
         state_since (datetime.datetime | None | Unset): When it entered that state
         billing_owner_user_id (None | str | Unset): Who pays: the owner billing is with. Null on an invitation
-        pending_billing_owner_user_id (None | str | Unset): The owner asked to take over billing, while that waits for
-            their card
-        grandfathered (bool | None | Unset): It existed on the release day: free whatever else its owner owns. Null on
-            an invitation
+        grandfathered (bool | None | Unset): It existed on the release day: no $1 fee whatever else its owner owns. Null
+            on an invitation
     """
 
     name: str
@@ -65,7 +62,6 @@ class OrganizationInDB:
     designations: list[str] | Unset = UNSET
     logo: None | str | Unset = UNSET
     email: None | str | Unset = UNSET
-    plan: None | str | Unset = UNSET
     role: str | Unset = "owner"
     metadata: None | OrganizationInDBMetadataType0 | Unset = UNSET
     designation: None | str | Unset = UNSET
@@ -83,7 +79,6 @@ class OrganizationInDB:
     state: None | str | Unset = UNSET
     state_since: datetime.datetime | None | Unset = UNSET
     billing_owner_user_id: None | str | Unset = UNSET
-    pending_billing_owner_user_id: None | str | Unset = UNSET
     grandfathered: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
@@ -118,12 +113,6 @@ class OrganizationInDB:
             email = UNSET
         else:
             email = self.email
-
-        plan: None | str | Unset
-        if isinstance(self.plan, Unset):
-            plan = UNSET
-        else:
-            plan = self.plan
 
         role = self.role
 
@@ -223,12 +212,6 @@ class OrganizationInDB:
         else:
             billing_owner_user_id = self.billing_owner_user_id
 
-        pending_billing_owner_user_id: None | str | Unset
-        if isinstance(self.pending_billing_owner_user_id, Unset):
-            pending_billing_owner_user_id = UNSET
-        else:
-            pending_billing_owner_user_id = self.pending_billing_owner_user_id
-
         grandfathered: bool | None | Unset
         if isinstance(self.grandfathered, Unset):
             grandfathered = UNSET
@@ -251,8 +234,6 @@ class OrganizationInDB:
             field_dict["logo"] = logo
         if email is not UNSET:
             field_dict["email"] = email
-        if plan is not UNSET:
-            field_dict["plan"] = plan
         if role is not UNSET:
             field_dict["role"] = role
         if metadata is not UNSET:
@@ -287,8 +268,6 @@ class OrganizationInDB:
             field_dict["state_since"] = state_since
         if billing_owner_user_id is not UNSET:
             field_dict["billing_owner_user_id"] = billing_owner_user_id
-        if pending_billing_owner_user_id is not UNSET:
-            field_dict["pending_billing_owner_user_id"] = pending_billing_owner_user_id
         if grandfathered is not UNSET:
             field_dict["grandfathered"] = grandfathered
 
@@ -331,15 +310,6 @@ class OrganizationInDB:
             return cast(None | str | Unset, data)
 
         email = _parse_email(d.pop("email", UNSET))
-
-        def _parse_plan(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        plan = _parse_plan(d.pop("plan", UNSET))
 
         role = d.pop("role", UNSET)
 
@@ -506,17 +476,6 @@ class OrganizationInDB:
 
         billing_owner_user_id = _parse_billing_owner_user_id(d.pop("billing_owner_user_id", UNSET))
 
-        def _parse_pending_billing_owner_user_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        pending_billing_owner_user_id = _parse_pending_billing_owner_user_id(
-            d.pop("pending_billing_owner_user_id", UNSET)
-        )
-
         def _parse_grandfathered(data: object) -> bool | None | Unset:
             if data is None:
                 return data
@@ -533,7 +492,6 @@ class OrganizationInDB:
             designations=designations,
             logo=logo,
             email=email,
-            plan=plan,
             role=role,
             metadata=metadata,
             designation=designation,
@@ -551,7 +509,6 @@ class OrganizationInDB:
             state=state,
             state_since=state_since,
             billing_owner_user_id=billing_owner_user_id,
-            pending_billing_owner_user_id=pending_billing_owner_user_id,
             grandfathered=grandfathered,
         )
 

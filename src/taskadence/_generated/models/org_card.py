@@ -25,15 +25,12 @@ class OrgCard:
     Attributes:
         org_id (str): Organization ID Example: O123456.
         name (str): Organization name Example: Acme Corp.
-        plan (None | str | Unset): free: storage included; paid: nothing included, every GB billed. Null on an
-            invitation
-        state (None | str | Unset): active, pending_payment, restricted or read_only. Null on an invitation
+        state (None | str | Unset): active, restricted, read_only, locked or archived (the card lifecycle of a
+            chargeable organization whose billing owner has no working card). Null on an invitation
         state_since (datetime.datetime | None | Unset): When it entered that state
         billing_owner_user_id (None | str | Unset): Who pays: the owner billing is with. Null on an invitation
-        pending_billing_owner_user_id (None | str | Unset): The owner asked to take over billing, while that waits for
-            their card
-        grandfathered (bool | None | Unset): It existed on the release day: free whatever else its owner owns. Null on
-            an invitation
+        grandfathered (bool | None | Unset): It existed on the release day: no $1 fee whatever else its owner owns. Null
+            on an invitation
         description (None | str | Unset): Description of the organization (optional) Example: A global tech company..
         role (str | Unset): Role of the current user in the organization Default: 'owner'. Example: owner.
         designation (None | str | Unset): User's designation in the organization
@@ -54,11 +51,9 @@ class OrgCard:
 
     org_id: str
     name: str
-    plan: None | str | Unset = UNSET
     state: None | str | Unset = UNSET
     state_since: datetime.datetime | None | Unset = UNSET
     billing_owner_user_id: None | str | Unset = UNSET
-    pending_billing_owner_user_id: None | str | Unset = UNSET
     grandfathered: bool | None | Unset = UNSET
     description: None | str | Unset = UNSET
     role: str | Unset = "owner"
@@ -83,12 +78,6 @@ class OrgCard:
 
         name = self.name
 
-        plan: None | str | Unset
-        if isinstance(self.plan, Unset):
-            plan = UNSET
-        else:
-            plan = self.plan
-
         state: None | str | Unset
         if isinstance(self.state, Unset):
             state = UNSET
@@ -108,12 +97,6 @@ class OrgCard:
             billing_owner_user_id = UNSET
         else:
             billing_owner_user_id = self.billing_owner_user_id
-
-        pending_billing_owner_user_id: None | str | Unset
-        if isinstance(self.pending_billing_owner_user_id, Unset):
-            pending_billing_owner_user_id = UNSET
-        else:
-            pending_billing_owner_user_id = self.pending_billing_owner_user_id
 
         grandfathered: bool | None | Unset
         if isinstance(self.grandfathered, Unset):
@@ -196,16 +179,12 @@ class OrgCard:
                 "name": name,
             }
         )
-        if plan is not UNSET:
-            field_dict["plan"] = plan
         if state is not UNSET:
             field_dict["state"] = state
         if state_since is not UNSET:
             field_dict["state_since"] = state_since
         if billing_owner_user_id is not UNSET:
             field_dict["billing_owner_user_id"] = billing_owner_user_id
-        if pending_billing_owner_user_id is not UNSET:
-            field_dict["pending_billing_owner_user_id"] = pending_billing_owner_user_id
         if grandfathered is not UNSET:
             field_dict["grandfathered"] = grandfathered
         if description is not UNSET:
@@ -244,15 +223,6 @@ class OrgCard:
 
         name = d.pop("name")
 
-        def _parse_plan(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        plan = _parse_plan(d.pop("plan", UNSET))
-
         def _parse_state(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -287,17 +257,6 @@ class OrgCard:
             return cast(None | str | Unset, data)
 
         billing_owner_user_id = _parse_billing_owner_user_id(d.pop("billing_owner_user_id", UNSET))
-
-        def _parse_pending_billing_owner_user_id(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        pending_billing_owner_user_id = _parse_pending_billing_owner_user_id(
-            d.pop("pending_billing_owner_user_id", UNSET)
-        )
 
         def _parse_grandfathered(data: object) -> bool | None | Unset:
             if data is None:
@@ -417,11 +376,9 @@ class OrgCard:
         org_card = cls(
             org_id=org_id,
             name=name,
-            plan=plan,
             state=state,
             state_since=state_since,
             billing_owner_user_id=billing_owner_user_id,
-            pending_billing_owner_user_id=pending_billing_owner_user_id,
             grandfathered=grandfathered,
             description=description,
             role=role,

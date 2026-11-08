@@ -2,11 +2,12 @@
 # Change the spec snapshot (or the generator) and run `python scripts/generate.py`.
 from typing import Literal
 
-StorageUsageState = Literal["active", "pending_payment", "read_only", "restricted"]
+StorageUsageState = Literal["active", "archived", "locked", "read_only", "restricted"]
 
 STORAGE_USAGE_STATE_VALUES: set[StorageUsageState] = {
     "active",
-    "pending_payment",
+    "archived",
+    "locked",
     "read_only",
     "restricted",
 }

@@ -15,6 +15,7 @@ Versions follow semver and the API's versioning policy (https://docs.taskadence.
 from . import errors, models, webhooks
 from ._client import AsyncTaskadence, Taskadence
 from ._core import AUTO, ConfigurationError, FileInput, NotModified, NotModifiedType, Operation
+from ._legal import LegalNotice
 from ._operations import API_VERSION, DEFAULT_BASE_URL, OPERATIONS
 from ._uploads import UploadProgress
 from ._version import __version__
@@ -39,10 +40,11 @@ from .errors import (
     MemberNotLinked,
     MemberNotLinkedError,
     NotFoundError,
-    OrganizationPendingPaymentError,
+    OrganizationLockedError,
     OrganizationReadOnlyError,
     OrganizationRestrictedError,
     OrganizationSuspendedError,
+    PaymentRequiredError,
     PreconditionFailedError,
     RateLimitedError,
     RemovedInRelease10,
@@ -51,6 +53,7 @@ from .errors import (
     ResponseValidationError,
     SprintProjectMismatch,
     SprintProjectMismatchError,
+    StorageLimitReachedError,
     TaskadenceError,
     TestTokenReadOnlyError,
     TokenExpiredError,
@@ -89,17 +92,19 @@ __all__ = [
     "InternalError",
     "InvalidParameterError",
     "InvalidValueError",
+    "LegalNotice",
     "MemberNotLinked",
     "MemberNotLinkedError",
     "NotFoundError",
     "NotModified",
     "NotModifiedType",
     "Operation",
-    "OrganizationPendingPaymentError",
+    "OrganizationLockedError",
     "OrganizationReadOnlyError",
     "OrganizationRestrictedError",
     "OrganizationSuspendedError",
     "Page",
+    "PaymentRequiredError",
     "PreconditionFailedError",
     "RateLimitedError",
     "RemovedInRelease10",
@@ -108,6 +113,7 @@ __all__ = [
     "ResponseValidationError",
     "SprintProjectMismatch",
     "SprintProjectMismatchError",
+    "StorageLimitReachedError",
     "Taskadence",
     "TaskadenceError",
     "TestTokenReadOnlyError",

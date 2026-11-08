@@ -186,7 +186,8 @@ def sync_detailed(
         org_id (str):
         search (None | str | Unset): Text to find in the username, display name or email (case-
             insensitive)
-        role (None | str | Unset):
+        role (None | str | Unset): Only this role. `owner` is also answered to an owner's session
+            on a locked or archived organization (the hand-over targets); any other list there is 423
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
             `filter[designation]` (comma-separated values are OR-ed). Default: 1000.
@@ -248,7 +249,8 @@ def sync(
         org_id (str):
         search (None | str | Unset): Text to find in the username, display name or email (case-
             insensitive)
-        role (None | str | Unset):
+        role (None | str | Unset): Only this role. `owner` is also answered to an owner's session
+            on a locked or archived organization (the hand-over targets); any other list there is 423
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
             `filter[designation]` (comma-separated values are OR-ed). Default: 1000.
@@ -305,7 +307,8 @@ async def asyncio_detailed(
         org_id (str):
         search (None | str | Unset): Text to find in the username, display name or email (case-
             insensitive)
-        role (None | str | Unset):
+        role (None | str | Unset): Only this role. `owner` is also answered to an owner's session
+            on a locked or archived organization (the hand-over targets); any other list there is 423
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
             `filter[designation]` (comma-separated values are OR-ed). Default: 1000.
@@ -365,7 +368,8 @@ async def asyncio(
         org_id (str):
         search (None | str | Unset): Text to find in the username, display name or email (case-
             insensitive)
-        role (None | str | Unset):
+        role (None | str | Unset): Only this role. `owner` is also answered to an owner's session
+            on a locked or archived organization (the hand-over targets); any other list there is 423
         is_active (bool | None | Unset):
         limit (int | Unset): Page size; default 1000, capped at 1000. Filters: `filter[role]`,
             `filter[designation]` (comma-separated values are OR-ed). Default: 1000.

@@ -122,6 +122,7 @@ class _Request:
     content: bytes | None = None
     files: list[tuple[str, tuple[str, bytes, str]]] | None = None
     data: dict[str, str] | None = None
+    anonymous: bool = False  # sent without the client's token (`tm.legal_notice()`)
 
     @property
     def retryable(self) -> bool:
@@ -240,6 +241,12 @@ class _BaseClient:
         }
         self._warned: set[str] = set()
         self._sleep: Callable[[float], Any] = time.sleep
+
+    def _headers_for(self, request: _Request) -> dict[str, str]:
+        headers = {**self._headers, **request.headers}
+        if request.anonymous:
+            headers.pop("Authorization", None)
+        return headers
 
     def __repr__(self) -> str:  # never the token
         return f"<{type(self).__name__} base_url={self.base_url!r}>"
@@ -450,7 +457,7 @@ class SyncCore(_BaseClient):
                     request.method,
                     self.base_url + request.url,
                     params=tuple(request.params),
-                    headers={**self._headers, **request.headers},
+                    headers=self._headers_for(request),
                     content=request.content,
                     files=request.files,
                     data=request.data,
@@ -521,7 +528,7 @@ class AsyncCore(_BaseClient):
                     request.method,
                     self.base_url + request.url,
                     params=tuple(request.params),
-                    headers={**self._headers, **request.headers},
+                    headers=self._headers_for(request),
                     content=request.content,
                     files=request.files,
                     data=request.data,

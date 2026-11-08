@@ -26,8 +26,7 @@ class MeOrganization:
         role (str): Org role: owner · admin · member · guest
         name (None | str | Unset):
         designation (None | str | Unset):
-        plan (None | str | Unset): free or paid
-        state (None | str | Unset): active, pending_payment, restricted or read_only
+        state (None | str | Unset): active, restricted, read_only, locked or archived
         state_since (None | str | Unset): When it entered that state
     """
 
@@ -35,7 +34,6 @@ class MeOrganization:
     role: str
     name: None | str | Unset = UNSET
     designation: None | str | Unset = UNSET
-    plan: None | str | Unset = UNSET
     state: None | str | Unset = UNSET
     state_since: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -59,12 +57,6 @@ class MeOrganization:
             designation = UNSET
         else:
             designation = self.designation
-
-        plan: None | str | Unset
-        if isinstance(self.plan, Unset):
-            plan = UNSET
-        else:
-            plan = self.plan
 
         state: None | str | Unset
         if isinstance(self.state, Unset):
@@ -90,8 +82,6 @@ class MeOrganization:
             field_dict["name"] = name
         if designation is not UNSET:
             field_dict["designation"] = designation
-        if plan is not UNSET:
-            field_dict["plan"] = plan
         if state is not UNSET:
             field_dict["state"] = state
         if state_since is not UNSET:
@@ -124,15 +114,6 @@ class MeOrganization:
 
         designation = _parse_designation(d.pop("designation", UNSET))
 
-        def _parse_plan(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        plan = _parse_plan(d.pop("plan", UNSET))
-
         def _parse_state(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -156,7 +137,6 @@ class MeOrganization:
             role=role,
             name=name,
             designation=designation,
-            plan=plan,
             state=state,
             state_since=state_since,
         )

@@ -250,16 +250,19 @@ from .sprint_deleted import SprintDeleted
 from .sprint_list_page import SprintListPage
 from .sprint_out import SprintOut
 from .sprint_update import SprintUpdate
+from .storage_billing_owner import StorageBillingOwner
 from .storage_breakdown import StorageBreakdown
 from .storage_by_kind import StorageByKind
 from .storage_day import StorageDay
+from .storage_fee import StorageFee
+from .storage_fee_amount_cents import StorageFeeAmountCents
+from .storage_fee_reason import StorageFeeReason
 from .storage_file import StorageFile
 from .storage_file_brief import StorageFileBrief
 from .storage_file_brief_kind import StorageFileBriefKind
 from .storage_file_kind import StorageFileKind
 from .storage_project import StorageProject
 from .storage_usage import StorageUsage
-from .storage_usage_plan import StorageUsagePlan
 from .storage_usage_state import StorageUsageState
 from .storage_usage_status import StorageUsageStatus
 from .subtask_link import SubtaskLink
@@ -620,16 +623,19 @@ __all__ = (
     "SprintListPage",
     "SprintOut",
     "SprintUpdate",
+    "StorageBillingOwner",
     "StorageBreakdown",
     "StorageByKind",
     "StorageDay",
+    "StorageFee",
+    "StorageFeeAmountCents",
+    "StorageFeeReason",
     "StorageFile",
     "StorageFileBrief",
     "StorageFileBriefKind",
     "StorageFileKind",
     "StorageProject",
     "StorageUsage",
-    "StorageUsagePlan",
     "StorageUsageState",
     "StorageUsageStatus",
     "SubtaskLink",

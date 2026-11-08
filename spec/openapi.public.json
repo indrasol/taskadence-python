@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TasKadence API",
-    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `urn:taskadence:problem:organization-restricted` | The paid organization has no usable card: it cannot add people until an owner saves one. `errors[0]` is `{state, since}`. |\n| `urn:taskadence:problem:organization-read-only` | The paid organization has had no usable card for 3 days: it is read-only until an owner saves one. Nothing is deleted. Reads still work, and so do billing, deleting the organization and the writes that reduce access or ask for help. `errors[0]` is `{state, since}`. |\n| `urn:taskadence:problem:organization-pending-payment` | The organization waits for its card. Until an owner adds one it can only be read, have its billing managed, or be deleted. `setup_url_route` is where an owner gets the card page. |\n| `urn:taskadence:problem:billing-owner-must-hand-over` | This person is the organization's billing owner. Hand billing to another owner first (`handover_route`). |\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:member-not-linked` | This member's sign-in is not linked to their TasKadence profile yet, so they cannot be subscribed to a task or react to a comment; they need to sign in again. `errors[0].user_ids` names them. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner adds a card) are in the body. Reads, downloads and deletes still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:gone` | The route was removed in release 11 with the account level: an organization is now the top level. `detail` says where to go and `successor` names the route. |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-11-05:** Breaking: the account level is removed and the organization is the top level. Removed (410 `urn:taskadence:problem:gone`, kept for one release): `GET /v1/account`, `GET /v1/account/people`, `GET /v1/storage`, and every other `/v1/account*` route. `GET /v1/me` no longer returns `account`. The problem type `urn:taskadence:problem:email-in-other-account` is removed: invitations and joins never answer it. The `account:read` and `account:write` scopes are still accepted and grant nothing. Changed: `GET /v1/organizations/{org_id}/storage` measures the organization alone and loses `account_id`, `account_used_bytes`, `account_quota_bytes` and `account_percent`. Added: `plan`, `state` and `billing_exempt` on that read, and the problem type `urn:taskadence:problem:gone`. An organization waiting for its card answers 409 `urn:taskadence:problem:organization-pending-payment` (with `org_id` and `setup_url_route`) on everything but its own read, and a token gets that answer on every route. `GET /v1/organizations/{org_id}` gains `plan` and `state`. Demoting or removing a billing owner answers 409 `urn:taskadence:problem:billing-owner-must-hand-over`. Breaking: `POST /v1/organizations` always answers 201 with `{organization, setup_url, expires_at}` (`setup_url` null for a free organization), instead of 200 with the bare organization. A paid organization that loses its card answers 423 `urn:taskadence:problem:organization-restricted` to invitations and every way of adding people from the first day, and 423 `urn:taskadence:problem:organization-read-only` to writes from the third day, with no end date (`errors[0]` is `{state, since}`); reads, billing and the writes that reduce access and deleting the organization stay open, nothing is deleted otherwise, and a working card (the open invoice paid) restores it. `GET /v1/me` `organizations[]`, `GET /v1/organizations` and `GET /v1/organizations/{org_id}` carry `plan`, `state` and `state_since`. `GET /v1/organizations` and `GET /v1/organizations/{org_id}` also carry `billing_owner_user_id`, `pending_billing_owner_user_id` and `grandfathered`.\n- **2026-10-27:** `GET /v1/account/people` takes optional `limit` / `cursor`, `search` and `group` and answers `next_cursor`, `total` and `totals_by_group` (without them: everyone, as before). With `include=subscribers`, a task row's `subscriber_count` and `subscribers_preview` leave out its current assignee.\n- **2026-10-27:** Access requests are public. New: `GET /v1/access-systems` (with `/{system_id}`, `/resources` and `/roles`), `POST /v1/access-requests`, `POST /v1/access-requests/batch` (up to 20, per-item results), `GET /v1/access-requests` (`scope` `mine` / `to_approve` / `all`) and `GET /v1/access-requests/{task_id}`, with the `tasks:read` / `tasks:write` scopes. Deciding (approve, deny, grant, revoke) stays in the app. A request's description now opens with a REASON section (stored requests keep WHAT I USE THIS FOR).\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
-    "version": "2026-11-05"
+    "description": "The TasKadence public API: JSON over HTTPS, under `/v1`.\n\n- **Authentication:** a TasKadence access token (`TaskadenceToken` - one organization, scopes you choose, optionally limited to some projects; `admin` implies every scope) or a Supabase session JWT.\n- **Errors:** always `application/problem+json` with `type`, `title`, `status`, `detail`, `instance` and `request_id`. The types are listed below.\n- **Lists:** `{data, next_cursor}`. Page with `limit` and `cursor`; order with `sort_by` and `sort_order`.\n- **Conditional requests:** single reads return an `ETag`. Send it as `If-None-Match` for a 304, or as `If-Match` on a write - a stale one is a 412.\n- **Safe retries:** creates honour an `Idempotency-Key` for 24 h.\n- **Search:** `GET /v1/tasks?filter[search]=\u2026`.\n\n**Problem types**\n\n| `type` | Meaning |\n|---|---|\n| `urn:taskadence:problem:organization-restricted` | The organization's billing owner has no working card: it cannot add people until one is saved. `errors[0]` is `{state, since}`. |\n| `urn:taskadence:problem:organization-read-only` | The organization's billing owner has had no working card for 3 days: it is read-only until one is saved. Nothing is deleted. Reads still work, and so do billing, deleting the organization and the writes that reduce access or ask for help. `errors[0]` is `{state, since}`. |\n| `urn:taskadence:problem:organization-locked` | No working card for 30 days: the organization is locked and cannot be opened until its billing owner saves one; it is deleted on day 90. Only its own read and your own membership answer; a token gets this everywhere. `errors[0]` is `{state, since, archive_on, delete_on}`. |\n| `urn:taskadence:problem:billing-owner-must-hand-over` | This person is the organization's billing owner. Hand billing to another owner first (`handover_route`). |\n| `about:blank` | A plain HTTP error; the status and `detail` say everything. |\n| `urn:taskadence:problem:validation` | The request body or query did not validate. `errors` lists each failure (`loc`, `msg`, `type`). |\n| `urn:taskadence:problem:invalid-parameter` | A query parameter (400) or a body field with a fixed set of values, such as a status (422), is outside what the operation accepts; `errors[].allowed` lists the valid values. |\n| `urn:taskadence:problem:precondition-failed` | `If-Match` did not match the resource's current `ETag` - re-read it and retry. |\n| `urn:taskadence:problem:idempotency-key-reused` | This `Idempotency-Key` was first used for a different request (method, path or body). |\n| `urn:taskadence:problem:idempotency-key-in-flight` | The first request with this `Idempotency-Key` has not finished; retry shortly. |\n| `urn:taskadence:problem:idempotency-key-invalid` | `Idempotency-Key` must be 1\u2013255 printable ASCII characters. |\n| `urn:taskadence:problem:rate-limit` | Too many requests with this access token, or a signed-in user, or an address; wait `Retry-After` seconds (`X-RateLimit-*` say where you stand). |\n| `urn:taskadence:problem:database-unavailable` | The database did not answer this request, after retries. Nothing was applied: retry after `Retry-After` seconds. |\n| `urn:taskadence:problem:member-not-linked` | This member's sign-in is not linked to their TasKadence profile yet, so they cannot be subscribed to a task or react to a comment; they need to sign in again. `errors[0].user_ids` names them. |\n| `urn:taskadence:problem:internal` | An unexpected server error. Quote `request_id` to support. |\n| `urn:taskadence:problem:token-invalid` | The access token is unknown or malformed (or its principal no longer exists). |\n| `urn:taskadence:problem:token-expired` | The access token is past its `expires_at`; mint a new one. |\n| `urn:taskadence:problem:token-revoked` | The access token was revoked (by its owner, an admin, a rotation, or its service account's deactivation). |\n| `urn:taskadence:problem:insufficient-scope` | The access token does not carry the scope this operation needs (`errors[0].required`; null = not available to tokens). |\n| `urn:taskadence:problem:test-token-read-only` | A `tkd_test_` token can authenticate and read, never write. |\n| `urn:taskadence:problem:token-policy` | The organization's token policy refuses this token (personal tokens off, expiry required, or past the maximum lifetime). |\n| `urn:taskadence:problem:url-refused` | The webhook URL is refused: not https, carries credentials, or resolves to a private, loopback, link-local, metadata, multicast or reserved address (`errors[0].reason`). |\n| `urn:taskadence:problem:mfa-required` | The organization requires two-step sign-in and this session signed in with one step. `mfa.enrolled` says whether the person has an authenticator app set up (sign in with it) or must set one up first; `mfa.required_for` is `all` or `admins`. Access tokens are not affected. |\n| `urn:taskadence:problem:email-unverified` | The signed-in person has not confirmed their email address yet. Confirm it from the email that was sent (or ask for a new one), then retry. Access tokens are not affected. |\n| `urn:taskadence:problem:upload-too-large` | The file is over the size limit (`detail` names it): 100 MB (100,000,000 bytes) for attachments and project files, 2 MB (2,000,000 bytes) for an avatar. A zip whose contents unpack to over 10 times the limit counts as too large. |\n| `urn:taskadence:problem:upload-type-not-allowed` | The file's type is not allowed (`detail` lists the allowed types). Executables, scripts, HTML, SVG, XML and macro-enabled Office files are never accepted, nor a zip holding one. |\n| `urn:taskadence:problem:upload-type-mismatch` | The file's contents are not what its extension (or its declared content type) says, for example an executable named `.png`, or a `.txt` that is not UTF-8 text. |\n| `urn:taskadence:problem:upload-rejected` | The malware scan refused the file (422), or could not scan it right now (503: retry later). |\n| `urn:taskadence:problem:sso-required` | The signed-in person's email domain belongs to an organization that requires single sign-on, and this session signed in another way (an email code, Google or Microsoft). Sign in with SSO. Access tokens are not affected. |\n| `urn:taskadence:problem:storage-limit-reached` | The organization has used its included storage and no card keeps it going, so new uploads are paused. `bytes_used`, `included_bytes` and `manage_url` (where an owner adds a card) are in the body. Reads, downloads and deletes still work. |\n| `urn:taskadence:problem:sprint-project-mismatch` | A task joins only a sprint of its own project: the sprint belongs to another project, or the task has none (`errors[0]` names both projects; code `sprint_project_mismatch`). |\n| `urn:taskadence:problem:sprint-not-empty` | A sprint moves to another project only while it holds no task; take its tasks out first (code `sprint_not_empty`, `errors[0].task_count`). |\n| `urn:taskadence:problem:gone` | The route was removed in release 11 with the account level: an organization is now the top level. `detail` says where to go and `successor` names the route. |\n| `urn:taskadence:problem:removed-in-release-10` | The route was removed in release 10 (teams, sections and test sprints left the product). `successor` names what to call instead, when there is one; `changelog` links the docs changelog entry. |\n\n**Changes**\n\n- **2026-11-06:** Billing belongs to the person who pays for an organization (its billing owner): one card and one monthly invoice for all the organizations they pay for. Every organization includes 10 GB of file storage; storage beyond it is billed per GB-month, and every organization after a person's first costs $1 a month (organizations that existed before this change carry no fee). Breaking: `plan` is removed from `GET /v1/organizations`, `GET /v1/organizations/{org_id}`, `GET /v1/organizations/{org_id}/storage` and `GET /v1/me` `organizations[]`, and `PUT /v1/organizations/{org_id}` no longer accepts it. No organization waits for a card any more: the pending-payment state and the problem type `urn:taskadence:problem:organization-pending-payment` are removed, and `pending_billing_owner_user_id` is gone from the organization reads. `state` is `active`, `restricted`, `read_only`, `locked` or `archived`. Added: `fee` (`{amount_cents, reason}`, `reason` one of `first`, `grandfathered`, `exempt`, `none`) and `billing_owner` on `GET /v1/organizations/{org_id}/storage`, whose `included_bytes` is 10 GB for every organization (or its grant). The billing routes are the signed-in person's own and are not part of this API. A chargeable organization whose billing owner has no working card now goes on past read-only: from day 30 it is `locked` and from day 60 `archived`, and every route answers 423 `urn:taskadence:problem:organization-locked` (reads included; `errors[0]` is `{state, since, archive_on, delete_on}`), except the organization's own read and the caller's own membership read for a signed-in person, and, for an owner's session, `GET /v1/organization-members/{org_id}?role=owner` (the owners an owner can hand billing to), deleting the organization and handing its billing over; an access token gets it on every route of that organization. On day 90 the organization is deleted. A working card before then restores it. The MCP `whoami` tool lists such an organization under `organizations_locked` instead of `organizations`. Outside this API's contract, for the web app: `/v1/me/billing*` (session only; `GET /v1/me/billing/preflight` says what creating another organization would cost, and each `estimate.orgs[]` row carries `deleted_on`, the deletion request day where billing stopped) and `GET /v1/legal/notice` (public: 200 with the effective date of the Terms and Privacy change and their links, or 204 when none is set). Links in emails to support requests, notifications and email settings open the web app's Profile page.\n- **2026-11-05:** Breaking: the account level is removed and the organization is the top level. Removed (410 `urn:taskadence:problem:gone`, kept for one release): `GET /v1/account`, `GET /v1/account/people`, `GET /v1/storage`, and every other `/v1/account*` route. `GET /v1/me` no longer returns `account`. The problem type `urn:taskadence:problem:email-in-other-account` is removed: invitations and joins never answer it. The `account:read` and `account:write` scopes are still accepted and grant nothing. Changed: `GET /v1/organizations/{org_id}/storage` measures the organization alone and loses `account_id`, `account_used_bytes`, `account_quota_bytes` and `account_percent`. Added: `plan`, `state` and `billing_exempt` on that read, and the problem type `urn:taskadence:problem:gone`. An organization waiting for its card answers 409 `urn:taskadence:problem:organization-pending-payment` (with `org_id` and `setup_url_route`) on everything but its own read, and a token gets that answer on every route. `GET /v1/organizations/{org_id}` gains `plan` and `state`. Demoting or removing a billing owner answers 409 `urn:taskadence:problem:billing-owner-must-hand-over`. Breaking: `POST /v1/organizations` always answers 201 with `{organization, setup_url, expires_at}` (`setup_url` null for a free organization), instead of 200 with the bare organization. A paid organization that loses its card answers 423 `urn:taskadence:problem:organization-restricted` to invitations and every way of adding people from the first day, and 423 `urn:taskadence:problem:organization-read-only` to writes from the third day, with no end date (`errors[0]` is `{state, since}`); reads, billing and the writes that reduce access and deleting the organization stay open, nothing is deleted otherwise, and a working card (the open invoice paid) restores it. `GET /v1/me` `organizations[]`, `GET /v1/organizations` and `GET /v1/organizations/{org_id}` carry `plan`, `state` and `state_since`. `GET /v1/organizations` and `GET /v1/organizations/{org_id}` also carry `billing_owner_user_id`, `pending_billing_owner_user_id` and `grandfathered`.\n- **2026-10-27:** `GET /v1/account/people` takes optional `limit` / `cursor`, `search` and `group` and answers `next_cursor`, `total` and `totals_by_group` (without them: everyone, as before). With `include=subscribers`, a task row's `subscriber_count` and `subscribers_preview` leave out its current assignee.\n- **2026-10-27:** Access requests are public. New: `GET /v1/access-systems` (with `/{system_id}`, `/resources` and `/roles`), `POST /v1/access-requests`, `POST /v1/access-requests/batch` (up to 20, per-item results), `GET /v1/access-requests` (`scope` `mine` / `to_approve` / `all`) and `GET /v1/access-requests/{task_id}`, with the `tasks:read` / `tasks:write` scopes. Deciding (approve, deny, grant, revoke) stays in the app. A request's description now opens with a REASON section (stored requests keep WHAT I USE THIS FOR).\n- **2026-10-24:** Teams, sections and test sprints are removed. Gone: `/v1/teams*` (with their sprints and availability routes), `/v1/sections*`, `PUT /v1/tasks/{task_id}/section`, `/v1/trackers*`, `PUT /v1/tasks/{task_id}/test-run`, `/v1/projects/{project_id}/test-runs`, `/v1/projects/{project_id}/teams*`, `/v1/view-pins/teams/{team_id}`; the `team_id` fields on tasks and projects; `filter[team]`, `filter[test_run]`, `section_scope` and `group_by=section`; the `team` saved-view scope and team pins. The `teams:read` / `teams:write` scopes are retired: a token or app that carries them keeps working and the scope is ignored. Sprints now belong to a project: `GET|POST /v1/projects/{project_id}/sprints`, `GET /v1/sprints?org_id=`, `GET|PATCH|DELETE /v1/sprints/{sprint_id}` (with `position` and `project_id`); a task joins only a sprint of its own project (409 `sprint-project-mismatch`). Capacity is organization-wide: `GET|POST /v1/organizations/{org_id}/availability`, `PUT|DELETE /v1/organizations/{org_id}/availability/{entry_id}`, `PUT /v1/me/availability`. New: `GET /v1/organizations/{org_id}/workload` (open work per person). `PATCH /v1/projects/{project_id}` accepts `position` (org owners and admins).",
+    "version": "2026-11-06"
   },
   "paths": {
     "/v1/health": {
@@ -301,11 +301,9 @@
                 "example": {
                   "data": [
                     {
-                      "plan": "string",
                       "state": "string",
                       "state_since": "2026-09-25T12:00:00Z",
                       "billing_owner_user_id": "string",
-                      "pending_billing_owner_user_id": "string",
                       "grandfathered": false,
                       "org_id": "O123456",
                       "name": "Acme Corp",
@@ -558,7 +556,6 @@
                   ],
                   "logo": "https://example.com/logo.png",
                   "email": "info@acme.com",
-                  "plan": "string",
                   "role": "owner",
                   "metadata": {
                     "industry": "tech"
@@ -581,7 +578,6 @@
                   "state": "string",
                   "state_since": "2026-09-25T12:00:00Z",
                   "billing_owner_user_id": "string",
-                  "pending_billing_owner_user_id": "string",
                   "grandfathered": false
                 }
               }
@@ -10572,8 +10568,10 @@
                   "type": "null"
                 }
               ],
+              "description": "Only this role. `owner` is also answered to an owner's session on a locked or archived organization (the hand-over targets); any other list there is 423",
               "title": "Role"
-            }
+            },
+            "description": "Only this role. `owner` is also answered to an owner's session on a locked or archived organization (the hand-over targets); any other list there is 423"
           },
           {
             "name": "is_active",
@@ -25463,8 +25461,15 @@
                 },
                 "example": {
                   "org_id": "string",
-                  "plan": "free",
                   "state": "active",
+                  "fee": {
+                    "amount_cents": 0,
+                    "reason": "first"
+                  },
+                  "billing_owner": {
+                    "user_id": "string",
+                    "name": "string"
+                  },
                   "bytes_used": 0,
                   "file_count": 0,
                   "project_count": 0,
@@ -48972,7 +48977,7 @@
                       "enum": [
                         "urn:taskadence:problem:organization-restricted",
                         "urn:taskadence:problem:organization-read-only",
-                        "urn:taskadence:problem:organization-pending-payment",
+                        "urn:taskadence:problem:organization-locked",
                         "urn:taskadence:problem:billing-owner-must-hand-over",
                         "about:blank",
                         "urn:taskadence:problem:validation",
@@ -49305,7 +49310,7 @@
                       "enum": [
                         "urn:taskadence:problem:organization-restricted",
                         "urn:taskadence:problem:organization-read-only",
-                        "urn:taskadence:problem:organization-pending-payment",
+                        "urn:taskadence:problem:organization-locked",
                         "urn:taskadence:problem:billing-owner-must-hand-over",
                         "about:blank",
                         "urn:taskadence:problem:validation",
@@ -49433,7 +49438,7 @@
                       "enum": [
                         "urn:taskadence:problem:organization-restricted",
                         "urn:taskadence:problem:organization-read-only",
-                        "urn:taskadence:problem:organization-pending-payment",
+                        "urn:taskadence:problem:organization-locked",
                         "urn:taskadence:problem:billing-owner-must-hand-over",
                         "about:blank",
                         "urn:taskadence:problem:validation",
@@ -54280,18 +54285,6 @@
             ],
             "title": "Designation"
           },
-          "plan": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Plan",
-            "description": "free or paid"
-          },
           "state": {
             "anyOf": [
               {
@@ -54302,7 +54295,7 @@
               }
             ],
             "title": "State",
-            "description": "active, pending_payment, restricted or read_only"
+            "description": "active, restricted, read_only, locked or archived"
           },
           "state_since": {
             "anyOf": [
@@ -56177,18 +56170,6 @@
       },
       "OrgCard": {
         "properties": {
-          "plan": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Plan",
-            "description": "free: storage included; paid: nothing included, every GB billed. Null on an invitation"
-          },
           "state": {
             "anyOf": [
               {
@@ -56199,7 +56180,7 @@
               }
             ],
             "title": "State",
-            "description": "active, pending_payment, restricted or read_only. Null on an invitation"
+            "description": "active, restricted, read_only, locked or archived (the card lifecycle of a chargeable organization whose billing owner has no working card). Null on an invitation"
           },
           "state_since": {
             "anyOf": [
@@ -56226,18 +56207,6 @@
             "title": "Billing Owner User Id",
             "description": "Who pays: the owner billing is with. Null on an invitation"
           },
-          "pending_billing_owner_user_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pending Billing Owner User Id",
-            "description": "The owner asked to take over billing, while that waits for their card"
-          },
           "grandfathered": {
             "anyOf": [
               {
@@ -56248,7 +56217,7 @@
               }
             ],
             "title": "Grandfathered",
-            "description": "It existed on the release day: free whatever else its owner owns. Null on an invitation"
+            "description": "It existed on the release day: no $1 fee whatever else its owner owns. Null on an invitation"
           },
           "org_id": {
             "type": "string",
@@ -56527,18 +56496,6 @@
             "description": "Contact email",
             "example": "info@acme.com"
           },
-          "plan": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Plan",
-            "description": "free: storage included; paid: nothing included, every GB billed"
-          },
           "role": {
             "type": "string",
             "title": "Role",
@@ -56698,7 +56655,7 @@
               }
             ],
             "title": "State",
-            "description": "active, or pending_payment while it waits for its card (restricted, read_only: a paid organization that lost its card)"
+            "description": "active, restricted, read_only, locked or archived (the card lifecycle of a chargeable organization whose billing owner has no working card)"
           },
           "state_since": {
             "anyOf": [
@@ -56725,18 +56682,6 @@
             "title": "Billing Owner User Id",
             "description": "Who pays: the owner billing is with. Null on an invitation"
           },
-          "pending_billing_owner_user_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pending Billing Owner User Id",
-            "description": "The owner asked to take over billing, while that waits for their card"
-          },
           "grandfathered": {
             "anyOf": [
               {
@@ -56747,7 +56692,7 @@
               }
             ],
             "title": "Grandfathered",
-            "description": "It existed on the release day: free whatever else its owner owns. Null on an invitation"
+            "description": "It existed on the release day: no $1 fee whatever else its owner owns. Null on an invitation"
           }
         },
         "type": "object",
@@ -62683,6 +62628,33 @@
         "title": "SprintUpdate",
         "description": "A true partial - every field optional; an absent field is left alone."
       },
+      "StorageBillingOwner": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "Who pays for the organization"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Their display name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "StorageBillingOwner",
+        "description": "Part of `StorageUsage`."
+      },
       "StorageBreakdown": {
         "properties": {
           "by_kind": {
@@ -62747,6 +62719,37 @@
           "bytes_used"
         ],
         "title": "StorageDay",
+        "description": "Part of `StorageUsage`."
+      },
+      "StorageFee": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer",
+            "enum": [
+              0,
+              100
+            ],
+            "title": "Amount Cents",
+            "description": "The organization's monthly fee on its billing owner's invoice: 100 ($1) or 0"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "first",
+              "grandfathered",
+              "exempt",
+              "none"
+            ],
+            "title": "Reason",
+            "description": "Why it is 0: its billing owner's first organization, it existed before the change, or exempt; none = it carries the fee"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount_cents",
+          "reason"
+        ],
+        "title": "StorageFee",
         "description": "Part of `StorageUsage`."
       },
       "StorageFile": {
@@ -62940,27 +62943,32 @@
             "type": "string",
             "title": "Org Id"
           },
-          "plan": {
-            "type": "string",
-            "enum": [
-              "free",
-              "paid"
-            ],
-            "title": "Plan",
-            "description": "free: storage included; paid: nothing included, every GB billed",
-            "default": "free"
-          },
           "state": {
             "type": "string",
             "enum": [
-              "pending_payment",
               "active",
               "restricted",
-              "read_only"
+              "read_only",
+              "locked",
+              "archived"
             ],
             "title": "State",
-            "description": "The card lifecycle of a paid organization; a free one is always active",
+            "description": "The card lifecycle: anything but active means its billing owner has no working card",
             "default": "active"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/StorageFee"
+          },
+          "billing_owner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StorageBillingOwner"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who pays for it; null for an organization with no billing owner"
           },
           "bytes_used": {
             "type": "integer",
@@ -62981,7 +62989,7 @@
           "included_bytes": {
             "type": "integer",
             "title": "Included Bytes",
-            "description": "Storage included before overage, in bytes (decimal). A free organization's plan value is 10^10 (10 GB), a paid one's is 0 (every GB is billed); an organization may have a grant."
+            "description": "Storage included before overage, in bytes (decimal): 10^10 (10 GB) for every organization, or its grant."
           },
           "overage_bytes": {
             "type": "integer",
@@ -63008,7 +63016,7 @@
           "payment_method_on_file": {
             "type": "boolean",
             "title": "Payment Method On File",
-            "description": "An owner has a card on file (uploads continue past the included storage)"
+            "description": "Its billing owner has a working card on file (uploads continue past the included storage)"
           },
           "billing_exempt": {
             "type": "boolean",
@@ -63061,12 +63069,13 @@
           "manage_url": {
             "type": "string",
             "title": "Manage Url",
-            "description": "The organization's Billing settings in the web app"
+            "description": "Where the billing owner manages their card in the web app (Profile > Billing)"
           }
         },
         "type": "object",
         "required": [
           "org_id",
+          "fee",
           "bytes_used",
           "file_count",
           "included_bytes",
@@ -69527,7 +69536,7 @@
             "enum": [
               "urn:taskadence:problem:organization-restricted",
               "urn:taskadence:problem:organization-read-only",
-              "urn:taskadence:problem:organization-pending-payment",
+              "urn:taskadence:problem:organization-locked",
               "urn:taskadence:problem:billing-owner-must-hand-over",
               "about:blank",
               "urn:taskadence:problem:validation",
@@ -70043,7 +70052,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "availability.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70145,7 +70154,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "availability.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70247,7 +70256,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "availability.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70351,7 +70360,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "designation.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70453,7 +70462,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "designation.deactivated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70557,7 +70566,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "designation.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70661,7 +70670,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "designation.visibility_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -70765,7 +70774,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.closed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -70869,7 +70878,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -70971,7 +70980,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -71073,7 +71082,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.moved",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -71177,7 +71186,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.reopened",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -71281,7 +71290,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.reordered",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -71385,7 +71394,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "goal.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -71489,7 +71498,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.accepted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -71593,7 +71602,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -71695,7 +71704,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.external_override",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -71799,7 +71808,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.rejected",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -71903,7 +71912,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.revoked",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72007,7 +72016,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "invite.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72111,7 +72120,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72213,7 +72222,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.admin_grants_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72317,7 +72326,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.auto_joined",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72421,7 +72430,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.designation_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72525,7 +72534,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72627,7 +72636,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "member.role_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72731,7 +72740,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.closed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72835,7 +72844,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -72937,7 +72946,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73039,7 +73048,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.moved",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73143,7 +73152,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.reopened",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73247,7 +73256,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.reordered",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73351,7 +73360,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "milestone.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73455,7 +73464,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73557,7 +73566,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.domain_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73659,7 +73668,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.domain_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73761,7 +73770,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.domain_verified",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73865,7 +73874,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.join_request_decided",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -73969,7 +73978,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.settings_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -74073,7 +74082,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "org.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -74177,7 +74186,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.agent_review_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74281,7 +74290,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.children_detached",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74383,7 +74392,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74485,7 +74494,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.delegation_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74589,7 +74598,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74691,7 +74700,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.leads_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74795,7 +74804,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.managers_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -74899,7 +74908,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.member_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75001,7 +75010,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.member_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75103,7 +75112,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.member_role_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75207,7 +75216,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.member_updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75311,7 +75320,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.owner_transferred",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75415,7 +75424,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.parent_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75519,7 +75528,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.reordered",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75623,7 +75632,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75727,7 +75736,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "project.visibility_changed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -75831,7 +75840,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "service_account.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -75933,7 +75942,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "service_account.deactivated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -76037,7 +76046,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "service_account.renamed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -76141,7 +76150,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "sprint.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -76243,7 +76252,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "sprint.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -76345,7 +76354,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "sprint.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -76449,7 +76458,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.attachment_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -76551,7 +76560,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.attachment_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -76653,7 +76662,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.comment_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -76757,7 +76766,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.comment_reaction_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -76859,7 +76868,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.comment_reaction_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -76961,7 +76970,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.comment_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77064,7 +77073,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.comment_updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77172,7 +77181,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77274,7 +77283,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77376,7 +77385,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.dependency_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77478,7 +77487,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.dependency_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77580,7 +77589,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.moved",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77684,7 +77693,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.restricted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77788,7 +77797,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.reviewed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77892,7 +77901,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.subtask_added",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -77994,7 +78003,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.subtask_removed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -78096,7 +78105,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "task.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": "P30104",
@@ -78200,7 +78209,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "token.auth_failed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78304,7 +78313,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "token.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78406,7 +78415,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "token.renamed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78510,7 +78519,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "token.revoked",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78614,7 +78623,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "token.rotated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78718,7 +78727,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.created",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78820,7 +78829,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.deleted",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -78922,7 +78931,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.delivery_replayed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79026,7 +79035,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.disabled",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79130,7 +79139,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.paused",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79234,7 +79243,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.resumed",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79338,7 +79347,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.rotated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79442,7 +79451,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.test",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79546,7 +79555,7 @@
               "example": {
                 "id": "WD000001",
                 "type": "webhook.updated",
-                "api_version": "2026-11-05",
+                "api_version": "2026-11-06",
                 "created_at": "2026-09-25T12:00:00Z",
                 "org_id": "O123456",
                 "project_id": null,
@@ -79725,21 +79734,21 @@
       "statuses": [
         423
       ],
-      "description": "The paid organization has no usable card: it cannot add people until an owner saves one. `errors[0]` is `{state, since}`."
+      "description": "The organization's billing owner has no working card: it cannot add people until one is saved. `errors[0]` is `{state, since}`."
     },
     {
       "type": "urn:taskadence:problem:organization-read-only",
       "statuses": [
         423
       ],
-      "description": "The paid organization has had no usable card for 3 days: it is read-only until an owner saves one. Nothing is deleted. Reads still work, and so do billing, deleting the organization and the writes that reduce access or ask for help. `errors[0]` is `{state, since}`."
+      "description": "The organization's billing owner has had no working card for 3 days: it is read-only until one is saved. Nothing is deleted. Reads still work, and so do billing, deleting the organization and the writes that reduce access or ask for help. `errors[0]` is `{state, since}`."
     },
     {
-      "type": "urn:taskadence:problem:organization-pending-payment",
+      "type": "urn:taskadence:problem:organization-locked",
       "statuses": [
-        409
+        423
       ],
-      "description": "The organization waits for its card. Until an owner adds one it can only be read, have its billing managed, or be deleted. `setup_url_route` is where an owner gets the card page."
+      "description": "No working card for 30 days: the organization is locked and cannot be opened until its billing owner saves one; it is deleted on day 90. Only its own read and your own membership answer; a token gets this everywhere. `errors[0]` is `{state, since, archive_on, delete_on}`."
     },
     {
       "type": "urn:taskadence:problem:billing-owner-must-hand-over",

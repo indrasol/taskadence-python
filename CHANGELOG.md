@@ -9,20 +9,23 @@ entries below were pre-releases with no compatibility promise.
 
 ## [3.0.0] - unreleased
 
-Release 11: the organization is the top level. There is no account object any more: each organization has its own plan,
-storage, card, invoice and suspension state, and one person can belong to any number of organizations. Re-generated from
-the API contract at `taskadence-api` `242ed401` (branch `feature/org-billing`); the API version is now `2026-11-05` (was
-`2026-10-24`), so every request sends `TasKadence-Version: 2026-11-05`. A major version because methods, models, fields
-and an exception are removed, and the API stops serving the account routes in the same release. `taskadence-mcp` and
-`@taskadence/mcp` have no generated code and change only their shared version.
+Release 11: the organization is the top level, and billing belongs to the person who pays for it. There is no account
+object any more: one person can belong to any number of organizations, every organization includes 10 GB of file
+storage, and each organization's billing owner pays for it on their one card and one monthly invoice (storage beyond
+10 GB, and $1 a month for every organization after their first; organizations that existed before this change carry no
+fee). Re-generated from the API contract at `taskadence-api` `15305fda` (branch `feature/org-billing`); the API version
+is now `2026-11-06` (was `2026-10-24`), so every request sends `TasKadence-Version: 2026-11-06`. A major version because
+methods, models, fields and exceptions are removed, and the API stops serving the account routes in the same release.
+`taskadence-mcp` and `@taskadence/mcp` have no generated code and change only their shared version.
 
 **Upgrading from 2.x:**
 - `tm.account.*` and `tm.storage.get()` now raise `RemovedInRelease11Error`. For organizations use
   `tm.organizations.list()`, for people `tm.organization_members.list(...)`, for storage
   `tm.organizations.storage(org_id)`.
 - Delete `me.account` reads, and any `except EmailInOtherAccountError` (the class is gone, the API never answers it now).
-- Catch `OrganizationSuspendedError` (423) and `OrganizationPendingPaymentError` (409) where an organization may have no
-  card: these are new answers on routes that used to succeed.
+- Catch `OrganizationSuspendedError` (423) where an organization's billing owner may have no working card: from the
+  first day it cannot add people, from day 3 it is read-only, and from day 30 `OrganizationLockedError` answers every
+  call, reads included. Catch `StorageLimitReachedError` (402) on uploads once an organization's 10 GB is used.
 
 ### Removed
 - **Account methods:** `tm.account.read` / `get`, `tm.account.people`, `tm.account.storage` and `tm.storage.get` remain
@@ -35,25 +38,35 @@ and an exception are removed, and the API stops serving the account routes in th
 - **Errors:** `EmailInOtherAccountError` and its alias `EmailInOtherAccount`. Invitations and joins never answer it.
 
 ### Added
-- `plan`, `state` and `state_since` on `OrgCard`, `OrganizationInDB` and `MeOrganization` (`tm.organizations.list`,
-  `tm.organizations.read`, `tm.me`); `billing_owner_user_id`, `pending_billing_owner_user_id` and `grandfathered` on
-  `OrgCard` and `OrganizationInDB`; `plan`, `state` and `billing_exempt` on `StorageUsage`.
+- `state` and `state_since` on `OrgCard`, `OrganizationInDB` and `MeOrganization` (`tm.organizations.list`,
+  `tm.organizations.read`, `tm.me`): `active`, `restricted`, `read_only`, `locked` or `archived`. `billing_owner_user_id`
+  and `grandfathered` on `OrgCard` and `OrganizationInDB`.
+- On `StorageUsage` (`tm.organizations.storage`): `state`, `billing_exempt`, `fee` (`StorageFee`: `amount_cents` 100 or 0,
+  `reason` `first`, `grandfathered`, `exempt` or `none`) and `billing_owner` (`StorageBillingOwner`: `user_id`, `name`;
+  None for an organization with no billing owner).
 - **Errors:** `RemovedInRelease11Error` (410, a subclass of `RemovedInRelease10Error`); `OrganizationSuspendedError` (423),
-  with `OrganizationRestrictedError` and `OrganizationReadOnlyError` (`.state`, `.since`); `OrganizationPendingPaymentError`
-  (409, `.org_id`, `.setup_url_route`); `BillingOwnerMustHandOverError` (409, `.org_id`, `.handover_route`).
-- `tm orgs list` shows each organization's plan and state, and `tm me` shows them too.
+  with `OrganizationRestrictedError`, `OrganizationReadOnlyError` and `OrganizationLockedError` (`.state`, `.since`; the
+  locked one adds `.archive_on` and `.delete_on`); `PaymentRequiredError` (402) with `StorageLimitReachedError`
+  (`.bytes_used`, `.included_bytes`, `.manage_url`; 402 used to be a plain `TaskadenceError`);
+  `BillingOwnerMustHandOverError` (409, `.org_id`, `.handover_route`).
+- `tm.legal_notice()` (and on `AsyncTaskadence`): the pending change to the Terms of Service and Privacy Policy as a
+  `LegalNotice` (`effective_date`, `headline`, `terms_url`, `privacy_url`), or None. The route is public and outside the
+  API contract, so it is hand-written and sent without your token.
+- `tm orgs list` and `tm me` show each organization's state; `tm storage` prints its state, fee and who pays.
 - **Access requests:** `tm.access_systems` (`list`, `read`, `resources`, `roles`) and `tm.access_requests` (`create`,
   `create_batch`, `list`, `read`), with their models. Deciding stays in the app.
 - `tm.task_history.batch`.
 
 ### Changed
 - **Storage is the organization's.** `tm.organizations.storage(org_id)` measures that organization alone, and
-  `included_bytes` is 0 on a paid organization. `tm storage` prints its plan and state, not an account total.
+  `included_bytes` is 10 GB (10^10 bytes) for every organization, or its grant. `tm storage` no longer prints an account
+  total.
 - The `account:read` and `account:write` scopes are still accepted and grant nothing.
 
 ### Not in the SDK
-Creating an organization, its billing and handing billing to another owner stay out of the SDK: the API keeps those routes
-internal and refuses every access token on them. Owners use the web app (`StorageUsage.manage_url`).
+Creating an organization, billing (the card, this month so far, invoices, the billing email) and handing billing to
+another owner stay out of the SDK: the API keeps those routes for a signed-in session and refuses every access token on
+them. People manage billing in the web app under Profile > Billing.
 
 ## [2.0.0] - 2026-10-24
 

@@ -215,7 +215,7 @@ from ._generated.models import (
     WebhookOut,
 )
 
-API_VERSION = "2026-11-05"
+API_VERSION = "2026-11-06"
 """The API date of the spec this SDK was generated from (`info.version`)."""
 DEFAULT_BASE_URL = "https://api.taskadence.com"
 """The spec's first server — the base URL when neither `base_url=` nor TASKADENCE_API_URL is given."""

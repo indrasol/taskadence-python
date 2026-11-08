@@ -10,8 +10,6 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..models.storage_usage_plan import check_storage_usage_plan
-from ..models.storage_usage_plan import StorageUsagePlan
 from ..models.storage_usage_state import check_storage_usage_state
 from ..models.storage_usage_state import StorageUsageState
 from ..models.storage_usage_status import check_storage_usage_status
@@ -20,8 +18,10 @@ from ..types import UNSET, Unset
 from typing import cast
 
 if TYPE_CHECKING:
+    from ..models.storage_billing_owner import StorageBillingOwner
     from ..models.storage_breakdown import StorageBreakdown
     from ..models.storage_day import StorageDay
+    from ..models.storage_fee import StorageFee
     from ..models.storage_file import StorageFile
 
 
@@ -34,25 +34,27 @@ class StorageUsage:
 
     Attributes:
         org_id (str):
+        fee (StorageFee): Part of `StorageUsage`.
         bytes_used (int): Bytes of the organization's files right now (decimal: 1 GB = 10^9 bytes)
         file_count (int): Counted files (task attachments, project files, legacy bug attachments); `GET
             .../storage/files` lists them
-        included_bytes (int): Storage included before overage, in bytes (decimal). A free organization's plan value is
-            10^10 (10 GB), a paid one's is 0 (every GB is billed); an organization may have a grant.
+        included_bytes (int): Storage included before overage, in bytes (decimal): 10^10 (10 GB) for every organization,
+            or its grant.
         overage_bytes (int): max(0, bytes_used - included_bytes)
         percent (float): bytes_used / included_bytes, in percent, one decimal (100 when nothing is included and
             something is stored)
         status (StorageUsageStatus): ok; warning (80 % or more); blocked (full, no card on file: new uploads answer
             402); metered (full, a card on file: billed per GB-month at month end); exempt (full, exempt from billing: never
             billed or blocked)
-        payment_method_on_file (bool): An owner has a card on file (uploads continue past the included storage)
+        payment_method_on_file (bool): Its billing owner has a working card on file (uploads continue past the included
+            storage)
         billing_exempt (bool): Exempt from billing: metered and shown, never billed or blocked
         breakdown (StorageBreakdown): Part of `StorageUsage`.
-        manage_url (str): The organization's Billing settings in the web app
-        plan (StorageUsagePlan | Unset): free: storage included; paid: nothing included, every GB billed Default:
-            'free'.
-        state (StorageUsageState | Unset): The card lifecycle of a paid organization; a free one is always active
-            Default: 'active'.
+        manage_url (str): Where the billing owner manages their card in the web app (Profile > Billing)
+        state (StorageUsageState | Unset): The card lifecycle: anything but active means its billing owner has no
+            working card Default: 'active'.
+        billing_owner (None | StorageBillingOwner | Unset): Who pays for it; null for an organization with no billing
+            owner
         project_count (int | Unset): Projects holding at least one counted file; `GET .../storage/projects` lists them
             Default: 0.
         exempt_message (None | str | Unset): Set only while the organization is exempt from billing
@@ -62,6 +64,7 @@ class StorageUsage:
     """
 
     org_id: str
+    fee: StorageFee
     bytes_used: int
     file_count: int
     included_bytes: int
@@ -72,8 +75,8 @@ class StorageUsage:
     billing_exempt: bool
     breakdown: StorageBreakdown
     manage_url: str
-    plan: StorageUsagePlan | Unset = "free"
     state: StorageUsageState | Unset = "active"
+    billing_owner: None | StorageBillingOwner | Unset = UNSET
     project_count: int | Unset = 0
     exempt_message: None | str | Unset = UNSET
     top_files: list[StorageFile] | Unset = UNSET
@@ -85,11 +88,15 @@ class StorageUsage:
     etag: str | None = _attrs_field(default=None, init=False, repr=False, eq=False)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.storage_billing_owner import StorageBillingOwner  # noqa: PLC0415
         from ..models.storage_breakdown import StorageBreakdown  # noqa: PLC0415
         from ..models.storage_day import StorageDay  # noqa: PLC0415
+        from ..models.storage_fee import StorageFee  # noqa: PLC0415
         from ..models.storage_file import StorageFile  # noqa: PLC0415
 
         org_id = self.org_id
+
+        fee = self.fee.to_dict()
 
         bytes_used = self.bytes_used
 
@@ -111,13 +118,17 @@ class StorageUsage:
 
         manage_url = self.manage_url
 
-        plan: str | Unset = UNSET
-        if not isinstance(self.plan, Unset):
-            plan = self.plan
-
         state: str | Unset = UNSET
         if not isinstance(self.state, Unset):
             state = self.state
+
+        billing_owner: dict[str, Any] | None | Unset
+        if isinstance(self.billing_owner, Unset):
+            billing_owner = UNSET
+        elif isinstance(self.billing_owner, StorageBillingOwner):
+            billing_owner = self.billing_owner.to_dict()
+        else:
+            billing_owner = self.billing_owner
 
         project_count = self.project_count
 
@@ -152,6 +163,7 @@ class StorageUsage:
         field_dict.update(
             {
                 "org_id": org_id,
+                "fee": fee,
                 "bytes_used": bytes_used,
                 "file_count": file_count,
                 "included_bytes": included_bytes,
@@ -164,10 +176,10 @@ class StorageUsage:
                 "manage_url": manage_url,
             }
         )
-        if plan is not UNSET:
-            field_dict["plan"] = plan
         if state is not UNSET:
             field_dict["state"] = state
+        if billing_owner is not UNSET:
+            field_dict["billing_owner"] = billing_owner
         if project_count is not UNSET:
             field_dict["project_count"] = project_count
         if exempt_message is not UNSET:
@@ -183,12 +195,16 @@ class StorageUsage:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.storage_billing_owner import StorageBillingOwner  # noqa: PLC0415
         from ..models.storage_breakdown import StorageBreakdown  # noqa: PLC0415
         from ..models.storage_day import StorageDay  # noqa: PLC0415
+        from ..models.storage_fee import StorageFee  # noqa: PLC0415
         from ..models.storage_file import StorageFile  # noqa: PLC0415
 
         d = dict(src_dict)
         org_id = d.pop("org_id")
+
+        fee = StorageFee.from_dict(d.pop("fee"))
 
         bytes_used = d.pop("bytes_used")
 
@@ -210,19 +226,29 @@ class StorageUsage:
 
         manage_url = d.pop("manage_url")
 
-        _plan = d.pop("plan", UNSET)
-        plan: StorageUsagePlan | Unset
-        if isinstance(_plan, Unset):
-            plan = UNSET
-        else:
-            plan = check_storage_usage_plan(_plan)
-
         _state = d.pop("state", UNSET)
         state: StorageUsageState | Unset
         if isinstance(_state, Unset):
             state = UNSET
         else:
             state = check_storage_usage_state(_state)
+
+        def _parse_billing_owner(data: object) -> None | StorageBillingOwner | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                billing_owner_type_0 = StorageBillingOwner.from_dict(data)
+
+                return billing_owner_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | StorageBillingOwner | Unset, data)
+
+        billing_owner = _parse_billing_owner(d.pop("billing_owner", UNSET))
 
         project_count = d.pop("project_count", UNSET)
 
@@ -264,6 +290,7 @@ class StorageUsage:
 
         storage_usage = cls(
             org_id=org_id,
+            fee=fee,
             bytes_used=bytes_used,
             file_count=file_count,
             included_bytes=included_bytes,
@@ -274,8 +301,8 @@ class StorageUsage:
             billing_exempt=billing_exempt,
             breakdown=breakdown,
             manage_url=manage_url,
-            plan=plan,
             state=state,
+            billing_owner=billing_owner,
             project_count=project_count,
             exempt_message=exempt_message,
             top_files=top_files,

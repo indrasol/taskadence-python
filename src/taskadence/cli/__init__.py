@@ -50,7 +50,7 @@ app = typer.Typer(
 )
 auth_app = typer.Typer(help="Store, check and remove your access token.", no_args_is_help=True)
 tasks_app = typer.Typer(help="Tasks: list (the filter grammar), get, create, update, attach.", no_args_is_help=True)
-orgs_app = typer.Typer(help="Organizations: list, with each one's plan and state.", no_args_is_help=True)
+orgs_app = typer.Typer(help="Organizations: list, with each one's state.", no_args_is_help=True)
 projects_app = typer.Typer(help="Projects: list, upload.", no_args_is_help=True)
 views_app = typer.Typer(help="Saved views.", no_args_is_help=True)
 webhooks_app = typer.Typer(help="Webhooks (owner / admin).", no_args_is_help=True)
@@ -268,9 +268,7 @@ def me(json_: JsonOpt = False) -> None:
         f"[bold]{principal.get('username') or principal.get('id')}[/bold] ({principal.get('type')})"
         + (f" <{principal['email']}>" if principal.get("email") else "")
     )
-    _table(
-        result.organizations or [], ["org_id", "name", "role", "designation", "plan", "state"], title="Organizations"
-    )
+    _table(result.organizations or [], ["org_id", "name", "role", "designation", "state"], title="Organizations")
 
 
 # ---------------------------------------------------------------------------
@@ -280,9 +278,10 @@ def me(json_: JsonOpt = False) -> None:
 
 @orgs_app.command("list")
 def orgs_list(json_: JsonOpt = False, table: TableOpt = False) -> None:
-    """The organizations you belong to or are invited to, with each one's plan and state."""
+    """The organizations you belong to or are invited to, with each one's state (active, restricted, read_only, locked
+    or archived: anything but active means its billing owner has no working card)."""
     rows = _run(lambda tm: list(tm.organizations.list()))
-    _print_json(rows) if json_ else _table(rows, ["org_id", "name", "role", "plan", "state", "member_count"])
+    _print_json(rows) if json_ else _table(rows, ["org_id", "name", "role", "state", "member_count"])
 
 
 # ---------------------------------------------------------------------------
@@ -300,9 +299,26 @@ def _bytes(n: Any) -> str:
     return f"{value:.2f} TB"  # pragma: no cover - the loop returns
 
 
+_FEE_REASONS = {
+    "first": "its billing owner's first organization",
+    "grandfathered": "it existed before the fee",
+    "exempt": "exempt",
+}
+
+
+def _fee(fee: Any) -> str:
+    """`StorageUsage.fee`: "$1.00 a month", or "none (why)"."""
+    fee = fee or {}
+    cents = int(fee.get("amount_cents") or 0)
+    if cents:
+        return f"${cents / 100:.2f} a month"
+    reason = _FEE_REASONS.get(str(fee.get("reason")))
+    return f"none ({reason})" if reason else "none"
+
+
 @app.command("storage")
 def storage(org: OrgOpt = None, json_: JsonOpt = False) -> None:
-    """The organization's storage: plan, state, used of the included storage, by kind, top projects, largest files."""
+    """The organization's storage: state, fee, who pays, used of the included 10 GB, by kind, top projects, files."""
     result = _run(lambda tm: tm.organizations.storage(_resolve_org(tm, org)))
     if json_:
         _print_json(result)
@@ -313,12 +329,15 @@ def storage(org: OrgOpt = None, json_: JsonOpt = False) -> None:
         f"[bold]{_bytes(data.get('bytes_used'))}[/bold] of {_bytes(data.get('included_bytes'))} included "
         f"({data.get('percent')}%), {data.get('file_count')} files - status [bold]{status}[/bold]"
     )
-    if data.get("plan") or data.get("state"):
-        out.print(f"Plan: {data.get('plan') or '-'}, state: {data.get('state') or '-'}")
+    owner = data.get("billing_owner") or {}
+    out.print(
+        f"State: {data.get('state') or '-'}, fee: {_fee(data.get('fee'))}, "
+        f"billed to: {owner.get('name') or owner.get('user_id') or 'nobody'}"
+    )
     if data.get("exempt_message"):
         out.print(str(data["exempt_message"]))
     if status == "blocked":
-        out.print("New uploads are paused until an owner of the organization adds a card.", style="red")
+        out.print("New uploads are paused until the organization's billing owner adds a card.", style="red")
     breakdown = data.get("breakdown") or {}
     kinds = breakdown.get("by_kind") or {}
     _table(

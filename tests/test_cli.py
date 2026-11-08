@@ -156,41 +156,44 @@ def test_me(signed_in: None, api: respx.MockRouter) -> None:
     assert json.loads(as_json.output)["principal"] == example("me.read")["principal"]
 
 
-def test_me_shows_each_organizations_plan_and_state(signed_in: None, api: respx.MockRouter) -> None:
-    org = {"org_id": "O1", "name": "Acme", "role": "owner", "plan": "paid", "state": "read_only"}
+def test_me_shows_each_organizations_state(signed_in: None, api: respx.MockRouter) -> None:
+    org = {"org_id": "O1", "name": "Acme", "role": "owner", "state": "read_only"}
     api.get("/v1/me").respond(json=example("me.read") | {"organizations": [org]})
     result = invoke("me")
-    assert result.exit_code == 0 and "paid" in result.output and "read_only" in result.output
+    assert result.exit_code == 0 and "read_only" in result.output and "plan" not in result.output
 
 
-def test_orgs_list_shows_plan_and_state(signed_in: None, api: respx.MockRouter) -> None:
-    free = {"org_id": "O1", "name": "Acme", "role": "owner", "plan": "free", "state": "active"}
-    paid = {"org_id": "O2", "name": "Labs", "role": "owner", "plan": "paid", "state": "pending_payment"}
-    route = api.get("/v1/organizations").respond(json={"data": [free, paid], "next_cursor": None})
+def test_orgs_list_shows_state(signed_in: None, api: respx.MockRouter) -> None:
+    active = {"org_id": "O1", "name": "Acme", "role": "owner", "state": "active"}
+    locked = {"org_id": "O2", "name": "Labs", "role": "owner", "state": "locked"}
+    route = api.get("/v1/organizations").respond(json={"data": [active, locked], "next_cursor": None})
     result = invoke("orgs", "list")
     assert result.exit_code == 0, result.output
-    for text in ("plan", "state", "free", "active", "paid", "pending_payment", "2 rows"):
+    for text in ("state", "active", "locked", "2 rows"):
         assert text in result.output, text
+    assert "plan" not in result.output
     assert route.called
     assert [o["org_id"] for o in json.loads(invoke("orgs", "list", "--json").output)] == ["O1", "O2"]
 
 
-def test_orgs_has_no_create_command(signed_in: None) -> None:
-    """Creating an organization is internal in the contract: the API refuses every access token there."""
+def test_orgs_has_no_create_command_and_me_no_billing(signed_in: None) -> None:
+    """Creating an organization and billing are internal in the contract: the API refuses every access token there."""
     assert invoke("orgs", "create").exit_code == 2
+    assert invoke("me", "billing").exit_code == 2
 
 
 STORAGE = {
     "org_id": "O123456",
     "bytes_used": 1_000_400_000_000,
     "file_count": 18342,
-    "included_bytes": 10**12,
+    "included_bytes": 10**10,
     "overage_bytes": 400_000_000,
     "percent": 100.0,
     "status": "blocked",
     "payment_method_on_file": False,
-    "plan": "free",
     "state": "active",
+    "fee": {"amount_cents": 100, "reason": "none"},
+    "billing_owner": {"user_id": "U1", "name": "Ada Owner"},
     "billing_exempt": False,
     "exempt_message": None,
     "breakdown": {
@@ -218,11 +221,12 @@ def test_storage(signed_in: None, api: respx.MockRouter) -> None:
     route = api.get("/v1/organizations/O123456/storage").respond(json=STORAGE)
     result = invoke("storage", "--org", "O123456")
     assert result.exit_code == 0, result.output
-    assert "1.00 TB of 1.00 TB included" in result.output and "status blocked" in result.output
-    assert "Plan: free, state: active" in result.output and "exempt" not in result.output
+    assert "1.00 TB of 10.00 GB included" in result.output and "status blocked" in result.output
+    assert "State: active, fee: $1.00 a month, billed to: Ada Owner" in result.output
+    assert "exempt" not in result.output and "plan" not in result.output.lower()
     assert "account" not in result.output.lower()
     assert (
-        "New uploads are paused" in result.output
+        "New uploads are paused until the organization's billing owner adds a card" in result.output
         and "Website relaunch" in result.output
         and "launch.mp4" in result.output
     )
