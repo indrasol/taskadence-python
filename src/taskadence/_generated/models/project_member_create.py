@@ -15,6 +15,7 @@ from ..models.project_role_enum import ProjectRoleEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="ProjectMemberCreate")
@@ -278,7 +279,7 @@ class ProjectMemberCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -295,7 +296,7 @@ class ProjectMemberCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -312,7 +313,7 @@ class ProjectMemberCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                deleted_at_type_0 = datetime.datetime.fromisoformat(data)
+                deleted_at_type_0 = parse_datetime(data)
 
                 return deleted_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

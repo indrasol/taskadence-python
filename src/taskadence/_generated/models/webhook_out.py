@@ -15,6 +15,7 @@ from ..models.webhook_out_status import WebhookOutStatus
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="WebhookOut")
@@ -271,7 +272,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                secret_rotated_at_type_0 = datetime.datetime.fromisoformat(data)
+                secret_rotated_at_type_0 = parse_datetime(data)
 
                 return secret_rotated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -288,7 +289,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                previous_secret_expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                previous_secret_expires_at_type_0 = parse_datetime(data)
 
                 return previous_secret_expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -316,7 +317,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_delivery_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_delivery_at_type_0 = parse_datetime(data)
 
                 return last_delivery_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -342,7 +343,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_success_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_success_at_type_0 = parse_datetime(data)
 
                 return last_success_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -359,7 +360,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -376,7 +377,7 @@ class WebhookOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

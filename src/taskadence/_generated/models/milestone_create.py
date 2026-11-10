@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 
 T = TypeVar("T", bound="MilestoneCreate")
@@ -76,7 +77,7 @@ class MilestoneCreate:
         d = dict(src_dict)
         title = d.pop("title")
 
-        target_date = datetime.date.fromisoformat(d.pop("target_date"))
+        target_date = parse_date(d.pop("target_date"))
 
         def _parse_description(data: object) -> None | str | Unset:
             if data is None:

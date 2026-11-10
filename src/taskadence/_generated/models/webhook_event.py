@@ -12,6 +12,7 @@ from ..types import UNSET, Unset
 
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.webhook_actor import WebhookActor
@@ -107,7 +108,7 @@ class WebhookEvent:
 
         api_version = d.pop("api_version")
 
-        created_at = datetime.datetime.fromisoformat(d.pop("created_at"))
+        created_at = parse_datetime(d.pop("created_at"))
 
         org_id = d.pop("org_id")
 

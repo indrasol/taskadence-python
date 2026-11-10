@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 if TYPE_CHECKING:
     from ..models.access_grant import AccessGrant
@@ -184,7 +185,7 @@ class AccessRequestCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                until_type_0 = datetime.date.fromisoformat(data)
+                until_type_0 = parse_date(data)
 
                 return until_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

@@ -17,6 +17,7 @@ from ..models.release_type import ReleaseType
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.release_note_item import ReleaseNoteItem
@@ -156,11 +157,11 @@ class Release:
 
         branch = d.pop("branch")
 
-        release_date = datetime.datetime.fromisoformat(d.pop("release_date"))
+        release_date = parse_datetime(d.pop("release_date"))
 
-        created_at = datetime.datetime.fromisoformat(d.pop("created_at"))
+        created_at = parse_datetime(d.pop("created_at"))
 
-        updated_at = datetime.datetime.fromisoformat(d.pop("updated_at"))
+        updated_at = parse_datetime(d.pop("updated_at"))
 
         summary = ReleaseSummary.from_dict(d.pop("summary"))
 

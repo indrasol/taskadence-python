@@ -12,6 +12,7 @@ from ..types import UNSET, Unset
 
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 if TYPE_CHECKING:
     from ..models.availability_entry import AvailabilityEntry
@@ -86,9 +87,9 @@ class AvailabilityRange:
         d = dict(src_dict)
         org_id = d.pop("org_id")
 
-        from_ = datetime.date.fromisoformat(d.pop("from"))
+        from_ = parse_date(d.pop("from"))
 
-        to = datetime.date.fromisoformat(d.pop("to"))
+        to = parse_date(d.pop("to"))
 
         members = []
         _members = d.pop("members")

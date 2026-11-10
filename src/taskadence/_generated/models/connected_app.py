@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="ConnectedApp")
@@ -193,7 +194,7 @@ class ConnectedApp:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -210,7 +211,7 @@ class ConnectedApp:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_used_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_used_at_type_0 = parse_datetime(data)
 
                 return last_used_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

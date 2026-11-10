@@ -19,6 +19,7 @@ from ..models.project_visibility_enum import ProjectVisibilityEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 if TYPE_CHECKING:
     from ..models.project_update_metadata_type_0 import ProjectUpdateMetadataType0
@@ -337,7 +338,7 @@ class ProjectUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                start_date_type_0 = datetime.date.fromisoformat(data)
+                start_date_type_0 = parse_date(data)
 
                 return start_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -354,7 +355,7 @@ class ProjectUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                end_date_type_0 = datetime.date.fromisoformat(data)
+                end_date_type_0 = parse_date(data)
 
                 return end_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 from typing import Literal, cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="TaskAttachmentInDB")
@@ -240,7 +241,7 @@ class TaskAttachmentInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                uploaded_at_type_0 = datetime.datetime.fromisoformat(data)
+                uploaded_at_type_0 = parse_datetime(data)
 
                 return uploaded_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -257,7 +258,7 @@ class TaskAttachmentInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                deleted_at_type_0 = datetime.datetime.fromisoformat(data)
+                deleted_at_type_0 = parse_datetime(data)
 
                 return deleted_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -292,7 +293,7 @@ class TaskAttachmentInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                url_expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                url_expires_at_type_0 = parse_datetime(data)
 
                 return url_expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 if TYPE_CHECKING:
     from ..models.workload_counts import WorkloadCounts
@@ -105,7 +106,7 @@ class WorkloadOut:
         d = dict(src_dict)
         org_id = d.pop("org_id")
 
-        as_of = datetime.date.fromisoformat(d.pop("as_of"))
+        as_of = parse_date(d.pop("as_of"))
 
         totals = WorkloadCounts.from_dict(d.pop("totals"))
 

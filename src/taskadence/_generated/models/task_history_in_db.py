@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.task_history_in_db_metadata_type_0_item import TaskHistoryInDBMetadataType0Item
@@ -183,7 +184,7 @@ class TaskHistoryInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -197,7 +198,7 @@ class TaskHistoryInDB:
         if isinstance(_created_at, Unset):
             created_at = UNSET
         else:
-            created_at = datetime.datetime.fromisoformat(_created_at)
+            created_at = parse_datetime(_created_at)
 
         task_history_in_db = cls(
             task_id=task_id,

@@ -21,6 +21,7 @@ from ..models.project_visibility_enum import ProjectVisibilityEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date, parse_datetime
 
 if TYPE_CHECKING:
     from ..models.project_card_metadata_type_0 import ProjectCardMetadataType0
@@ -448,7 +449,7 @@ class ProjectCard:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                start_date_type_0 = datetime.date.fromisoformat(data)
+                start_date_type_0 = parse_date(data)
 
                 return start_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -465,7 +466,7 @@ class ProjectCard:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                end_date_type_0 = datetime.date.fromisoformat(data)
+                end_date_type_0 = parse_date(data)
 
                 return end_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -570,7 +571,7 @@ class ProjectCard:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -587,7 +588,7 @@ class ProjectCard:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

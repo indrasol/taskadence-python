@@ -15,6 +15,7 @@ from ..models.access_connection_out_status import check_access_connection_out_st
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="AccessConnectionOut")
@@ -154,7 +155,7 @@ class AccessConnectionOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                connected_at_type_0 = datetime.datetime.fromisoformat(data)
+                connected_at_type_0 = parse_datetime(data)
 
                 return connected_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -171,7 +172,7 @@ class AccessConnectionOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_sync_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_sync_at_type_0 = parse_datetime(data)
 
                 return last_sync_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

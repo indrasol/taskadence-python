@@ -12,6 +12,7 @@ from ..types import UNSET, Unset
 
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.release import Release
@@ -79,7 +80,7 @@ class WhatsNewResponse:
 
         summary = WhatsNewResponseSummary.from_dict(d.pop("summary"))
 
-        since_date = datetime.datetime.fromisoformat(d.pop("since_date"))
+        since_date = parse_datetime(d.pop("since_date"))
 
         whats_new_response = cls(
             latest_releases=latest_releases,
