@@ -14,10 +14,14 @@
         ├── NotFoundError (404)
         ├── ConflictError (409)           ├── IdempotencyKeyInFlightError
         │                                 ├── SprintProjectMismatchError  a task joins only a sprint of its project
-        │                                 ├── EmailInOtherAccountError    the invitee's email is in another account
-        │                                 └── MemberNotLinkedError        a member must sign in again (.user_ids)
+        │                                 ├── MemberNotLinkedError        a member must sign in again (.user_ids)
+        │                                 └── BillingOwnerMustHandOverError    hand billing over (.handover_route)
         ├── GoneError (410)               └── RemovedInRelease10Error  (.changelog .successor) never retried
+        │                                     └── RemovedInRelease11Error  the account level: a route it had
         ├── PreconditionFailedError (412)
+        ├── PaymentRequiredError (402)    └── StorageLimitReachedError  uploads paused (.manage_url .bytes_used)
+        ├── OrganizationSuspendedError (423) ├── OrganizationRestrictedError / OrganizationReadOnlyError (.state .since)
+        │                                 └── OrganizationLockedError  day 30 (.archive_on .delete_on)
         ├── UnprocessableEntityError (422) ├── ValidationError, IdempotencyKeyReusedError, UrlRefusedError
         │                                 └── InvalidValueError   422 invalid-parameter: also an InvalidParameterError
         ├── RateLimitedError (429)        (.retry_after)
@@ -162,6 +166,75 @@ class GoneError(TaskadenceError):
     """410: the route was removed. Not retried: it will not come back."""
 
 
+class PaymentRequiredError(TaskadenceError):
+    """402: the request needs a working card on the billing owner's side. Not retried."""
+
+
+class StorageLimitReachedError(PaymentRequiredError):
+    """402 `storage-limit-reached`: the organization has used its included storage (10 GB) and its billing owner has no
+    working card, so new uploads pause. Reads, downloads and deletes still work. `.bytes_used`, `.included_bytes` and
+    `.manage_url` (where the billing owner adds a card) come from the body."""
+
+    def _number(self, key: str) -> int | None:
+        value = self.body.get(key) if isinstance(self.body, dict) else None
+        return int(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+    @property
+    def bytes_used(self) -> int | None:
+        return self._number("bytes_used")
+
+    @property
+    def included_bytes(self) -> int | None:
+        return self._number("included_bytes")
+
+    @property
+    def manage_url(self) -> str | None:
+        value = self.body.get("manage_url") if isinstance(self.body, dict) else None
+        return str(value) if value is not None else None
+
+
+class OrganizationSuspendedError(TaskadenceError):
+    """423: the organization's billing owner has no working card, so the organization is restricted, read-only or locked
+    until they save one. `.state` is the organization's state and `.since` when it entered it (from `errors[0]`; the
+    timestamp as the API sends it). Not retried: only a working card changes the answer."""
+
+    def _lock(self, key: str) -> str | None:
+        first = self.errors[0] if self.errors else None
+        value = first.get(key) if isinstance(first, Mapping) else None
+        return str(value) if value is not None else None
+
+    @property
+    def state(self) -> str | None:
+        return self._lock("state")
+
+    @property
+    def since(self) -> str | None:
+        return self._lock("since")
+
+
+class OrganizationRestrictedError(OrganizationSuspendedError):
+    """423 `organization-restricted`: the organization cannot add people until its billing owner saves a card."""
+
+
+class OrganizationReadOnlyError(OrganizationSuspendedError):
+    """423 `organization-read-only`: no working card for 3 days, so the organization is read-only until one is saved.
+    Nothing is deleted. Reads still work, and so do the writes that reduce access or ask for help."""
+
+
+class OrganizationLockedError(OrganizationSuspendedError):
+    """423 `organization-locked`: no working card for 30 days, so the organization cannot be opened (an access token
+    gets this on every route of it, reads included). `.archive_on` is the day it is archived (day 60) and `.delete_on`
+    the day it is deleted (day 90). A working card before then restores it fully."""
+
+    @property
+    def archive_on(self) -> str | None:
+        return self._lock("archive_on")
+
+    @property
+    def delete_on(self) -> str | None:
+        return self._lock("delete_on")
+
+
 class PreconditionFailedError(TaskadenceError):
     """412: `If-Match` named a stale `ETag` — re-read the resource and retry. Nothing was written."""
 
@@ -221,13 +294,24 @@ SprintProjectMismatch = SprintProjectMismatchError
 """The name the release 10 notes use; the same class."""
 
 
-class EmailInOtherAccountError(ConflictError):
-    """An invite (or a member add) of a person who already uses TasKadence with another account: one email belongs to
-    one account. `errors[0]["code"]` is `email_in_other_account`."""
+def _extension(error: TaskadenceError, key: str) -> str | None:
+    """A problem's top-level extension member, as text; None when it is absent."""
+    value = error.body.get(key) if isinstance(error.body, dict) else None
+    return str(value) if value is not None else None
 
 
-EmailInOtherAccount = EmailInOtherAccountError
-"""The name the release 10 notes use; the same class."""
+class BillingOwnerMustHandOverError(ConflictError):
+    """409 `billing-owner-must-hand-over`: this person is the organization's billing owner, so they cannot be demoted or
+    removed until an owner hands billing to someone else. `.org_id` names it; `.handover_route` is the route the web app
+    uses for that."""
+
+    @property
+    def org_id(self) -> str | None:
+        return _extension(self, "org_id")
+
+    @property
+    def handover_route(self) -> str | None:
+        return _extension(self, "handover_route")
 
 
 class MemberNotLinkedError(ConflictError):
@@ -273,6 +357,11 @@ class RemovedInRelease10Error(GoneError):
 
 RemovedInRelease10 = RemovedInRelease10Error
 """The name the release 10 notes use; the same class."""
+
+
+class RemovedInRelease11Error(RemovedInRelease10Error):
+    """A route release 11 removed with the account level (problem type `gone`): `tm.account.*` and `tm.storage.get`. An
+    organization is now the top level. The message is the server's; `.successor` names the route to call instead."""
 
 
 class UrlRefusedError(UnprocessableEntityError):
@@ -330,20 +419,27 @@ BY_TYPE: dict[str, type[TaskadenceError]] = {
     URN + "token-policy": TokenPolicyError,
     URN + "url-refused": UrlRefusedError,
     URN + "sprint-project-mismatch": SprintProjectMismatchError,
-    URN + "email-in-other-account": EmailInOtherAccountError,
     URN + "member-not-linked": MemberNotLinkedError,
     URN + "removed-in-release-10": RemovedInRelease10Error,
+    URN + "gone": RemovedInRelease11Error,
+    URN + "billing-owner-must-hand-over": BillingOwnerMustHandOverError,
+    URN + "organization-restricted": OrganizationRestrictedError,
+    URN + "organization-read-only": OrganizationReadOnlyError,
+    URN + "organization-locked": OrganizationLockedError,
+    URN + "storage-limit-reached": StorageLimitReachedError,
 }
 
 BY_STATUS: dict[int, type[TaskadenceError]] = {
     400: BadRequestError,
     401: AuthenticationError,
+    402: PaymentRequiredError,
     403: ForbiddenError,
     404: NotFoundError,
     409: ConflictError,
     410: GoneError,
     412: PreconditionFailedError,
     422: UnprocessableEntityError,
+    423: OrganizationSuspendedError,
     429: RateLimitedError,
 }
 

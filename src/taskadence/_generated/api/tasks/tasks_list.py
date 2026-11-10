@@ -522,10 +522,12 @@ def sync_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
-            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
-            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
-            carry neither field.
+        include (None | str | Unset): Extra data on each row, comma-separated or repeated; an
+            unknown value is a 400.
+
+            - `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id,
+            name}`) on every row you may read, leaving out the task's current assignee. Without it the
+            rows carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -725,10 +727,12 @@ def sync(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
-            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
-            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
-            carry neither field.
+        include (None | str | Unset): Extra data on each row, comma-separated or repeated; an
+            unknown value is a 400.
+
+            - `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id,
+            name}`) on every row you may read, leaving out the task's current assignee. Without it the
+            rows carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -923,10 +927,12 @@ async def asyncio_detailed(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
-            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
-            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
-            carry neither field.
+        include (None | str | Unset): Extra data on each row, comma-separated or repeated; an
+            unknown value is a 400.
+
+            - `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id,
+            name}`) on every row you may read, leaving out the task's current assignee. Without it the
+            rows carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored
@@ -1124,10 +1130,12 @@ async def asyncio(
         subtasks (None | str | Unset): How subtasks show: `hidden` (default, top-level tasks
             only), `flat` (subtasks are rows of their own) or `nested` (each parent followed by its
             subtasks). Unknown value → 400. See the list grammar.
-        include (None | str | Unset): Release 10: extra data on each row, comma-separated or
-            repeated; unknown value → 400. `subscribers`: `subscriber_count` and `subscribers_preview`
-            (the first 3, `{user_id, name}`) on every row the caller may read. Without it the rows
-            carry neither field.
+        include (None | str | Unset): Extra data on each row, comma-separated or repeated; an
+            unknown value is a 400.
+
+            - `subscribers`: `subscriber_count` and `subscribers_preview` (the first 3, `{user_id,
+            name}`) on every row you may read, leaving out the task's current assignee. Without it the
+            rows carry neither field.
         search (None | str | Unset): Deprecated alias of filter[search].
         status (None | str | Unset): Deprecated alias of filter[status].
         unfiled (bool | None | Unset): Deprecated alias of filter[project]=__unfiled__ (ignored

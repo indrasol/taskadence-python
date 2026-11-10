@@ -32,7 +32,6 @@ class OrganizationInDB:
         designations (list[str] | Unset): List of designation names available in this organization
         logo (None | str | Unset): Logo URL Example: https://example.com/logo.png.
         email (None | str | Unset): Contact email Example: info@acme.com.
-        plan (None | str | Unset): Subscription plan Example: pro.
         role (str | Unset): Role of the current user in the organization Default: 'owner'.
         metadata (None | OrganizationInDBMetadataType0 | Unset): Additional metadata Example: {'industry': 'tech'}.
         designation (None | str | Unset): Single designation chosen during organization creation
@@ -49,6 +48,12 @@ class OrganizationInDB:
             reports) Default: 0.
         owners (list[str] | Unset): List of usernames of the organization owners
         access_status (None | str | Unset):
+        state (None | str | Unset): active, restricted, read_only, locked or archived (the card lifecycle of a
+            chargeable organization whose billing owner has no working card)
+        state_since (datetime.datetime | None | Unset): When it entered that state
+        billing_owner_user_id (None | str | Unset): Who pays: the owner billing is with. Null on an invitation
+        grandfathered (bool | None | Unset): It existed on the release day: no $1 fee whatever else its owner owns. Null
+            on an invitation
     """
 
     name: str
@@ -57,7 +62,6 @@ class OrganizationInDB:
     designations: list[str] | Unset = UNSET
     logo: None | str | Unset = UNSET
     email: None | str | Unset = UNSET
-    plan: None | str | Unset = UNSET
     role: str | Unset = "owner"
     metadata: None | OrganizationInDBMetadataType0 | Unset = UNSET
     designation: None | str | Unset = UNSET
@@ -72,6 +76,10 @@ class OrganizationInDB:
     member_count: int | Unset = 0
     owners: list[str] | Unset = UNSET
     access_status: None | str | Unset = UNSET
+    state: None | str | Unset = UNSET
+    state_since: datetime.datetime | None | Unset = UNSET
+    billing_owner_user_id: None | str | Unset = UNSET
+    grandfathered: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -105,12 +113,6 @@ class OrganizationInDB:
             email = UNSET
         else:
             email = self.email
-
-        plan: None | str | Unset
-        if isinstance(self.plan, Unset):
-            plan = UNSET
-        else:
-            plan = self.plan
 
         role = self.role
 
@@ -190,6 +192,32 @@ class OrganizationInDB:
         else:
             access_status = self.access_status
 
+        state: None | str | Unset
+        if isinstance(self.state, Unset):
+            state = UNSET
+        else:
+            state = self.state
+
+        state_since: None | str | Unset
+        if isinstance(self.state_since, Unset):
+            state_since = UNSET
+        elif isinstance(self.state_since, datetime.datetime):
+            state_since = self.state_since.isoformat()
+        else:
+            state_since = self.state_since
+
+        billing_owner_user_id: None | str | Unset
+        if isinstance(self.billing_owner_user_id, Unset):
+            billing_owner_user_id = UNSET
+        else:
+            billing_owner_user_id = self.billing_owner_user_id
+
+        grandfathered: bool | None | Unset
+        if isinstance(self.grandfathered, Unset):
+            grandfathered = UNSET
+        else:
+            grandfathered = self.grandfathered
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -206,8 +234,6 @@ class OrganizationInDB:
             field_dict["logo"] = logo
         if email is not UNSET:
             field_dict["email"] = email
-        if plan is not UNSET:
-            field_dict["plan"] = plan
         if role is not UNSET:
             field_dict["role"] = role
         if metadata is not UNSET:
@@ -236,6 +262,14 @@ class OrganizationInDB:
             field_dict["owners"] = owners
         if access_status is not UNSET:
             field_dict["access_status"] = access_status
+        if state is not UNSET:
+            field_dict["state"] = state
+        if state_since is not UNSET:
+            field_dict["state_since"] = state_since
+        if billing_owner_user_id is not UNSET:
+            field_dict["billing_owner_user_id"] = billing_owner_user_id
+        if grandfathered is not UNSET:
+            field_dict["grandfathered"] = grandfathered
 
         return field_dict
 
@@ -276,15 +310,6 @@ class OrganizationInDB:
             return cast(None | str | Unset, data)
 
         email = _parse_email(d.pop("email", UNSET))
-
-        def _parse_plan(data: object) -> None | str | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(None | str | Unset, data)
-
-        plan = _parse_plan(d.pop("plan", UNSET))
 
         role = d.pop("role", UNSET)
 
@@ -416,6 +441,50 @@ class OrganizationInDB:
 
         access_status = _parse_access_status(d.pop("access_status", UNSET))
 
+        def _parse_state(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        state = _parse_state(d.pop("state", UNSET))
+
+        def _parse_state_since(data: object) -> datetime.datetime | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                state_since_type_0 = datetime.datetime.fromisoformat(data)
+
+                return state_since_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(datetime.datetime | None | Unset, data)
+
+        state_since = _parse_state_since(d.pop("state_since", UNSET))
+
+        def _parse_billing_owner_user_id(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        billing_owner_user_id = _parse_billing_owner_user_id(d.pop("billing_owner_user_id", UNSET))
+
+        def _parse_grandfathered(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        grandfathered = _parse_grandfathered(d.pop("grandfathered", UNSET))
+
         organization_in_db = cls(
             name=name,
             org_id=org_id,
@@ -423,7 +492,6 @@ class OrganizationInDB:
             designations=designations,
             logo=logo,
             email=email,
-            plan=plan,
             role=role,
             metadata=metadata,
             designation=designation,
@@ -438,6 +506,10 @@ class OrganizationInDB:
             member_count=member_count,
             owners=owners,
             access_status=access_status,
+            state=state,
+            state_since=state_since,
+            billing_owner_user_id=billing_owner_user_id,
+            grandfathered=grandfathered,
         )
 
         organization_in_db.additional_properties = d

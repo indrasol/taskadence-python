@@ -12,6 +12,8 @@ from ..types import UNSET, Unset
 
 from ..models.priority_enum import check_priority_enum
 from ..models.priority_enum import PriorityEnum
+from ..models.project_card_my_role_type_0 import check_project_card_my_role_type_0
+from ..models.project_card_my_role_type_0 import ProjectCardMyRoleType0
 from ..models.project_status_enum import check_project_status_enum
 from ..models.project_status_enum import ProjectStatusEnum
 from ..models.project_visibility_enum import check_project_visibility_enum
@@ -73,6 +75,11 @@ class ProjectCard:
             not shown members' emails).
         logo_url (None | str | Unset): A link to the project's logo (a 256 px square PNG, JPEG or WebP), valid for 60
             minutes; fetch the project again for a fresh one. null when the project has no logo.
+        my_role (None | ProjectCardMyRoleType0 | Unset): Your role on the project: `owner` (its owner, or an
+            organization owner / admin), `lead`, `manager`, `member` or `viewer`, the strongest that applies; null when you
+            can only read it because it is public.
+        can_manage_sprints (bool | Unset): Whether you may create and change the project's sprints (its owners, leads,
+            managers and members, organization owners and admins); a viewer may not. Default: False.
     """
 
     org_id: str
@@ -104,6 +111,8 @@ class ProjectCard:
     owner_username: None | str | Unset = UNSET
     owner_email: None | str | Unset = UNSET
     logo_url: None | str | Unset = UNSET
+    my_role: None | ProjectCardMyRoleType0 | Unset = UNSET
+    can_manage_sprints: bool | Unset = False
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -277,6 +286,16 @@ class ProjectCard:
         else:
             logo_url = self.logo_url
 
+        my_role: None | str | Unset
+        if isinstance(self.my_role, Unset):
+            my_role = UNSET
+        elif isinstance(self.my_role, str):
+            my_role = self.my_role
+        else:
+            my_role = self.my_role
+
+        can_manage_sprints = self.can_manage_sprints
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -335,6 +354,10 @@ class ProjectCard:
             field_dict["owner_email"] = owner_email
         if logo_url is not UNSET:
             field_dict["logo_url"] = logo_url
+        if my_role is not UNSET:
+            field_dict["my_role"] = my_role
+        if can_manage_sprints is not UNSET:
+            field_dict["can_manage_sprints"] = can_manage_sprints
 
         return field_dict
 
@@ -622,6 +645,25 @@ class ProjectCard:
 
         logo_url = _parse_logo_url(d.pop("logo_url", UNSET))
 
+        def _parse_my_role(data: object) -> None | ProjectCardMyRoleType0 | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                my_role_type_0 = check_project_card_my_role_type_0(data)
+
+                return my_role_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | ProjectCardMyRoleType0 | Unset, data)
+
+        my_role = _parse_my_role(d.pop("my_role", UNSET))
+
+        can_manage_sprints = d.pop("can_manage_sprints", UNSET)
+
         project_card = cls(
             org_id=org_id,
             name=name,
@@ -652,6 +694,8 @@ class ProjectCard:
             owner_username=owner_username,
             owner_email=owner_email,
             logo_url=logo_url,
+            my_role=my_role,
+            can_manage_sprints=can_manage_sprints,
         )
 
         project_card.additional_properties = d

@@ -14,6 +14,16 @@ A task's change history.
 - **Returns:** `Page[TaskHistoryInDB]`
 - **List:** returns a `Page`; iterating it follows `next_cursor` through every page.
 
+## `tm.task_history.batch(task_id: Sequence[str], if_none_match: str | None = None)`
+
+Several tasks' change histories in one call.
+
+- **HTTP:** `GET /v1/task-history/batch`
+- **operationId:** `task-history.batch`
+- **Token scope:** `tasks:read`
+- **Returns:** `TaskHistoryBatch`
+- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+
 ## `tm.task_history.read(history_id: str, if_none_match: str | None = None)`
 
 Read one history entry.

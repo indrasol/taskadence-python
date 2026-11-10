@@ -10,85 +10,25 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models.account_out import AccountOut
 from ...models.problem import Problem
-from ...types import UNSET, Unset
 from typing import cast
 
 
-def _get_kwargs(
-    *,
-    if_none_match: str | Unset = UNSET,
-) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-    if not isinstance(if_none_match, Unset):
-        headers["If-None-Match"] = if_none_match
+def _get_kwargs() -> dict[str, Any]:
 
     _kwargs: dict[str, Any] = {
         "method": "get",
         "url": "/v1/account",
     }
 
-    _kwargs["headers"] = headers
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> AccountOut | Any | Problem | None:
-    if response.status_code == 200:
-        response_200 = AccountOut.from_dict(response.json())
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Problem | None:
+    if response.status_code == 410:
+        response_410 = Problem.from_dict(response.json())
 
-        return response_200
-
-    if response.status_code == 304:
-        response_304 = cast(Any, None)
-        return response_304
-
-    if response.status_code == 400:
-        response_400 = Problem.from_dict(response.json())
-
-        return response_400
-
-    if response.status_code == 401:
-        response_401 = Problem.from_dict(response.json())
-
-        return response_401
-
-    if response.status_code == 403:
-        response_403 = Problem.from_dict(response.json())
-
-        return response_403
-
-    if response.status_code == 404:
-        response_404 = Problem.from_dict(response.json())
-
-        return response_404
-
-    if response.status_code == 409:
-        response_409 = Problem.from_dict(response.json())
-
-        return response_409
-
-    if response.status_code == 412:
-        response_412 = Problem.from_dict(response.json())
-
-        return response_412
-
-    if response.status_code == 422:
-        response_422 = Problem.from_dict(response.json())
-
-        return response_422
-
-    if response.status_code == 429:
-        response_429 = Problem.from_dict(response.json())
-
-        return response_429
-
-    if response.status_code == 500:
-        response_500 = Problem.from_dict(response.json())
-
-        return response_500
+        return response_410
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -96,9 +36,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[AccountOut | Any | Problem]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -109,31 +47,21 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Response[AccountOut | Any | Problem]:
-    """The caller's account: its organizations, the caller's account role and the storage pool
+    client: AuthenticatedClient | Client,
+) -> Response[Problem]:
+    """Removed in release 11: answers 410
 
-     The caller's account: its name, the caller's account role, the owner, its organizations (with
-    members and
-    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
-    and
-    `pending_actions` (the account owner's; all zero for everyone else).
-
-    Args:
-        if_none_match (str | Unset):
+     Removed in release 11: answers 410.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[AccountOut | Any | Problem]
+        Response[Problem]
     """
 
-    kwargs = _get_kwargs(
-        if_none_match=if_none_match,
-    )
+    kwargs = _get_kwargs()
 
     response = client.get_httpx_client().request(
         **kwargs,
@@ -144,61 +72,42 @@ def sync_detailed(
 
 def sync(
     *,
-    client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> AccountOut | Any | Problem | None:
-    """The caller's account: its organizations, the caller's account role and the storage pool
+    client: AuthenticatedClient | Client,
+) -> Problem | None:
+    """Removed in release 11: answers 410
 
-     The caller's account: its name, the caller's account role, the owner, its organizations (with
-    members and
-    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
-    and
-    `pending_actions` (the account owner's; all zero for everyone else).
-
-    Args:
-        if_none_match (str | Unset):
+     Removed in release 11: answers 410.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        AccountOut | Any | Problem
+        Problem
     """
 
     return sync_detailed(
         client=client,
-        if_none_match=if_none_match,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
-    client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> Response[AccountOut | Any | Problem]:
-    """The caller's account: its organizations, the caller's account role and the storage pool
+    client: AuthenticatedClient | Client,
+) -> Response[Problem]:
+    """Removed in release 11: answers 410
 
-     The caller's account: its name, the caller's account role, the owner, its organizations (with
-    members and
-    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
-    and
-    `pending_actions` (the account owner's; all zero for everyone else).
-
-    Args:
-        if_none_match (str | Unset):
+     Removed in release 11: answers 410.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[AccountOut | Any | Problem]
+        Response[Problem]
     """
 
-    kwargs = _get_kwargs(
-        if_none_match=if_none_match,
-    )
+    kwargs = _get_kwargs()
 
     response = await client.get_async_httpx_client().request(**kwargs)
 
@@ -207,31 +116,22 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: AuthenticatedClient,
-    if_none_match: str | Unset = UNSET,
-) -> AccountOut | Any | Problem | None:
-    """The caller's account: its organizations, the caller's account role and the storage pool
+    client: AuthenticatedClient | Client,
+) -> Problem | None:
+    """Removed in release 11: answers 410
 
-     The caller's account: its name, the caller's account role, the owner, its organizations (with
-    members and
-    storage each), the shared storage pool, `billing.exempt_message` (only while the account is exempt)
-    and
-    `pending_actions` (the account owner's; all zero for everyone else).
-
-    Args:
-        if_none_match (str | Unset):
+     Removed in release 11: answers 410.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        AccountOut | Any | Problem
+        Problem
     """
 
     return (
         await asyncio_detailed(
             client=client,
-            if_none_match=if_none_match,
         )
     ).parsed

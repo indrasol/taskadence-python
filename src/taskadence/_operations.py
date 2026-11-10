@@ -6,6 +6,14 @@
 from __future__ import annotations
 
 from ._core import Operation
+from ._generated.api.access_requests import access_requests_create as _access_requests_create
+from ._generated.api.access_requests import access_requests_create_batch as _access_requests_create_batch
+from ._generated.api.access_requests import access_requests_list as _access_requests_list
+from ._generated.api.access_requests import access_requests_read as _access_requests_read
+from ._generated.api.access_systems import access_systems_list as _access_systems_list
+from ._generated.api.access_systems import access_systems_read as _access_systems_read
+from ._generated.api.access_systems import access_systems_resources as _access_systems_resources
+from ._generated.api.access_systems import access_systems_roles as _access_systems_roles
 from ._generated.api.account import account_people as _account_people
 from ._generated.api.account import account_read as _account_read
 from ._generated.api.account import account_storage as _account_storage
@@ -121,6 +129,7 @@ from ._generated.api.task_comments import task_comments_read as _task_comments_r
 from ._generated.api.task_comments import task_comments_remove_reaction as _task_comments_remove_reaction
 from ._generated.api.task_comments import task_comments_reply as _task_comments_reply
 from ._generated.api.task_comments import task_comments_update as _task_comments_update
+from ._generated.api.task_history import task_history_batch as _task_history_batch
 from ._generated.api.task_history import task_history_list as _task_history_list
 from ._generated.api.task_history import task_history_read as _task_history_read
 from ._generated.api.tasks import tasks_add_dependency as _tasks_add_dependency
@@ -206,7 +215,7 @@ from ._generated.models import (
     WebhookOut,
 )
 
-API_VERSION = "2026-10-24"
+API_VERSION = "2026-11-06"
 """The API date of the spec this SDK was generated from (`info.version`)."""
 DEFAULT_BASE_URL = "https://api.taskadence.com"
 """The spec's first server — the base URL when neither `base_url=` nor TASKADENCE_API_URL is given."""
@@ -1079,6 +1088,16 @@ OPERATIONS: dict[str, Operation] = {
         scopes=("tasks:read",),
         summary="A task's change history",
     ),
+    "task-history.batch": Operation(
+        op_id="task-history.batch",
+        method="GET",
+        path="/v1/task-history/batch",
+        query=("task_id",),
+        if_none_match=True,
+        parse=_task_history_batch._parse_response,
+        scopes=("tasks:read",),
+        summary="Several tasks' change histories in one call",
+    ),
     "task-history.read": Operation(
         op_id="task-history.read",
         method="GET",
@@ -1103,28 +1122,25 @@ OPERATIONS: dict[str, Operation] = {
         op_id="account.read",
         method="GET",
         path="/v1/account",
-        if_none_match=True,
+        returns="none",
         parse=_account_read._parse_response,
-        scopes=("account:read",),
-        summary="The caller's account: its organizations, the caller's account role and the storage pool",
+        summary="Removed in release 11: answers 410",
     ),
     "account.people": Operation(
         op_id="account.people",
         method="GET",
         path="/v1/account/people",
-        if_none_match=True,
+        returns="none",
         parse=_account_people._parse_response,
-        scopes=("account:read",),
-        summary="Everyone in the account with their role in each organization (account owner / admin)",
+        summary="Removed in release 11: answers 410",
     ),
     "account.storage": Operation(
         op_id="account.storage",
         method="GET",
         path="/v1/storage",
-        if_none_match=True,
+        returns="none",
         parse=_account_storage._parse_response,
-        scopes=("account:read",),
-        summary="The account's storage pool: totals and the per-organization breakdown",
+        summary="Removed in release 11: answers 410",
     ),
     "organizations.settings": Operation(
         op_id="organizations.settings",
@@ -1483,6 +1499,88 @@ OPERATIONS: dict[str, Operation] = {
         if_none_match=True,
         parse=_releases_whats_new._parse_response,
         summary="What's new - recent release notes",
+    ),
+    "access-systems.list": Operation(
+        op_id="access-systems.list",
+        method="GET",
+        path="/v1/access-systems",
+        query=("org_id", "include_archived"),
+        if_none_match=True,
+        parse=_access_systems_list._parse_response,
+        scopes=("tasks:read",),
+        summary="List the organization's access systems",
+    ),
+    "access-systems.read": Operation(
+        op_id="access-systems.read",
+        method="GET",
+        path="/v1/access-systems/{system_id}",
+        path_params=("system_id",),
+        if_none_match=True,
+        parse=_access_systems_read._parse_response,
+        scopes=("tasks:read",),
+        summary="Read an access system",
+    ),
+    "access-systems.resources": Operation(
+        op_id="access-systems.resources",
+        method="GET",
+        path="/v1/access-systems/{system_id}/resources",
+        path_params=("system_id",),
+        query=("type", "q", "cursor"),
+        if_none_match=True,
+        parse=_access_systems_resources._parse_response,
+        scopes=("tasks:read",),
+        summary="A connected system's resources to request",
+    ),
+    "access-systems.roles": Operation(
+        op_id="access-systems.roles",
+        method="GET",
+        path="/v1/access-systems/{system_id}/roles",
+        path_params=("system_id",),
+        query=("type",),
+        if_none_match=True,
+        parse=_access_systems_roles._parse_response,
+        scopes=("tasks:read",),
+        summary="The roles a system's resource type offers",
+    ),
+    "access-requests.create": Operation(
+        op_id="access-requests.create",
+        method="POST",
+        path="/v1/access-requests",
+        body="json",
+        is_create=True,
+        parse=_access_requests_create._parse_response,
+        scopes=("tasks:write",),
+        summary="File an access request",
+    ),
+    "access-requests.list": Operation(
+        op_id="access-requests.list",
+        method="GET",
+        path="/v1/access-requests",
+        query=("org_id", "scope", "state"),
+        if_none_match=True,
+        parse=_access_requests_list._parse_response,
+        scopes=("tasks:read",),
+        summary="List the access requests you filed or decide",
+    ),
+    "access-requests.create_batch": Operation(
+        op_id="access-requests.create_batch",
+        method="POST",
+        path="/v1/access-requests/batch",
+        body="json",
+        is_create=True,
+        parse=_access_requests_create_batch._parse_response,
+        scopes=("tasks:write",),
+        summary="File up to 20 access requests (per-item results)",
+    ),
+    "access-requests.read": Operation(
+        op_id="access-requests.read",
+        method="GET",
+        path="/v1/access-requests/{task_id}",
+        path_params=("task_id",),
+        if_none_match=True,
+        parse=_access_requests_read._parse_response,
+        scopes=("tasks:read",),
+        summary="Read an access request",
     ),
     "sprints.list": Operation(
         op_id="sprints.list",

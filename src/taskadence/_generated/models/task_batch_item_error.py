@@ -20,7 +20,7 @@ T = TypeVar("T", bound="TaskBatchItemError")
 
 @_attrs_define
 class TaskBatchItemError:
-    """Part of `TaskBatchItemResult`.
+    """Part of `AccessBatchItemResult` and `TaskBatchItemResult`.
 
     Attributes:
         code (TaskBatchItemErrorCode): What went wrong, for a client to branch on

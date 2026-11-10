@@ -79,6 +79,8 @@ def test_every_list_is_a_page_and_every_create_is_idempotent() -> None:
     assert {"tasks.list", "views.rows", "projects.list", "webhooks.deliveries", "audit.list"} <= lists
     # 5.9: + milestones.create (a project's milestones, goals' create); the batch creates / updates (re-pin for N.3)
     assert creates == {
+        "access-requests.create",
+        "access-requests.create_batch",
         "tasks.create",
         "tasks.create_batch",
         "tasks.update_batch",
@@ -107,7 +109,7 @@ def test_generated_files_say_do_not_edit() -> None:
 
 
 def test_the_sdk_knows_its_api_version_and_default_server() -> None:
-    assert taskadence.API_VERSION == SPEC["info"]["version"] == "2026-10-24"
+    assert taskadence.API_VERSION == SPEC["info"]["version"] == "2026-11-06"
     assert SPEC["servers"][0]["url"] == taskadence.DEFAULT_BASE_URL
 
 

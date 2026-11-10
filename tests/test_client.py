@@ -50,7 +50,7 @@ def test_every_request_carries_auth_user_agent_and_api_version(tm: Taskadence, a
     headers = route.calls.last.request.headers
     assert headers["authorization"] == f"Bearer {TOKEN}"
     assert headers["user-agent"] == f"taskadence-python/{taskadence.__version__} python/{platform.python_version()}"
-    assert headers["taskadence-version"] == "2026-10-24"
+    assert headers["taskadence-version"] == "2026-11-06"
 
 
 def test_me_is_callable_and_typed(tm: Taskadence, api: respx.MockRouter) -> None:

@@ -26,12 +26,16 @@ class MeOrganization:
         role (str): Org role: owner · admin · member · guest
         name (None | str | Unset):
         designation (None | str | Unset):
+        state (None | str | Unset): active, restricted, read_only, locked or archived
+        state_since (None | str | Unset): When it entered that state
     """
 
     org_id: str
     role: str
     name: None | str | Unset = UNSET
     designation: None | str | Unset = UNSET
+    state: None | str | Unset = UNSET
+    state_since: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
     # taskadence: the response's `ETag` (set by the facade on single reads / writes). Not a property of the resource: it is
     # never serialized by `to_dict` nor read by `from_dict`, and it does not take part in equality.
@@ -54,6 +58,18 @@ class MeOrganization:
         else:
             designation = self.designation
 
+        state: None | str | Unset
+        if isinstance(self.state, Unset):
+            state = UNSET
+        else:
+            state = self.state
+
+        state_since: None | str | Unset
+        if isinstance(self.state_since, Unset):
+            state_since = UNSET
+        else:
+            state_since = self.state_since
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -66,6 +82,10 @@ class MeOrganization:
             field_dict["name"] = name
         if designation is not UNSET:
             field_dict["designation"] = designation
+        if state is not UNSET:
+            field_dict["state"] = state
+        if state_since is not UNSET:
+            field_dict["state_since"] = state_since
 
         return field_dict
 
@@ -94,11 +114,31 @@ class MeOrganization:
 
         designation = _parse_designation(d.pop("designation", UNSET))
 
+        def _parse_state(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        state = _parse_state(d.pop("state", UNSET))
+
+        def _parse_state_since(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
+
+        state_since = _parse_state_since(d.pop("state_since", UNSET))
+
         me_organization = cls(
             org_id=org_id,
             role=role,
             name=name,
             designation=designation,
+            state=state,
+            state_since=state_since,
         )
 
         me_organization.additional_properties = d

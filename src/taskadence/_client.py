@@ -7,8 +7,10 @@ from types import TracebackType
 
 import httpx
 
-from ._core import AsyncCore, SyncCore
+from . import _legal
+from ._core import AsyncCore, SyncCore, _Request
 from ._generated import models
+from ._legal import LegalNotice
 from ._operations import API_VERSION, DEFAULT_BASE_URL
 from .resources import AsyncResources, SyncResources
 
@@ -66,6 +68,12 @@ class Taskadence(SyncResources):
     @property
     def api_version(self) -> str:
         return self._core.api_version
+
+    def legal_notice(self) -> LegalNotice | None:
+        """The pending change to the Terms of Service and Privacy Policy (`.effective_date`, `.terms_url`,
+        `.privacy_url`, `.headline`), or None when no change is pending. Sent without your token: the route is public
+        and outside the API contract (`taskadence._legal`)."""
+        return _legal.parse(self._core._send(_Request("GET", _legal.PATH, [], {}, anonymous=True)))
 
     def close(self) -> None:
         """Close the HTTP connection pool (not an `http_client` you passed in)."""
@@ -126,6 +134,10 @@ class AsyncTaskadence(AsyncResources):
     def api_version(self) -> str:
         return self._core.api_version
 
+    async def legal_notice(self) -> LegalNotice | None:
+        """`Taskadence.legal_notice`, awaited."""
+        return _legal.parse(await self._core._send(_Request("GET", _legal.PATH, [], {}, anonymous=True)))
+
     async def close(self) -> None:
         await self._core.aclose()
 
@@ -141,4 +153,4 @@ class AsyncTaskadence(AsyncResources):
         return f"AsyncTaskadence(base_url={self.base_url!r})"
 
 
-__all__ = ["AsyncTaskadence", "Taskadence", "models"]
+__all__ = ["AsyncTaskadence", "LegalNotice", "Taskadence", "models"]

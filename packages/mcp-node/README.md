@@ -99,8 +99,9 @@ prefer the user-level file for a config that holds a token.
 
 ## Check it works
 
-Ask your assistant: *"Which TasKadence account and organization are you connected to?"* It should call the `whoami`
-tool (your client may ask you to allow it first) and answer with your name and your organization. Then try *"List my
+Ask your assistant: *"Who am I in TasKadence, and which organization are you connected to?"* It should call the
+`whoami` tool (your client may ask you to allow it first) and answer with your name and your organization (one whose
+billing owner has had no working card for 30 days is listed apart, under `organizations_locked`). Then try *"List my
 tasks that are in progress."*
 
 Your client also lists its MCP servers: `taskadence` should be there, connected, with its tools (in Claude Code, type

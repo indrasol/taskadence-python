@@ -1,36 +1,30 @@
 # `tm.account`
 
-Your account: one per email, any number of organizations, one shared storage pool.
+Removed in release 11: every operation here answers 410 Gone. An organization is now the top level.
 
 _Generated from `spec/openapi.public.json` by `scripts/generate.py`. Do not edit by hand._
 
-## `tm.account.read(if_none_match: str | None = None)`
+## `tm.account.read()`
 
-The caller's account: its organizations, the caller's account role and the storage pool.
+Removed in release 11: answers 410.
 
 - **HTTP:** `GET /v1/account`
 - **operationId:** `account.read`
-- **Token scope:** `account:read`
-- **Returns:** `AccountOut`
-- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Returns:** `None`
 
-## `tm.account.people(if_none_match: str | None = None)`
+## `tm.account.people()`
 
-Everyone in the account with their role in each organization (account owner / admin).
+Removed in release 11: answers 410.
 
 - **HTTP:** `GET /v1/account/people`
 - **operationId:** `account.people`
-- **Token scope:** `account:read`
-- **Returns:** `AccountPeople`
-- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Returns:** `None`
 
-## `tm.account.storage(if_none_match: str | None = None)`
+## `tm.account.storage()`
 
-The account's storage pool: totals and the per-organization breakdown.
+Removed in release 11: answers 410.
 
 - **HTTP:** `GET /v1/storage`
 - **operationId:** `account.storage`
-- **Token scope:** `account:read`
-- **Returns:** `AccountStorage`
-- **Conditional read:** `if_none_match=obj.etag` → `NotModified` when unchanged.
+- **Returns:** `None`
 - **Also:** `tm.storage.get` (same call).
