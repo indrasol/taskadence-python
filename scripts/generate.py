@@ -4,7 +4,8 @@
 
 1. `src/taskadence/_generated/`  openapi-python-client 0.29.1 (config `openapi-python-client.yaml`; two one-line
                                 template overrides in `templates/`: a model `etag` field, `Self` from typing_extensions
-                                for Python 3.10), a do-not-edit header on every file, `ruff format`;
+                                for Python 3.10), every `fromisoformat` routed through `_generated/_dt.py` (a `Z` and
+                                any fraction parse on 3.10), a do-not-edit header on every file, `ruff format`;
 2. `src/taskadence/_operations.py`  the facade's operation table: method, path, parameters, filters, body, list /
                                 create / If-Match / If-None-Match, scopes — and each operation's generated parser;
 3. `src/taskadence/resources.py`  `tm.<resource>.<verb>(…)` for every public operationId (sync and async), typed with
@@ -168,9 +169,63 @@ def generate_client(spec: dict[str, Any]) -> None:
             str(ROOT / "templates"),
             "--overwrite",
         )
+    route_datetimes()
     for path in sorted(GEN.rglob("*.py")):
         path.write_text(HEADER + path.read_text())
     run(bin_("ruff"), "format", "--quiet", "--no-respect-gitignore", "--config", "line-length=120", str(GEN))
+
+
+# The generated models parse with `datetime.datetime.fromisoformat` (inside a try/except that falls back to the raw
+# string). Python 3.10's accepts neither the `Z` the API sends nor a fraction other than 3 or 6 digits (Postgres trims
+# trailing zeros: `…:13.8361+00:00`), so on 3.10 every datetime field was a `str`. Every call goes through `_dt`.
+DT_MODULE = '''"""Datetime parsing for the generated models, the same on every supported Python (3.10 included)."""
+
+from __future__ import annotations
+
+import datetime
+import re
+
+_FRACTION = re.compile(r"(\\.\\d{1,6})\\d*(?=[+-]\\d{2}:\\d{2}$|$)")
+
+
+def parse_datetime(s: str) -> datetime.datetime:
+    """`datetime.datetime.fromisoformat`, plus what 3.10's refuses: a trailing `Z` / `z` (UTC) and a fraction of other
+    than 3 or 6 digits (padded, or cut, to microseconds)."""
+    if s.endswith(("Z", "z")):
+        s = s[:-1] + "+00:00"
+    s = _FRACTION.sub(lambda m: m.group(1).ljust(7, "0"), s, count=1)
+    return datetime.datetime.fromisoformat(s)
+
+
+def parse_date(s: str) -> datetime.date:
+    """`datetime.date.fromisoformat` (`YYYY-MM-DD` parses alike on every version); the one place to widen it."""
+    return datetime.date.fromisoformat(s)
+'''
+DT_CALLS = {"datetime.datetime.fromisoformat(": "parse_datetime", "datetime.date.fromisoformat(": "parse_date"}
+
+
+def route_datetimes() -> None:
+    """Write `_generated/_dt.py` and point every generated `fromisoformat` call at it (imported per module)."""
+    (GEN / "_dt.py").write_text(DT_MODULE)
+    for path in sorted(GEN.rglob("*.py")):
+        if path.name == "_dt.py":
+            continue
+        text = path.read_text()
+        used = sorted(name for call, name in DT_CALLS.items() if call in text)
+        if not used:
+            continue
+        for call, name in DT_CALLS.items():
+            text = text.replace(call, name + "(")
+        depth = len(path.relative_to(GEN).parts) - 1  # models/x.py imports `.._dt`
+        import_line = f"from {'.' * (depth + 1)}_dt import {', '.join(used)}\n"
+        if "\nimport datetime\n" not in text:
+            sys.exit(f"{path.relative_to(ROOT)}: parses datetimes but has no `import datetime` to put `_dt` beside")
+        path.write_text(text.replace("\nimport datetime\n", "\nimport datetime\n" + import_line, 1))
+    left = [
+        str(p.relative_to(ROOT)) for p in GEN.rglob("*.py") if p.name != "_dt.py" and "fromisoformat(" in p.read_text()
+    ]
+    if left:
+        sys.exit(f"`fromisoformat` left outside _generated/_dt.py (route it through _dt): {left}")
 
 
 # ---------------------------------------------------------------------------

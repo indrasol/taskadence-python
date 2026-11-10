@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 
 T = TypeVar("T", bound="SprintCreate")
@@ -109,7 +110,7 @@ class SprintCreate:
         d = dict(src_dict)
         name = d.pop("name")
 
-        start_date = datetime.date.fromisoformat(d.pop("start_date"))
+        start_date = parse_date(d.pop("start_date"))
 
         def _parse_description(data: object) -> None | str | Unset:
             if data is None:
@@ -137,7 +138,7 @@ class SprintCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                end_date_type_0 = datetime.date.fromisoformat(data)
+                end_date_type_0 = parse_date(data)
 
                 return end_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

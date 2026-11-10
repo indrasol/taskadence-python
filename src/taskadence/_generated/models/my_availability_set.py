@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 
 T = TypeVar("T", bound="MyAvailabilitySet")
@@ -69,9 +70,9 @@ class MyAvailabilitySet:
         d = dict(src_dict)
         org_id = d.pop("org_id")
 
-        start_date = datetime.date.fromisoformat(d.pop("start_date"))
+        start_date = parse_date(d.pop("start_date"))
 
-        end_date = datetime.date.fromisoformat(d.pop("end_date"))
+        end_date = parse_date(d.pop("end_date"))
 
         def _parse_note(data: object) -> None | str | Unset:
             if data is None:

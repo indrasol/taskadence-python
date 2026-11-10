@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="DesignationVisibility")
@@ -110,7 +111,7 @@ class DesignationVisibility:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

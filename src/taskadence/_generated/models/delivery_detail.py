@@ -15,6 +15,7 @@ from ..models.delivery_detail_status import DeliveryDetailStatus
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.delivery_detail_attempt_log_item import DeliveryDetailAttemptLogItem
@@ -256,7 +257,7 @@ class DeliveryDetail:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                next_attempt_at_type_0 = datetime.datetime.fromisoformat(data)
+                next_attempt_at_type_0 = parse_datetime(data)
 
                 return next_attempt_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -318,7 +319,7 @@ class DeliveryDetail:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -335,7 +336,7 @@ class DeliveryDetail:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                finished_at_type_0 = datetime.datetime.fromisoformat(data)
+                finished_at_type_0 = parse_datetime(data)
 
                 return finished_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

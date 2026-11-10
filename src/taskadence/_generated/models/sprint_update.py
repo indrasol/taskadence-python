@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 
 T = TypeVar("T", bound="SprintUpdate")
@@ -172,7 +173,7 @@ class SprintUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                start_date_type_0 = datetime.date.fromisoformat(data)
+                start_date_type_0 = parse_date(data)
 
                 return start_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -189,7 +190,7 @@ class SprintUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                end_date_type_0 = datetime.date.fromisoformat(data)
+                end_date_type_0 = parse_date(data)
 
                 return end_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

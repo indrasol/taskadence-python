@@ -15,6 +15,7 @@ from ..models.commit_type import CommitType
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="ReleaseNoteItem")
@@ -165,7 +166,7 @@ class ReleaseNoteItem:
 
         subject = d.pop("subject")
 
-        commit_date = datetime.datetime.fromisoformat(d.pop("commit_date"))
+        commit_date = parse_datetime(d.pop("commit_date"))
 
         def _parse_scope(data: object) -> None | str | Unset:
             if data is None:

@@ -14,6 +14,7 @@ from ..types import UNSET, Unset
 from typing import cast
 from uuid import UUID
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="OrganizationMemberInDB")
@@ -341,7 +342,7 @@ class OrganizationMemberInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                invited_at_type_0 = datetime.datetime.fromisoformat(data)
+                invited_at_type_0 = parse_datetime(data)
 
                 return invited_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -358,7 +359,7 @@ class OrganizationMemberInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                accepted_at_type_0 = datetime.datetime.fromisoformat(data)
+                accepted_at_type_0 = parse_datetime(data)
 
                 return accepted_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -384,7 +385,7 @@ class OrganizationMemberInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -401,7 +402,7 @@ class OrganizationMemberInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                deleted_at_type_0 = datetime.datetime.fromisoformat(data)
+                deleted_at_type_0 = parse_datetime(data)
 
                 return deleted_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -436,7 +437,7 @@ class OrganizationMemberInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_active_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_active_at_type_0 = parse_datetime(data)
 
                 return last_active_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

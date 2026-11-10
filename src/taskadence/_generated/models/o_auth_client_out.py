@@ -21,6 +21,7 @@ from ..models.o_auth_client_out_status import OAuthClientOutStatus
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="OAuthClientOut")
@@ -313,7 +314,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_used_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_used_at_type_0 = parse_datetime(data)
 
                 return last_used_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -330,7 +331,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                secret_rotated_at_type_0 = datetime.datetime.fromisoformat(data)
+                secret_rotated_at_type_0 = parse_datetime(data)
 
                 return secret_rotated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -347,7 +348,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                previous_secret_expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                previous_secret_expires_at_type_0 = parse_datetime(data)
 
                 return previous_secret_expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -373,7 +374,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -390,7 +391,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -407,7 +408,7 @@ class OAuthClientOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                revoked_at_type_0 = datetime.datetime.fromisoformat(data)
+                revoked_at_type_0 = parse_datetime(data)
 
                 return revoked_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

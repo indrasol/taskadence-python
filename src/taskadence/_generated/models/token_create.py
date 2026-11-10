@@ -16,6 +16,7 @@ from ..types import UNSET, Unset
 from typing import cast
 from uuid import UUID
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="TokenCreate")
@@ -151,7 +152,7 @@ class TokenCreate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                expires_at_type_0 = parse_datetime(data)
 
                 return expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

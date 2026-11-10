@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 if TYPE_CHECKING:
     from ..models.audit_export_row_after_type_0 import AuditExportRowAfterType0
@@ -203,7 +204,7 @@ class AuditExportRow:
         if isinstance(_created_at, Unset):
             created_at = UNSET
         else:
-            created_at = datetime.datetime.fromisoformat(_created_at)
+            created_at = parse_datetime(_created_at)
 
         org_id = d.pop("org_id", UNSET)
 

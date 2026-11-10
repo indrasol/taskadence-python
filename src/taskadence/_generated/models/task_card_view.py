@@ -19,6 +19,7 @@ from ..models.task_type_enum import TaskTypeEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date, parse_datetime
 
 if TYPE_CHECKING:
     from ..models.task_card_view_metadata_type_0_item import TaskCardViewMetadataType0Item
@@ -574,7 +575,7 @@ class TaskCardView:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -589,7 +590,7 @@ class TaskCardView:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -700,7 +701,7 @@ class TaskCardView:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                start_date_type_0 = datetime.date.fromisoformat(data)
+                start_date_type_0 = parse_date(data)
 
                 return start_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -717,7 +718,7 @@ class TaskCardView:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                due_date_type_0 = datetime.date.fromisoformat(data)
+                due_date_type_0 = parse_date(data)
 
                 return due_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -922,7 +923,7 @@ class TaskCardView:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                reviewed_at_type_0 = datetime.datetime.fromisoformat(data)
+                reviewed_at_type_0 = parse_datetime(data)
 
                 return reviewed_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

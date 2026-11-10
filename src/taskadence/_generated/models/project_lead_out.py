@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="ProjectLeadOut")
@@ -109,7 +110,7 @@ class ProjectLeadOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                assigned_at_type_0 = datetime.datetime.fromisoformat(data)
+                assigned_at_type_0 = parse_datetime(data)
 
                 return assigned_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

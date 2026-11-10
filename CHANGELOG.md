@@ -63,6 +63,11 @@ methods, models, fields and exceptions are removed, and the API stops serving th
   total.
 - The `account:read` and `account:write` scopes are still accepted and grant nothing.
 
+### Fixed
+- Datetimes ending in `Z` are parsed on Python 3.10 (were left as strings). Every generated model now parses through
+  `_generated/_dt.parse_datetime`, which also reads a fraction of other than 3 or 6 digits there; a required
+  datetime field (`TaskInDB.created_at`) sent with a `Z` no longer raises on 3.10.
+
 ### Not in the SDK
 Creating an organization, billing (the card, this month so far, invoices, the billing email) and handing billing to
 another owner stay out of the SDK: the API keeps those routes for a signed-in session and refuses every access token on

@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date, parse_datetime
 
 if TYPE_CHECKING:
     from ..models.goal_moved_tasks_type_0_item import GoalMovedTasksType0Item
@@ -233,7 +234,7 @@ class GoalMoved:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                target_date_type_0 = datetime.date.fromisoformat(data)
+                target_date_type_0 = parse_date(data)
 
                 return target_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -263,7 +264,7 @@ class GoalMoved:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                closed_at_type_0 = datetime.datetime.fromisoformat(data)
+                closed_at_type_0 = parse_datetime(data)
 
                 return closed_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -316,7 +317,7 @@ class GoalMoved:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -333,7 +334,7 @@ class GoalMoved:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

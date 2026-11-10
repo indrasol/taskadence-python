@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date, parse_datetime
 
 
 T = TypeVar("T", bound="SprintOut")
@@ -215,9 +216,9 @@ class SprintOut:
 
         name = d.pop("name")
 
-        start_date = datetime.date.fromisoformat(d.pop("start_date"))
+        start_date = parse_date(d.pop("start_date"))
 
-        end_date = datetime.date.fromisoformat(d.pop("end_date"))
+        end_date = parse_date(d.pop("end_date"))
 
         def _parse_description(data: object) -> None | str | Unset:
             if data is None:
@@ -247,7 +248,7 @@ class SprintOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                completed_at_type_0 = datetime.datetime.fromisoformat(data)
+                completed_at_type_0 = parse_datetime(data)
 
                 return completed_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -291,7 +292,7 @@ class SprintOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -308,7 +309,7 @@ class SprintOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

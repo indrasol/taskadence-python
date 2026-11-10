@@ -15,6 +15,7 @@ from ..models.invite_status_enum import InviteStatusEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="OrganizationInviteInDB")
@@ -292,7 +293,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                sent_at_type_0 = datetime.datetime.fromisoformat(data)
+                sent_at_type_0 = parse_datetime(data)
 
                 return sent_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -309,7 +310,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                expires_at_type_0 = parse_datetime(data)
 
                 return expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -335,7 +336,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                cancel_date_type_0 = datetime.datetime.fromisoformat(data)
+                cancel_date_type_0 = parse_datetime(data)
 
                 return cancel_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -370,7 +371,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -387,7 +388,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -413,7 +414,7 @@ class OrganizationInviteInDB:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                accepted_at_type_0 = datetime.datetime.fromisoformat(data)
+                accepted_at_type_0 = parse_datetime(data)
 
                 return accepted_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

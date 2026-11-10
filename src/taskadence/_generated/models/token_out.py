@@ -19,6 +19,7 @@ from ..models.token_out_status import TokenOutStatus
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_datetime
 
 
 T = TypeVar("T", bound="TokenOut")
@@ -301,7 +302,7 @@ class TokenOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                expires_at_type_0 = datetime.datetime.fromisoformat(data)
+                expires_at_type_0 = parse_datetime(data)
 
                 return expires_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -318,7 +319,7 @@ class TokenOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                last_used_at_type_0 = datetime.datetime.fromisoformat(data)
+                last_used_at_type_0 = parse_datetime(data)
 
                 return last_used_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -337,7 +338,7 @@ class TokenOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                revoked_at_type_0 = datetime.datetime.fromisoformat(data)
+                revoked_at_type_0 = parse_datetime(data)
 
                 return revoked_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -381,7 +382,7 @@ class TokenOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                created_at_type_0 = datetime.datetime.fromisoformat(data)
+                created_at_type_0 = parse_datetime(data)
 
                 return created_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -398,7 +399,7 @@ class TokenOut:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                updated_at_type_0 = datetime.datetime.fromisoformat(data)
+                updated_at_type_0 = parse_datetime(data)
 
                 return updated_at_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

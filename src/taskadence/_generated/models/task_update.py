@@ -19,6 +19,7 @@ from ..models.task_type_enum import TaskTypeEnum
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 if TYPE_CHECKING:
     from ..models.task_update_metadata_type_0_item import TaskUpdateMetadataType0Item
@@ -378,7 +379,7 @@ class TaskUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                start_date_type_0 = datetime.date.fromisoformat(data)
+                start_date_type_0 = parse_date(data)
 
                 return start_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
@@ -395,7 +396,7 @@ class TaskUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                due_date_type_0 = datetime.date.fromisoformat(data)
+                due_date_type_0 = parse_date(data)
 
                 return due_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

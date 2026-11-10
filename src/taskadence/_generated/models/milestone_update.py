@@ -13,6 +13,7 @@ from ..types import UNSET, Unset
 from ..types import UNSET, Unset
 from typing import cast
 import datetime
+from .._dt import parse_date
 
 
 T = TypeVar("T", bound="MilestoneUpdate")
@@ -114,7 +115,7 @@ class MilestoneUpdate:
             try:
                 if not isinstance(data, str):
                     raise TypeError()
-                target_date_type_0 = datetime.date.fromisoformat(data)
+                target_date_type_0 = parse_date(data)
 
                 return target_date_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
